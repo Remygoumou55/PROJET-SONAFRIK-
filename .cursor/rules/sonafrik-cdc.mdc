@@ -1,0 +1,39 @@
+---
+description: Règles SONAFRIK CDC V9.0 — source unique de vérité développement
+alwaysApply: true
+---
+
+# SONAFRIK — CDC V9.0
+
+Référence : `docs/CDC-v9.0.md`
+
+## Stack (non négociable)
+
+- Mobile : React Native + Expo + TypeScript + Expo Router
+- Web : Next.js 15 + Tailwind + Shadcn (Sprint 1+)
+- Backend : Supabase uniquement — **pas MongoDB, pas NestJS**
+- Monorepo Turborepo, packages `@sonafrik/*`
+
+## Design
+
+- Fond `#0D0D0D` toujours · Vert = action · Or = premium
+- Police Montserrat · Bottom nav : Accueil · Explorer · Bibliothèque · Profil
+- Animations max 300ms
+
+## Code
+
+- TypeScript strict, jamais `any` · Zod sur inputs · RLS partout
+- Repository + Service Layer · Pas de logique métier dans React Native
+- Edge Functions pour opérations financières
+- Tests unitaires obligatoires modules financiers
+
+## Interdit
+
+- Barre player cliquable · URL audio directe côté client
+- UPDATE/DELETE sur `audit_logs` et `wallet_ledger`
+- Awards / Beat Store / Marketplace avant MVP validé
+- Modifier logo CA ou palette officielle
+
+## Sprints
+
+Ordre strict Sprint 0→13. Ne pas avancer si `pnpm build lint typecheck` échoue.

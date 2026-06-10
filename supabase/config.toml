@@ -1,0 +1,16 @@
+# Sprint 2+ : supabase init et migrations
+
+[project]
+id = "sonafrik"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323

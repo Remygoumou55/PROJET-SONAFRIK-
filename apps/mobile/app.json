@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "SONAFRIK",
+    "slug": "sonafrik",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "scheme": "sonafrik",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0D0D0D"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sonafrik.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D0D0D"
+      },
+      "package": "com.sonafrik.app"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
