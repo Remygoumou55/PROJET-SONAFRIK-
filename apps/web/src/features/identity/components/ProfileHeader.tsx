@@ -10,10 +10,10 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ context, avatarUrl }: ProfileHeaderProps) {
   const { profile, roles, unreadNotifications, activeSessions } = context;
-  const displayName = profile.full_name ?? profile.phone ?? "Utilisateur";
+  const displayName = profile.full_name ?? profile.phone ?? "Utilisateur SONAFRIK";
   const accountLabel =
     ACCOUNT_TYPE_OPTIONS.find((option) => option.value === profile.account_type)?.label ??
-    profile.account_type;
+    "Auditeur";
 
   return (
     <Card>

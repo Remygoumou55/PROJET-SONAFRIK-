@@ -25,14 +25,9 @@ export async function requireIdentityContext() {
     if (err instanceof IdentityError && err.code === "profile_not_found") {
       redirect("/auth/inscription");
     }
-    // Vérifier la session avant de décider
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      redirect("/auth/connexion");
-    }
-    // Utilisateur connecté mais données incomplètes → error boundary
-    throw err;
+    redirect(user ? "/auth/inscription" : "/auth/connexion");
   }
 }
 

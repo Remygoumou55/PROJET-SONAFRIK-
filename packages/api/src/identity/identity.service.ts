@@ -8,6 +8,14 @@ import type {
   UserSession,
 } from "@sonafrik/types";
 import { IdentityError } from "./errors";
+import { IdentityRepository } from "./identity.repository";
+import {
+  avatarUploadRequestSchema,
+  updatePreferencesSchema,
+  updateProfileSchema,
+  type UpdatePreferencesInput,
+  type UpdateProfileInput,
+} from "./schemas";
 
 function makeDefaultPreferences(userId: string): UserPreferences {
   const now = new Date().toISOString();
@@ -33,14 +41,6 @@ function makeDefaultPreferences(userId: string): UserPreferences {
     updated_at: now,
   };
 }
-import { IdentityRepository } from "./identity.repository";
-import {
-  avatarUploadRequestSchema,
-  updatePreferencesSchema,
-  updateProfileSchema,
-  type UpdatePreferencesInput,
-  type UpdateProfileInput,
-} from "./schemas";
 
 export class IdentityService {
   private readonly repository: IdentityRepository;
@@ -63,7 +63,7 @@ export class IdentityService {
     // Les queries non-critiques (rôles, notifs, sessions) ne doivent jamais
     // crasher la page — elles retournent des valeurs sûres en cas d'erreur RLS
     const [profile, preferences, roles, unreadNotifications, sessions] = await Promise.all([
-      this.repository.getProfile(userId),
+      this.repository.getProfile(userId).catch(() => null),
       this.repository.getPreferences(userId).catch(() => null),
       this.repository.getUserRoles(userId).catch((): UserRole[] => []),
       this.repository.getUnreadCount(userId).catch(() => 0),
