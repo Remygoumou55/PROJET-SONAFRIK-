@@ -113,7 +113,11 @@ export class AuthService {
       error,
     } = await this.client.auth.getUser();
 
-    if (error) throw mapSupabaseAuthError(error);
+    // AuthSessionMissingError = visiteur anonyme — comportement normal, pas une erreur
+    if (error) {
+      if (error.message?.includes("Auth session missing")) return null;
+      throw mapSupabaseAuthError(error);
+    }
     if (!user) return null;
 
     return this.repository.getProfile(user.id);
