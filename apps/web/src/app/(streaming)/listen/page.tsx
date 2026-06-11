@@ -221,7 +221,7 @@ export default async function ListenPage() {
           </div>
           <div className="min-w-0">
             <p className="font-bold text-sm" style={{ color: "#FFFFFF" }}>
-              Commencer l'écoute
+              Commencer l&apos;écoute
             </p>
             <p className="text-xs mt-0.5" style={{ color: "#A0A0A0" }}>
               Recherchez un morceau pour démarrer

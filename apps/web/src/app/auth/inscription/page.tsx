@@ -47,7 +47,7 @@ export default function InscriptionPage() {
           setStep("profile");
         });
     });
-  }, []);
+  }, [router]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);
@@ -172,7 +172,7 @@ export default function InscriptionPage() {
               </p>
             )}
             <Button type="submit" fullWidth isLoading={loading} disabled={!accountType || loading}>
-              Terminer l'inscription
+              Terminer l&apos;inscription
             </Button>
           </form>
         )}
