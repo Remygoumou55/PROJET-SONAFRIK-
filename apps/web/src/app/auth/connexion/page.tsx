@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
@@ -45,7 +46,17 @@ export default function ConnexionPage() {
           <p className="mt-1 text-sm text-texte-secondaire">Entrez votre numéro pour recevoir un code SMS</p>
         </header>
 
-        {step === "phone" && <PhoneForm onSubmit={handlePhoneSubmit} submitLabel="Envoyer le code" />}
+        {step === "phone" && (
+          <>
+            <PhoneForm onSubmit={handlePhoneSubmit} submitLabel="Envoyer le code" />
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+              <span className="text-xs" style={{ color: "#555555" }}>ou</span>
+              <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+            </div>
+            <GoogleAuthButton label="Se connecter avec Google" />
+          </>
+        )}
 
         {step === "otp" && (
           <OtpForm

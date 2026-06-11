@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AccountType } from "@sonafrik/types";
 import { Button, Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
 import { AccountTypeSelector } from "@/features/auth/components/AccountTypeSelector";
+import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Step = "role" | "phone" | "otp" | "profile";
 
@@ -22,6 +24,20 @@ export default function InscriptionPage() {
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+
+  // Détecte une session Google existante (retour du callback OAuth sans onboarding)
+  useEffect(() => {
+    getSupabaseBrowserClient()
+      .auth.getSession()
+      .then(({ data: { session } }) => {
+        if (session?.user && step === "role") {
+          setIsGoogleUser(true);
+          const googleName = session.user.user_metadata?.full_name as string | undefined;
+          if (googleName) setFullName(googleName);
+        }
+      });
+  }, []);
 
   async function handlePhoneSubmit(p: string) {
     setPhone(p);
@@ -68,9 +84,24 @@ export default function InscriptionPage() {
         {step === "role" && (
           <>
             <AccountTypeSelector value={accountType} onChange={setAccountType} />
-            <Button fullWidth disabled={!accountType} onClick={() => setStep("phone")}>
+            <Button
+              fullWidth
+              disabled={!accountType}
+              onClick={() => setStep(isGoogleUser ? "profile" : "phone")}
+            >
               Continuer
             </Button>
+
+            {!isGoogleUser && (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+                  <span className="text-xs" style={{ color: "#555555" }}>ou</span>
+                  <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+                </div>
+                <GoogleAuthButton label="S'inscrire avec Google" />
+              </>
+            )}
           </>
         )}
 
