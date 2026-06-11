@@ -47,17 +47,25 @@ export function useLibrary() {
 
   const createPlaylist = useCallback(
     async (title: string, description?: string) => {
-      const playlist = await streaming.createPlaylist({ title, description, isPublic: false });
-      await loadLibrary();
-      return playlist;
+      try {
+        const playlist = await streaming.createPlaylist({ title, description, isPublic: false });
+        await loadLibrary();
+        return playlist;
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de créer la playlist.");
+      }
     },
     [streaming, loadLibrary],
   );
 
   const deletePlaylist = useCallback(
     async (playlistId: string) => {
-      await streaming.deletePlaylist(playlistId);
-      await loadLibrary();
+      try {
+        await streaming.deletePlaylist(playlistId);
+        await loadLibrary();
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de supprimer la playlist.");
+      }
     },
     [streaming, loadLibrary],
   );

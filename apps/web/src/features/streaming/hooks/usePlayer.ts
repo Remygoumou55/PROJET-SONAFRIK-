@@ -35,11 +35,15 @@ export function usePlayer() {
 
   const loadAndPlay = useCallback(
     async (track: TrackWithMeta): Promise<void> => {
-      const result = await streaming.startStream({
-        trackId: track.id,
-        platform: "web",
-      });
-      player.play(track, result.signedUrl, result.sessionId, result.durationSeconds);
+      try {
+        const result = await streaming.startStream({
+          trackId: track.id,
+          platform: "web",
+        });
+        player.play(track, result.signedUrl, result.sessionId, result.durationSeconds);
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de démarrer la lecture.");
+      }
     },
     [streaming, player],
   );

@@ -10,6 +10,7 @@ export function useSearch() {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchIdRef = useRef(0);
 
   const search = useCallback(
     (query: string) => {
@@ -21,16 +22,23 @@ export function useSearch() {
       }
 
       debounceRef.current = setTimeout(async () => {
+        const currentId = ++searchIdRef.current;
         setIsSearching(true);
         setError(null);
         try {
           const data = await streaming.search({ query, limit: 20 });
-          setResults(data);
+          if (currentId === searchIdRef.current) {
+            setResults(data);
+          }
         } catch {
-          setError("Recherche indisponible.");
-          setResults(null);
+          if (currentId === searchIdRef.current) {
+            setError("Recherche indisponible.");
+            setResults(null);
+          }
         } finally {
-          setIsSearching(false);
+          if (currentId === searchIdRef.current) {
+            setIsSearching(false);
+          }
         }
       }, 300);
     },
@@ -39,8 +47,10 @@ export function useSearch() {
 
   const clearSearch = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    searchIdRef.current++;
     setResults(null);
     setError(null);
+    setIsSearching(false);
   }, []);
 
   useEffect(() => {

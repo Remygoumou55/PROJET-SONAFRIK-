@@ -40,9 +40,13 @@ export function useWallet() {
   }, [loadContext]);
 
   const subscribePremium = useCallback(async (input: SubscribePremiumInput) => {
-    const result = await service.subscribePremium(input);
-    await loadContext();
-    return result;
+    try {
+      const result = await service.subscribePremium(input);
+      await loadContext();
+      return result;
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Échec de l'abonnement.");
+    }
   }, [service, loadContext]);
 
   return { context, isLoading, error, subscribePremium, reload: loadContext };
@@ -52,24 +56,32 @@ export function useTransactions() {
   const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    service.getTransactions(20).then(setTransactions).finally(() => setIsLoading(false));
+    service.getTransactions(20)
+      .then(setTransactions)
+      .catch(() => setError("Impossible de charger les transactions."))
+      .finally(() => setIsLoading(false));
   }, [service]);
 
-  return { transactions, isLoading };
+  return { transactions, isLoading, error };
 }
 
 export function useWithdrawals() {
   const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    service.getWithdrawals().then(setWithdrawals).finally(() => setIsLoading(false));
+    service.getWithdrawals()
+      .then(setWithdrawals)
+      .catch(() => setError("Impossible de charger les retraits."))
+      .finally(() => setIsLoading(false));
   }, [service]);
 
-  return { withdrawals, isLoading };
+  return { withdrawals, isLoading, error };
 }
 
 export function usePayoutAccounts() {
@@ -87,13 +99,21 @@ export function usePayoutAccounts() {
   useEffect(() => { reload(); }, [reload]);
 
   const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
-    await service.addPayoutAccount(input);
-    await reload();
+    try {
+      await service.addPayoutAccount(input);
+      await reload();
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
+    }
   }, [service, reload]);
 
   const removeAccount = useCallback(async (id: string) => {
-    await service.removePayoutAccount(id);
-    await reload();
+    try {
+      await service.removePayoutAccount(id);
+      await reload();
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
+    }
   }, [service, reload]);
 
   return { accounts, isLoading, addAccount, removeAccount, reload };
@@ -111,10 +131,14 @@ export function useRoyalties() {
   const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
   const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    service.getRoyaltyCalculations().then(setRoyalties).finally(() => setIsLoading(false));
+    service.getRoyaltyCalculations()
+      .then(setRoyalties)
+      .catch(() => setError("Impossible de charger les royalties."))
+      .finally(() => setIsLoading(false));
   }, [service]);
 
-  return { royalties, isLoading };
+  return { royalties, isLoading, error };
 }

@@ -15,27 +15,38 @@ export default function ConnexionPage() {
   const auth = useAuthService();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function handlePhoneSubmit(p: string) {
-    setPhone(p);
-    await auth.requestOtp({ phone: p });
-    setStep("otp");
+    setError(null);
+    try {
+      setPhone(p);
+      await auth.requestOtp({ phone: p });
+      setStep("otp");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible d'envoyer le code. Réessayez.");
+    }
   }
 
   async function handleOtpSubmit(token: string) {
-    const { profile } = await auth.verifyOtp({ phone, token });
+    setError(null);
+    try {
+      const { profile } = await auth.verifyOtp({ phone, token });
 
-    if (!profile?.onboarding_completed) {
-      router.push("/auth/inscription");
-      return;
+      if (!profile?.onboarding_completed) {
+        router.push("/auth/inscription");
+        return;
+      }
+
+      auth.registerCurrentSession({
+        platform: "web",
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      }).catch(() => {});
+
+      router.push("/listen");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Code invalide. Réessayez.");
     }
-
-    auth.registerCurrentSession({
-      platform: "web",
-      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-    }).catch(console.error);
-
-    router.push("/listen");
   }
 
   return (
@@ -74,6 +85,10 @@ export default function ConnexionPage() {
             onSubmit={handleOtpSubmit}
             onResend={() => auth.requestOtp({ phone })}
           />
+        )}
+
+        {error && (
+          <p className="text-center text-sm" style={{ color: "#FF4D4F" }}>{error}</p>
         )}
 
         <p className="text-center text-sm text-texte-secondaire">
