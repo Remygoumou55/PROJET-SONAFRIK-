@@ -80,8 +80,10 @@ export default function InscriptionPage() {
       }).catch(() => {});
       router.push("/profile");
     } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("[inscription] handleProfileSubmit error:", err);
+      console.error("[inscription] handleProfileSubmit error:", err);
+      if (err && typeof err === "object") {
+        const { message, code, details, hint, status } = err as Record<string, unknown>;
+        console.error("[inscription] Supabase error details:", { message, code, details, hint, status });
       }
       setError(err instanceof AuthError ? err.message : "Erreur lors de l'inscription. Veuillez réessayer.");
     } finally {

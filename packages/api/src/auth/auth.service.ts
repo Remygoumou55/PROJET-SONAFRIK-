@@ -78,14 +78,22 @@ export class AuthService {
 
     // assignRole et logAudit sont non-bloquants : le profil est déjà mis à jour.
     // Une RPC manquante en prod ne doit pas empêcher l'utilisateur d'accéder à l'app.
-    await this.repository.assignRole(userId, parsed.data.accountType).catch(() => {
-      // Non-bloquant : RPC peut être indisponible en preview deploy
+    await this.repository.assignRole(userId, parsed.data.accountType).catch((err) => {
+      console.error("[auth] assignRole error:", err);
+      if (err && typeof err === "object") {
+        const { message, code, details, hint, status } = err as Record<string, unknown>;
+        console.error("[auth] assignRole Supabase details:", { message, code, details, hint, status });
+      }
     });
 
     await this.repository.logAudit("auth.onboarding.completed", "profiles", userId, {
       account_type: parsed.data.accountType,
-    }).catch(() => {
-      // Non-bloquant
+    }).catch((err) => {
+      console.error("[auth] logAudit error:", err);
+      if (err && typeof err === "object") {
+        const { message, code, details, hint, status } = err as Record<string, unknown>;
+        console.error("[auth] logAudit Supabase details:", { message, code, details, hint, status });
+      }
     });
 
     return profile;
