@@ -13,30 +13,41 @@ import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-type Step = "role" | "phone" | "otp" | "profile";
+type Step = "phone" | "otp" | "profile";
 
 export default function InscriptionPage() {
   const router = useRouter();
   const auth = useAuthService();
-  const [step, setStep] = useState<Step>("role");
+  const [step, setStep] = useState<Step>("phone");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isGoogleUser, setIsGoogleUser] = useState(false);
 
-  // Détecte une session Google existante (retour du callback OAuth sans onboarding)
+  // Retour du callback Google OAuth : session déjà établie, compléter l'onboarding
   useEffect(() => {
-    getSupabaseBrowserClient()
-      .auth.getSession()
-      .then(({ data: { session } }) => {
-        if (session?.user && step === "role") {
-          setIsGoogleUser(true);
-          const googleName = session.user.user_metadata?.full_name as string | undefined;
-          if (googleName) setFullName(googleName);
-        }
-      });
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+
+      // Vérifier si l'onboarding est déjà complété (reconnexion Google)
+      supabase
+        .from("profiles")
+        .select("onboarding_completed, full_name")
+        .eq("id", user.id)
+        .single()
+        .then(({ data: profile }) => {
+          if (profile?.onboarding_completed) {
+            router.push("/");
+            return;
+          }
+          // Nouveau compte Google → pré-remplir le nom et passer au profil
+          const name = (profile?.full_name ?? user.user_metadata?.full_name) as string | undefined;
+          if (name) setFullName(name);
+          setStep("profile");
+        });
+    });
   }, []);
 
   async function handlePhoneSubmit(p: string) {
@@ -81,31 +92,17 @@ export default function InscriptionPage() {
           <p className="mt-1 text-sm text-texte-secondaire">NOTRE BIEN COMMUN</p>
         </header>
 
-        {step === "role" && (
+        {step === "phone" && (
           <>
-            <AccountTypeSelector value={accountType} onChange={setAccountType} />
-            <Button
-              fullWidth
-              disabled={!accountType}
-              onClick={() => setStep(isGoogleUser ? "profile" : "phone")}
-            >
-              Continuer
-            </Button>
-
-            {!isGoogleUser && (
-              <>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
-                  <span className="text-xs" style={{ color: "#555555" }}>ou</span>
-                  <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
-                </div>
-                <GoogleAuthButton label="S'inscrire avec Google" />
-              </>
-            )}
+            <PhoneForm onSubmit={handlePhoneSubmit} />
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+              <span className="text-xs" style={{ color: "#555555" }}>ou</span>
+              <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+            </div>
+            <GoogleAuthButton label="S'inscrire avec Google" />
           </>
         )}
-
-        {step === "phone" && <PhoneForm onSubmit={handlePhoneSubmit} />}
 
         {step === "otp" && (
           <OtpForm
@@ -116,7 +113,8 @@ export default function InscriptionPage() {
         )}
 
         {step === "profile" && (
-          <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleProfileSubmit} className="flex flex-col gap-5">
+            <AccountTypeSelector value={accountType} onChange={setAccountType} />
             <Input
               label="Nom complet"
               placeholder="Votre nom"
@@ -124,12 +122,12 @@ export default function InscriptionPage() {
               onChange={(e) => setFullName(e.target.value)}
               required
             />
-            {error ? (
+            {error && (
               <p className="text-sm text-red-500" role="alert">
                 {error}
               </p>
-            ) : null}
-            <Button type="submit" fullWidth isLoading={loading}>
+            )}
+            <Button type="submit" fullWidth isLoading={loading} disabled={!accountType}>
               Terminer l'inscription
             </Button>
           </form>

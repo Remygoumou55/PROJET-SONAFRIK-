@@ -70,7 +70,15 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Utilisateur connecté sur une route auth → redirection profil
-  if (user && pathname.startsWith(AUTH_PREFIX) && pathname !== `${AUTH_PREFIX}/`) {
+  // Exceptions : /auth/callback (échange code OAuth) et /auth/inscription
+  // (nouvel utilisateur Google sans onboarding doit compléter son profil)
+  const AUTH_PASSTHROUGH = ["/auth/callback", "/auth/inscription"];
+  if (
+    user &&
+    pathname.startsWith(AUTH_PREFIX) &&
+    pathname !== `${AUTH_PREFIX}/` &&
+    !AUTH_PASSTHROUGH.includes(pathname)
+  ) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/profile";
     redirectUrl.search = "";

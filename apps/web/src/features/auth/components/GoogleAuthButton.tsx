@@ -16,10 +16,14 @@ export function GoogleAuthButton({ label = "Continuer avec Google" }: GoogleAuth
     setError(null);
     const supabase = getSupabaseBrowserClient();
 
+    // NEXT_PUBLIC_APP_URL fixe l'URL stable (prod Vercel) pour éviter que les
+    // URLs de preview changeantes soient rejetées par Supabase Redirect URLs
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${appUrl}/auth/callback`,
       },
     });
 
