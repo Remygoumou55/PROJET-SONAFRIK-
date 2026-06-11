@@ -39,7 +39,19 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
 
       {/* Historique par cycle */}
       {isLoading ? (
-        <div className="py-8 text-center" style={{ color: "#555555" }}>Chargement…</div>
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 70}ms` }}>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1.5">
+                  <div className="h-3.5 w-32 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-3 w-48 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                </div>
+                <div className="h-6 w-16 rounded-full" style={{ backgroundColor: "#2A2A2A" }} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : royalties.length === 0 ? (
         <div className="py-10 text-center rounded-xl" style={{ backgroundColor: "#1F1F1F" }}>
           <p className="text-2xl mb-2">🎵</p>

@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import type { IdentityContext } from "@sonafrik/types";

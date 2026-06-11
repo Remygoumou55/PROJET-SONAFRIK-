@@ -130,7 +130,17 @@ export const PayoutPage = memo(function PayoutPage() {
         )}
 
         {accountsLoading ? (
-          <div className="py-8 text-center" style={{ color: "#555555" }}>Chargement…</div>
+          <div className="space-y-2">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}>
+                <div className="w-10 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: "#2A2A2A" }} />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3.5 w-32 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : accounts.length === 0 ? (
           <div className="py-8 text-center rounded-xl" style={{ backgroundColor: "#1F1F1F" }}>
             <p className="text-2xl mb-2">🏦</p>
@@ -220,7 +230,17 @@ export const PayoutPage = memo(function PayoutPage() {
       <section>
         <h2 className="text-base font-semibold mb-4" style={{ color: "#FFFFFF" }}>Historique des retraits</h2>
         {withdrawalsLoading ? (
-          <div className="py-4 text-center" style={{ color: "#555555" }}>Chargement…</div>
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 70}ms` }}>
+                <div className="space-y-1.5">
+                  <div className="h-3.5 w-28 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                </div>
+                <div className="h-6 w-16 rounded-full" style={{ backgroundColor: "#2A2A2A" }} />
+              </div>
+            ))}
+          </div>
         ) : withdrawals.length === 0 ? (
           <p className="text-sm" style={{ color: "#A0A0A0" }}>Aucun retrait.</p>
         ) : (
