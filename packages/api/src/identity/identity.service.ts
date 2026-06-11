@@ -43,11 +43,17 @@ export class IdentityService {
     ]);
 
     if (!profile) throw new IdentityError("profile_not_found");
-    if (!preferences) throw new IdentityError("preferences_not_found");
+
+    // user_preferences peut manquer pour les utilisateurs OAuth (Google) si le
+    // trigger handle_new_user_preferences n'a pas encore été exécuté — créer
+    // la ligne avec les valeurs par défaut plutôt que d'interrompre le rendu
+    const resolvedPreferences =
+      preferences ??
+      (await this.repository.upsertDefaultPreferences(userId));
 
     return {
       profile,
-      preferences,
+      preferences: resolvedPreferences,
       roles,
       unreadNotifications,
       activeSessions: sessions.length,

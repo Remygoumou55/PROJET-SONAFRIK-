@@ -8,9 +8,7 @@ const nextConfig: NextConfig = {
     "@sonafrik/api",
     "@sonafrik/database",
   ],
-  experimental: {
-    optimizePackageImports: ["@sonafrik/ui", "@sonafrik/types"],
-  },
+  experimental: {},
   async headers() {
     return [
       {

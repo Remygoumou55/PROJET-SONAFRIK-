@@ -66,6 +66,17 @@ export class IdentityRepository {
     return data as UserPreferences | null;
   }
 
+  async upsertDefaultPreferences(userId: string): Promise<UserPreferences> {
+    const { data, error } = await this.client
+      .from("user_preferences")
+      .upsert({ user_id: userId, updated_by: userId }, { onConflict: "user_id" })
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return data as UserPreferences;
+  }
+
   async updatePreferences(
     userId: string,
     updates: Partial<
