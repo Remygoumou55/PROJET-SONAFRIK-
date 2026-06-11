@@ -30,12 +30,12 @@ export default function ConnexionPage() {
       return;
     }
 
-    await auth.registerCurrentSession({
+    auth.registerCurrentSession({
       platform: "web",
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-    });
+    }).catch(console.error);
 
-    router.push("/profile");
+    router.push("/listen");
   }
 
   return (

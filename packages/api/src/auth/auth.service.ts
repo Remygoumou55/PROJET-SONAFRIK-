@@ -76,10 +76,16 @@ export class AuthService {
       parsed.data.fullName,
     );
 
-    await this.repository.assignRole(userId, parsed.data.accountType);
+    // assignRole et logAudit sont non-bloquants : le profil est déjà mis à jour.
+    // Une RPC manquante en prod ne doit pas empêcher l'utilisateur d'accéder à l'app.
+    await this.repository.assignRole(userId, parsed.data.accountType).catch(() => {
+      // Non-bloquant : RPC peut être indisponible en preview deploy
+    });
 
     await this.repository.logAudit("auth.onboarding.completed", "profiles", userId, {
       account_type: parsed.data.accountType,
+    }).catch(() => {
+      // Non-bloquant
     });
 
     return profile;

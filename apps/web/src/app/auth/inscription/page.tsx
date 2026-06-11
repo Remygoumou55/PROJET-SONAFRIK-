@@ -72,11 +72,13 @@ export default function InscriptionPage() {
     setLoading(true);
     try {
       await auth.completeOnboardingForCurrentUser({ accountType, fullName });
-      await auth.registerCurrentSession({
+      // Non-bloquant : l'échec de l'enregistrement de session ne doit pas
+      // empêcher l'utilisateur d'accéder à l'application.
+      auth.registerCurrentSession({
         platform: "web",
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-      });
-      router.push("/");
+      }).catch(console.error);
+      router.push("/listen");
     } catch (err) {
       setError(err instanceof AuthError ? err.message : "Erreur lors de l'inscription.");
     } finally {
