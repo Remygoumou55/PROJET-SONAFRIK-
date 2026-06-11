@@ -22,7 +22,6 @@ export default function InscriptionPage() {
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   // Retour du callback Google OAuth : session déjà établie, compléter l'onboarding
   useEffect(() => {
@@ -67,35 +66,27 @@ export default function InscriptionPage() {
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!accountType) return;
-    setError(null);
-    setLoading(true);
-    try {
-      const supabase = getSupabaseBrowserClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Session expirée");
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: fullName.trim(),
-          account_type: accountType,
-          onboarding_completed: true,
-        })
-        .eq("id", user.id);
+    const supabase = getSupabaseBrowserClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setError("Session expirée. Reconnectez-vous."); return; }
 
-      if (error) throw error;
-      router.push("/profile");
-    } catch (err) {
-      console.error("[inscription] handleProfileSubmit error:", err);
-      if (err && typeof err === "object") {
-        const { message, code, details, hint, status } = err as Record<string, unknown>;
-        console.error("[inscription] Supabase error details:", { message, code, details, hint, status });
-      }
-      const msg = err instanceof Error ? err.message : null;
-      setError(msg === "Session expirée" ? "Session expirée. Veuillez vous reconnecter." : "Erreur lors de l'inscription. Veuillez réessayer.");
-    } finally {
-      setLoading(false);
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        full_name: fullName.trim(),
+        account_type: accountType,
+        onboarding_completed: true,
+      })
+      .eq("id", session.user.id);
+
+    if (updateError) {
+      console.error("UPDATE ERROR:", JSON.stringify(updateError));
+      setError(`Erreur: ${updateError.message}`);
+      return;
     }
+
+    router.push("/profile");
   }
 
   return (
@@ -151,7 +142,7 @@ export default function InscriptionPage() {
                 {error}
               </p>
             )}
-            <Button type="submit" fullWidth isLoading={loading} disabled={!accountType}>
+            <Button type="submit" fullWidth disabled={!accountType}>
               Terminer l'inscription
             </Button>
           </form>
