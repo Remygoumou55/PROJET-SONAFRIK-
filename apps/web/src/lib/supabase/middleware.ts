@@ -17,8 +17,12 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (url && anonKey) {
-    return { url, anonKey };
+  if (url && anonKey) return { url, anonKey };
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "[SONAFRIK] NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY sont requis en production.",
+    );
   }
 
   // Fallback développement local uniquement — jamais atteint en production Vercel

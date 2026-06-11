@@ -1,7 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -107,9 +108,9 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
-  } catch (err) {
+  } catch {
     return new Response(
-      JSON.stringify({ error: "unknown", detail: String(err) }),
+      JSON.stringify({ error: "stream_complete_failed" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -1,7 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -55,7 +56,7 @@ Deno.serve(async (req: Request) => {
     // Récupérer le wallet
     const { data: wallet, error: walletError } = await adminClient
       .from("wallets")
-      .select("id, balance_gnf")
+      .select("id, balance_gnf, total_credited_gnf")
       .eq("user_id", user.id)
       .single();
 
@@ -67,6 +68,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const newBalance = Number(wallet.balance_gnf) + amountGnf;
+    const newTotalCredited = Number(wallet.total_credited_gnf ?? 0) + amountGnf;
 
     // Transaction
     const { data: transaction, error: txError } = await adminClient
@@ -90,19 +92,16 @@ Deno.serve(async (req: Request) => {
 
     if (txError) throw new Error("transaction_insert_failed");
 
-    // Mise à jour du solde
-    await adminClient
+    // Mise à jour du solde et du total crédité
+    const { error: updateError } = await adminClient
       .from("wallets")
       .update({
         balance_gnf: newBalance,
-        total_credited_gnf: adminClient.rpc as never,
+        total_credited_gnf: newTotalCredited,
       })
       .eq("user_id", user.id);
 
-    // Mise à jour manuelle (rpc non disponible dans edge function sans type)
-    await adminClient.from("wallets").update({
-      balance_gnf: newBalance,
-    }).eq("user_id", user.id);
+    if (updateError) throw new Error("wallet_update_failed");
 
     // Entrée ledger
     await adminClient.from("wallet_ledger").insert({
