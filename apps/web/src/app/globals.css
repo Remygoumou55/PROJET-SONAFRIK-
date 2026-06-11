@@ -21,3 +21,21 @@ body {
   color: var(--color-texte-principal);
   font-family: var(--font-sans);
 }
+
+/* Gradient texte brand (vert-énergie → or-solaire) */
+.gradient-brand {
+  background: linear-gradient(135deg, #00d26a 0%, #ffc20e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Masquer la scrollbar tout en conservant le scroll natif */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

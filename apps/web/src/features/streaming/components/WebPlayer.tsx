@@ -12,8 +12,8 @@ export const WebPlayer = memo(function WebPlayer() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 px-4 py-3"
-      style={{ backgroundColor: "#1A1A1A", borderTop: "1px solid #333333" }}
+      className="fixed left-0 right-0 z-50 px-4 py-3 bottom-16 md:bottom-0"
+      style={{ backgroundColor: "#1A1A1A", borderTop: "1px solid #2A2A2A" }}
     >
       <div className="max-w-screen-xl mx-auto">
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} />

@@ -18,6 +18,8 @@ const badgeVariants = cva(
         legend: "bg-or-solaire/20 text-or-solaire shadow-[0_0_12px_rgba(255,194,14,0.2)]",
         founder: "bg-or-profond/20 text-or-solaire border border-or-profond/40",
         outline: "border border-bordure text-texte-secondaire bg-transparent",
+        genre: "bg-elevated text-texte-secondaire border border-bordure text-xs",
+        nouveau: "bg-or-solaire/10 text-or-solaire border border-or-solaire/40 text-xs font-bold tracking-wide",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",
