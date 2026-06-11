@@ -36,6 +36,10 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
+    if (error && process.env.NODE_ENV === "development") {
+      console.error("[OAuth callback error]", error);
+    }
+
     if (!error) {
       const {
         data: { user },

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
+  poweredByHeader: false,
   transpilePackages: [
     "@sonafrik/ui",
     "@sonafrik/shared",
@@ -8,6 +10,10 @@ const nextConfig: NextConfig = {
     "@sonafrik/api",
     "@sonafrik/database",
   ],
+  images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60,
+  },
   experimental: {},
   async headers() {
     return [
