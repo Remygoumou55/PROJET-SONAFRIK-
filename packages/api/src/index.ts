@@ -21,3 +21,4 @@ export * from "./identity";
 export * from "./creator";
 export * from "./catalog";
 export * from "./streaming";
+export * from "./wallet";

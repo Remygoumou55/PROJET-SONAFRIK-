@@ -649,3 +649,184 @@ export const STREAMING_ERROR_MESSAGES: Record<string, string> = {
 };
 
 export const STREAMING_ERROR_LABELS: Record<string, string> = STREAMING_ERROR_MESSAGES;
+
+// ---------------------------------------------------------------------------
+// Wallet OS — Sprint 8
+// CDC Règle #2 : Premium J1 · Gratuit 7 jours
+// CDC Règle #3 : Revenue Pool 65% aux artistes
+// CDC Règle #5 : Pourboire commission 5% invisible UI
+// ---------------------------------------------------------------------------
+
+export const PREMIUM_GRACE_PERIOD_DAYS = 7;
+export const REVENUE_POOL_PERCENT = 65;
+export const TIP_COMMISSION_PERCENT = 5;
+
+export const SUBSCRIPTION_PLANS = {
+  MONTHLY: { type: "monthly" as const, price_gnf: 50_000, label: "Mensuel", duration_days: 30 },
+  ANNUAL: { type: "annual" as const, price_gnf: 480_000, label: "Annuel", duration_days: 365 },
+} as const;
+
+export type SubscriptionPlanType = keyof typeof SUBSCRIPTION_PLANS;
+export type PayoutAccountType = "orange_money" | "mtn_momo" | "wave" | "bank_transfer";
+export type TransactionType = "topup" | "subscription" | "tip" | "beat_purchase" | "withdrawal" | "royalty_payout" | "refund";
+export type TransactionStatus = "pending" | "completed" | "failed" | "cancelled" | "refunded";
+export type WithdrawalStatus = "pending" | "processing" | "completed" | "failed" | "cancelled";
+export type WalletLedgerReason = "topup" | "subscription" | "royalty" | "tip" | "refund" | "withdrawal" | "commission";
+export type RoyaltyCycleStatus = "open" | "calculating" | "ready" | "distributed" | "closed";
+export type RoyaltyCalculationStatus = "pending" | "approved" | "paid" | "cancelled";
+
+export interface Wallet {
+  id: string;
+  user_id: string;
+  balance_gnf: number;
+  currency: string;
+  total_credited_gnf: number;
+  total_debited_gnf: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WalletLedgerEntry {
+  id: string;
+  wallet_id: string;
+  user_id: string;
+  entry_type: "credit" | "debit";
+  amount_gnf: number;
+  balance_after_gnf: number;
+  reason: WalletLedgerReason;
+  reference_id: string | null;
+  reference_type: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface Transaction {
+  id: string;
+  user_id: string;
+  wallet_id: string;
+  type: TransactionType;
+  status: TransactionStatus;
+  amount_gnf: number;
+  commission_gnf: number;
+  net_amount_gnf: number;
+  currency: string;
+  payment_method: PayoutAccountType | "card" | "internal" | null;
+  payment_reference: string | null;
+  description: string | null;
+  metadata: Record<string, unknown>;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Withdrawal {
+  id: string;
+  user_id: string;
+  wallet_id: string;
+  payout_account_id: string;
+  amount_gnf: number;
+  fee_gnf: number;
+  net_amount_gnf: number;
+  status: WithdrawalStatus;
+  reference: string | null;
+  rejection_reason: string | null;
+  processed_by: string | null;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayoutAccount {
+  id: string;
+  user_id: string;
+  type: PayoutAccountType;
+  is_default: boolean;
+  verified: boolean;
+  display_name: string;
+  phone_number: string | null;
+  iban: string | null;
+  bank_name: string | null;
+  account_holder_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export interface RoyaltyCycle {
+  id: string;
+  period_start: string;
+  period_end: string;
+  status: RoyaltyCycleStatus;
+  total_valid_listens: number;
+  total_revenue_gnf: number;
+  revenue_pool_gnf: number;
+  revenue_pool_percent: number;
+  artist_count: number;
+  distributed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RoyaltyCalculation {
+  id: string;
+  cycle_id: string;
+  artist_id: string;
+  creator_id: string | null;
+  valid_listen_count: number;
+  listen_share_percent: number;
+  gross_amount_gnf: number;
+  platform_commission_gnf: number;
+  net_amount_gnf: number;
+  status: RoyaltyCalculationStatus;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WalletContext {
+  wallet: Wallet;
+  isPremium: boolean;
+  premiumExpiresAt: string | null;
+  isInGracePeriod: boolean;
+  recentTransactions: Transaction[];
+  pendingWithdrawals: number;
+}
+
+export const PAYOUT_ACCOUNT_LABELS: Record<PayoutAccountType, string> = {
+  orange_money: "Orange Money",
+  mtn_momo: "MTN MoMo",
+  wave: "Wave",
+  bank_transfer: "Virement bancaire",
+};
+
+export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
+  topup: "Recharge",
+  subscription: "Abonnement",
+  tip: "Pourboire",
+  beat_purchase: "Achat beat",
+  withdrawal: "Retrait",
+  royalty_payout: "Royalties",
+  refund: "Remboursement",
+};
+
+export const WITHDRAWAL_STATUS_LABELS: Record<WithdrawalStatus, string> = {
+  pending: "En attente",
+  processing: "En cours",
+  completed: "Effectué",
+  failed: "Échoué",
+  cancelled: "Annulé",
+};
+
+export const WALLET_ERROR_MESSAGES: Record<string, string> = {
+  wallet_not_found: "Portefeuille introuvable.",
+  insufficient_balance: "Solde insuffisant.",
+  payout_account_not_found: "Compte de retrait introuvable.",
+  minimum_withdrawal_5000: "Le retrait minimum est de 5 000 GNF.",
+  subscription_failed: "Impossible de souscrire. Vérifiez votre solde.",
+  topup_failed: "Échec de la recharge. Réessayez.",
+  withdrawal_failed: "Impossible d'initier le retrait.",
+  payout_account_create_failed: "Impossible d'ajouter le compte de retrait.",
+  unauthorized: "Accès non autorisé.",
+  unknown: "Une erreur est survenue. Réessayez.",
+};

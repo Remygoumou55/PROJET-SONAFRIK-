@@ -18,6 +18,8 @@ export interface Database {
           locale: string;
           fraud_score: number;
           onboarding_completed: boolean;
+          is_premium: boolean;
+          premium_expires_at: string | null;
           created_at: string;
           updated_at: string;
           created_by: string | null;
@@ -38,6 +40,8 @@ export interface Database {
           locale?: string;
           fraud_score?: number;
           onboarding_completed?: boolean;
+          is_premium?: boolean;
+          premium_expires_at?: string | null;
           created_by?: string | null;
           updated_by?: string | null;
         };
@@ -54,6 +58,8 @@ export interface Database {
           locale?: string;
           fraud_score?: number;
           onboarding_completed?: boolean;
+          is_premium?: boolean;
+          premium_expires_at?: string | null;
           updated_by?: string | null;
           deleted_at?: string | null;
         };
@@ -1057,8 +1063,146 @@ export interface Database {
         Args: { p_user_id?: string };
         Returns: boolean;
       };
+      // Wallet OS — Sprint 8
+      get_wallet_balance: {
+        Args: { p_user_id?: string };
+        Returns: number;
+      };
+      subscribe_premium: {
+        Args: { p_plan_type?: string };
+        Returns: { success: boolean; expires_at: string; amount_debited_gnf: number; plan_type: string };
+      };
+      add_payout_account: {
+        Args: {
+          p_type: string;
+          p_display_name: string;
+          p_account_holder_name: string;
+          p_phone_number?: string | null;
+          p_iban?: string | null;
+          p_bank_name?: string | null;
+          p_is_default?: boolean;
+        };
+        Returns: string;
+      };
+      request_withdrawal: {
+        Args: { p_payout_account_id: string; p_amount_gnf: number };
+        Returns: string;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
+}
+
+// ---------------------------------------------------------------------------
+// Wallet OS table types — Sprint 8
+// ---------------------------------------------------------------------------
+
+export interface WalletRow {
+  id: string;
+  user_id: string;
+  balance_gnf: number;
+  currency: string;
+  total_credited_gnf: number;
+  total_debited_gnf: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WalletLedgerRow {
+  id: string;
+  wallet_id: string;
+  user_id: string;
+  entry_type: "credit" | "debit";
+  amount_gnf: number;
+  balance_after_gnf: number;
+  reason: string;
+  reference_id: string | null;
+  reference_type: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface TransactionRow {
+  id: string;
+  user_id: string;
+  wallet_id: string;
+  type: string;
+  status: string;
+  amount_gnf: number;
+  commission_gnf: number;
+  net_amount_gnf: number;
+  currency: string;
+  payment_method: string | null;
+  payment_reference: string | null;
+  description: string | null;
+  metadata: Record<string, unknown>;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WithdrawalRow {
+  id: string;
+  user_id: string;
+  wallet_id: string;
+  payout_account_id: string;
+  amount_gnf: number;
+  fee_gnf: number;
+  net_amount_gnf: number;
+  status: string;
+  reference: string | null;
+  rejection_reason: string | null;
+  processed_by: string | null;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayoutAccountRow {
+  id: string;
+  user_id: string;
+  type: string;
+  is_default: boolean;
+  verified: boolean;
+  display_name: string;
+  phone_number: string | null;
+  iban: string | null;
+  bank_name: string | null;
+  account_holder_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export interface RoyaltyCycleRow {
+  id: string;
+  period_start: string;
+  period_end: string;
+  status: string;
+  total_valid_listens: number;
+  total_revenue_gnf: number;
+  revenue_pool_gnf: number;
+  revenue_pool_percent: number;
+  artist_count: number;
+  distributed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RoyaltyCalculationRow {
+  id: string;
+  cycle_id: string;
+  artist_id: string;
+  creator_id: string | null;
+  valid_listen_count: number;
+  listen_share_percent: number;
+  gross_amount_gnf: number;
+  platform_commission_gnf: number;
+  net_amount_gnf: number;
+  status: string;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
