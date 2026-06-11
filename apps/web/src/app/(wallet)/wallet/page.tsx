@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
-import { SubscriptionModal } from "@/features/wallet/components/SubscriptionModal";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
+
+const SubscriptionModal = dynamic(
+  () =>
+    import("@/features/wallet/components/SubscriptionModal").then(
+      (m) => ({ default: m.SubscriptionModal }),
+    ),
+  { ssr: false },
+);
 
 export default function WalletPage() {
   const { context, isLoading, error } = useWallet();

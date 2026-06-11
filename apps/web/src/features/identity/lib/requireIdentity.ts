@@ -1,8 +1,10 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createIdentityService } from "@sonafrik/api/identity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-export async function requireIdentityContext() {
+// cache() déduplique les appels identiques dans le même arbre de rendu (layout + page)
+export const requireIdentityContext = cache(async function requireIdentityContext() {
   const supabase = await getSupabaseServerClient();
   const identity = createIdentityService(supabase);
 
@@ -11,7 +13,7 @@ export async function requireIdentityContext() {
   } catch {
     redirect("/auth/connexion");
   }
-}
+});
 
 export async function getOptionalAvatarUrl() {
   const supabase = await getSupabaseServerClient();
