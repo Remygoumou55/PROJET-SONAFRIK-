@@ -109,6 +109,47 @@ CREATE POLICY "royalty_calculations_manage_admin" ON public.royalty_calculations
   FOR ALL USING (public.is_admin(auth.uid()));
 
 -- ---------------------------------------------------------------------------
+-- Seed des rôles de base (idempotent — ON CONFLICT DO NOTHING)
+-- Doit précéder toute assignation de role_permissions
+-- ---------------------------------------------------------------------------
+INSERT INTO public.roles (name, description) VALUES
+  ('auditeur',         'Auditeur — accès écoute'),
+  ('artiste',          'Artiste — création de contenu'),
+  ('auditeur_artiste', 'Auditeur et Artiste'),
+  ('admin',            'Administrateur SONAFRIK')
+ON CONFLICT (name) DO NOTHING;
+
+-- Ré-assigner les permissions streaming (sprint 6 : rôles absents lors de la migration)
+INSERT INTO public.role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM public.roles r
+CROSS JOIN public.permissions p
+WHERE r.name IN ('auditeur', 'artiste', 'auditeur_artiste')
+  AND p.code IN (
+    'stream:play',
+    'stream:playlist:create',
+    'stream:playlist:edit',
+    'stream:library:manage',
+    'stream:analytics:view:own'
+  )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO public.role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM public.roles r
+CROSS JOIN public.permissions p
+WHERE r.name = 'admin'
+  AND p.code IN (
+    'stream:play',
+    'stream:playlist:create',
+    'stream:playlist:edit',
+    'stream:library:manage',
+    'stream:analytics:view:own',
+    'admin:stream:analytics'
+  )
+ON CONFLICT DO NOTHING;
+
+-- ---------------------------------------------------------------------------
 -- Permissions Wallet OS
 -- ---------------------------------------------------------------------------
 INSERT INTO public.permissions (code, description) VALUES
@@ -136,26 +177,34 @@ BEGIN
   SELECT id INTO v_admin_id FROM public.roles WHERE name = 'admin';
 
   -- Auditeur
-  INSERT INTO public.role_permissions (role_id, permission_id)
-  SELECT v_auditeur_id, id FROM public.permissions
-  WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:payout:manage')
-  ON CONFLICT DO NOTHING;
+  IF v_auditeur_id IS NOT NULL THEN
+    INSERT INTO public.role_permissions (role_id, permission_id)
+    SELECT v_auditeur_id, id FROM public.permissions
+    WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:payout:manage')
+    ON CONFLICT DO NOTHING;
+  END IF;
 
   -- Artiste
-  INSERT INTO public.role_permissions (role_id, permission_id)
-  SELECT v_artiste_id, id FROM public.permissions
-  WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own')
-  ON CONFLICT DO NOTHING;
+  IF v_artiste_id IS NOT NULL THEN
+    INSERT INTO public.role_permissions (role_id, permission_id)
+    SELECT v_artiste_id, id FROM public.permissions
+    WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own')
+    ON CONFLICT DO NOTHING;
+  END IF;
 
   -- Auditeur+Artiste
-  INSERT INTO public.role_permissions (role_id, permission_id)
-  SELECT v_auditeur_artiste_id, id FROM public.permissions
-  WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own')
-  ON CONFLICT DO NOTHING;
+  IF v_auditeur_artiste_id IS NOT NULL THEN
+    INSERT INTO public.role_permissions (role_id, permission_id)
+    SELECT v_auditeur_artiste_id, id FROM public.permissions
+    WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own')
+    ON CONFLICT DO NOTHING;
+  END IF;
 
   -- Admin
-  INSERT INTO public.role_permissions (role_id, permission_id)
-  SELECT v_admin_id, id FROM public.permissions
-  WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own', 'admin:wallet:manage', 'admin:royalty:distribute')
-  ON CONFLICT DO NOTHING;
+  IF v_admin_id IS NOT NULL THEN
+    INSERT INTO public.role_permissions (role_id, permission_id)
+    SELECT v_admin_id, id FROM public.permissions
+    WHERE code IN ('wallet:view', 'wallet:topup', 'wallet:subscribe', 'wallet:withdraw', 'wallet:payout:manage', 'royalty:view:own', 'admin:wallet:manage', 'admin:royalty:distribute')
+    ON CONFLICT DO NOTHING;
+  END IF;
 END $$;
