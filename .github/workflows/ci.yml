@@ -6,22 +6,49 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Annule les runs en cours sur la même branche quand un nouveau commit arrive.
+# Économise les minutes GitHub Actions sur les push rapides.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Remote cache Vercel Turborepo (optionnel — ignoré si les secrets ne sont pas définis)
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
 jobs:
   quality:
+    name: Quality Gate
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          version: 11
+          # fetch-depth: 2 permet à Turbo de comparer HEAD~1 pour --affected
+          fetch-depth: 2
 
-      - uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        # Pas de `version` ici — l'action lit automatiquement package.json#packageManager
+        # Source unique de vérité : "packageManager": "pnpm@11.5.2"
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
-      - name: Install
+      - name: Cache Turbo artifacts
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint
