@@ -107,6 +107,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const resume = useCallback(() => {
     if (!audioRef.current) return;
+    clearHeartbeat();
     audioRef.current.play().catch(() => {});
     setState((prev) => ({ ...prev, isPlaying: true }));
     heartbeatRef.current = setInterval(() => {
@@ -115,7 +116,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onHeartbeatCallbackRef.current?.(audio.currentTime);
       }
     }, STREAM_HEARTBEAT_INTERVAL_MS);
-  }, []);
+  }, [clearHeartbeat]);
 
   const stop = useCallback(() => {
     clearHeartbeat();
@@ -143,7 +144,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     return () => {
       clearHeartbeat();
-      audioRef.current?.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
     };
   }, [clearHeartbeat]);
 

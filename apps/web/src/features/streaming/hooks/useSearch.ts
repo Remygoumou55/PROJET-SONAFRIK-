@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SearchResult } from "@sonafrik/types";
 import { useStreamingService } from "./useStreaming";
 
@@ -41,6 +41,12 @@ export function useSearch() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     setResults(null);
     setError(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []);
 
   return { results, isSearching, error, search, clearSearch };

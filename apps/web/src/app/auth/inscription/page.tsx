@@ -22,6 +22,7 @@ export default function InscriptionPage() {
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Retour du callback Google OAuth : session déjà établie, compléter l'onboarding
   useEffect(() => {
@@ -49,44 +50,72 @@ export default function InscriptionPage() {
   }, []);
 
   async function handlePhoneSubmit(p: string) {
-    setPhone(p);
-    await auth.requestOtp({ phone: p });
-    setStep("otp");
+    setError(null);
+    setLoading(true);
+    try {
+      setPhone(p);
+      await auth.requestOtp({ phone: p });
+      setStep("otp");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible d'envoyer le code. Réessayez.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleOtpSubmit(token: string) {
-    const { profile } = await auth.verifyOtp({ phone, token });
-    if (profile?.onboarding_completed) {
-      router.push("/listen");
-      return;
+    setError(null);
+    setLoading(true);
+    try {
+      const { profile } = await auth.verifyOtp({ phone, token });
+      if (profile?.onboarding_completed) {
+        router.push("/listen");
+        return;
+      }
+      setStep("profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Code invalide. Réessayez.");
+    } finally {
+      setLoading(false);
     }
-    setStep("profile");
   }
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!accountType) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setError("Session expirée. Reconnectez-vous."); return; }
 
-    const supabase = getSupabaseBrowserClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setError("Session expirée. Reconnectez-vous."); return; }
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName.trim(),
+          account_type: accountType,
+          onboarding_completed: true,
+        })
+        .eq("id", session.user.id);
 
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        full_name: fullName.trim(),
-        account_type: accountType,
-        onboarding_completed: true,
-      })
-      .eq("id", session.user.id);
+      if (updateError) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("[inscription] UPDATE profiles error:", JSON.stringify(updateError));
+        }
+        setError(`Erreur: ${updateError.message}`);
+        return;
+      }
 
-    if (updateError) {
-      console.error("UPDATE ERROR:", JSON.stringify(updateError));
-      setError(`Erreur: ${updateError.message}`);
-      return;
+      router.push("/profile");
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[inscription] handleProfileSubmit:", err);
+      }
+      setError("Erreur lors de l'inscription. Réessayez.");
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/profile");
   }
 
   return (
@@ -142,7 +171,7 @@ export default function InscriptionPage() {
                 {error}
               </p>
             )}
-            <Button type="submit" fullWidth disabled={!accountType}>
+            <Button type="submit" fullWidth isLoading={loading} disabled={!accountType || loading}>
               Terminer l'inscription
             </Button>
           </form>

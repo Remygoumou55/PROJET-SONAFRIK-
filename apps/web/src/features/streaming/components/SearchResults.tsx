@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 import type { SearchResult, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 
@@ -53,6 +53,19 @@ const TrackRow = memo(function TrackRow({
 
 export function SearchResults({ results, isSearching }: SearchResultsProps) {
   const { loadAndPlay } = usePlayer();
+  const [playError, setPlayError] = useState<string | null>(null);
+
+  const handlePlay = useCallback(
+    async (track: TrackWithMeta) => {
+      setPlayError(null);
+      try {
+        await loadAndPlay(track);
+      } catch {
+        setPlayError("Impossible de lire ce morceau. Réessayez.");
+      }
+    },
+    [loadAndPlay],
+  );
 
   if (isSearching) {
     return (
@@ -77,6 +90,9 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
 
   return (
     <div className="space-y-6">
+      {playError && (
+        <p className="text-sm text-red-500 px-1" role="alert">{playError}</p>
+      )}
       {results.tracks.length > 0 && (
         <section>
           <h3 className="text-sm font-semibold mb-2" style={{ color: "#A0A0A0" }}>
@@ -84,7 +100,7 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
           </h3>
           <div className="space-y-1">
             {results.tracks.map((track) => (
-              <TrackRow key={track.id} track={track} onPlay={loadAndPlay} />
+              <TrackRow key={track.id} track={track} onPlay={handlePlay} />
             ))}
           </div>
         </section>

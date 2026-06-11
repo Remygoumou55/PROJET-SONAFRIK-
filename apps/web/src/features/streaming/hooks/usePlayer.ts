@@ -34,27 +34,12 @@ export function usePlayer() {
   }, [player, streaming]);
 
   const loadAndPlay = useCallback(
-    async (track: TrackWithMeta) => {
-      try {
-        const result = await streaming.startStream({
-          trackId: track.id,
-          platform: "web",
-        });
-
-        // Sauvegarder la position résumée
-        const savedPosition = await streaming.getPosition(track.id).catch(() => 0);
-
-        player.play(track, result.signedUrl, result.sessionId, result.durationSeconds);
-
-        // Reprendre depuis la position sauvegardée si > 10s
-        if (savedPosition > 10) {
-          setTimeout(() => {
-            // La reprise de position se fait via l'élément audio dans le contexte
-          }, 500);
-        }
-      } catch {
-        // erreur gérée dans le composant parent
-      }
+    async (track: TrackWithMeta): Promise<void> => {
+      const result = await streaming.startStream({
+        trackId: track.id,
+        platform: "web",
+      });
+      player.play(track, result.signedUrl, result.sessionId, result.durationSeconds);
     },
     [streaming, player],
   );
