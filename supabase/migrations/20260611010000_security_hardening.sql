@@ -7,6 +7,7 @@
 --    doit toujours être associé à ses propres événements d'audit.
 -- ---------------------------------------------------------------------------
 DROP POLICY IF EXISTS audit_logs_insert_authenticated_via_function ON public.audit_logs;
+DROP POLICY IF EXISTS audit_logs_insert_own ON public.audit_logs;
 
 CREATE POLICY audit_logs_insert_own ON public.audit_logs
   FOR INSERT TO authenticated
@@ -16,6 +17,8 @@ CREATE POLICY audit_logs_insert_own ON public.audit_logs
 -- 2. Permettre aux utilisateurs de consulter leur propre historique d'activité
 --    (awareness de sécurité — détection de connexions suspectes)
 -- ---------------------------------------------------------------------------
+DROP POLICY IF EXISTS audit_logs_select_own ON public.audit_logs;
+
 CREATE POLICY audit_logs_select_own ON public.audit_logs
   FOR SELECT TO authenticated
   USING (actor_id = auth.uid());
