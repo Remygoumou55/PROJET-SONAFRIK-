@@ -39,7 +39,7 @@ export default function InscriptionPage() {
         .single()
         .then(({ data: profile }) => {
           if (profile?.onboarding_completed) {
-            router.push("/");
+            router.push("/listen");
             return;
           }
           // Nouveau compte Google → pré-remplir le nom et passer au profil
@@ -59,7 +59,7 @@ export default function InscriptionPage() {
   async function handleOtpSubmit(token: string) {
     const { profile } = await auth.verifyOtp({ phone, token });
     if (profile?.onboarding_completed) {
-      router.push("/");
+      router.push("/listen");
       return;
     }
     setStep("profile");
@@ -77,10 +77,13 @@ export default function InscriptionPage() {
       auth.registerCurrentSession({
         platform: "web",
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-      }).catch(console.error);
-      router.push("/listen");
+      }).catch(() => {});
+      router.push("/profile");
     } catch (err) {
-      setError(err instanceof AuthError ? err.message : "Erreur lors de l'inscription.");
+      if (process.env.NODE_ENV === "development") {
+        console.error("[inscription] handleProfileSubmit error:", err);
+      }
+      setError(err instanceof AuthError ? err.message : "Erreur lors de l'inscription. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }

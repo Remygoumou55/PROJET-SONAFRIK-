@@ -24,13 +24,17 @@ export class AuthRepository {
   ): Promise<Profile> {
     const { data, error } = await this.client
       .from("profiles")
-      .update({
-        account_type: accountType,
-        full_name: fullName,
-        onboarding_completed: true,
-        updated_by: userId,
-      })
-      .eq("id", userId)
+      .upsert(
+        {
+          id: userId,
+          account_type: accountType,
+          full_name: fullName,
+          onboarding_completed: true,
+          updated_by: userId,
+          created_by: userId,
+        },
+        { onConflict: "id" },
+      )
       .select("*")
       .single();
 
