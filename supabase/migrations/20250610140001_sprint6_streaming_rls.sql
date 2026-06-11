@@ -207,7 +207,7 @@ INSERT INTO public.permissions (code, description) VALUES
   ('stream:playlist:create',    'Créer des playlists'),
   ('stream:playlist:edit',      'Modifier ses playlists'),
   ('stream:library:manage',     'Gérer sa bibliothèque'),
-  ('stream:analytics:view:own', 'Voir ses statistiques d\'écoute'),
+  ('stream:analytics:view:own', 'Voir ses statistiques d''écoute'),
   ('admin:stream:analytics',    'Voir toutes les statistiques streaming')
 ON CONFLICT (code) DO NOTHING;
 

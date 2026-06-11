@@ -1,8 +1,5 @@
 # Sprint 2+ : supabase init et migrations
 
-[project]
-id = "sonafrik"
-
 [api]
 enabled = true
 port = 54321
