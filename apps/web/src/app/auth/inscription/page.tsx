@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { AccountType } from "@sonafrik/types";
 import { Button, Input } from "@sonafrik/ui";
-import { AuthError } from "@sonafrik/api/auth";
 import { AccountTypeSelector } from "@/features/auth/components/AccountTypeSelector";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
@@ -71,13 +70,20 @@ export default function InscriptionPage() {
     setError(null);
     setLoading(true);
     try {
-      await auth.completeOnboardingForCurrentUser({ accountType, fullName });
-      // Non-bloquant : l'échec de l'enregistrement de session ne doit pas
-      // empêcher l'utilisateur d'accéder à l'application.
-      auth.registerCurrentSession({
-        platform: "web",
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-      }).catch(() => {});
+      const supabase = getSupabaseBrowserClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Session expirée");
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName.trim(),
+          account_type: accountType,
+          onboarding_completed: true,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
       router.push("/profile");
     } catch (err) {
       console.error("[inscription] handleProfileSubmit error:", err);
@@ -85,7 +91,8 @@ export default function InscriptionPage() {
         const { message, code, details, hint, status } = err as Record<string, unknown>;
         console.error("[inscription] Supabase error details:", { message, code, details, hint, status });
       }
-      setError(err instanceof AuthError ? err.message : "Erreur lors de l'inscription. Veuillez réessayer.");
+      const msg = err instanceof Error ? err.message : null;
+      setError(msg === "Session expirée" ? "Session expirée. Veuillez vous reconnecter." : "Erreur lors de l'inscription. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
