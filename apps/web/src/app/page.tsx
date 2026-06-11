@@ -5,7 +5,21 @@ import { Button } from "@sonafrik/ui";
 import { AuthHomeActions } from "@/features/auth/components/AuthHomeActions";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const params = await searchParams;
+
+  // Supabase redirige parfois le code OAuth vers la racine si la redirect URL
+  // n'est pas encore dans la liste autorisée du dashboard
+  if (params.code) {
+    const qs = new URLSearchParams({ code: params.code });
+    if (params.next) qs.set("next", params.next);
+    redirect(`/auth/callback?${qs.toString()}`);
+  }
+
   const supabase = await getSupabaseServerClient();
   const auth = createAuthService(supabase);
   const profile = await auth.getCurrentProfile();
