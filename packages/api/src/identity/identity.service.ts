@@ -8,6 +8,31 @@ import type {
   UserSession,
 } from "@sonafrik/types";
 import { IdentityError } from "./errors";
+
+function makeDefaultPreferences(userId: string): UserPreferences {
+  const now = new Date().toISOString();
+  return {
+    user_id: userId,
+    language: "fr",
+    audio_quality: "128",
+    data_saver: false,
+    autoplay_on_wifi: true,
+    autoplay_on_cellular: false,
+    explicit_content_allowed: false,
+    profile_visibility: "public",
+    show_listening_activity: true,
+    push_notifications: true,
+    email_notifications: true,
+    sms_notifications: false,
+    marketing_notifications: false,
+    awards_reminders: true,
+    new_releases_alerts: true,
+    artist_comment_replies: true,
+    timezone: "Africa/Conakry",
+    created_at: now,
+    updated_at: now,
+  };
+}
 import { IdentityRepository } from "./identity.repository";
 import {
   avatarUploadRequestSchema,
@@ -34,22 +59,26 @@ export class IdentityService {
 
   async getIdentityContext(): Promise<IdentityContext> {
     const userId = await this.requireUserId();
+
+    // Les queries non-critiques (rôles, notifs, sessions) ne doivent jamais
+    // crasher la page — elles retournent des valeurs sûres en cas d'erreur RLS
     const [profile, preferences, roles, unreadNotifications, sessions] = await Promise.all([
       this.repository.getProfile(userId),
-      this.repository.getPreferences(userId),
-      this.repository.getUserRoles(userId),
-      this.repository.getUnreadCount(userId),
-      this.repository.getActiveSessions(userId),
+      this.repository.getPreferences(userId).catch(() => null),
+      this.repository.getUserRoles(userId).catch((): UserRole[] => []),
+      this.repository.getUnreadCount(userId).catch(() => 0),
+      this.repository.getActiveSessions(userId).catch((): UserSession[] => []),
     ]);
 
     if (!profile) throw new IdentityError("profile_not_found");
 
-    // user_preferences peut manquer pour les utilisateurs OAuth (Google) si le
-    // trigger handle_new_user_preferences n'a pas encore été exécuté — créer
-    // la ligne avec les valeurs par défaut plutôt que d'interrompre le rendu
+    // user_preferences peut manquer pour les nouveaux comptes OAuth si le
+    // trigger DB n'a pas encore été exécuté. On tente l'upsert, et en cas
+    // d'échec RLS on utilise un fallback mémoire pour ne pas crasher la page.
     const resolvedPreferences =
       preferences ??
-      (await this.repository.upsertDefaultPreferences(userId));
+      await this.repository.upsertDefaultPreferences(userId)
+        .catch(() => makeDefaultPreferences(userId));
 
     return {
       profile,
