@@ -662,6 +662,64 @@ export const STREAMING_ERROR_MESSAGES: Record<string, string> = {
 export const STREAMING_ERROR_LABELS: Record<string, string> = STREAMING_ERROR_MESSAGES;
 
 // ---------------------------------------------------------------------------
+// Recommendation OS — Sprint 5.1
+// ---------------------------------------------------------------------------
+
+export type RecommendationWindow = 'today' | '7d' | '30d';
+export type RecommendationReason = 'genre_affinity' | 'collaborative' | 'new_release' | 'trending';
+
+export interface TrendingTrack {
+  track_id: string;
+  title: string;
+  slug: string;
+  duration_seconds: number | null;
+  artist_name: string | null;
+  creator_id: string;
+  album_id: string | null;
+  album_title: string | null;
+  cover_path: string | null;
+  listen_count: number;
+  unique_listeners: number;
+  trending_score: number;
+}
+
+export interface SimilarTrack {
+  track_id: string;
+  title: string;
+  slug: string;
+  duration_seconds: number | null;
+  artist_name: string | null;
+  creator_id: string;
+  album_id: string | null;
+  album_title: string | null;
+  cover_path: string | null;
+  similarity_score: number;
+  similarity_reasons: string[];
+}
+
+export interface RecommendedTrack {
+  track_id: string;
+  title: string;
+  slug: string;
+  duration_seconds: number | null;
+  artist_name: string | null;
+  creator_id: string;
+  album_id: string | null;
+  album_title: string | null;
+  cover_path: string | null;
+  recommendation_score: number;
+  reason: RecommendationReason;
+}
+
+export const RECOMMENDATION_ERROR_MESSAGES: Record<string, string> = {
+  unauthorized: "Accès non autorisé. Connectez-vous.",
+  trending_failed: "Impossible de charger les tendances.",
+  similar_failed: "Impossible de charger les morceaux similaires.",
+  recommendations_failed: "Impossible de charger les recommandations.",
+  unknown: "Une erreur est survenue. Réessayez.",
+};
+
+// ---------------------------------------------------------------------------
 // Wallet OS — Sprint 8
 // CDC Règle #2 : Premium J1 · Gratuit 7 jours
 // CDC Règle #3 : Revenue Pool 65% aux artistes

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { TrendingTrack } from "@sonafrik/types";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -39,7 +40,7 @@ async function getHomepageContent() {
   try {
     const supabase = await getSupabaseServerClient();
 
-    const [playlistsResult, artistsResult, genresResult] = await Promise.all([
+    const [playlistsResult, artistsResult, genresResult, trendingResult] = await Promise.all([
       supabase
         .from("playlists")
         .select("id, title, track_count")
@@ -60,6 +61,7 @@ async function getHomepageContent() {
         .is("deleted_at", null)
         .order("sort_order")
         .limit(12),
+      supabase.rpc("get_trending_tracks" as never, { p_window: "7d", p_limit: 10 } as never),
     ]);
 
     return {
@@ -77,14 +79,15 @@ async function getHomepageContent() {
         id: string;
         name: string;
       }>,
+      trending: (trendingResult.data ?? []) as TrendingTrack[],
     };
   } catch {
-    return { playlists: [], artists: [], genres: [] };
+    return { playlists: [], artists: [], genres: [], trending: [] };
   }
 }
 
 export default async function ListenPage() {
-  const [{ profile }, { playlists, artists, genres }] = await Promise.all([
+  const [{ profile }, { playlists, artists, genres, trending }] = await Promise.all([
     requireIdentityContext(),
     getHomepageContent(),
   ]);
@@ -129,6 +132,62 @@ export default async function ListenPage() {
           </span>
         </Link>
       </div>
+
+      {/* ── Tendances ───────────────────────────────────── */}
+      {trending.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Tendances
+            </h2>
+            <span className="text-xs font-semibold" style={{ color: "#00D26A" }}>
+              7 derniers jours
+            </span>
+          </div>
+          <div className="space-y-1 px-6">
+            {trending.map((track, i) => (
+              <div
+                key={track.track_id}
+                className="flex items-center gap-3 py-2.5"
+                style={{ borderBottom: "1px solid #1F1F1F" }}
+              >
+                <span
+                  className="text-xs font-bold w-5 text-right flex-shrink-0 tabular-nums"
+                  style={{ color: i < 3 ? "#00D26A" : "#555555" }}
+                >
+                  {i + 1}
+                </span>
+                <div
+                  className="w-9 h-9 rounded-md flex-shrink-0 flex items-center justify-center"
+                  style={{ backgroundColor: "#1F1F1F" }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="#00D26A">
+                    <path d="M4 2L14 8L4 14V2Z" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
+                    {track.title}
+                  </p>
+                  {track.artist_name && (
+                    <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+                      {track.artist_name}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                  <span className="text-xs tabular-nums" style={{ color: "#555555" }}>
+                    {track.listen_count.toLocaleString("fr-FR")}
+                  </span>
+                  <span className="text-[10px]" style={{ color: "#333333" }}>
+                    écoutes
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Pour vous (playlists publiques) ─────────────── */}
       {playlists.length > 0 && (
