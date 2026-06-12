@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
@@ -10,12 +10,19 @@ import { useAuthService } from "@/features/auth/hooks/useAuth";
 
 type Step = "phone" | "otp";
 
-export default function ConnexionPage() {
+function ConnexionPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const auth = useAuthService();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "oauth") {
+      setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
+    }
+  }, [searchParams]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);
@@ -99,5 +106,13 @@ export default function ConnexionPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function ConnexionPage() {
+  return (
+    <Suspense>
+      <ConnexionPageInner />
+    </Suspense>
   );
 }

@@ -39,31 +39,31 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (error && process.env.NODE_ENV === "development") {
-      console.error("[OAuth callback error]", error);
+    if (error) {
+      console.error("[OAuth callback error]", error.message, error.code ?? "");
+      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=${encodeURIComponent(error.message)}`);
     }
 
-    if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", user.id)
-          .single();
-
-        if (!profile?.onboarding_completed) {
-          // Nouvel utilisateur Google → compléter l'onboarding
-          return NextResponse.redirect(`${origin}/auth/inscription`);
-        }
-
-        return NextResponse.redirect(`${origin}/profile`);
-      }
+    if (!user) {
+      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=no_user`);
     }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.onboarding_completed) {
+      return NextResponse.redirect(`${origin}/auth/inscription`);
+    }
+
+    return NextResponse.redirect(`${origin}/listen`);
   }
 
-  return NextResponse.redirect(`${origin}/auth/connexion?error=oauth`);
+  return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=no_code`);
 }
