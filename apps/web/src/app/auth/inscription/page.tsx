@@ -88,10 +88,10 @@ export default function InscriptionPage() {
     try {
       const supabase = getSupabaseBrowserClient();
 
-      const { error: rpcError } = await supabase.rpc("complete_onboarding" as never, {
-        p_full_name: fullName.trim(),
-        p_account_type: accountType,
-      });
+      const { error: rpcError } = await supabase.rpc(
+        "complete_onboarding" as never,
+        { p_full_name: fullName.trim(), p_account_type: accountType } as never,
+      );
 
       if (rpcError) {
         setError("Erreur lors de l'inscription. Réessayez.");
