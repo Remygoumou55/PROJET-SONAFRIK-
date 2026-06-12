@@ -88,10 +88,13 @@ export default function InscriptionPage() {
     try {
       const supabase = getSupabaseBrowserClient();
 
-      const { error: rpcError } = await supabase.rpc(
-        "complete_onboarding" as never,
-        { p_full_name: fullName.trim(), p_account_type: accountType } as never,
-      );
+      // RPC non encore dans les types générés — cast explicite
+      type RpcFn = (fn: string, args: Record<string, string>) => Promise<{ data: unknown; error: { message: string } | null }>;
+      const rpc = supabase.rpc as unknown as RpcFn;
+      const { error: rpcError } = await rpc("complete_onboarding", {
+        p_full_name: fullName.trim(),
+        p_account_type: accountType,
+      });
 
       if (rpcError) {
         setError("Erreur lors de l'inscription. Réessayez.");
