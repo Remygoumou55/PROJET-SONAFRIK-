@@ -87,23 +87,14 @@ export default function InscriptionPage() {
     setLoading(true);
     try {
       const supabase = getSupabaseBrowserClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { setError("Session expirée. Reconnectez-vous."); return; }
 
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: fullName.trim(),
-          account_type: accountType,
-          onboarding_completed: true,
-        })
-        .eq("id", session.user.id);
+      const { error: rpcError } = await supabase.rpc("complete_onboarding" as never, {
+        p_full_name: fullName.trim(),
+        p_account_type: accountType,
+      });
 
-      if (updateError) {
-        if (process.env.NODE_ENV === "development") {
-          console.error("[inscription] UPDATE profiles error:", JSON.stringify(updateError));
-        }
-        setError(`Erreur: ${updateError.message}`);
+      if (rpcError) {
+        setError("Erreur lors de l'inscription. Réessayez.");
         return;
       }
 
@@ -112,10 +103,7 @@ export default function InscriptionPage() {
       } else {
         router.push("/creator");
       }
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("[inscription] handleProfileSubmit:", err);
-      }
+    } catch {
       setError("Erreur lors de l'inscription. Réessayez.");
     } finally {
       setLoading(false);
