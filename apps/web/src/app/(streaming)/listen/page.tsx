@@ -1,63 +1,94 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Accueil — SONAFRIK",
   description: "Découvrez la musique africaine sur SONAFRIK.",
 };
 
-const FEATURED_PLAYLISTS = [
-  {
-    id: "afro-vibes",
-    title: "Afro Vibes",
-    subtitle: "50 titres",
-    colorA: "#00D26A",
-    colorB: "#009B3A",
-  },
-  {
-    id: "hits-moment",
-    title: "Hits du moment",
-    subtitle: "50 titres",
-    colorA: "#FFC20E",
-    colorB: "#F4A300",
-  },
-  {
-    id: "new-afro",
-    title: "New Afro",
-    subtitle: "50 titres",
-    colorA: "#FF6B6B",
-    colorB: "#C0392B",
-  },
-  {
-    id: "roots-africa",
-    title: "Roots Africa",
-    subtitle: "40 titres",
-    colorA: "#9B59B6",
-    colorB: "#1A5276",
-  },
+const CARD_COLORS = [
+  { colorA: "#00D26A", colorB: "#009B3A" },
+  { colorA: "#FFC20E", colorB: "#F4A300" },
+  { colorA: "#FF6B6B", colorB: "#C0392B" },
+  { colorA: "#9B59B6", colorB: "#1A5276" },
+  { colorA: "#3498DB", colorB: "#2471A3" },
+  { colorA: "#E74C3C", colorB: "#A93226" },
 ] as const;
 
-const TOP_ARTISTS = [
-  { id: "yemi-alade", name: "Yemi Alade", genre: "Afropop", initials: "YA", color: "#00D26A" },
-  { id: "burna-boy", name: "Burna Boy", genre: "Afrobeats", initials: "BB", color: "#FFC20E" },
-  { id: "wizkid", name: "Wizkid", genre: "Afrobeats", initials: "WZ", color: "#9B59B6" },
-  { id: "aya-nakamura", name: "Aya Nakamura", genre: "Afropop", initials: "AN", color: "#E74C3C" },
+const ARTIST_COLORS = [
+  "#00D26A",
+  "#FFC20E",
+  "#9B59B6",
+  "#E74C3C",
+  "#3498DB",
+  "#FF6B6B",
 ] as const;
 
-const GENRES = [
-  "#Afrobeat",
-  "#Coupé-Décalé",
-  "#Ndombolo",
-  "#Afropop",
-  "#Mbalax",
-  "#Highlife",
-  "#Amapiano",
-  "#Afrosoul",
-] as const;
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0] ?? "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+async function getHomepageContent() {
+  try {
+    const supabase = await getSupabaseServerClient();
+
+    const [playlistsResult, artistsResult, genresResult] = await Promise.all([
+      supabase
+        .from("playlists")
+        .select("id, title, track_count")
+        .eq("is_public", true)
+        .is("deleted_at", null)
+        .order("updated_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("artist_profiles")
+        .select("creator_id, stage_name, genres")
+        .eq("is_public", true)
+        .order("created_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("genres")
+        .select("id, name")
+        .eq("is_active", true)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .limit(12),
+    ]);
+
+    return {
+      playlists: (playlistsResult.data ?? []) as Array<{
+        id: string;
+        title: string;
+        track_count: number;
+      }>,
+      artists: (artistsResult.data ?? []) as Array<{
+        creator_id: string;
+        stage_name: string;
+        genres: string[];
+      }>,
+      genres: (genresResult.data ?? []) as Array<{
+        id: string;
+        name: string;
+      }>,
+    };
+  } catch {
+    return { playlists: [], artists: [], genres: [] };
+  }
+}
 
 export default async function ListenPage() {
-  const { profile } = await requireIdentityContext();
+  const [{ profile }, { playlists, artists, genres }] = await Promise.all([
+    requireIdentityContext(),
+    getHomepageContent(),
+  ]);
+
   const firstName = profile.full_name?.split(" ")[0] ?? "artiste";
 
   return (
@@ -99,108 +130,131 @@ export default async function ListenPage() {
         </Link>
       </div>
 
-      {/* ── Pour vous ───────────────────────────────────── */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between px-6 mb-4">
-          <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
-            Pour vous
-          </h2>
-          <Link href="/search" className="text-xs font-semibold" style={{ color: "#00D26A" }}>
-            Voir tout
-          </Link>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-2 px-6 scrollbar-hide">
-          {FEATURED_PLAYLISTS.map((pl) => (
-            <Link key={pl.id} href="/search" className="flex-shrink-0 w-36">
-              <div
-                className="aspect-square rounded-2xl mb-2 flex flex-col justify-end p-3 relative overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, ${pl.colorA}33 0%, ${pl.colorB}1A 100%)`,
-                  backgroundColor: "#1F1F1F",
-                  border: "1px solid #2A2A2A",
-                }}
-              >
-                {/* Vinyl decoratif */}
-                <div
-                  className="absolute top-3 right-3 w-12 h-12 rounded-full opacity-20"
-                  style={{ border: `3px solid ${pl.colorA}`, boxShadow: `0 0 0 5px ${pl.colorA}22` }}
-                />
-                <div
-                  className="absolute top-6 right-6 w-4 h-4 rounded-full"
-                  style={{ backgroundColor: pl.colorA, opacity: 0.3 }}
-                />
-                <p className="text-sm font-bold leading-tight relative z-10" style={{ color: "#FFFFFF" }}>
-                  {pl.title}
-                </p>
-              </div>
-              <p className="text-xs" style={{ color: "#A0A0A0" }}>
-                {pl.subtitle}
-              </p>
+      {/* ── Pour vous (playlists publiques) ─────────────── */}
+      {playlists.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Pour vous
+            </h2>
+            <Link href="/search" className="text-xs font-semibold" style={{ color: "#00D26A" }}>
+              Voir tout
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-2 px-6 scrollbar-hide">
+            {playlists.map((pl, i) => {
+              const colors = CARD_COLORS[i % CARD_COLORS.length]!;
+              const subtitle =
+                pl.track_count > 0
+                  ? `${pl.track_count} titre${pl.track_count > 1 ? "s" : ""}`
+                  : "Playlist";
+              return (
+                <Link key={pl.id} href="/search" className="flex-shrink-0 w-36">
+                  <div
+                    className="aspect-square rounded-2xl mb-2 flex flex-col justify-end p-3 relative overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${colors.colorA}33 0%, ${colors.colorB}1A 100%)`,
+                      backgroundColor: "#1F1F1F",
+                      border: "1px solid #2A2A2A",
+                    }}
+                  >
+                    {/* Vinyl decoratif */}
+                    <div
+                      className="absolute top-3 right-3 w-12 h-12 rounded-full opacity-20"
+                      style={{
+                        border: `3px solid ${colors.colorA}`,
+                        boxShadow: `0 0 0 5px ${colors.colorA}22`,
+                      }}
+                    />
+                    <div
+                      className="absolute top-6 right-6 w-4 h-4 rounded-full"
+                      style={{ backgroundColor: colors.colorA, opacity: 0.3 }}
+                    />
+                    <p className="text-sm font-bold leading-tight relative z-10" style={{ color: "#FFFFFF" }}>
+                      {pl.title}
+                    </p>
+                  </div>
+                  <p className="text-xs" style={{ color: "#A0A0A0" }}>
+                    {subtitle}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ── Top artistes ────────────────────────────────── */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between px-6 mb-4">
-          <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
-            Top artistes
-          </h2>
-          <Link href="/search" className="text-xs font-semibold" style={{ color: "#00D26A" }}>
-            Voir tout
-          </Link>
-        </div>
-        <div className="flex gap-5 overflow-x-auto pb-2 px-6 scrollbar-hide">
-          {TOP_ARTISTS.map((artist) => (
-            <Link
-              key={artist.id}
-              href="/search"
-              className="flex-shrink-0 flex flex-col items-center gap-2 w-20"
-            >
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, ${artist.color}33, ${artist.color}1A)`,
-                  border: `2px solid ${artist.color}55`,
-                  color: artist.color,
-                }}
-              >
-                {artist.initials}
-              </div>
-              <p className="text-xs text-center font-semibold leading-tight" style={{ color: "#FFFFFF" }}>
-                {artist.name}
-              </p>
-              <p className="text-[10px]" style={{ color: "#A0A0A0" }}>
-                {artist.genre}
-              </p>
+      {artists.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Top artistes
+            </h2>
+            <Link href="/search" className="text-xs font-semibold" style={{ color: "#00D26A" }}>
+              Voir tout
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 px-6 scrollbar-hide">
+            {artists.map((artist, i) => {
+              const color = ARTIST_COLORS[i % ARTIST_COLORS.length]!;
+              const genre = (artist.genres as string[])[0] ?? "Artiste";
+              return (
+                <Link
+                  key={artist.creator_id}
+                  href="/search"
+                  className="flex-shrink-0 flex flex-col items-center gap-2 w-20"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${color}33, ${color}1A)`,
+                      border: `2px solid ${color}55`,
+                      color,
+                    }}
+                  >
+                    {getInitials(artist.stage_name)}
+                  </div>
+                  <p
+                    className="text-xs text-center font-semibold leading-tight"
+                    style={{ color: "#FFFFFF" }}
+                  >
+                    {artist.stage_name}
+                  </p>
+                  <p className="text-[10px]" style={{ color: "#A0A0A0" }}>
+                    {genre}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ── Genres ──────────────────────────────────────── */}
-      <section className="px-6 mb-10">
-        <h2 className="text-base font-bold mb-4" style={{ color: "#FFFFFF" }}>
-          Genres
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {GENRES.map((genre) => (
-            <Link
-              key={genre}
-              href="/search"
-              className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: "#1F1F1F",
-                border: "1px solid #333333",
-                color: "#A0A0A0",
-              }}
-            >
-              {genre}
-            </Link>
-          ))}
-        </div>
-      </section>
+      {genres.length > 0 && (
+        <section className="px-6 mb-10">
+          <h2 className="text-base font-bold mb-4" style={{ color: "#FFFFFF" }}>
+            Genres
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {genres.map((genre) => (
+              <Link
+                key={genre.id}
+                href="/search"
+                className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: "#1F1F1F",
+                  border: "1px solid #333333",
+                  color: "#A0A0A0",
+                }}
+              >
+                #{genre.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Appel à l'action streaming ───────────────────── */}
       <section className="px-6 mb-8">
