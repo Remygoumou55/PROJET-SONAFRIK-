@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Label } from "@sonafrik/types";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function LabelManager({ labels: initial }: { labels: Label[] }) {
@@ -33,12 +34,38 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
       <Card>
         <CardContent className="py-4">
           <form onSubmit={createLabel} className="space-y-3">
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom du label" />
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Description (optionnel)"
-            />
+            <div className="space-y-1">
+              <Input
+                value={name}
+                maxLength={FIELD_LIMITS.LABEL_NAME}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nom du label"
+              />
+              <div className="flex justify-end">
+                <span
+                  className="text-xs"
+                  style={{ color: name.length > FIELD_LIMITS.LABEL_NAME * 0.85 ? "#FFC20E" : "#555555" }}
+                >
+                  {name.length}/{FIELD_LIMITS.LABEL_NAME}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Input
+                value={description}
+                maxLength={FIELD_LIMITS.LABEL_DESCRIPTION}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description (optionnel)"
+              />
+              <div className="flex justify-end">
+                <span
+                  className="text-xs"
+                  style={{ color: description.length > FIELD_LIMITS.LABEL_DESCRIPTION * 0.85 ? "#FFC20E" : "#555555" }}
+                >
+                  {description.length}/{FIELD_LIMITS.LABEL_DESCRIPTION}
+                </span>
+              </div>
+            </div>
             <Button type="submit" disabled={loading || name.length < 2}>
               Créer un label
             </Button>

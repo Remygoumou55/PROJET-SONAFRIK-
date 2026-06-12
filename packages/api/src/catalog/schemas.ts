@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 
 const isrcSchema = z
   .string()
@@ -12,7 +13,7 @@ const upcSchema = z
   .regex(/^\d{12,14}$/, "Code UPC invalide (12-14 chiffres).");
 
 export const createAlbumSchema = z.object({
-  title: z.string().trim().min(2).max(200),
+  title: z.string().trim().min(2).max(FIELD_LIMITS.ALBUM_TITLE),
   releaseType: z.enum(["album", "single", "ep"]),
   upc: upcSchema.optional().nullable(),
   description: z.string().trim().max(2000).optional().nullable(),
@@ -23,7 +24,7 @@ export const createAlbumSchema = z.object({
 export const updateAlbumSchema = createAlbumSchema.partial();
 
 export const createTrackSchema = z.object({
-  title: z.string().trim().min(2).max(200),
+  title: z.string().trim().min(2).max(FIELD_LIMITS.TRACK_TITLE),
   albumId: z.string().uuid().optional().nullable(),
   trackNumber: z.number().int().min(1).optional(),
   isrc: isrcSchema.optional().nullable(),

@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 
 export const updateProfileSchema = z.object({
-  fullName: z.string().trim().min(2).max(100).optional(),
-  bio: z.string().trim().max(500).optional().nullable(),
-  city: z.string().trim().min(2).max(100).optional(),
+  fullName: z.string().trim().min(2).max(FIELD_LIMITS.FULL_NAME).optional(),
+  bio: z.string().trim().max(FIELD_LIMITS.BIO).optional().nullable(),
+  city: z.string().trim().min(2).max(FIELD_LIMITS.CITY).optional(),
   countryCode: z.string().trim().length(2).optional(),
   email: z.string().email("Adresse email invalide.").optional().nullable(),
 });

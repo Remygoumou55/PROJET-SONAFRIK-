@@ -5,8 +5,11 @@ import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Track } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 import { AudioUploader } from "./AudioUploader";
+
+const ISRC_MAX = 12;
 
 export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; creatorId: string }) {
   const router = useRouter();
@@ -46,9 +49,25 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
       <Card>
         <CardContent className="py-4">
           <form onSubmit={createTrack} className="space-y-3">
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titre du morceau" />
+            <div className="space-y-1">
+              <Input
+                value={title}
+                maxLength={FIELD_LIMITS.TRACK_TITLE}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Titre du morceau"
+              />
+              <div className="flex justify-end">
+                <span
+                  className="text-xs"
+                  style={{ color: title.length > FIELD_LIMITS.TRACK_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
+                >
+                  {title.length}/{FIELD_LIMITS.TRACK_TITLE}
+                </span>
+              </div>
+            </div>
             <Input
               value={isrc}
+              maxLength={ISRC_MAX}
               onChange={(e) => setIsrc(e.target.value.toUpperCase())}
               placeholder="ISRC (ex. GNA012600001)"
             />

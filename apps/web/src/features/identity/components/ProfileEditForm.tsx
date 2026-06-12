@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafrik/ui";
 import type { Profile } from "@sonafrik/types";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { AvatarUpload } from "./AvatarUpload";
 import { useIdentityService } from "../hooks/useIdentity";
 
@@ -68,20 +69,31 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Field label="Nom complet">
-            <Input value={fullName} onChange={(event) => setFullName(event.target.value)} />
+            <Input
+              value={fullName}
+              maxLength={FIELD_LIMITS.FULL_NAME}
+              onChange={(event) => setFullName(event.target.value)}
+            />
+            <FieldCounter value={fullName} max={FIELD_LIMITS.FULL_NAME} />
           </Field>
           <Field label="Bio">
             <textarea
               value={bio}
-              maxLength={500}
+              maxLength={FIELD_LIMITS.BIO}
               rows={4}
               onChange={(event) => setBio(event.target.value)}
               className="border-bordure bg-elevated text-texte-principal focus:border-vert-energie w-full rounded-lg border px-3 py-2 text-sm outline-none"
             />
+            <FieldCounter value={bio} max={FIELD_LIMITS.BIO} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Ville">
-              <Input value={city} onChange={(event) => setCity(event.target.value)} />
+              <Input
+                value={city}
+                maxLength={FIELD_LIMITS.CITY}
+                onChange={(event) => setCity(event.target.value)}
+              />
+              <FieldCounter value={city} max={FIELD_LIMITS.CITY} />
             </Field>
             <Field label="Pays (code ISO)">
               <Input
@@ -124,5 +136,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-texte-secondaire text-sm">{label}</span>
       {children}
     </label>
+  );
+}
+
+function FieldCounter({ value, max }: { value: string; max: number }) {
+  return (
+    <div className="flex justify-end">
+      <span
+        className="text-xs"
+        style={{ color: value.length > max * 0.85 ? "#FFC20E" : "#555555" }}
+      >
+        {value.length}/{max}
+      </span>
+    </div>
   );
 }

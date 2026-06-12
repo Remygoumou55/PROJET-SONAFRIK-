@@ -5,8 +5,11 @@ import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Album } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS, RELEASE_TYPE_LABELS } from "@sonafrik/types";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CoverUploader } from "./CoverUploader";
+
+const UPC_MAX = 14;
 
 export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; creatorId: string }) {
   const router = useRouter();
@@ -51,7 +54,22 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
       <Card>
         <CardContent className="py-4">
           <form onSubmit={createRelease} className="space-y-3">
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titre" />
+            <div className="space-y-1">
+              <Input
+                value={title}
+                maxLength={FIELD_LIMITS.ALBUM_TITLE}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Titre"
+              />
+              <div className="flex justify-end">
+                <span
+                  className="text-xs"
+                  style={{ color: title.length > FIELD_LIMITS.ALBUM_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
+                >
+                  {title.length}/{FIELD_LIMITS.ALBUM_TITLE}
+                </span>
+              </div>
+            </div>
             <select
               value={releaseType}
               onChange={(e) => setReleaseType(e.target.value as typeof releaseType)}
@@ -61,7 +79,12 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <option value="album">Album</option>
               <option value="ep">EP</option>
             </select>
-            <Input value={upc} onChange={(e) => setUpc(e.target.value)} placeholder="UPC (12-14 chiffres)" />
+            <Input
+              value={upc}
+              maxLength={UPC_MAX}
+              onChange={(e) => setUpc(e.target.value)}
+              placeholder="UPC (12-14 chiffres)"
+            />
             <Button type="submit" disabled={loading || title.length < 2}>
               Créer une sortie
             </Button>

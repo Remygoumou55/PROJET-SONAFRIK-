@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafrik/ui";
 import type { ArtistProfile, Creator } from "@sonafrik/types";
 import { GENRE_OPTIONS } from "@sonafrik/types";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function ArtistIdentityForm({
@@ -100,17 +101,37 @@ export function ArtistIdentityForm({
         <CardContent className="space-y-4">
           <label className="block space-y-1.5">
             <span className="text-texte-secondaire text-sm">Nom de scène</span>
-            <Input value={stageName} onChange={(e) => setStageName(e.target.value)} />
+            <Input
+              value={stageName}
+              maxLength={FIELD_LIMITS.STAGE_NAME}
+              onChange={(e) => setStageName(e.target.value)}
+            />
+            <div className="flex justify-end">
+              <span
+                className="text-xs"
+                style={{ color: stageName.length > FIELD_LIMITS.STAGE_NAME * 0.85 ? "#FFC20E" : "#555555" }}
+              >
+                {stageName.length}/{FIELD_LIMITS.STAGE_NAME}
+              </span>
+            </div>
           </label>
           <label className="block space-y-1.5">
             <span className="text-texte-secondaire text-sm">Bio</span>
             <textarea
               value={bio}
               rows={4}
-              maxLength={1000}
+              maxLength={FIELD_LIMITS.ARTIST_BIO}
               onChange={(e) => setBio(e.target.value)}
               className="border-bordure bg-elevated text-texte-principal w-full rounded-lg border px-3 py-2 text-sm"
             />
+            <div className="flex justify-end">
+              <span
+                className="text-xs"
+                style={{ color: bio.length > FIELD_LIMITS.ARTIST_BIO * 0.85 ? "#FFC20E" : "#555555" }}
+              >
+                {bio.length}/{FIELD_LIMITS.ARTIST_BIO}
+              </span>
+            </div>
           </label>
           <label className="flex items-center gap-2 text-sm text-texte-secondaire">
             <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />

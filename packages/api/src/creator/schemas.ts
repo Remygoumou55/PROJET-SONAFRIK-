@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
+import { GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR, FIELD_LIMITS } from "@sonafrik/shared";
 
 export const updateArtistProfileSchema = z.object({
-  stageName: z.string().trim().min(2).max(100),
-  bio: z.string().trim().max(1000).optional().nullable(),
+  stageName: z.string().trim().min(2).max(FIELD_LIMITS.STAGE_NAME),
+  bio: z.string().trim().max(FIELD_LIMITS.ARTIST_BIO).optional().nullable(),
   genres: z.array(z.string().trim().min(2).max(50)).max(8).optional(),
   isPublic: z.boolean().optional(),
   socialLinks: z.record(z.string().url("URL invalide.")).optional(),
 });
 
 export const createLabelSchema = z.object({
-  name: z.string().trim().min(2).max(100),
-  description: z.string().trim().max(500).optional().nullable(),
+  name: z.string().trim().min(2).max(FIELD_LIMITS.LABEL_NAME),
+  description: z.string().trim().max(FIELD_LIMITS.LABEL_DESCRIPTION).optional().nullable(),
   countryCode: z.string().trim().length(2).optional(),
   websiteUrl: z.string().url().optional().nullable(),
 });
