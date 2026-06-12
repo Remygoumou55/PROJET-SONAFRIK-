@@ -143,7 +143,7 @@ export default function AccueilTab() {
   function handlePlay(track: DiscoveryTrack) {
     const meta = toTrackWithMeta(track);
     if (currentTrack?.id === meta.id) {
-      isPlaying ? pause() : resume();
+      if (isPlaying) { pause(); } else { resume(); }
     } else {
       loadAndPlay(meta);
     }
