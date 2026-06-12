@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 
 export const updateArtistProfileSchema = z.object({
   stageName: z.string().trim().min(2).max(100),
@@ -16,7 +17,7 @@ export const createLabelSchema = z.object({
 });
 
 export const inviteTeamMemberSchema = z.object({
-  memberPhone: z.string().trim().min(8).max(20),
+  memberPhone: z.string().trim().regex(GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR),
   role: z.enum(["manager", "editor", "accountant", "viewer"]),
 });
 

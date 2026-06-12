@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button, Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
+import { isValidGuineanPhone, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 
 interface PhoneFormProps {
   onSubmit: (phone: string) => Promise<void>;
@@ -22,6 +23,12 @@ export function PhoneForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!isValidGuineanPhone(phone)) {
+      setError(GUINEAN_PHONE_ERROR);
+      return;
+    }
+
     setLoading(true);
     try {
       await onSubmit(phone);
@@ -40,9 +47,13 @@ export function PhoneForm({
         inputMode="tel"
         autoComplete="tel"
         placeholder="+224620000000"
+        maxLength={13}
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        hint="Format international — Guinée : +224"
+        onChange={(e) => {
+          setPhone(e.target.value);
+          if (error) setError(null);
+        }}
+        hint="Format international — Guinée : +224XXXXXXXXX"
         required
       />
       {error ? (

@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 
-/** Format E.164 — Guinée +224 par défaut */
+/** +224 suivi de 9 chiffres — ex. +224624000001 */
 export const phoneSchema = z
   .string()
   .trim()
-  .regex(/^\+[1-9]\d{7,14}$/, "Numéro de téléphone invalide. Utilisez le format +224XXXXXXXXX.");
+  .regex(GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR);
 
 export const otpSchema = z
   .string()

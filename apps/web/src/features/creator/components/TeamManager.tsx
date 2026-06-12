@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { CreatorTeamMember } from "@sonafrik/types";
 import { CREATOR_TEAM_ROLE_LABELS } from "@sonafrik/types";
+import { isValidGuineanPhone, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
@@ -14,9 +15,17 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
   const [phone, setPhone] = useState("+224");
   const [role, setRole] = useState<"manager" | "editor" | "accountant" | "viewer">("editor");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function invite(event: React.FormEvent) {
     event.preventDefault();
+    setError(null);
+
+    if (!isValidGuineanPhone(phone)) {
+      setError(GUINEAN_PHONE_ERROR);
+      return;
+    }
+
     setLoading(true);
     try {
       const member = await creatorService.inviteTeamMember({ memberPhone: phone, role });
@@ -24,7 +33,7 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
       setPhone("+224");
       router.refresh();
     } catch {
-      alert("Membre introuvable. Le numéro doit être un compte SONAFRIK existant.");
+      setError("Membre introuvable. Le numéro doit être un compte SONAFRIK existant.");
     } finally {
       setLoading(false);
     }
@@ -46,7 +55,20 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
       <Card>
         <CardContent className="py-4">
           <form onSubmit={invite} className="space-y-3">
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+224XXXXXXXXX" />
+            <Input
+              value={phone}
+              maxLength={13}
+              placeholder="+224XXXXXXXXX"
+              onChange={(e) => {
+                setPhone(e.target.value);
+                if (error) setError(null);
+              }}
+            />
+            {error ? (
+              <p className="text-sm" style={{ color: "#FF4444" }} role="alert">
+                {error}
+              </p>
+            ) : null}
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as typeof role)}
