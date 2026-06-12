@@ -97,7 +97,7 @@ export default function InscriptionPage() {
       });
 
       if (rpcError) {
-        setError("Erreur lors de l'inscription. Réessayez.");
+        setError(`Erreur: ${rpcError.message}`);
         return;
       }
 
