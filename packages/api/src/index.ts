@@ -23,3 +23,4 @@ export * from "./catalog";
 export * from "./streaming";
 export * from "./wallet";
 export * from "./recommendation";
+export * from "./social";

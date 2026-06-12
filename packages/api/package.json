@@ -32,6 +32,14 @@
     "./wallet": {
       "types": "./dist/wallet/index.d.ts",
       "default": "./dist/wallet/index.js"
+    },
+    "./recommendation": {
+      "types": "./dist/recommendation/index.d.ts",
+      "default": "./dist/recommendation/index.js"
+    },
+    "./social": {
+      "types": "./dist/social/index.d.ts",
+      "default": "./dist/social/index.js"
     }
   },
   "scripts": {
