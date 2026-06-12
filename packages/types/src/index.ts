@@ -42,6 +42,8 @@ export interface Profile {
   locale: string;
   fraud_score: number;
   onboarding_completed: boolean;
+  is_premium: boolean;
+  premium_expires_at: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

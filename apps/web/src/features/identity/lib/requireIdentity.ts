@@ -2,7 +2,55 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createIdentityService } from "@sonafrik/api/identity";
 import { IdentityError } from "@sonafrik/api/identity";
+import type { IdentityContext } from "@sonafrik/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+
+const DEV_IDENTITY: IdentityContext = {
+  profile: {
+    id: "dev-bypass",
+    phone: null,
+    email: "dev@sonafrik.local",
+    full_name: "Dev Preview",
+    avatar_url: null,
+    avatar_path: null,
+    bio: null,
+    city: null,
+    country_code: null,
+    account_type: "auditeur_artiste",
+    locale: "fr",
+    fraud_score: 0,
+    onboarding_completed: true,
+    is_premium: false,
+    premium_expires_at: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    deleted_at: null,
+  },
+  preferences: {
+    user_id: "dev-bypass",
+    language: "fr",
+    audio_quality: "128",
+    data_saver: false,
+    autoplay_on_wifi: true,
+    autoplay_on_cellular: false,
+    explicit_content_allowed: false,
+    profile_visibility: "public",
+    show_listening_activity: true,
+    push_notifications: true,
+    email_notifications: true,
+    sms_notifications: false,
+    marketing_notifications: false,
+    awards_reminders: true,
+    new_releases_alerts: true,
+    artist_comment_replies: true,
+    timezone: "Africa/Conakry",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  roles: ["auditeur_artiste"],
+  unreadNotifications: 0,
+  activeSessions: 1,
+};
 
 // React.cache() déduplique les appels dans le même rendu serveur :
 // layout.tsx et profile/page.tsx appellent tous les deux requireIdentityContext()
@@ -14,6 +62,7 @@ const fetchIdentityContext = cache(async () => {
 });
 
 export async function requireIdentityContext() {
+  if (process.env.BYPASS_AUTH === "true") return DEV_IDENTITY;
   try {
     return await fetchIdentityContext();
   } catch (err) {
