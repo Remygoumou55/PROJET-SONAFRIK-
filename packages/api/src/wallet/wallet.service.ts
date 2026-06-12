@@ -16,9 +16,11 @@ import {
   subscribePremiumSchema,
   addPayoutAccountSchema,
   requestWithdrawalSchema,
+  topupWalletSchema,
   type SubscribePremiumInput,
   type AddPayoutAccountInput,
   type RequestWithdrawalInput,
+  type TopupWalletInput,
 } from "./schemas";
 
 export class WalletService {
@@ -106,6 +108,31 @@ export class WalletService {
   async getPayoutAccounts(): Promise<PayoutAccount[]> {
     const userId = await this.requireUserId();
     return this.repo.getPayoutAccounts(userId);
+  }
+
+  async topupWallet(input: TopupWalletInput): Promise<{ transactionId: string; newBalanceGnf: number; idempotent: boolean }> {
+    const parsed = topupWalletSchema.parse(input);
+    await this.requireUserId();
+
+    const { data, error } = await this.client.rpc("topup_wallet" as never, {
+      p_amount_gnf: parsed.amountGnf,
+      p_payment_method: parsed.paymentMethod,
+      p_payment_reference: parsed.paymentReference,
+    } as never);
+
+    if (error) {
+      if (error.message.includes("minimum_topup")) throw new WalletError("TOPUP_FAILED", "Recharge minimum 1 000 GNF");
+      if (error.message.includes("wallet_not_found")) throw new WalletError("WALLET_NOT_FOUND", "Portefeuille introuvable");
+      if (error.message.includes("invalid_payment_method")) throw new WalletError("TOPUP_FAILED", "Méthode de paiement invalide");
+      throw new WalletError("TOPUP_FAILED", "Échec de la recharge");
+    }
+
+    const result = data as { success: boolean; transaction_id: string; new_balance_gnf: number; idempotent: boolean };
+    return {
+      transactionId: result.transaction_id,
+      newBalanceGnf: result.new_balance_gnf,
+      idempotent: result.idempotent,
+    };
   }
 
   async subscribePremium(input: SubscribePremiumInput): Promise<{ expiresAt: string; amountDebitedGnf: number }> {

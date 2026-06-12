@@ -6,124 +6,84 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const VALID_PAYMENT_METHODS = ["orange_money", "mtn_momo", "wave", "card", "internal"] as const;
+type PaymentMethod = (typeof VALID_PAYMENT_METHODS)[number];
+
+function json(body: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS, "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "unauthorized" }), {
-        status: 401,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
-    }
+    if (!authHeader) return json({ error: "unauthorized" }, 401);
 
-    // Client authentifié pour récupérer l'utilisateur
-    const anonClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    const { data: { user }, error: authError } = await anonClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "unauthorized" }), {
-        status: 401,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
-    }
-
-    const body = await req.json();
-    const { amountGnf, paymentMethod, paymentReference } = body as {
-      amountGnf: number;
-      paymentMethod: string;
-      paymentReference: string;
-    };
-
-    if (!amountGnf || amountGnf < 1000) {
-      return new Response(JSON.stringify({ error: "minimum_topup_1000_gnf" }), {
-        status: 400,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
-    }
-
-    // Service role pour accès complet
-    const adminClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-
-    // Récupérer le wallet
-    const { data: wallet, error: walletError } = await adminClient
-      .from("wallets")
-      .select("id, balance_gnf, total_credited_gnf")
-      .eq("user_id", user.id)
-      .single();
-
-    if (walletError || !wallet) {
-      return new Response(JSON.stringify({ error: "wallet_not_found" }), {
-        status: 404,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
-    }
-
-    const newBalance = Number(wallet.balance_gnf) + amountGnf;
-    const newTotalCredited = Number(wallet.total_credited_gnf ?? 0) + amountGnf;
-
-    // Transaction
-    const { data: transaction, error: txError } = await adminClient
-      .from("transactions")
-      .insert({
-        user_id: user.id,
-        wallet_id: wallet.id,
-        type: "topup",
-        status: "completed",
-        amount_gnf: amountGnf,
-        commission_gnf: 0,
-        net_amount_gnf: amountGnf,
-        currency: "GNF",
-        payment_method: paymentMethod,
-        payment_reference: paymentReference,
-        description: `Recharge portefeuille — ${paymentMethod}`,
-        processed_at: new Date().toISOString(),
-      })
-      .select("id")
-      .single();
-
-    if (txError) throw new Error("transaction_insert_failed");
-
-    // Mise à jour du solde et du total crédité
-    const { error: updateError } = await adminClient
-      .from("wallets")
-      .update({
-        balance_gnf: newBalance,
-        total_credited_gnf: newTotalCredited,
-      })
-      .eq("user_id", user.id);
-
-    if (updateError) throw new Error("wallet_update_failed");
-
-    // Entrée ledger
-    await adminClient.from("wallet_ledger").insert({
-      wallet_id: wallet.id,
-      user_id: user.id,
-      entry_type: "credit",
-      amount_gnf: amountGnf,
-      balance_after_gnf: newBalance,
-      reason: "topup",
-      reference_id: transaction!.id,
-      reference_type: "transactions",
-      metadata: { payment_method: paymentMethod, payment_reference: paymentReference },
+    // Client authentifié — la RPC topup_wallet tourne en SECURITY DEFINER
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
     });
 
-    return new Response(
-      JSON.stringify({ success: true, new_balance_gnf: newBalance, transaction_id: transaction!.id }),
-      { status: 200, headers: { ...CORS, "Content-Type": "application/json" } },
-    );
+    const { data: { user }, error: authError } = await userClient.auth.getUser();
+    if (authError || !user) return json({ error: "unauthorized" }, 401);
+
+    const body = await req.json() as {
+      amountGnf: unknown;
+      paymentMethod: unknown;
+      paymentReference: unknown;
+      description?: unknown;
+    };
+
+    const amountGnf = Number(body.amountGnf);
+    const paymentMethod = body.paymentMethod as PaymentMethod;
+    const paymentReference = typeof body.paymentReference === "string" ? body.paymentReference : null;
+
+    // Validation côté Edge Function (double protection avant la RPC)
+    if (!amountGnf || amountGnf < 1000) {
+      return json({ error: "minimum_topup_1000_gnf" }, 400);
+    }
+
+    if (!VALID_PAYMENT_METHODS.includes(paymentMethod)) {
+      return json({ error: "invalid_payment_method" }, 400);
+    }
+
+    // Délégation à la RPC atomique — atomicité + idempotence garanties par PostgreSQL
+    const { data, error: rpcError } = await userClient.rpc("topup_wallet" as never, {
+      p_amount_gnf: amountGnf,
+      p_payment_method: paymentMethod,
+      p_payment_reference: paymentReference,
+      p_description: typeof body.description === "string" ? body.description : null,
+    } as never);
+
+    if (rpcError) {
+      const msg = rpcError.message;
+      if (msg.includes("minimum_topup")) return json({ error: "minimum_topup_1000_gnf" }, 400);
+      if (msg.includes("wallet_not_found")) return json({ error: "wallet_not_found" }, 404);
+      if (msg.includes("invalid_payment_method")) return json({ error: "invalid_payment_method" }, 400);
+      return json({ error: "topup_failed" }, 500);
+    }
+
+    const result = data as {
+      success: boolean;
+      transaction_id: string;
+      new_balance_gnf: number;
+      idempotent: boolean;
+    };
+
+    return json({
+      success: true,
+      transaction_id: result.transaction_id,
+      new_balance_gnf: result.new_balance_gnf,
+      idempotent: result.idempotent,
+    });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "internal_error" }),
-      { status: 500, headers: { ...CORS, "Content-Type": "application/json" } },
-    );
+    return json({ error: err instanceof Error ? err.message : "internal_error" }, 500);
   }
 });

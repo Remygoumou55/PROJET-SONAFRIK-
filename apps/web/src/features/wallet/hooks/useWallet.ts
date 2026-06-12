@@ -6,6 +6,7 @@ import type {
   SubscribePremiumInput,
   AddPayoutAccountInput,
   RequestWithdrawalInput,
+  TopupWalletInput,
 } from "@sonafrik/api/wallet";
 import type {
   WalletContext,
@@ -49,7 +50,17 @@ export function useWallet() {
     }
   }, [service, loadContext]);
 
-  return { context, isLoading, error, subscribePremium, reload: loadContext };
+  const topupWallet = useCallback(async (input: TopupWalletInput) => {
+    try {
+      const result = await service.topupWallet(input);
+      await loadContext();
+      return result;
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Échec de la recharge.");
+    }
+  }, [service, loadContext]);
+
+  return { context, isLoading, error, subscribePremium, topupWallet, reload: loadContext };
 }
 
 export function useTransactions() {

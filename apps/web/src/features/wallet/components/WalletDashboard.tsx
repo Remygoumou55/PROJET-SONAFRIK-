@@ -136,7 +136,7 @@ export const WalletDashboard = memo(function WalletDashboard({
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold" style={{ color: "#FFFFFF" }}>Dernières opérations</h3>
-            <a href="/wallet/transactions" className="text-xs" style={{ color: "#00D26A" }}>Voir tout</a>
+            <a href="/wallet" className="text-xs" style={{ color: "#00D26A" }}>Voir tout</a>
           </div>
           <div className="rounded-xl px-4" style={{ backgroundColor: "#1F1F1F" }}>
             {recentTransactions.map((tx) => (

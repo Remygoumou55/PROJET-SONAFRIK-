@@ -13,9 +13,18 @@ const SubscriptionModal = dynamic(
   { ssr: false },
 );
 
+const TopupModal = dynamic(
+  () =>
+    import("@/features/wallet/components/TopupModal").then(
+      (m) => ({ default: m.TopupModal }),
+    ),
+  { ssr: false },
+);
+
 export default function WalletPage() {
   const { context, isLoading, error } = useWallet();
   const [showSubscription, setShowSubscription] = useState(false);
+  const [showTopup, setShowTopup] = useState(false);
 
   if (isLoading) {
     return (
@@ -38,9 +47,10 @@ export default function WalletPage() {
       <WalletDashboard
         context={context}
         onSubscribe={() => setShowSubscription(true)}
-        onTopup={() => {}}
+        onTopup={() => setShowTopup(true)}
       />
       {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} />}
+      {showTopup && <TopupModal onClose={() => setShowTopup(false)} />}
     </>
   );
 }
