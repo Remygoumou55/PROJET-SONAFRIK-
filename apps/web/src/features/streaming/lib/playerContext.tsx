@@ -77,7 +77,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
       });
 
-      audio.oncanplay = () => setState((prev) => ({ ...prev, isLoading: false }));
+      // Durée réelle depuis les métadonnées HTML5 — fallback si duration_seconds = 0 en DB
+      audio.onloadedmetadata = () => {
+        if (audio.duration > 0 && isFinite(audio.duration)) {
+          setState((prev) => ({ ...prev, duration: audio.duration }));
+        }
+      };
+
+      audio.oncanplay = () => {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          duration: (audio.duration > 0 && isFinite(audio.duration)) ? audio.duration : prev.duration,
+        }));
+      };
 
       audio.ontimeupdate = () => {
         setState((prev) => ({ ...prev, currentPosition: audio.currentTime }));

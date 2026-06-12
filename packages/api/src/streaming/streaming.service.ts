@@ -85,7 +85,17 @@ export class StreamingService {
     if (!parsed.success) throw new StreamingError("session_not_found");
 
     await this.requireUserId();
-    await this.repository.heartbeat(parsed.data.sessionId, parsed.data.positionSeconds);
+
+    // Route via l'Edge Function stream-progress pour activer l'anti-fraude
+    // et enregistrer les events heartbeat dans stream_events.
+    const { error } = await this.client.functions.invoke("stream-progress", {
+      body: {
+        sessionId: parsed.data.sessionId,
+        positionSeconds: parsed.data.positionSeconds,
+      },
+    });
+
+    if (error) throw new StreamingError("session_not_found");
   }
 
   /** Real Listen V7.2 — retourne true si l'écoute est valide (≥90%) */

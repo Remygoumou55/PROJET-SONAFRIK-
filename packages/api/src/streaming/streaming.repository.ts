@@ -327,9 +327,37 @@ export class StreamingRepository {
   async getStreamAnalytics(creatorId: string, periodDays: number): Promise<StreamAnalytics> {
     const since = new Date(Date.now() - periodDays * 24 * 3600 * 1000).toISOString();
 
+    // Récupérer uniquement les tracks de ce créateur avec leur titre
+    const { data: creatorTracks } = await this.client
+      .from("tracks")
+      .select("id, title")
+      .eq("creator_id", creatorId)
+      .eq("publication_status", "published")
+      .is("deleted_at", null);
+
+    const trackIds = (creatorTracks ?? []).map((t) => t.id as string);
+    const titleMap: Record<string, string> = {};
+    for (const t of creatorTracks ?? []) {
+      titleMap[t.id as string] = t.title as string;
+    }
+
+    if (trackIds.length === 0) {
+      return {
+        creator_id: creatorId,
+        period_days: periodDays,
+        total_streams: 0,
+        valid_streams: 0,
+        unique_listeners: 0,
+        total_listened_seconds: 0,
+        top_tracks: [],
+        streams_by_platform: { web: 0, ios: 0, android: 0 },
+      };
+    }
+
     const { data, error } = await this.client
       .from("stream_sessions")
-      .select("is_valid_listen, platform, total_listened_seconds, user_id, track_id")
+      .select("platform, total_listened_seconds, user_id, track_id")
+      .in("track_id", trackIds)
       .eq("is_valid_listen", true)
       .gte("started_at", since);
 
@@ -337,7 +365,7 @@ export class StreamingRepository {
 
     const rows = data ?? [];
     const total_streams = rows.length;
-    const valid_streams = rows.filter((r) => r.is_valid_listen).length;
+    const valid_streams = rows.length;
     const unique_listeners = new Set(rows.map((r) => r.user_id)).size;
     const total_listened_seconds = rows.reduce(
       (acc, r) => acc + ((r.total_listened_seconds as number) ?? 0),
@@ -352,12 +380,17 @@ export class StreamingRepository {
 
     const trackCounts: Record<string, number> = {};
     for (const r of rows) {
-      trackCounts[r.track_id as string] = (trackCounts[r.track_id as string] ?? 0) + 1;
+      const tid = r.track_id as string;
+      trackCounts[tid] = (trackCounts[tid] ?? 0) + 1;
     }
     const top_tracks = Object.entries(trackCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([track_id, stream_count]) => ({ track_id, title: track_id, stream_count }));
+      .map(([track_id, stream_count]) => ({
+        track_id,
+        title: titleMap[track_id] ?? track_id,
+        stream_count,
+      }));
 
     return {
       creator_id: creatorId,
