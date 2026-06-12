@@ -44,6 +44,10 @@
     "./discovery": {
       "types": "./dist/discovery/index.d.ts",
       "default": "./dist/discovery/index.js"
+    },
+    "./analytics": {
+      "types": "./dist/analytics/index.d.ts",
+      "default": "./dist/analytics/index.js"
     }
   },
   "scripts": {

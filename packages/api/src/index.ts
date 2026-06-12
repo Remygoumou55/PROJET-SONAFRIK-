@@ -25,3 +25,4 @@ export * from "./wallet";
 export * from "./recommendation";
 export * from "./social";
 export * from "./discovery";
+export * from "./analytics";

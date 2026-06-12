@@ -1006,3 +1006,97 @@ export const WALLET_ERROR_MESSAGES: Record<string, string> = {
   unauthorized: "Accès non autorisé.",
   unknown: "Une erreur est survenue. Réessayez.",
 };
+
+// ─── Sprint 7.0 — Creator Analytics Pro ──────────────────────────────────────
+
+export interface CreatorStreamStats {
+  total_streams: number;
+  valid_streams: number;
+  fraud_streams: number;
+  today_streams: number;
+  week_streams: number;
+  month_streams: number;
+  quarter_streams: number;
+  valid_week_streams: number;
+  valid_month_streams: number;
+  valid_rate_percent: number;
+}
+
+export interface StreamTimelineEntry {
+  date: string;
+  streams: number;
+  valid_streams: number;
+}
+
+export interface CreatorTopTrack {
+  track_id: string;
+  title: string;
+  slug: string;
+  album_id: string | null;
+  album_title: string | null;
+  cover_path: string | null;
+  duration_seconds: number | null;
+  valid_streams: number;
+  total_streams: number;
+  like_count: number;
+  engagement_score: number;
+}
+
+export interface CreatorTopAlbum {
+  album_id: string;
+  title: string;
+  slug: string;
+  cover_path: string | null;
+  release_type: string;
+  release_date: string | null;
+  track_count: number;
+  valid_streams: number;
+  total_streams: number;
+  like_count: number;
+  engagement_score: number;
+}
+
+export interface CreatorAudienceStats {
+  total_followers: number;
+  artist_followers: number;
+  creator_followers: number;
+  new_followers_7d: number;
+  new_followers_30d: number;
+  total_track_likes: number;
+  total_album_favorites: number;
+  playlist_followers: number;
+  total_engagement: number;
+  engagement_score: number;
+}
+
+export interface CreatorRevenueStats {
+  total_royalties_gnf: number;
+  paid_royalties_gnf: number;
+  pending_royalties_gnf: number;
+  wallet_balance_gnf: number;
+  total_credited_gnf: number;
+  valid_listen_count: number;
+  avg_gnf_per_listen: number;
+  month_valid_streams: number;
+  estimated_monthly_gnf: number;
+}
+
+export interface CreatorAnalyticsData {
+  streamStats: CreatorStreamStats;
+  timeline: StreamTimelineEntry[];
+  topTracks: CreatorTopTrack[];
+  topAlbums: CreatorTopAlbum[];
+  audienceStats: CreatorAudienceStats;
+  revenueStats: CreatorRevenueStats;
+}
+
+export const ANALYTICS_ERROR_MESSAGES: Record<string, string> = {
+  stream_stats_failed: "Impossible de charger les statistiques de streams.",
+  timeline_failed: "Impossible de charger la timeline.",
+  top_tracks_failed: "Impossible de charger le top morceaux.",
+  top_albums_failed: "Impossible de charger le top albums.",
+  audience_stats_failed: "Impossible de charger les statistiques d'audience.",
+  revenue_stats_failed: "Impossible de charger les statistiques de revenus.",
+  unauthorized: "Accès non autorisé.",
+  unknown: "Une erreur est survenue.",
+};

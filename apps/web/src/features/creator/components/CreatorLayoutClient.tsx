@@ -17,15 +17,17 @@ export function CreatorLayoutClient({
       ? "Albums & Singles"
       : pathname.startsWith("/creator/catalog")
         ? "Catalogue"
-        : pathname.startsWith("/creator/identity")
-          ? "Identité artiste"
-          : pathname.startsWith("/creator/verification")
-            ? "Vérification"
-            : pathname.startsWith("/creator/labels")
-              ? "Labels"
-              : pathname.startsWith("/creator/team")
-                ? "Équipe"
-                : "Dashboard créateur";
+        : pathname.startsWith("/creator/analytics")
+          ? "Analytics Pro"
+          : pathname.startsWith("/creator/identity")
+            ? "Identité artiste"
+            : pathname.startsWith("/creator/verification")
+              ? "Vérification"
+              : pathname.startsWith("/creator/labels")
+                ? "Labels"
+                : pathname.startsWith("/creator/team")
+                  ? "Équipe"
+                  : "Dashboard créateur";
 
   return (
     <div className="min-h-screen bg-noir-profond">

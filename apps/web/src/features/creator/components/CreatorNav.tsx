@@ -3,6 +3,7 @@ import { Badge } from "@sonafrik/ui";
 
 const NAV = [
   { href: "/creator", label: "Dashboard", exact: true },
+  { href: "/creator/analytics", label: "Analytics Pro", exact: true },
   { href: "/creator/catalog", label: "Catalogue", exact: true },
   { href: "/creator/catalog/releases", label: "Albums & Singles" },
   { href: "/creator/catalog/tracks", label: "Morceaux" },
