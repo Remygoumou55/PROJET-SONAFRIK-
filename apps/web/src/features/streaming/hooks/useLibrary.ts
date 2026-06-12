@@ -46,9 +46,9 @@ export function useLibrary() {
   );
 
   const createPlaylist = useCallback(
-    async (title: string, description?: string) => {
+    async (title: string, description?: string, isPublic = false) => {
       try {
-        const playlist = await streaming.createPlaylist({ title, description, isPublic: false });
+        const playlist = await streaming.createPlaylist({ title, description, isPublic });
         await loadLibrary();
         return playlist;
       } catch (err) {

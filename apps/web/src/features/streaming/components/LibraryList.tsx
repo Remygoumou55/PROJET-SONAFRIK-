@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { Playlist } from "@sonafrik/types";
 import { useLibrary } from "../hooks/useLibrary";
 
@@ -46,72 +45,8 @@ function PlaylistCard({
   );
 }
 
-function CreatePlaylistForm({ onCreate }: { onCreate: (title: string) => void }) {
-  const [title, setTitle] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-3 w-full p-4 rounded-xl border-dashed border-2 transition-colors"
-        style={{ borderColor: "#333333", color: "#A0A0A0" }}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-        <span className="text-sm">Nouvelle playlist</span>
-      </button>
-    );
-  }
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (title.trim()) {
-          onCreate(title.trim());
-          setTitle("");
-          setIsOpen(false);
-        }
-      }}
-      className="flex gap-2"
-    >
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Nom de la playlist"
-        autoFocus
-        className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
-        style={{
-          backgroundColor: "#2A2A2A",
-          color: "#FFFFFF",
-          border: "1px solid #333333",
-        }}
-        maxLength={200}
-      />
-      <button
-        type="submit"
-        className="px-4 py-2 rounded-lg text-sm font-semibold"
-        style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
-      >
-        Créer
-      </button>
-      <button
-        type="button"
-        onClick={() => setIsOpen(false)}
-        className="px-3 py-2 rounded-lg text-sm"
-        style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
-      >
-        Annuler
-      </button>
-    </form>
-  );
-}
-
 export function LibraryList() {
-  const { playlists, isLoading, error, createPlaylist, deletePlaylist } = useLibrary();
+  const { playlists, isLoading, error, deletePlaylist } = useLibrary();
 
   if (isLoading) {
     return (
@@ -134,7 +69,6 @@ export function LibraryList() {
 
   return (
     <div className="space-y-4">
-      <CreatePlaylistForm onCreate={createPlaylist} />
       {playlists.length === 0 ? (
         <div className="py-8 text-center">
           <p className="text-lg font-semibold mb-2" style={{ color: "#FFFFFF" }}>
