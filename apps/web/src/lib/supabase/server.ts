@@ -8,19 +8,9 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (url && anonKey) return { url, anonKey };
+  if (!url || !anonKey) throw new Error("Configuration Supabase manquante");
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "[SONAFRIK] NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY sont requis en production.",
-    );
-  }
-
-  return {
-    url: "http://127.0.0.1:54321",
-    anonKey:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
-  };
+  return { url, anonKey };
 }
 
 // React.cache() déduplique les appels dans le même rendu serveur :
