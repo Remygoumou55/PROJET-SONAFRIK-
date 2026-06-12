@@ -760,6 +760,73 @@ export const SOCIAL_ERROR_MESSAGES: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// Discovery Engine — Sprint 6.0
+// ---------------------------------------------------------------------------
+
+export type DiscoverySection = 'pour_vous' | 'decouvertes' | 'tendances' | 'nouveautes' | 'artistes' | 'albums';
+export type NewReleasesType = 'track' | 'album' | 'artist' | 'all';
+
+export interface DiscoveryTrack {
+  track_id: string;
+  title: string;
+  slug: string;
+  duration_seconds: number | null;
+  artist_name: string | null;
+  creator_id: string;
+  album_id: string | null;
+  album_title: string | null;
+  cover_path: string | null;
+  published_at: string | null;
+  like_count: number;
+  stream_count: number;
+  discovery_score: number;
+}
+
+export interface DiscoveryAlbum {
+  id: string;
+  title: string;
+  slug: string;
+  release_type: string;
+  cover_path: string | null;
+  release_date: string | null;
+  artist_name: string | null;
+  creator_id: string;
+  published_at: string | null;
+  like_count: number;
+  stream_count: number;
+  discovery_score: number;
+}
+
+export interface DiscoveryArtist {
+  creator_id: string;
+  stage_name: string;
+  slug: string;
+  bio: string | null;
+  genres: string[];
+  cover_path: string | null;
+  verified: boolean;
+  follower_count: number;
+  stream_count: number;
+  discovery_score: number;
+  created_at?: string;
+}
+
+export interface NewReleasesResult {
+  tracks: DiscoveryTrack[];
+  albums: DiscoveryAlbum[];
+  artists: DiscoveryArtist[];
+}
+
+export const DISCOVERY_ERROR_MESSAGES: Record<string, string> = {
+  unauthorized: "Accès non autorisé. Connectez-vous.",
+  discovery_feed_failed: "Impossible de charger les découvertes.",
+  new_releases_failed: "Impossible de charger les nouveautés.",
+  suggested_artists_failed: "Impossible de charger les artistes suggérés.",
+  suggested_albums_failed: "Impossible de charger les albums suggérés.",
+  unknown: "Une erreur est survenue. Réessayez.",
+};
+
+// ---------------------------------------------------------------------------
 // Wallet OS — Sprint 8
 // CDC Règle #2 : Premium J1 · Gratuit 7 jours
 // CDC Règle #3 : Revenue Pool 65% aux artistes

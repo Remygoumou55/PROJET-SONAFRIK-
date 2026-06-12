@@ -40,6 +40,10 @@
     "./social": {
       "types": "./dist/social/index.d.ts",
       "default": "./dist/social/index.js"
+    },
+    "./discovery": {
+      "types": "./dist/discovery/index.d.ts",
+      "default": "./dist/discovery/index.js"
     }
   },
   "scripts": {

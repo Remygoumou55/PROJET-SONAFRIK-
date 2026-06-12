@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { TrendingTrack } from "@sonafrik/types";
+import type { DiscoveryAlbum, DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -40,7 +40,15 @@ async function getHomepageContent() {
   try {
     const supabase = await getSupabaseServerClient();
 
-    const [playlistsResult, artistsResult, genresResult, trendingResult] = await Promise.all([
+    const [
+      playlistsResult,
+      artistsResult,
+      genresResult,
+      trendingResult,
+      discoveryResult,
+      newAlbumsResult,
+      suggestedArtistsResult,
+    ] = await Promise.all([
       supabase
         .from("playlists")
         .select("id, title, track_count")
@@ -62,6 +70,9 @@ async function getHomepageContent() {
         .order("sort_order")
         .limit(12),
       supabase.rpc("get_trending_tracks" as never, { p_window: "7d", p_limit: 10 } as never),
+      supabase.rpc("get_discovery_feed" as never, { p_limit: 8 } as never),
+      supabase.rpc("get_new_releases" as never, { p_type: "album", p_days: 60, p_limit: 6 } as never),
+      supabase.rpc("get_suggested_artists" as never, { p_limit: 6 } as never),
     ]);
 
     return {
@@ -80,17 +91,20 @@ async function getHomepageContent() {
         name: string;
       }>,
       trending: (trendingResult.data ?? []) as TrendingTrack[],
+      discoveries: (discoveryResult.data ?? []) as DiscoveryTrack[],
+      newAlbums: ((newAlbumsResult.data as { albums?: DiscoveryAlbum[] } | null)?.albums ?? []) as DiscoveryAlbum[],
+      suggestedArtists: (suggestedArtistsResult.data ?? []) as DiscoveryArtist[],
     };
   } catch {
-    return { playlists: [], artists: [], genres: [], trending: [] };
+    return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [] };
   }
 }
 
 export default async function ListenPage() {
-  const [{ profile }, { playlists, artists, genres, trending }] = await Promise.all([
-    requireIdentityContext(),
-    getHomepageContent(),
-  ]);
+  const [
+    { profile },
+    { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists },
+  ] = await Promise.all([requireIdentityContext(), getHomepageContent()]);
 
   const firstName = profile.full_name?.split(" ")[0] ?? "artiste";
 
@@ -273,6 +287,137 @@ export default async function ListenPage() {
                     }}
                   >
                     {getInitials(artist.stage_name)}
+                  </div>
+                  <p
+                    className="text-xs text-center font-semibold leading-tight"
+                    style={{ color: "#FFFFFF" }}
+                  >
+                    {artist.stage_name}
+                  </p>
+                  <p className="text-[10px]" style={{ color: "#A0A0A0" }}>
+                    {genre}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── Découvertes ─────────────────────────────────── */}
+      {discoveries.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Découvertes
+            </h2>
+            <span className="text-xs font-semibold" style={{ color: "#00D26A" }}>
+              Pour toi
+            </span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 px-6 scrollbar-hide">
+            {discoveries.map((track) => (
+              <div
+                key={track.track_id}
+                className="flex-shrink-0 w-32"
+              >
+                <div
+                  className="aspect-square rounded-xl mb-2 flex items-center justify-center relative overflow-hidden"
+                  style={{ backgroundColor: "#1F1F1F", border: "1px solid #2A2A2A" }}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#00D26A" opacity={0.6}>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {track.like_count > 0 && (
+                    <div
+                      className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+                      style={{ backgroundColor: "#00D26A22", color: "#00D26A" }}
+                    >
+                      ♥ {track.like_count}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs font-semibold truncate" style={{ color: "#FFFFFF" }}>
+                  {track.title}
+                </p>
+                {track.artist_name && (
+                  <p className="text-[10px] truncate mt-0.5" style={{ color: "#A0A0A0" }}>
+                    {track.artist_name}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Nouveautés — Albums ──────────────────────────── */}
+      {newAlbums.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Nouveautés
+            </h2>
+            <span className="text-xs font-semibold" style={{ color: "#00D26A" }}>
+              60 derniers jours
+            </span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 px-6 scrollbar-hide">
+            {newAlbums.map((album) => (
+              <div key={album.id} className="flex-shrink-0 w-32">
+                <div
+                  className="aspect-square rounded-xl mb-2"
+                  style={{ backgroundColor: "#1F1F1F", border: "1px solid #2A2A2A" }}
+                />
+                <p className="text-xs font-semibold truncate" style={{ color: "#FFFFFF" }}>
+                  {album.title}
+                </p>
+                {album.artist_name && (
+                  <p className="text-[10px] truncate mt-0.5" style={{ color: "#A0A0A0" }}>
+                    {album.artist_name}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Artistes à découvrir ─────────────────────────── */}
+      {suggestedArtists.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <h2 className="text-base font-bold" style={{ color: "#FFFFFF" }}>
+              Artistes à découvrir
+            </h2>
+          </div>
+          <div className="flex gap-5 overflow-x-auto pb-2 px-6 scrollbar-hide">
+            {suggestedArtists.map((artist, i) => {
+              const color = ARTIST_COLORS[i % ARTIST_COLORS.length]!;
+              const genre = (artist.genres as string[])[0] ?? "Artiste";
+              return (
+                <Link
+                  key={artist.creator_id}
+                  href="/search"
+                  className="flex-shrink-0 flex flex-col items-center gap-2 w-20"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 relative"
+                    style={{
+                      background: `linear-gradient(135deg, ${color}33, ${color}1A)`,
+                      border: `2px solid ${color}55`,
+                      color,
+                    }}
+                  >
+                    {getInitials(artist.stage_name)}
+                    {artist.verified && (
+                      <span
+                        className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold"
+                        style={{ backgroundColor: "#FFC20E", color: "#0D0D0D" }}
+                      >
+                        ✓
+                      </span>
+                    )}
                   </div>
                   <p
                     className="text-xs text-center font-semibold leading-tight"
