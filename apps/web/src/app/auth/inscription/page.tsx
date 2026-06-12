@@ -107,7 +107,11 @@ export default function InscriptionPage() {
         return;
       }
 
-      router.push("/profile");
+      if (accountType === "auditeur") {
+        router.push("/listen");
+      } else {
+        router.push("/creator");
+      }
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
         console.error("[inscription] handleProfileSubmit:", err);
