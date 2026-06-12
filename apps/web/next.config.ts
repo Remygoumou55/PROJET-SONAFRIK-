@@ -7,6 +7,7 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
+  reactStrictMode: true,
   transpilePackages: [
     "@sonafrik/ui",
     "@sonafrik/shared",
@@ -16,7 +17,9 @@ const nextConfig: NextConfig = {
   ],
   images: {
     formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 3600,
+    minimumCacheTTL: 86400,
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     remotePatterns: [
       {
         protocol: "https",
@@ -25,12 +28,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Next.js 15 : cache client-side router — pages statiques 5 min, dynamiques 30 s
   experimental: {
+    // Next.js 15 : cache client-side router
     staleTimes: {
       static: 300,
       dynamic: 30,
     },
+    // Tree-shaking des gros packages — réduit le bundle JS client
+    optimizePackageImports: [
+      "@supabase/supabase-js",
+      "@supabase/ssr",
+      "@sonafrik/ui",
+      "@sonafrik/types",
+    ],
   },
   async headers() {
     return [
@@ -45,9 +55,24 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Assets statiques Next.js — cache 1 an (immutable car hash dans le nom)
         source: "/_next/static/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Images optimisées Next.js — cache 24h avec revalidation
+        source: "/_next/image/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=3600" },
+        ],
+      },
+      {
+        // Fichiers media publics (covers, avatars depuis storage Supabase)
+        source: "/storage/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=3600, stale-while-revalidate=600" },
         ],
       },
     ];

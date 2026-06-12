@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { Database } from "@sonafrik/database/types";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 
@@ -22,24 +23,29 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   };
 }
 
-export async function getSupabaseServerClient(): Promise<SonafrikSupabaseClient> {
-  const cookieStore = await cookies();
-  const { url, anonKey } = getSupabaseEnv();
+// React.cache() déduplique les appels dans le même rendu serveur :
+// layout.tsx + page.tsx + composants qui appellent getSupabaseServerClient()
+// partagent la même instance — une seule création par request HTTP.
+export const getSupabaseServerClient = cache(
+  async (): Promise<SonafrikSupabaseClient> => {
+    const cookieStore = await cookies();
+    const { url, anonKey } = getSupabaseEnv();
 
-  return createServerClient<Database>(url, anonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
+    return createServerClient<Database>(url, anonKey, {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch {
+            /* Server Component — ignore */
+          }
+        },
       },
-      setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        } catch {
-          /* Server Component — ignore */
-        }
-      },
-    },
-  }) as unknown as SonafrikSupabaseClient;
-}
+    }) as unknown as SonafrikSupabaseClient;
+  },
+);
