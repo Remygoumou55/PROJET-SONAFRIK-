@@ -65,9 +65,6 @@ export async function updateSession(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
-  // Bypass auth en développement local (BYPASS_AUTH=true dans .env.local)
-  if (process.env.BYPASS_AUTH === "true") return supabaseResponse;
-
   // Route protégée sans session → redirection login avec retour préservé
   if (isProtected && !user) {
     const redirectUrl = request.nextUrl.clone();
