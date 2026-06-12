@@ -6,6 +6,7 @@ import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Album } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS, RELEASE_TYPE_LABELS } from "@sonafrik/types";
 import { useCatalogService } from "../hooks/useCatalog";
+import { CoverUploader } from "./CoverUploader";
 
 export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; creatorId: string }) {
   const router = useRouter();
@@ -15,6 +16,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
   const [releaseType, setReleaseType] = useState<"album" | "single" | "ep">("single");
   const [upc, setUpc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [expandedCover, setExpandedCover] = useState<string | null>(null);
 
   async function createRelease(event: React.FormEvent) {
     event.preventDefault();
@@ -41,21 +43,6 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
         a.id === albumId ? { ...a, publication_status: "pending_review" } : a,
       ),
     );
-    router.refresh();
-  }
-
-  async function uploadCover(albumId: string, file: File) {
-    const { signedUrl, token } = await catalog.requestAssetUploadUrl({
-      creatorId,
-      assetType: "cover",
-      contentType: file.type,
-      albumId,
-    });
-    await fetch(signedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
-      body: file,
-    });
     router.refresh();
   }
 
@@ -91,25 +78,42 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <Badge variant="primary">{PUBLICATION_STATUS_LABELS[album.publication_status]}</Badge>
             </div>
             {album.upc ? <p className="text-texte-desactive text-xs">UPC · {album.upc}</p> : null}
-            <div className="flex flex-wrap gap-2">
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void uploadCover(album.id, file);
+
+            {/* Upload pochette */}
+            {expandedCover === album.id ? (
+              <div className="pt-1">
+                <CoverUploader
+                  albumId={album.id}
+                  creatorId={creatorId}
+                  onSuccess={() => {
+                    setExpandedCover(null);
+                    router.refresh();
                   }}
                 />
-                <span className="text-vert-energie text-sm hover:underline">Cover (URL signée)</span>
-              </label>
-              {album.publication_status === "draft" || album.publication_status === "rejected" ? (
-                <Button size="sm" variant="outline" onClick={() => submit(album.id)}>
-                  Soumettre à publication
-                </Button>
-              ) : null}
-            </div>
+                <button
+                  onClick={() => setExpandedCover(null)}
+                  className="mt-2 text-xs"
+                  style={{ color: "#555555" }}
+                >
+                  Fermer
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setExpandedCover(album.id)}
+                  className="text-sm hover:underline"
+                  style={{ color: "#00D26A" }}
+                >
+                  Ajouter / changer la pochette
+                </button>
+                {album.publication_status === "draft" || album.publication_status === "rejected" ? (
+                  <Button size="sm" variant="outline" onClick={() => submit(album.id)}>
+                    Soumettre à publication
+                  </Button>
+                ) : null}
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}
