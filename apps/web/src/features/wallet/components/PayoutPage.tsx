@@ -258,8 +258,18 @@ export const PayoutPage = memo(function PayoutPage() {
                 <span
                   className="text-xs px-2 py-1 rounded-full font-medium"
                   style={{
-                    backgroundColor: w.status === "completed" ? "#00D26A22" : w.status === "failed" ? "#FF444422" : "#FFC20E22",
-                    color: w.status === "completed" ? "#00D26A" : w.status === "failed" ? "#FF6666" : "#FFC20E",
+                    backgroundColor:
+                      w.status === "completed"  ? "#00D26A22" :
+                      w.status === "failed"     ? "#FF444422" :
+                      w.status === "cancelled"  ? "#55555522" :
+                      w.status === "approved"   ? "#3B82F622" :
+                                                  "#FFC20E22",
+                    color:
+                      w.status === "completed"  ? "#00D26A" :
+                      w.status === "failed"     ? "#FF6666" :
+                      w.status === "cancelled"  ? "#888888" :
+                      w.status === "approved"   ? "#60A5FA" :
+                                                  "#FFC20E",
                   }}
                 >
                   {WITHDRAWAL_STATUS_LABELS[w.status as keyof typeof WITHDRAWAL_STATUS_LABELS] ?? w.status}

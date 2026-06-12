@@ -846,7 +846,7 @@ export type SubscriptionPlanType = keyof typeof SUBSCRIPTION_PLANS;
 export type PayoutAccountType = "orange_money" | "mtn_momo" | "wave" | "bank_transfer";
 export type TransactionType = "topup" | "subscription" | "tip" | "beat_purchase" | "withdrawal" | "royalty_payout" | "refund";
 export type TransactionStatus = "pending" | "completed" | "failed" | "cancelled" | "refunded";
-export type WithdrawalStatus = "pending" | "processing" | "completed" | "failed" | "cancelled";
+export type WithdrawalStatus = "pending" | "approved" | "processing" | "completed" | "failed" | "cancelled";
 export type WalletLedgerReason = "topup" | "subscription" | "royalty" | "tip" | "refund" | "withdrawal" | "commission";
 export type RoyaltyCycleStatus = "open" | "calculating" | "ready" | "distributed" | "closed";
 export type RoyaltyCalculationStatus = "pending" | "approved" | "paid" | "cancelled";
@@ -987,11 +987,12 @@ export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
 };
 
 export const WITHDRAWAL_STATUS_LABELS: Record<WithdrawalStatus, string> = {
-  pending: "En attente",
+  pending:    "En attente",
+  approved:   "Approuvé",
   processing: "En cours",
-  completed: "Effectué",
-  failed: "Échoué",
-  cancelled: "Annulé",
+  completed:  "Effectué",
+  failed:     "Échoué",
+  cancelled:  "Annulé",
 };
 
 export const WALLET_ERROR_MESSAGES: Record<string, string> = {
@@ -1181,4 +1182,107 @@ export const ROYALTY_ENGINE_ERROR_MESSAGES: Record<string, string> = {
   active_cycle_failed: "Impossible de charger le cycle actif.",
   unauthorized: "Accès non autorisé.",
   unknown: "Une erreur est survenue.",
+};
+
+// ─── Sprint 9.0 — Enterprise Payout Engine ───────────────────────────────────
+
+export type PayoutBatchStatus = "open" | "processing" | "completed" | "closed";
+
+export interface PayoutBatch {
+  id: string;
+  name: string;
+  status: PayoutBatchStatus;
+  created_by: string;
+  total_amount_gnf: number;
+  withdrawal_count: number;
+  processed_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayoutAuditLog {
+  id: string;
+  withdrawal_id: string;
+  action: "requested" | "approved" | "rejected" | "processing" | "paid" | "cancelled" | "batch_assigned";
+  performed_by: string;
+  previous_status: string | null;
+  new_status: string;
+  reason: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface UserPayoutEntry {
+  id: string;
+  amount_gnf: number;
+  fee_gnf: number;
+  net_amount_gnf: number;
+  status: WithdrawalStatus;
+  reference: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+  processed_at: string | null;
+  payout_account: {
+    id: string;
+    type: PayoutAccountType;
+    display_name: string;
+    phone_number: string | null;
+  };
+}
+
+export interface PayoutSummary {
+  total_withdrawn_gnf: number;
+  pending_gnf: number;
+  completed_count: number;
+  pending_count: number;
+  cancelled_count: number;
+  total_fees_gnf: number;
+}
+
+export interface AdminPayoutEntry {
+  id: string;
+  user_id: string;
+  amount_gnf: number;
+  fee_gnf: number;
+  net_amount_gnf: number;
+  status: WithdrawalStatus;
+  reference: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+  processed_at: string | null;
+  batch_id: string | null;
+  payout_account: {
+    id: string;
+    type: PayoutAccountType;
+    display_name: string;
+    phone_number: string | null;
+    iban: string | null;
+    bank_name: string | null;
+    account_holder_name: string;
+  };
+  user_email: string | null;
+}
+
+export const PAYOUT_ENGINE_ERROR_MESSAGES: Record<string, string> = {
+  withdrawal_not_found:                "Demande de retrait introuvable.",
+  withdrawal_must_be_pending:          "Le retrait doit être en attente pour cette action.",
+  withdrawal_must_be_approved:         "Le retrait doit être approuvé pour cette action.",
+  withdrawal_must_be_processing:       "Le retrait doit être en cours de traitement.",
+  withdrawal_must_be_pending_or_approved: "Le retrait doit être en attente ou approuvé.",
+  cannot_cancel:                       "Impossible d'annuler ce retrait.",
+  rejection_reason_required:           "Motif de rejet obligatoire.",
+  payment_reference_required:          "Référence de paiement obligatoire.",
+  batch_name_required:                 "Nom du lot obligatoire.",
+  batch_not_found_or_closed:           "Lot introuvable ou fermé.",
+  queue_failed:                        "Impossible de charger la file des retraits.",
+  approve_failed:                      "Échec de l'approbation.",
+  reject_failed:                       "Échec du rejet.",
+  process_failed:                      "Échec du passage en traitement.",
+  mark_paid_failed:                    "Échec de la validation de paiement.",
+  cancel_failed:                       "Échec de l'annulation.",
+  payouts_failed:                      "Impossible de charger vos retraits.",
+  summary_failed:                      "Impossible de charger le récapitulatif.",
+  unauthorized:                        "Accès non autorisé.",
+  unknown:                             "Une erreur est survenue.",
 };

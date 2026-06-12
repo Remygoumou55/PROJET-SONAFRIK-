@@ -52,6 +52,10 @@
     "./royalties": {
       "types": "./dist/royalties/index.d.ts",
       "default": "./dist/royalties/index.js"
+    },
+    "./payout": {
+      "types": "./dist/payout/index.d.ts",
+      "default": "./dist/payout/index.js"
     }
   },
   "scripts": {
