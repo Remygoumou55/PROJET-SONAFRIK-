@@ -584,9 +584,20 @@ export interface AlbumWithMeta extends Album {
   is_favorited?: boolean;
 }
 
+export interface ArtistResult {
+  creator_id: string;
+  stage_name: string;
+  slug: string;
+  bio: string | null;
+  genres: string[];
+  cover_path: string | null;
+  verified: boolean;
+}
+
 export interface SearchResult {
   tracks: TrackWithMeta[];
   albums: AlbumWithMeta[];
+  artists: ArtistResult[];
   total: number;
   query: string;
 }

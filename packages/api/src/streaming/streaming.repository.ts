@@ -275,6 +275,39 @@ export class StreamingRepository {
   // Search
   // ---------------------------------------------------------------------------
 
+  async searchCatalog(query: string, limit: number): Promise<import("@sonafrik/types").SearchResult> {
+    const { data, error } = await this.client.rpc("search_catalog" as never, {
+      p_query: query,
+      p_limit: limit,
+    } as never);
+
+    if (error) throw error;
+
+    const result = data as {
+      tracks: import("@sonafrik/types").TrackWithMeta[];
+      albums: import("@sonafrik/types").AlbumWithMeta[];
+      artists: import("@sonafrik/types").ArtistResult[];
+    };
+
+    const tracks = (result?.tracks ?? []).map((t) => ({
+      ...t,
+      metadata: (t.metadata as Record<string, unknown>) ?? {},
+    }));
+    const albums = (result?.albums ?? []).map((a) => ({
+      ...a,
+      metadata: (a.metadata as Record<string, unknown>) ?? {},
+    }));
+    const artists = result?.artists ?? [];
+
+    return {
+      tracks,
+      albums,
+      artists,
+      total: tracks.length + albums.length + artists.length,
+      query,
+    };
+  }
+
   async searchTracks(query: string, limit: number): Promise<TrackWithMeta[]> {
     const { data, error } = await this.client
       .from("tracks")

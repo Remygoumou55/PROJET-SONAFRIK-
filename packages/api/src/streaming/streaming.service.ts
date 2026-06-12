@@ -250,19 +250,19 @@ export class StreamingService {
     await this.requireUserId();
 
     try {
-      const [tracks, albums] = await Promise.all([
-        this.repository.searchTracks(parsed.data.query, parsed.data.limit),
-        this.repository.searchAlbums(parsed.data.query, parsed.data.limit),
-      ]);
-
-      return {
-        tracks,
-        albums,
-        total: tracks.length + albums.length,
-        query: parsed.data.query,
-      };
+      // Utilise search_catalog (RPC enterprise : pg_trgm + unaccent + pertinence)
+      // Fallback vers ILIKE si la RPC n'est pas disponible
+      return await this.repository.searchCatalog(parsed.data.query, parsed.data.limit);
     } catch {
-      throw new StreamingError("search_failed");
+      try {
+        const [tracks, albums] = await Promise.all([
+          this.repository.searchTracks(parsed.data.query, parsed.data.limit),
+          this.repository.searchAlbums(parsed.data.query, parsed.data.limit),
+        ]);
+        return { tracks, albums, artists: [], total: tracks.length + albums.length, query: parsed.data.query };
+      } catch {
+        throw new StreamingError("search_failed");
+      }
     }
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useCallback, useState } from "react";
-import type { SearchResult, TrackWithMeta } from "@sonafrik/types";
+import type { ArtistResult, SearchResult, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 
 interface SearchResultsProps {
@@ -51,6 +51,36 @@ const TrackRow = memo(function TrackRow({
   );
 });
 
+function getArtistInitials(name: string): string {
+  return name.split(" ").map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
+}
+
+const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) {
+  return (
+    <div className="flex items-center gap-3 w-full p-3 rounded-lg">
+      <div
+        className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
+        style={{ backgroundColor: "#2A2A2A", color: "#00D26A" }}
+      >
+        {getArtistInitials(artist.stage_name)}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
+          {artist.stage_name}
+          {artist.verified && (
+            <span className="ml-1.5 text-xs" style={{ color: "#FFC20E" }}>✓</span>
+          )}
+        </p>
+        {artist.genres.length > 0 && (
+          <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+            {artist.genres.slice(0, 2).join(" · ")}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+});
+
 export function SearchResults({ results, isSearching }: SearchResultsProps) {
   const { loadAndPlay } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
@@ -92,6 +122,18 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
     <div className="space-y-6">
       {playError && (
         <p className="text-sm text-red-500 px-1" role="alert">{playError}</p>
+      )}
+      {results.artists.length > 0 && (
+        <section>
+          <h3 className="text-sm font-semibold mb-2" style={{ color: "#A0A0A0" }}>
+            Artistes
+          </h3>
+          <div className="space-y-1">
+            {results.artists.map((artist) => (
+              <ArtistRow key={artist.creator_id} artist={artist} />
+            ))}
+          </div>
+        </section>
       )}
       {results.tracks.length > 0 && (
         <section>
