@@ -1,6 +1,7 @@
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createAnalyticsService } from "@sonafrik/api/analytics";
+import { createRoyaltyService } from "@sonafrik/api/royalties";
 import { CreatorAnalyticsDashboard } from "@/features/analytics/components/CreatorAnalyticsDashboard";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
 
@@ -47,16 +48,25 @@ export default async function CreatorAnalyticsPage() {
   const creatorId = context.creator.id;
   const supabase = await getSupabaseServerClient();
   const analytics = createAnalyticsService(supabase);
+  const royalties = createRoyaltyService(supabase);
 
-  const [streamStats, timeline, topTracks, topAlbums, audienceStats, revenueStats] =
-    await Promise.allSettled([
-      analytics.getStreamStats({ creatorId }),
-      analytics.getStreamTimeline({ creatorId, days: 30 }),
-      analytics.getTopTracks({ creatorId, limit: 10 }),
-      analytics.getTopAlbums({ creatorId, limit: 10 }),
-      analytics.getAudienceStats({ creatorId }),
-      analytics.getRevenueStats({ creatorId }),
-    ]);
+  const [
+    streamStats,
+    timeline,
+    topTracks,
+    topAlbums,
+    audienceStats,
+    revenueStats,
+    royaltyHistory,
+  ] = await Promise.allSettled([
+    analytics.getStreamStats({ creatorId }),
+    analytics.getStreamTimeline({ creatorId, days: 30 }),
+    analytics.getTopTracks({ creatorId, limit: 10 }),
+    analytics.getTopAlbums({ creatorId, limit: 10 }),
+    analytics.getAudienceStats({ creatorId }),
+    analytics.getRevenueStats({ creatorId }),
+    royalties.getCreatorRoyaltyHistory({ creatorId, limit: 12 }),
+  ]);
 
   const data: CreatorAnalyticsData = {
     streamStats:
@@ -68,6 +78,8 @@ export default async function CreatorAnalyticsPage() {
       audienceStats.status === "fulfilled" ? audienceStats.value : EMPTY_AUDIENCE,
     revenueStats:
       revenueStats.status === "fulfilled" ? revenueStats.value : EMPTY_REVENUE,
+    royaltyHistory:
+      royaltyHistory.status === "fulfilled" ? royaltyHistory.value : [],
   };
 
   return <CreatorAnalyticsDashboard data={data} />;

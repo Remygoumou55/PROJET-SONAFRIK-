@@ -109,7 +109,7 @@ export class AnalyticsService {
         this.getAudienceStats(input),
         this.getRevenueStats(input),
       ]);
-    return { streamStats, timeline, topTracks, topAlbums, audienceStats, revenueStats };
+    return { streamStats, timeline, topTracks, topAlbums, audienceStats, revenueStats, royaltyHistory: [] };
   }
 }
 

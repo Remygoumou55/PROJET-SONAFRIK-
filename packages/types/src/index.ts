@@ -1088,6 +1088,7 @@ export interface CreatorAnalyticsData {
   topAlbums: CreatorTopAlbum[];
   audienceStats: CreatorAudienceStats;
   revenueStats: CreatorRevenueStats;
+  royaltyHistory: CreatorRoyaltyHistoryEntry[];
 }
 
 export const ANALYTICS_ERROR_MESSAGES: Record<string, string> = {
@@ -1097,6 +1098,87 @@ export const ANALYTICS_ERROR_MESSAGES: Record<string, string> = {
   top_albums_failed: "Impossible de charger le top albums.",
   audience_stats_failed: "Impossible de charger les statistiques d'audience.",
   revenue_stats_failed: "Impossible de charger les statistiques de revenus.",
+  unauthorized: "Accès non autorisé.",
+  unknown: "Une erreur est survenue.",
+};
+
+// ─── Sprint 8.0 — Royalty Engine Enterprise ──────────────────────────────────
+
+export interface RoyaltyCalculationResult {
+  cycle_id: string;
+  total_valid_listens: number;
+  artist_count: number;
+  revenue_pool_gnf: number;
+  total_net_gnf: number;
+  status: string;
+}
+
+export interface RoyaltyDistributionResult {
+  cycle_id: string;
+  distributed_count: number;
+  total_gnf: number;
+  status: string;
+}
+
+export interface RoyaltyCycleSummaryCalculation {
+  calculation_id: string;
+  artist_id: string;
+  creator_id: string | null;
+  valid_listen_count: number;
+  listen_share_percent: number;
+  net_amount_gnf: number;
+  status: RoyaltyCalculationStatus;
+  paid_at: string | null;
+}
+
+export interface RoyaltyCycleSummary {
+  id: string;
+  period_start: string;
+  period_end: string;
+  status: RoyaltyCycleStatus;
+  total_revenue_gnf: number;
+  revenue_pool_gnf: number;
+  revenue_pool_percent: number;
+  total_valid_listens: number;
+  artist_count: number;
+  distributed_at: string | null;
+  calculations: RoyaltyCycleSummaryCalculation[];
+}
+
+export interface CreatorRoyaltyHistoryEntry {
+  calculation_id: string;
+  cycle_id: string;
+  cycle_start: string;
+  cycle_end: string;
+  cycle_status: RoyaltyCycleStatus;
+  calc_status: RoyaltyCalculationStatus;
+  valid_listen_count: number;
+  listen_share_percent: number;
+  net_amount_gnf: number;
+  paid_at: string | null;
+  revenue_pool_gnf: number;
+  total_valid_listens: number;
+}
+
+export interface ActiveRoyaltyCycle {
+  id: string;
+  period_start: string;
+  period_end: string;
+  status: RoyaltyCycleStatus;
+  revenue_pool_percent: number;
+  total_valid_listens: number;
+  artist_count: number;
+  distributed_at: string | null;
+}
+
+export const ROYALTY_ENGINE_ERROR_MESSAGES: Record<string, string> = {
+  cycle_not_found: "Cycle de royalties introuvable.",
+  cycle_open_failed: "Impossible d'ouvrir un cycle de royalties.",
+  cycle_overlap: "Un cycle actif chevauche déjà cette période.",
+  calculate_failed: "Erreur lors du calcul des royalties.",
+  distribute_failed: "Erreur lors de la distribution des royalties.",
+  history_failed: "Impossible de charger l'historique des royalties.",
+  active_cycle_failed: "Impossible de charger le cycle actif.",
   unauthorized: "Accès non autorisé.",
   unknown: "Une erreur est survenue.",
 };

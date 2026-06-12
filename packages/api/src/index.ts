@@ -26,3 +26,4 @@ export * from "./recommendation";
 export * from "./social";
 export * from "./discovery";
 export * from "./analytics";
+export * from "./royalties";

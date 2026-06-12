@@ -5,6 +5,7 @@ import { TopTracksTable } from "./TopTracksTable";
 import { TopAlbumsTable } from "./TopAlbumsTable";
 import { AudienceCard } from "./AudienceCard";
 import { RevenueCard } from "./RevenueCard";
+import { RoyaltyHistoryCard } from "./RoyaltyHistoryCard";
 
 export function CreatorAnalyticsDashboard({ data }: { data: CreatorAnalyticsData }) {
   return (
@@ -26,6 +27,9 @@ export function CreatorAnalyticsDashboard({ data }: { data: CreatorAnalyticsData
         <AudienceCard stats={data.audienceStats} />
         <RevenueCard stats={data.revenueStats} />
       </div>
+
+      {/* Royalty Engine — historique des cycles */}
+      <RoyaltyHistoryCard history={data.royaltyHistory} />
 
       {/* Geo note */}
       <div className="border-bordure rounded-lg border border-dashed p-4">
