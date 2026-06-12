@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
     const SIGNED_URL_EXPIRY = 7200; // 2 heures
 
     const { data: signedData, error: signedError } = await supabaseAdmin.storage
-      .from("audio")
+      .from("catalog-audio")
       .createSignedUrl(trackFile.file_path, SIGNED_URL_EXPIRY);
 
     if (signedError || !signedData?.signedUrl) {

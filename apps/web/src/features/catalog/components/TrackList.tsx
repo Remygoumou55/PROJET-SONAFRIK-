@@ -14,6 +14,8 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
   const [title, setTitle] = useState("");
   const [isrc, setIsrc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
 
   async function createTrack(event: React.FormEvent) {
     event.preventDefault();
@@ -33,20 +35,30 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
   }
 
   async function uploadAudio(trackId: string, file: File) {
-    const format = file.type === "audio/mpeg" ? "mp3" : "aac";
-    const { signedUrl, token } = await catalog.requestAssetUploadUrl({
-      creatorId,
-      assetType: "audio",
-      contentType: file.type,
-      trackId,
-      format,
-    });
-    await fetch(signedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
-      body: file,
-    });
-    router.refresh();
+    setUploadingId(trackId);
+    setUploadErrors((prev) => { const next = { ...prev }; delete next[trackId]; return next; });
+    try {
+      const format = file.type === "audio/mpeg" ? "mp3" : "aac";
+      const { signedUrl, token } = await catalog.requestAssetUploadUrl({
+        creatorId,
+        assetType: "audio",
+        contentType: file.type,
+        trackId,
+        format,
+      });
+      const res = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
+        body: file,
+      });
+      if (!res.ok) throw new Error(`Échec du transfert (${res.status})`);
+      router.refresh();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Échec de l'envoi du fichier audio.";
+      setUploadErrors((prev) => ({ ...prev, [trackId]: msg }));
+    } finally {
+      setUploadingId(null);
+    }
   }
 
   async function submit(trackId: string) {
@@ -86,17 +98,20 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
             </div>
             {track.isrc ? <p className="text-texte-desactive text-xs">ISRC · {track.isrc}</p> : null}
             <div className="flex flex-wrap gap-2">
-              <label className="cursor-pointer">
+              <label className={uploadingId === track.id ? "cursor-not-allowed opacity-50" : "cursor-pointer"}>
                 <input
                   type="file"
                   accept="audio/mpeg,audio/mp4"
                   className="hidden"
+                  disabled={uploadingId === track.id}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) void uploadAudio(track.id, file);
                   }}
                 />
-                <span className="text-vert-energie text-sm hover:underline">Audio master (URL signée)</span>
+                <span className="text-vert-energie text-sm hover:underline">
+                  {uploadingId === track.id ? "Envoi en cours…" : "Audio master (URL signée)"}
+                </span>
               </label>
               {track.publication_status === "draft" || track.publication_status === "rejected" ? (
                 <Button size="sm" variant="outline" onClick={() => submit(track.id)}>
@@ -104,6 +119,9 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
                 </Button>
               ) : null}
             </div>
+            {uploadErrors[track.id] ? (
+              <p className="text-xs text-rouge-alerte">{uploadErrors[track.id]}</p>
+            ) : null}
           </CardContent>
         </Card>
       ))}
