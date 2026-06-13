@@ -1,9 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
-const TITLE_MAX = 60;
-const DESC_MAX = 200;
+import { FIELD_LIMITS } from "@sonafrik/shared";
 
 interface Props {
   isOpen: boolean;
@@ -49,8 +47,8 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
         setError("Le nom de la playlist est requis.");
         return;
       }
-      if (trimmedTitle.length > TITLE_MAX) {
-        setError(`Le nom ne doit pas dépasser ${TITLE_MAX} caractères.`);
+      if (trimmedTitle.length > FIELD_LIMITS.PLAYLIST_TITLE) {
+        setError(`Le nom ne doit pas dépasser ${FIELD_LIMITS.PLAYLIST_TITLE} caractères.`);
         return;
       }
 
@@ -116,7 +114,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ma playlist…"
-              maxLength={TITLE_MAX}
+              maxLength={FIELD_LIMITS.PLAYLIST_TITLE}
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none transition-colors"
               style={{
                 backgroundColor: "#2A2A2A",
@@ -129,9 +127,9 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: title.length > TITLE_MAX * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: title.length > FIELD_LIMITS.PLAYLIST_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
               >
-                {title.length}/{TITLE_MAX}
+                {title.length}/{FIELD_LIMITS.PLAYLIST_TITLE}
               </span>
             </div>
           </div>
@@ -146,7 +144,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Décrivez votre playlist…"
               rows={3}
-              maxLength={DESC_MAX}
+              maxLength={FIELD_LIMITS.PLAYLIST_DESCRIPTION}
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none resize-none transition-colors"
               style={{
                 backgroundColor: "#2A2A2A",
@@ -159,9 +157,9 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: description.length > DESC_MAX * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: description.length > FIELD_LIMITS.PLAYLIST_DESCRIPTION * 0.85 ? "#FFC20E" : "#555555" }}
               >
-                {description.length}/{DESC_MAX}
+                {description.length}/{FIELD_LIMITS.PLAYLIST_DESCRIPTION}
               </span>
             </div>
           </div>
