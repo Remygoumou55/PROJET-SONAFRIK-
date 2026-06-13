@@ -9,6 +9,8 @@ const PROTECTED_PREFIXES = [
   "/wallet",
   "/listen",
   "/library",
+  "/search",
+  "/admin",
 ];
 
 const AUTH_PREFIX = "/auth";
