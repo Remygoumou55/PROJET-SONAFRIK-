@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { AccountType } from "@sonafrik/types";
 import { Button, Input } from "@sonafrik/ui";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { AccountTypeSelector } from "@/features/auth/components/AccountTypeSelector";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
@@ -18,6 +19,7 @@ export default function InscriptionPage() {
   const router = useRouter();
   const auth = useAuthService();
   const [step, setStep] = useState<Step>("phone");
+  const [detecting, setDetecting] = useState(true);
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
@@ -28,9 +30,12 @@ export default function InscriptionPage() {
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      if (!user) {
+        // Parcours téléphone — aucune session active, afficher le formulaire
+        setDetecting(false);
+        return;
+      }
 
-      // Vérifier si l'onboarding est déjà complété (reconnexion Google)
       supabase
         .from("profiles")
         .select("onboarding_completed, full_name")
@@ -41,10 +46,11 @@ export default function InscriptionPage() {
             router.push("/listen");
             return;
           }
-          // Nouveau compte Google → pré-remplir le nom et passer au profil
+          // Nouveau compte Google → pré-remplir le nom et passer à l'étape profil
           const name = (profile?.full_name ?? user.user_metadata?.full_name) as string | undefined;
           if (name) setFullName(name);
           setStep("profile");
+          setDetecting(false);
         });
     });
   }, [router]);
@@ -82,42 +88,46 @@ export default function InscriptionPage() {
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!accountType) return;
+    if (!accountType || !fullName.trim()) return;
     setError(null);
     setLoading(true);
     try {
-      const supabase = getSupabaseBrowserClient();
-
-      // RPC non encore dans les types générés — cast explicite
-      type RpcFn = (fn: string, args: Record<string, string>) => Promise<{ data: unknown; error: { message: string } | null }>;
-      const rpc = supabase.rpc as unknown as RpcFn;
-      const { error: rpcError } = await rpc("complete_onboarding", {
-        p_full_name: fullName.trim(),
-        p_account_type: accountType,
+      await auth.completeOnboardingForCurrentUser({
+        fullName: fullName.trim(),
+        accountType,
       });
-
-      if (rpcError) {
-        setError(`Erreur: ${rpcError.message}`);
-        return;
-      }
 
       if (accountType === "auditeur") {
         router.push("/listen");
       } else {
         router.push("/creator");
       }
-    } catch {
-      setError("Erreur lors de l'inscription. Réessayez.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription. Réessayez.");
     } finally {
       setLoading(false);
     }
+  }
+
+  // Détection session Google en cours — spinner minimal
+  if (detecting) {
+    return (
+      <main
+        className="flex min-h-screen items-center justify-center"
+        style={{ backgroundColor: "#0D0D0D" }}
+      >
+        <div
+          className="w-8 h-8 rounded-full border-2 animate-spin"
+          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+        />
+      </main>
+    );
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-md space-y-8">
         <header className="text-center">
-          {/* Marque SONAFRIK */}
           <div className="mb-4">
             <p className="text-2xl font-extrabold tracking-tight leading-none">
               <span style={{ color: "#FFFFFF" }}>SONA</span>
@@ -154,19 +164,40 @@ export default function InscriptionPage() {
         {step === "profile" && (
           <form onSubmit={handleProfileSubmit} className="flex flex-col gap-5">
             <AccountTypeSelector value={accountType} onChange={setAccountType} />
-            <Input
-              label="Nom complet"
-              placeholder="Votre nom"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
+
+            <div className="space-y-1">
+              <Input
+                label="Nom complet"
+                placeholder="Votre nom"
+                value={fullName}
+                maxLength={FIELD_LIMITS.FULL_NAME}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+              <div className="flex justify-end">
+                <span
+                  className="text-xs"
+                  style={{
+                    color: fullName.length > FIELD_LIMITS.FULL_NAME * 0.85 ? "#FFC20E" : "#555555",
+                  }}
+                >
+                  {fullName.length}/{FIELD_LIMITS.FULL_NAME}
+                </span>
+              </div>
+            </div>
+
             {error && (
-              <p className="text-sm text-red-500" role="alert">
+              <p className="text-sm" role="alert" style={{ color: "#FF4D4F" }}>
                 {error}
               </p>
             )}
-            <Button type="submit" fullWidth isLoading={loading} disabled={!accountType || loading}>
+
+            <Button
+              type="submit"
+              fullWidth
+              isLoading={loading}
+              disabled={!accountType || !fullName.trim() || loading}
+            >
               Terminer l&apos;inscription
             </Button>
           </form>
