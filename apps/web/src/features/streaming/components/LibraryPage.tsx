@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { AlbumWithMeta, LibraryItem, TrackWithMeta } from "@sonafrik/types";
 import { LibraryList } from "./LibraryList";
 import { CreatePlaylistModal } from "./CreatePlaylistModal";
+import { FavoritesList } from "./FavoritesList";
 import { useLibrary } from "../hooks/useLibrary";
 
 type Tab = "playlists" | "favoris";
@@ -10,7 +12,19 @@ type Tab = "playlists" | "favoris";
 export function LibraryPage() {
   const [tab, setTab] = useState<Tab>("playlists");
   const [modalOpen, setModalOpen] = useState(false);
-  const { createPlaylist } = useLibrary();
+  const { library, isLoading, error, createPlaylist } = useLibrary();
+
+  const favoriteTracks = library
+    .filter((item): item is LibraryItem & { track: TrackWithMeta } =>
+      item.entity_type === "track" && item.track !== undefined
+    )
+    .map((item) => item.track);
+
+  const favoriteAlbums = library
+    .filter((item): item is LibraryItem & { album: AlbumWithMeta } =>
+      item.entity_type === "album" && item.album !== undefined
+    )
+    .map((item) => item.album);
 
   return (
     <div className="p-6">
@@ -50,15 +64,12 @@ export function LibraryPage() {
 
       {tab === "playlists" && <LibraryList />}
       {tab === "favoris" && (
-        <div className="py-8 text-center">
-          <p className="text-4xl mb-4">❤️</p>
-          <p className="font-semibold mb-1" style={{ color: "#FFFFFF" }}>
-            Aucun favori
-          </p>
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
-            Ajoutez des morceaux et albums en favoris pour les retrouver ici.
-          </p>
-        </div>
+        <FavoritesList
+          tracks={favoriteTracks}
+          albums={favoriteAlbums}
+          isLoading={isLoading}
+          error={error}
+        />
       )}
 
       <CreatePlaylistModal
