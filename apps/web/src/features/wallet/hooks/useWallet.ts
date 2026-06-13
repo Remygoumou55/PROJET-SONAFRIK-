@@ -102,9 +102,14 @@ export function usePayoutAccounts() {
 
   const reload = useCallback(async () => {
     setIsLoading(true);
-    const data = await service.getPayoutAccounts();
-    setAccounts(data);
-    setIsLoading(false);
+    try {
+      const data = await service.getPayoutAccounts();
+      setAccounts(data);
+    } catch {
+      setAccounts([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [service]);
 
   useEffect(() => { reload(); }, [reload]);
