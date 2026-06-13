@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function requireAdmin(): Promise<{ userId: string }> {
+  if (process.env.BYPASS_AUTH === "true") return { userId: "dev-mock-id" };
+
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 

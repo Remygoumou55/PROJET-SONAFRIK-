@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import type { AccountType } from "@sonafrik/types";
 import { Button, Input } from "@sonafrik/ui";
 import { FIELD_LIMITS } from "@sonafrik/shared";
@@ -15,11 +15,13 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Step = "phone" | "otp" | "profile";
 
-export default function InscriptionPage() {
+function InscriptionPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const auth = useAuthService();
-  const [step, setStep] = useState<Step>("phone");
-  const [detecting, setDetecting] = useState(true);
+  const initStep = searchParams.get("step") === "profile" ? "profile" : "phone";
+  const [step, setStep] = useState<Step>(initStep);
+  const [detecting, setDetecting] = useState(initStep === "phone");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
@@ -28,6 +30,7 @@ export default function InscriptionPage() {
 
   // Retour du callback Google OAuth : session déjà établie, compléter l'onboarding
   useEffect(() => {
+    if (initStep === "profile") return;
     const supabase = getSupabaseBrowserClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
@@ -53,7 +56,7 @@ export default function InscriptionPage() {
           setDetecting(false);
         });
     });
-  }, [router]);
+  }, [router, initStep]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);
@@ -211,5 +214,13 @@ export default function InscriptionPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function InscriptionPage() {
+  return (
+    <Suspense>
+      <InscriptionPageInner />
+    </Suspense>
   );
 }

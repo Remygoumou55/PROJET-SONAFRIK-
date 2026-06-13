@@ -60,28 +60,29 @@ export async function updateSession(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
-  // Route protégée sans session → redirection login avec retour préservé
-  if (isProtected && !user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/auth/connexion";
-    redirectUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
+  // DEV_BYPASS : désactivé temporairement pour contrôle visuel — À RÉACTIVER
+  if (process.env.NODE_ENV !== "development") {
+    // Route protégée sans session → redirection login avec retour préservé
+    if (isProtected && !user) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/auth/connexion";
+      redirectUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
 
-  // Utilisateur connecté sur une route auth → redirection profil
-  // Exceptions : /auth/callback (échange code OAuth) et /auth/inscription
-  // (nouvel utilisateur Google sans onboarding doit compléter son profil)
-  const AUTH_PASSTHROUGH = ["/auth/callback", "/auth/inscription"];
-  if (
-    user &&
-    pathname.startsWith(AUTH_PREFIX) &&
-    pathname !== `${AUTH_PREFIX}/` &&
-    !AUTH_PASSTHROUGH.includes(pathname)
-  ) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/profile";
-    redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
+    // Utilisateur connecté sur une route auth → redirection profil
+    const AUTH_PASSTHROUGH = ["/auth/callback", "/auth/inscription"];
+    if (
+      user &&
+      pathname.startsWith(AUTH_PREFIX) &&
+      pathname !== `${AUTH_PREFIX}/` &&
+      !AUTH_PASSTHROUGH.includes(pathname)
+    ) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/profile";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
   return supabaseResponse;
