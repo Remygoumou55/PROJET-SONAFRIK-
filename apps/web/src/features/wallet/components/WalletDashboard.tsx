@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { memo } from "react";
 import type { WalletContext, Transaction } from "@sonafrik/types";
 import { TRANSACTION_TYPE_LABELS, SUBSCRIPTION_PLANS } from "@sonafrik/types";
@@ -72,13 +73,13 @@ export const WalletDashboard = memo(function WalletDashboard({
           >
             Recharger
           </button>
-          <a
+          <Link
             href="/wallet/payout"
             className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all"
             style={{ backgroundColor: "#FFFFFF22", color: "#FFFFFF" }}
           >
             Retirer
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -136,7 +137,7 @@ export const WalletDashboard = memo(function WalletDashboard({
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold" style={{ color: "#FFFFFF" }}>Dernières opérations</h3>
-            <a href="/wallet" className="text-xs" style={{ color: "#00D26A" }}>Voir tout</a>
+            <Link href="/wallet" className="text-xs" style={{ color: "#00D26A" }}>Voir tout</Link>
           </div>
           <div className="rounded-xl px-4" style={{ backgroundColor: "#1F1F1F" }}>
             {recentTransactions.map((tx) => (
