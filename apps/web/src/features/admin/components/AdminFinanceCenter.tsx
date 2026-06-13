@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
 import { createPayoutService } from "@sonafrik/api/payout";
-import { createBrowserClient } from "@supabase/ssr";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
@@ -32,11 +32,7 @@ function fmtDate(iso: string) {
 }
 
 function getService() {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-  return createPayoutService(supabase as never);
+  return createPayoutService(getSupabaseBrowserClient());
 }
 
 interface Props {

@@ -1088,6 +1088,22 @@ export interface Database {
         Args: { p_payout_account_id: string; p_amount_gnf: number };
         Returns: string;
       };
+      get_trending_tracks: {
+        Args: { p_window?: string; p_limit?: number };
+        Returns: Json;
+      };
+      get_discovery_feed: {
+        Args: { p_limit?: number };
+        Returns: Json;
+      };
+      get_new_releases: {
+        Args: { p_type?: string; p_days?: number; p_limit?: number };
+        Returns: Json;
+      };
+      get_suggested_artists: {
+        Args: { p_limit?: number };
+        Returns: Json;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

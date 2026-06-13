@@ -40,7 +40,9 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
-      console.error("[OAuth callback error]", error.message, error.code ?? "");
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[OAuth callback error]", error.message, error.code ?? "");
+      }
       return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=${encodeURIComponent(error.message)}`);
     }
 

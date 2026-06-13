@@ -51,19 +51,19 @@ async function getHomepageContent() {
       supabase.from("playlists").select("id, title, track_count").eq("is_public", true).is("deleted_at", null).order("updated_at", { ascending: false }).limit(8),
       supabase.from("artist_profiles").select("creator_id, stage_name, genres").eq("is_public", true).order("created_at", { ascending: false }).limit(8),
       supabase.from("genres").select("id, name").eq("is_active", true).is("deleted_at", null).order("sort_order").limit(14),
-      supabase.rpc("get_trending_tracks" as never, { p_window: "7d", p_limit: 10 } as never),
-      supabase.rpc("get_discovery_feed" as never, { p_limit: 8 } as never),
-      supabase.rpc("get_new_releases" as never, { p_type: "album", p_days: 60, p_limit: 8 } as never),
-      supabase.rpc("get_suggested_artists" as never, { p_limit: 8 } as never),
+      supabase.rpc("get_trending_tracks", { p_window: "7d", p_limit: 10 }),
+      supabase.rpc("get_discovery_feed", { p_limit: 8 }),
+      supabase.rpc("get_new_releases", { p_type: "album", p_days: 60, p_limit: 8 }),
+      supabase.rpc("get_suggested_artists", { p_limit: 8 }),
     ]);
     return {
       playlists: (playlistsResult.data ?? []) as Array<{ id: string; title: string; track_count: number }>,
       artists: (artistsResult.data ?? []) as Array<{ creator_id: string; stage_name: string; genres: string[] }>,
       genres: (genresResult.data ?? []) as Array<{ id: string; name: string }>,
-      trending: (trendingResult.data ?? []) as TrendingTrack[],
-      discoveries: (discoveryResult.data ?? []) as DiscoveryTrack[],
-      newAlbums: ((newAlbumsResult.data as { albums?: DiscoveryAlbum[] } | null)?.albums ?? []) as DiscoveryAlbum[],
-      suggestedArtists: (suggestedArtistsResult.data ?? []) as DiscoveryArtist[],
+      trending: (trendingResult.data ?? []) as unknown as TrendingTrack[],
+      discoveries: (discoveryResult.data ?? []) as unknown as DiscoveryTrack[],
+      newAlbums: ((newAlbumsResult.data as unknown as { albums?: DiscoveryAlbum[] } | null)?.albums ?? []) as DiscoveryAlbum[],
+      suggestedArtists: (suggestedArtistsResult.data ?? []) as unknown as DiscoveryArtist[],
     };
   } catch {
     return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [] };

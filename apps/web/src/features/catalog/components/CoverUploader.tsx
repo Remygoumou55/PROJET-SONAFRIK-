@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { useCatalogService } from "../hooks/useCatalog";
 
@@ -151,12 +150,12 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
       <div className="space-y-3">
         <div className="flex items-center gap-4">
           {/* Preview */}
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={state.previewUrl}
             alt="Aperçu de la pochette"
             width={80}
             height={80}
-            unoptimized
             className="w-20 h-20 rounded-lg object-cover"
             style={{ border: "1px solid #333333" }}
           />
