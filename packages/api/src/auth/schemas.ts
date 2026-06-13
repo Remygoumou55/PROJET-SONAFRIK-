@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
+import { FIELD_LIMITS, GUINEAN_PHONE_REGEX, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 
 /** +224 suivi de 9 chiffres — ex. +224624000001 */
 export const phoneSchema = z
@@ -18,7 +18,7 @@ export const fullNameSchema = z
   .string()
   .trim()
   .min(2, "Le nom doit contenir au moins 2 caractères.")
-  .max(100, "Le nom ne peut pas dépasser 100 caractères.");
+  .max(FIELD_LIMITS.FULL_NAME, `Le nom ne peut pas dépasser ${FIELD_LIMITS.FULL_NAME} caractères.`);
 
 export const requestOtpSchema = z.object({
   phone: phoneSchema,
