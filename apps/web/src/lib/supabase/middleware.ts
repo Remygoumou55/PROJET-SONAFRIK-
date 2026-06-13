@@ -48,9 +48,13 @@ export async function updateSession(request: NextRequest) {
   });
 
   // IMPORTANT : getUser() rafraîchit le token — ne jamais remplacer par getSession()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Supabase indisponible → continuer sans session (routes publiques passent)
+  }
 
   const isProtected = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),

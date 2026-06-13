@@ -20,7 +20,12 @@ export default async function HomePage({
 
   const supabase = await getSupabaseServerClient();
   const auth = createAuthService(supabase);
-  const profile = await auth.getCurrentProfile();
+  let profile = null;
+  try {
+    profile = await auth.getCurrentProfile();
+  } catch {
+    // Supabase indisponible → traiter comme visiteur anonyme
+  }
 
   if (!profile) {
     return (
