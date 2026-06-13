@@ -21,10 +21,11 @@ export function usePlayer() {
 
     player.onComplete(async () => {
       if (!player.sessionId || !player.duration) return;
+      const accumulated = player.getAccumulatedListenSeconds();
       try {
         await streaming.completeStream({
           sessionId: player.sessionId,
-          positionSeconds: player.duration,
+          positionSeconds: accumulated,
           totalDurationSeconds: player.duration,
         });
       } catch {
