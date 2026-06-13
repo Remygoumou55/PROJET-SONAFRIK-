@@ -7,14 +7,9 @@ export async function requireAdmin(): Promise<{ userId: string }> {
 
   if (!user) redirect("/auth/connexion");
 
-  const { data } = await supabase
-    .from("user_roles" as never)
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("role", "admin")
-    .maybeSingle() as { data: { role: string } | null };
+  const { data: isAdmin } = await supabase.rpc("is_admin", { p_user_id: user.id });
 
-  if (!data) redirect("/");
+  if (!isAdmin) redirect("/");
 
   return { userId: user.id };
 }
