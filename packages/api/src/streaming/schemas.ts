@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 
 export const startStreamSchema = z.object({
   trackId: z.string().uuid(),
@@ -19,8 +20,8 @@ export const completeStreamSchema = z.object({
 });
 
 export const createPlaylistSchema = z.object({
-  title: z.string().trim().min(2).max(200),
-  description: z.string().trim().max(1000).optional().nullable(),
+  title: z.string().trim().min(2).max(FIELD_LIMITS.PLAYLIST_TITLE),
+  description: z.string().trim().max(FIELD_LIMITS.PLAYLIST_DESCRIPTION).optional().nullable(),
   isPublic: z.boolean().default(false),
 });
 
