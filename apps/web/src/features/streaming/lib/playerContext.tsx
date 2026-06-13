@@ -15,6 +15,7 @@ interface PlayerActions {
   resume: () => void;
   stop: () => void;
   setVolume: (volume: number) => void;
+  seek: (positionSeconds: number) => void;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
   onComplete: (callback: () => void) => void;
 }
@@ -49,6 +50,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       heartbeatRef.current = null;
     }
   }, []);
+
+  // Démarre le heartbeat 10s — remplace l'interval précédent s'il existe (C-2.3)
+  const startHeartbeat = useCallback(() => {
+    clearHeartbeat();
+    heartbeatRef.current = setInterval(() => {
+      const audio = audioRef.current;
+      if (audio && !audio.paused) {
+        onHeartbeatCallbackRef.current?.(audio.currentTime);
+      }
+    }, STREAM_HEARTBEAT_INTERVAL_MS);
+  }, [clearHeartbeat]);
 
   const play = useCallback(
     (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number) => {
@@ -102,14 +114,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onCompleteCallbackRef.current?.();
       };
 
-      // Heartbeat toutes les 10s (Real Listen V7.2)
-      heartbeatRef.current = setInterval(() => {
-        if (audio && !audio.paused) {
-          onHeartbeatCallbackRef.current?.(audio.currentTime);
-        }
-      }, STREAM_HEARTBEAT_INTERVAL_MS);
+      startHeartbeat();
     },
-    [state.volume, clearHeartbeat],
+    [state.volume, clearHeartbeat, startHeartbeat],
   );
 
   const pause = useCallback(() => {
@@ -120,16 +127,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const resume = useCallback(() => {
     if (!audioRef.current) return;
-    clearHeartbeat();
     audioRef.current.play().catch(() => {});
     setState((prev) => ({ ...prev, isPlaying: true }));
-    heartbeatRef.current = setInterval(() => {
-      const audio = audioRef.current;
-      if (audio && !audio.paused) {
-        onHeartbeatCallbackRef.current?.(audio.currentTime);
-      }
-    }, STREAM_HEARTBEAT_INTERVAL_MS);
-  }, [clearHeartbeat]);
+    startHeartbeat();
+  }, [startHeartbeat]);
 
   const stop = useCallback(() => {
     clearHeartbeat();
@@ -144,6 +145,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const clampedVolume = Math.max(0, Math.min(1, volume));
     if (audioRef.current) audioRef.current.volume = clampedVolume;
     setState((prev) => ({ ...prev, volume: clampedVolume }));
+  }, []);
+
+  // Déplace la tête de lecture — bornes clampées [0, duration]
+  const seek = useCallback((positionSeconds: number) => {
+    if (!audioRef.current) return;
+    const clamped = Math.max(0, Math.min(positionSeconds, audioRef.current.duration || 0));
+    audioRef.current.currentTime = clamped;
+    setState((prev) => ({ ...prev, currentPosition: clamped }));
   }, []);
 
   const onHeartbeat = useCallback((cb: (pos: number) => void) => {
@@ -173,6 +182,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         resume,
         stop,
         setVolume,
+        seek,
         onHeartbeat,
         onComplete,
       }}

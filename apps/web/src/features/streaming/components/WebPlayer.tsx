@@ -6,7 +6,7 @@ import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 
 export const WebPlayer = memo(function WebPlayer() {
-  const { currentTrack, currentPosition, duration, setVolume, volume } = usePlayer();
+  const { currentTrack, currentPosition, duration, setVolume, volume, seek } = usePlayer();
 
   if (!currentTrack) return null;
 
@@ -16,7 +16,7 @@ export const WebPlayer = memo(function WebPlayer() {
       style={{ backgroundColor: "#1A1A1A", borderTop: "1px solid #2A2A2A" }}
     >
       <div className="max-w-screen-xl mx-auto">
-        <PlayerProgressBar currentPosition={currentPosition} duration={duration} />
+        <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
         <div className="flex items-center gap-4 mt-3">
           {/* Track info */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
