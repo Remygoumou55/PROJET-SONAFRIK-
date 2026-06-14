@@ -20,15 +20,23 @@ export function VerificationPanel({
   const [verifications, setVerifications] = useState(initial);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function create(type: "identity" | "artist" | "label") {
     setLoading(true);
+    setError(null);
     try {
       const v = await creatorService.createVerification({
         verificationType: type,
         documentType: type === "label" ? "business_license" : "national_id",
       });
       setVerifications((current) => [v, ...current]);
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Impossible de créer la demande de vérification. Réessayez.",
+      );
     } finally {
       setLoading(false);
     }
@@ -66,6 +74,15 @@ export function VerificationPanel({
 
   return (
     <div className="space-y-4">
+      {error && (
+        <p
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ backgroundColor: "#FF4D4F22", color: "#FF4D4F" }}
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={loading} onClick={() => create("identity")}>
           Identité
