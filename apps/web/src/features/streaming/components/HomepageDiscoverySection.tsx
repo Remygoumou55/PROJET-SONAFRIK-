@@ -5,6 +5,7 @@ import type { DiscoveryTrack, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
+import { CoverImage } from "@/components/CoverImage";
 
 function toTrackWithMeta(t: DiscoveryTrack): TrackWithMeta {
   return {
@@ -30,18 +31,8 @@ function toTrackWithMeta(t: DiscoveryTrack): TrackWithMeta {
     deleted_at: null,
     artist_name: t.artist_name ?? undefined,
     album_title: t.album_title ?? undefined,
-    cover_url: null,
+    cover_url: t.cover_path ?? null,
   };
-}
-
-function MusicNote({ size = 22, color = "#FFFFFF" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <path d="M9 18V5l12-2v13" />
-      <circle cx="6" cy="18" r="3" fill={color} />
-      <circle cx="18" cy="16" r="3" fill={color} />
-    </svg>
-  );
 }
 
 interface Props {
@@ -80,19 +71,26 @@ export function HomepageDiscoverySection({ tracks }: Props) {
               aria-label={`Lire ${track.title}${track.artist_name ? ` — ${track.artist_name}` : ""}`}
             >
               <div
-                className="aspect-square rounded-xl mb-2 flex items-center justify-center relative overflow-hidden"
-                style={{
-                  background: `linear-gradient(145deg, ${gradient.from}1A 0%, ${gradient.to}0D 100%)`,
-                  border: `1px solid ${isActive ? gradient.from : `${gradient.from}25`}`,
-                }}
+                className="aspect-square rounded-xl mb-2 relative overflow-hidden"
+                style={{ border: `1px solid ${isActive ? gradient.from : `${gradient.from}25`}` }}
               >
-                {isActive && isPlaying ? (
-                  <svg width="18" height="18" viewBox="0 0 16 16" fill={gradient.from}>
-                    <rect x="2" y="2" width="4" height="12" rx="1" />
-                    <rect x="10" y="2" width="4" height="12" rx="1" />
-                  </svg>
-                ) : (
-                  <MusicNote size={22} color={isActive ? gradient.from : gradient.from} />
+                <CoverImage coverPath={track.cover_path} alt={track.title} gradientSeed={i} />
+                {isActive && (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,0.4)" }}
+                  >
+                    {isPlaying ? (
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill={gradient.from}>
+                        <rect x="2" y="2" width="4" height="12" rx="1" />
+                        <rect x="10" y="2" width="4" height="12" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill={gradient.from}>
+                        <path d="M4 2l8 6-8 6V2Z" />
+                      </svg>
+                    )}
+                  </div>
                 )}
                 {/* Like count */}
                 {track.like_count > 0 && (

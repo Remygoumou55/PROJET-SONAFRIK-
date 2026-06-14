@@ -5,6 +5,7 @@ import type { TrendingTrack, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
+import { CoverImage } from "@/components/CoverImage";
 
 function toTrackWithMeta(t: TrendingTrack): TrackWithMeta {
   return {
@@ -30,7 +31,7 @@ function toTrackWithMeta(t: TrendingTrack): TrackWithMeta {
     deleted_at: null,
     artist_name: t.artist_name ?? undefined,
     album_title: t.album_title ?? undefined,
-    cover_url: null,
+    cover_url: t.cover_path ?? null,
   };
 }
 
@@ -84,25 +85,29 @@ export function HomepageTrendingSection({ tracks }: Props) {
               )}
             </div>
 
-            {/* Art placeholder */}
+            {/* Art */}
             <div
-              className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center relative overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg, ${grad.from}28, ${grad.to}14)`,
-                border: `1px solid ${grad.from}25`,
-              }}
+              className="w-10 h-10 rounded-xl flex-shrink-0 relative overflow-hidden"
+              style={{ border: `1px solid ${grad.from}25` }}
             >
-              {isActive && isPlaying ? (
-                <svg width="14" height="14" viewBox="0 0 16 16" fill={grad.from}>
-                  <rect x="2" y="2" width="4" height="12" rx="1" />
-                  <rect x="10" y="2" width="4" height="12" rx="1" />
-                </svg>
-              ) : (
-                <svg width={10} height={12} viewBox="0 0 10 12" fill={isActive ? grad.from : "#555"}>
-                  <path d="M0 0L10 6L0 12V0Z" />
-                </svg>
+              <CoverImage coverPath={track.cover_path} alt={track.title} gradientSeed={i} />
+              {isActive && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ background: "rgba(0,0,0,0.45)" }}
+                >
+                  {isPlaying ? (
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="#00D26A">
+                      <rect x="2" y="2" width="4" height="12" rx="1" />
+                      <rect x="10" y="2" width="4" height="12" rx="1" />
+                    </svg>
+                  ) : (
+                    <svg width={10} height={12} viewBox="0 0 10 12" fill="#00D26A">
+                      <path d="M0 0L10 6L0 12V0Z" />
+                    </svg>
+                  )}
+                </div>
               )}
-              {/* Play overlay on hover */}
               <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"
                 style={{ background: "rgba(0,0,0,0.6)" }}
