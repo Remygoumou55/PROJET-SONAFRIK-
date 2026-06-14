@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
 import { createPayoutService } from "@sonafrik/api/payout";
@@ -31,15 +31,12 @@ function fmtDate(iso: string) {
   });
 }
 
-function getService() {
-  return createPayoutService(getSupabaseBrowserClient());
-}
-
 interface Props {
   initialQueue: AdminPayoutEntry[];
 }
 
 export function AdminFinanceCenter({ initialQueue }: Props) {
+  const service = useMemo(() => createPayoutService(getSupabaseBrowserClient()), []);
   const [queue, setQueue] = useState<AdminPayoutEntry[]>(initialQueue);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [loading, setLoading] = useState(false);
@@ -57,15 +54,14 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const svc = getService();
-      const data = await svc.getAdminPayoutQueue({ status, limit: 100 });
+      const data = await service.getAdminPayoutQueue({ status, limit: 100 });
       setQueue(data);
     } catch {
       setError("Impossible de charger la file.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [service]);
 
   const handleFilterChange = (s: StatusFilter) => {
     setStatusFilter(s);
@@ -94,7 +90,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
   };
 
   const handleApprove = (id: string) => {
-    void runAction(id, () => getService().approvePayoutRequest({ withdrawalId: id }));
+    void runAction(id, () => service.approvePayoutRequest({ withdrawalId: id }));
   };
 
   const handleReject = (id: string) => {
@@ -102,7 +98,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
   };
 
   const handleProcess = (id: string) => {
-    void runAction(id, () => getService().processPayoutRequest({ withdrawalId: id }));
+    void runAction(id, () => service.processPayoutRequest({ withdrawalId: id }));
   };
 
   const handleMarkPaid = (id: string) => {
@@ -110,7 +106,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
   };
 
   const handleCancel = (id: string) => {
-    void runAction(id, () => getService().cancelPayoutRequest({ withdrawalId: id }));
+    void runAction(id, () => service.cancelPayoutRequest({ withdrawalId: id }));
   };
 
   const confirmModal = () => {
@@ -119,11 +115,11 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
     setModal(null);
     if (type === "reject") {
       void runAction(withdrawalId, () =>
-        getService().rejectPayoutRequest({ withdrawalId, reason: value }),
+        service.rejectPayoutRequest({ withdrawalId, reason: value }),
       );
     } else {
       void runAction(withdrawalId, () =>
-        getService().markPayoutPaid({ withdrawalId, reference: value }),
+        service.markPayoutPaid({ withdrawalId, reference: value }),
       );
     }
   };
