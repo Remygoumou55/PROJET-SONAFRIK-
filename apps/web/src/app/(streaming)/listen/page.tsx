@@ -196,7 +196,7 @@ export default async function ListenPage() {
   ] = await Promise.all([requireIdentityContext(), getHomepageContent()]);
 
   const firstName = profile.full_name?.split(" ")[0] ?? "là";
-  const hour = new Date().getUTCHours() + 1; // UTC+1 approximatif
+  const hour = new Date().getUTCHours(); // Guinée = UTC+0 (GMT)
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
 
   return (
