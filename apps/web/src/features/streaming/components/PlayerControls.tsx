@@ -3,7 +3,7 @@
 import { usePlayer } from "../hooks/usePlayer";
 
 export function PlayerControls() {
-  const { isPlaying, isLoading, pause, resume, stop } = usePlayer();
+  const { isPlaying, isLoading, pauseAndSave, resume, stop } = usePlayer();
 
   return (
     <div className="flex items-center gap-3">
@@ -14,7 +14,7 @@ export function PlayerControls() {
         />
       ) : isPlaying ? (
         <button
-          onClick={pause}
+          onClick={pauseAndSave}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
           style={{ backgroundColor: "#00D26A" }}
           aria-label="Pause"
