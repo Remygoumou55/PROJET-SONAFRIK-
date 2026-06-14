@@ -3,6 +3,8 @@
 import { memo, useCallback, useState } from "react";
 import type { ArtistResult, SearchResult, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
+import { getInitials } from "@/lib/utils";
+import { CoverImage } from "@/components/CoverImage";
 
 interface SearchResultsProps {
   results: SearchResult | null;
@@ -24,13 +26,8 @@ const TrackRow = memo(function TrackRow({
       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.backgroundColor = "transparent")}
       onClick={() => onPlay(track)}
     >
-      <div
-        className="w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center"
-        style={{ backgroundColor: "#2A2A2A" }}
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="#00D26A">
-          <path d="M4 2L14 8L4 14V2Z" />
-        </svg>
+      <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">
+        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
@@ -51,10 +48,6 @@ const TrackRow = memo(function TrackRow({
   );
 });
 
-function getArtistInitials(name: string): string {
-  return name.split(" ").map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
-}
-
 const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) {
   return (
     <div className="flex items-center gap-3 w-full p-3 rounded-lg">
@@ -62,7 +55,7 @@ const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) 
         className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
         style={{ backgroundColor: "#2A2A2A", color: "#00D26A" }}
       >
-        {getArtistInitials(artist.stage_name)}
+        {getInitials(artist.stage_name)}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
@@ -159,10 +152,9 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
                 className="rounded-xl p-3 flex flex-col gap-2"
                 style={{ backgroundColor: "#1F1F1F" }}
               >
-                <div
-                  className="aspect-square rounded-lg w-full"
-                  style={{ backgroundColor: "#2A2A2A" }}
-                />
+                <div className="aspect-square rounded-lg w-full relative overflow-hidden">
+                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} />
+                </div>
                 <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
                   {album.title}
                 </p>
