@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createWalletService } from "@sonafrik/api/wallet";
+import { useCallback, useEffect, useState } from "react";
 import type {
   SubscribePremiumInput,
   AddPayoutAccountInput,
@@ -15,10 +14,10 @@ import type {
   PayoutAccount,
   RoyaltyCalculation,
 } from "@sonafrik/types";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useWalletService } from "../lib/walletServiceContext";
 
 export function useWallet() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
   const [context, setContext] = useState<WalletContext | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +63,7 @@ export function useWallet() {
 }
 
 export function useTransactions() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +79,7 @@ export function useTransactions() {
 }
 
 export function useWithdrawals() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +95,7 @@ export function useWithdrawals() {
 }
 
 export function usePayoutAccounts() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -136,7 +135,7 @@ export function usePayoutAccounts() {
 }
 
 export function useRequestWithdrawal() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
 
   return useCallback(async (input: RequestWithdrawalInput) => {
     return service.requestWithdrawal(input);
@@ -144,7 +143,7 @@ export function useRequestWithdrawal() {
 }
 
 export function useRoyalties() {
-  const service = useMemo(() => createWalletService(getSupabaseBrowserClient()), []);
+  const service = useWalletService();
   const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
