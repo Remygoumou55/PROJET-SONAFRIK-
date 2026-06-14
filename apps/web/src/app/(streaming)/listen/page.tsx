@@ -57,9 +57,11 @@ async function getHomepageContent() {
       discoveries: (discoveryResult.data ?? []) as unknown as DiscoveryTrack[],
       newAlbums: ((newAlbumsResult.data as unknown as { albums?: DiscoveryAlbum[] } | null)?.albums ?? []) as DiscoveryAlbum[],
       suggestedArtists: (suggestedArtistsResult.data ?? []) as unknown as DiscoveryArtist[],
+      hadError: false,
     };
-  } catch {
-    return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [] };
+  } catch (err) {
+    console.error("[Homepage] getHomepageContent failed:", err);
+    return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [], hadError: true };
   }
 }
 
@@ -144,7 +146,7 @@ function MediaCard({
 export default async function ListenPage() {
   const [
     { profile, unreadNotifications },
-    { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists },
+    { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists, hadError },
   ] = await Promise.all([requireIdentityContext(), getHomepageContent()]);
 
   const firstName = profile.full_name?.split(" ")[0] ?? "là";
@@ -246,6 +248,17 @@ export default async function ListenPage() {
       </div>
 
       <div className="pb-8">
+
+        {/* Bannière d'erreur discrète si getHomepageContent a échoué */}
+        {hadError && (
+          <div
+            className="mx-6 mt-4 rounded-xl px-4 py-3 text-sm"
+            style={{ background: "#FF444418", color: "#FF8888", border: "1px solid #FF444433" }}
+            role="alert"
+          >
+            Contenu temporairement indisponible. Réessayez dans quelques instants.
+          </div>
+        )}
 
         {/* ── TENDANCES ────────────────────────────────────────────────────── */}
         {trending.length > 0 && (
