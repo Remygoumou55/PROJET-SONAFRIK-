@@ -8,6 +8,7 @@ import { PUBLICATION_STATUS_LABELS, RELEASE_TYPE_LABELS } from "@sonafrik/types"
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CoverUploader } from "./CoverUploader";
+import { CoverImage } from "@/components/CoverImage";
 
 const UPC_MAX = 14;
 
@@ -101,6 +102,13 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <Badge variant="primary">{PUBLICATION_STATUS_LABELS[album.publication_status]}</Badge>
             </div>
             {album.upc ? <p className="text-texte-desactive text-xs">UPC · {album.upc}</p> : null}
+
+            {/* Pochette actuelle */}
+            {album.cover_path && (
+              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                <CoverImage coverPath={album.cover_path} alt={album.title} />
+              </div>
+            )}
 
             {/* Upload pochette */}
             {expandedCover === album.id ? (
