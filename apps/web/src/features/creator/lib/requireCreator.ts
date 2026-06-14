@@ -65,6 +65,9 @@ const fetchCreatorContext = cache(async () => {
 });
 
 export async function requireCreatorContext(): Promise<CreatorContext> {
+  if (process.env.BYPASS_AUTH === "true" && process.env.NODE_ENV === "production") {
+    throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
+  }
   if (process.env.BYPASS_AUTH === "true") return DEV_MOCK_CREATOR;
   return fetchCreatorContext();
 }
