@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { DiscoveryAlbum, DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { HomepageTrendingSection } from "@/features/streaming/components/HomepageTrendingRow";
+import { HomepageDiscoverySection } from "@/features/streaming/components/HomepageDiscoverySection";
 
 export const metadata: Metadata = {
   title: "Accueil — SONAFRIK",
@@ -27,12 +29,6 @@ const ARTIST_RING_COLORS = [
 
 function getInitials(name: string): string {
   return name.split(" ").map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
-}
-
-function formatCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return n.toString();
 }
 
 // ─── Fetch données homepage ────────────────────────────────────────────────────
@@ -144,47 +140,6 @@ function MediaCard({
       <p className="text-xs font-bold truncate" style={{ color: "#FFFFFF" }}>{title}</p>
       {subtitle && <p className="text-[10px] mt-0.5 truncate" style={{ color: "#777777" }}>{subtitle}</p>}
     </Link>
-  );
-}
-
-// ─── Carte track découverte ────────────────────────────────────────────────────
-function TrackCard({ track, gradient }: { track: DiscoveryTrack; gradient: { from: string; to: string } }) {
-  return (
-    <div className="flex-shrink-0 w-32 group cursor-pointer">
-      <div
-        className="aspect-square rounded-xl mb-2 flex items-center justify-center relative overflow-hidden"
-        style={{
-          background: `linear-gradient(145deg, ${gradient.from}1A 0%, ${gradient.to}0D 100%)`,
-          border: `1px solid ${gradient.from}25`,
-        }}
-      >
-        <MusicNote size={22} color={gradient.from} />
-        {/* Like count */}
-        {track.like_count > 0 && (
-          <div
-            className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
-          >
-            <svg width={8} height={8} viewBox="0 0 24 24" fill="#00D26A">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            <span className="text-[9px] font-bold" style={{ color: "#00D26A" }}>{formatCount(track.like_count)}</span>
-          </div>
-        )}
-        {/* Play hover */}
-        <div
-          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.55)" }}
-        >
-          <div className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: "#00D26A", boxShadow: "0 0 14px rgba(0,210,106,0.7)" }}>
-            <svg width={12} height={12} viewBox="0 0 12 14" fill="#000"><path d="M0 0L12 7L0 14V0Z" /></svg>
-          </div>
-        </div>
-      </div>
-      <p className="text-xs font-semibold truncate" style={{ color: "#FFFFFF" }}>{track.title}</p>
-      {track.artist_name && <p className="text-[10px] mt-0.5 truncate" style={{ color: "#777777" }}>{track.artist_name}</p>}
-    </div>
   );
 }
 
@@ -319,66 +274,7 @@ export default async function ListenPage() {
               </span>
             </div>
 
-            <div className="px-6 space-y-0.5">
-              {trending.map((track, i) => {
-                const isTop = i < 3;
-                return (
-                  <div
-                    key={track.track_id}
-                    className="flex items-center gap-3 py-3 rounded-xl px-3 group cursor-pointer transition-colors"
-                    style={{ borderBottom: "1px solid #141414" }}
-                  >
-                    {/* Rank */}
-                    <div
-                      className="w-6 flex-shrink-0 text-right"
-                    >
-                      {isTop ? (
-                        <span
-                          className="text-sm font-black"
-                          style={{ color: i === 0 ? "#00D26A" : i === 1 ? "#FFC20E" : "#F97316" }}
-                        >
-                          {i + 1}
-                        </span>
-                      ) : (
-                        <span className="text-xs font-bold" style={{ color: "#444444" }}>{i + 1}</span>
-                      )}
-                    </div>
-
-                    {/* Art placeholder */}
-                    <div
-                      className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center relative overflow-hidden"
-                      style={{
-                        background: `linear-gradient(135deg, ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]!.from}28, ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]!.to}14)`,
-                        border: `1px solid ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]!.from}25`,
-                      }}
-                    >
-                      <MusicNote size={14} color={CARD_GRADIENTS[i % CARD_GRADIENTS.length]!.from} />
-                      {/* Play overlay */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"
-                        style={{ background: "rgba(0,0,0,0.6)" }}>
-                        <svg width={10} height={12} viewBox="0 0 10 12" fill="#00D26A"><path d="M0 0L10 6L0 12V0Z" /></svg>
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{track.title}</p>
-                      {track.artist_name && (
-                        <p className="text-xs truncate mt-0.5" style={{ color: "#666666" }}>{track.artist_name}</p>
-                      )}
-                    </div>
-
-                    {/* Streams */}
-                    <div className="flex-shrink-0 text-right">
-                      <p className="text-xs font-bold tabular-nums" style={{ color: isTop ? "#00D26A" : "#444444" }}>
-                        {formatCount(track.listen_count)}
-                      </p>
-                      <p className="text-[9px]" style={{ color: "#333333" }}>écoutes</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <HomepageTrendingSection tracks={trending} />
           </section>
         )}
 
@@ -496,11 +392,7 @@ export default async function ListenPage() {
                 Pour toi
               </span>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
-              {discoveries.map((track, i) => (
-                <TrackCard key={track.track_id} track={track} gradient={CARD_GRADIENTS[i % CARD_GRADIENTS.length]!} />
-              ))}
-            </div>
+            <HomepageDiscoverySection tracks={discoveries} />
           </section>
         )}
 
