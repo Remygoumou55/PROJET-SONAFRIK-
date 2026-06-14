@@ -505,7 +505,7 @@ export default async function ListenPage() {
                 return (
                   <Link
                     key={genre.id}
-                    href="/search"
+                    href={`/search?genre=${encodeURIComponent(genre.name)}`}
                     className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
                     style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }}
                   >

@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: "Recherchez des morceaux, albums et artistes sur SONAFRIK.",
 };
 
-export default function Search() {
-  return <SearchPage />;
+export default async function Search({
+  searchParams,
+}: {
+  searchParams: Promise<{ genre?: string }>;
+}) {
+  const { genre } = await searchParams;
+  return <SearchPage initialGenre={genre} />;
 }

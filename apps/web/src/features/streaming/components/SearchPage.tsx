@@ -1,17 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { SearchResults } from "./SearchResults";
 
-export function SearchPage() {
-  const [query, setQuery] = useState("");
+interface Props {
+  initialGenre?: string;
+}
+
+export function SearchPage({ initialGenre }: Props) {
+  const [query, setQuery] = useState(initialGenre ?? "");
+  const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const { results, isSearching, error, search, clearSearch } = useSearch();
+
+  useEffect(() => {
+    if (initialGenre) {
+      search(initialGenre);
+    }
+  }, [initialGenre, search]);
 
   const handleChange = (value: string) => {
     setQuery(value);
+    setActiveGenre(undefined);
     search(value);
     if (!value) clearSearch();
+  };
+
+  const clearGenreFilter = () => {
+    setActiveGenre(undefined);
+    setQuery("");
+    clearSearch();
   };
 
   return (
@@ -19,6 +37,33 @@ export function SearchPage() {
       <h1 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>
         Recherche
       </h1>
+
+      {/* Chip genre actif */}
+      {activeGenre && (
+        <div className="flex items-center gap-2 mb-4">
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+            style={{ background: "#00D26A14", color: "#00D26A", border: "1px solid #00D26A30" }}
+          >
+            <svg width={10} height={10} viewBox="0 0 24 24" fill="#00D26A">
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+            Genre : {activeGenre}
+            <button
+              onClick={clearGenreFilter}
+              className="ml-1 flex items-center justify-center w-3.5 h-3.5 rounded-full hover:bg-green-900/30"
+              aria-label={`Retirer le filtre ${activeGenre}`}
+            >
+              <svg width={8} height={8} viewBox="0 0 8 8" fill="none" stroke="#00D26A" strokeWidth={1.5} strokeLinecap="round">
+                <path d="M1 1l6 6M7 1L1 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="relative mb-6">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2"
@@ -34,7 +79,7 @@ export function SearchPage() {
           type="text"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
-          placeholder="Artiste, morceau, album…"
+          placeholder={activeGenre ? `Chercher dans ${activeGenre}…` : "Artiste, morceau, album…"}
           className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
           style={{
             backgroundColor: "#1F1F1F",
@@ -45,7 +90,7 @@ export function SearchPage() {
         />
         {query && (
           <button
-            onClick={() => { setQuery(""); clearSearch(); }}
+            onClick={() => { setQuery(""); setActiveGenre(undefined); clearSearch(); }}
             className="absolute right-3 top-1/2 -translate-y-1/2"
             style={{ color: "#555555" }}
             aria-label="Effacer"
@@ -62,7 +107,7 @@ export function SearchPage() {
         </p>
       )}
       <SearchResults results={results} isSearching={isSearching} />
-      {!query && (
+      {!query && !activeGenre && (
         <div className="text-center py-12">
           <p className="text-4xl mb-4">🎵</p>
           <p className="font-semibold mb-1" style={{ color: "#FFFFFF" }}>
