@@ -28,7 +28,7 @@ function PlaylistCard({
           {playlist.title}
         </p>
         <p className="text-sm" style={{ color: "#A0A0A0" }}>
-          {playlist.track_count} morceau{playlist.track_count !== 1 ? "x" : ""}
+          {playlist.track_count ?? 0} morceau{(playlist.track_count ?? 0) !== 1 ? "x" : ""}
         </p>
       </div>
       <button
