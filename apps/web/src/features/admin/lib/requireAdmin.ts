@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function requireAdmin(): Promise<{ userId: string }> {
-  if (process.env.BYPASS_AUTH === "true" && process.env.NODE_ENV === "production") {
+  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
     throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
   }
   if (process.env.BYPASS_AUTH === "true") return { userId: "dev-mock-id" };
