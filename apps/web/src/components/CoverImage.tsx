@@ -11,10 +11,12 @@ interface Props {
   alt: string;
   gradientSeed?: number;
   size?: "sm" | "md" | "lg";
+  priority?: boolean;
+  imgSizes?: string;
 }
 
 const SIZE_MAP = { sm: "w-10 h-10", md: "w-20 h-20", lg: "w-32 h-32" } as const;
-const IMG_SIZES = { sm: "40px", md: "80px", lg: "128px" } as const;
+const DEFAULT_SIZES = { sm: "40px", md: "80px", lg: "128px" } as const;
 
 function buildSrc(path: string): string {
   return path.startsWith("http")
@@ -39,9 +41,17 @@ function GradientPlaceholder({ seed }: { seed: number }) {
   );
 }
 
-export function CoverImage({ coverPath, alt, gradientSeed = 0, size }: Props) {
+export function CoverImage({
+  coverPath,
+  alt,
+  gradientSeed = 0,
+  size,
+  priority = false,
+  imgSizes,
+}: Props) {
   const [error, setError] = useState(false);
   const sizeClass = size ? SIZE_MAP[size] : "w-full h-full";
+  const resolvedSizes = imgSizes ?? (size ? DEFAULT_SIZES[size] : "100vw");
 
   return (
     <div className={`${sizeClass} relative overflow-hidden`}>
@@ -52,7 +62,8 @@ export function CoverImage({ coverPath, alt, gradientSeed = 0, size }: Props) {
           fill
           className="object-cover"
           onError={() => setError(true)}
-          sizes={size ? IMG_SIZES[size] : "100vw"}
+          sizes={resolvedSizes}
+          priority={priority}
         />
       ) : (
         <GradientPlaceholder seed={gradientSeed} />

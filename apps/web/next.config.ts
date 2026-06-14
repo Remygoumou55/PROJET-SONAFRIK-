@@ -17,9 +17,9 @@ const nextConfig: NextConfig = {
   ],
   images: {
     formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 86400,
-    deviceSizes: [640, 750, 828, 1080, 1200],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 604800,
+    deviceSizes: [390, 640, 768, 1080, 1280],
+    imageSizes: [32, 40, 64, 96, 128],
     remotePatterns: [
       {
         protocol: "https",
@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ["@supabase/supabase-js", "@supabase/ssr"],
   experimental: {
     // Next.js 15 : cache client-side router
     staleTimes: {
@@ -36,10 +37,9 @@ const nextConfig: NextConfig = {
     },
     // Tree-shaking des gros packages — réduit le bundle JS client
     optimizePackageImports: [
-      "@supabase/supabase-js",
-      "@supabase/ssr",
       "@sonafrik/ui",
       "@sonafrik/types",
+      "@sonafrik/api",
     ],
   },
   async headers() {
