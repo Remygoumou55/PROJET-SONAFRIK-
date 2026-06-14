@@ -4,6 +4,7 @@ import { memo } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
+import { CoverImage } from "@/components/CoverImage";
 
 export const WebPlayer = memo(function WebPlayer() {
   const { currentTrack, currentPosition, duration, setVolume, volume, seek } = usePlayer();
@@ -20,11 +21,9 @@ export const WebPlayer = memo(function WebPlayer() {
         <div className="flex items-center gap-4 mt-3">
           {/* Track info */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div
-              className="w-10 h-10 rounded-md flex-shrink-0"
-              style={{ backgroundColor: "#2A2A2A" }}
-              aria-hidden="true"
-            />
+            <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">
+              <CoverImage coverPath={currentTrack.cover_url ?? null} alt={currentTrack.title} />
+            </div>
             <div className="min-w-0">
               <p
                 className="text-sm font-semibold truncate"
