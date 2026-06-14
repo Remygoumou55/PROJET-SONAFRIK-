@@ -42,6 +42,11 @@ export class CreatorService {
     if (error || !data) throw new CreatorError("not_artist_account");
   }
 
+  async becomeArtist(): Promise<void> {
+    const { error } = await this.client.rpc("become_artist_for_current_user");
+    if (error) throw error;
+  }
+
   async ensureCreator(): Promise<Creator> {
     const userId = await this.requireUserId();
     await this.requireArtistAccount(userId);

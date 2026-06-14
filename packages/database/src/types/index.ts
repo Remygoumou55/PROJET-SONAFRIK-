@@ -965,6 +965,10 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
+      become_artist_for_current_user: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       submit_creator_verification: {
         Args: { p_verification_id: string };
         Returns: undefined;

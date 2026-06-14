@@ -3,6 +3,7 @@ import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle } from 
 import type { IdentityContext } from "@sonafrik/types";
 import { ACCOUNT_TYPE_OPTIONS } from "@sonafrik/types";
 import { formatDate } from "@/lib/formatters";
+import { BecomeArtistButton } from "./BecomeArtistButton";
 
 interface ProfileHeaderProps {
   context: IdentityContext;
@@ -75,8 +76,6 @@ export function ProfileHeader({ context, avatarUrl }: ProfileHeaderProps) {
         </CardContent>
       </Card>
 
-      {/* GAP D-3.0 : updateAccountType absent de updateProfileSchema et ensureCreator()
-          requiert is_artist_account RPC → impossible sans nouvelle RPC SQL */}
       {profile.account_type === "auditeur" && (
         <div
           className="mt-6 rounded-2xl overflow-hidden"
@@ -103,10 +102,7 @@ export function ProfileHeader({ context, avatarUrl }: ProfileHeaderProps) {
               Partagez votre musique africaine avec le monde. Le Creator OS vous donne accès
               à la gestion de votre catalogue, vos analytics et vos royalties.
             </p>
-            <p className="text-xs px-3 py-2 rounded-lg" style={{ background: "#1A1A1A", color: "#666666" }}>
-              La mise à niveau vers un compte artiste est actuellement gérée par notre équipe.
-              Contactez le support pour démarrer votre espace créateur.
-            </p>
+            <BecomeArtistButton />
           </div>
         </div>
       )}
