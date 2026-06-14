@@ -4,14 +4,7 @@ import Link from "next/link";
 import { memo } from "react";
 import type { WalletContext, Transaction } from "@sonafrik/types";
 import { TRANSACTION_TYPE_LABELS, SUBSCRIPTION_PLANS } from "@sonafrik/types";
-
-function formatGnf(amount: number): string {
-  return new Intl.NumberFormat("fr-GN", { style: "decimal" }).format(Math.round(amount)) + " GNF";
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
-}
+import { formatGnf, formatDate } from "@/lib/formatters";
 
 const TransactionRow = memo(function TransactionRow({ tx }: { tx: Transaction }) {
   const isCredit = tx.type === "royalty_payout" || tx.type === "topup" || tx.type === "refund";
@@ -167,7 +160,7 @@ export const WalletDashboard = memo(function WalletDashboard({
             >
               <p className="font-semibold" style={{ color: "#FFFFFF" }}>{plan.label}</p>
               <p className="text-lg font-bold mt-1" style={{ color: "#FFC20E" }}>
-                {new Intl.NumberFormat("fr-GN").format(plan.price_gnf)} GNF
+                {formatGnf(plan.price_gnf)}
               </p>
               <p className="text-xs mt-1" style={{ color: "#A0A0A0" }}>
                 {plan.duration_days} jours · Écoute illimitée

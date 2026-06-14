@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Badge, Button, Card, CardContent } from "@sonafrik/ui";
 import type { UserSession } from "@sonafrik/types";
 import { useIdentityService } from "../hooks/useIdentity";
+import { formatDateWithTime } from "@/lib/formatters";
 
 interface SessionListProps {
   sessions: UserSession[];
@@ -57,7 +58,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
                   <Badge variant="outline">{PLATFORM_LABELS[session.platform] ?? session.platform}</Badge>
                 ) : null}
                 <span className="text-texte-desactive text-xs">
-                  Dernière activité · {formatDate(session.last_active_at)}
+                  Dernière activité · {formatDateWithTime(session.last_active_at)}
                 </span>
               </div>
               {session.ip_address ? (
@@ -79,11 +80,3 @@ export function SessionList({ sessions: initial }: SessionListProps) {
   );
 }
 
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
-}

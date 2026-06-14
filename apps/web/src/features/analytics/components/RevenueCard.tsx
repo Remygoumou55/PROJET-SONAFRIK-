@@ -1,5 +1,6 @@
 import type { CreatorRevenueStats } from "@sonafrik/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
+import { formatGnf } from "@/lib/formatters";
 
 function Row({
   label,
@@ -27,10 +28,6 @@ function Row({
   );
 }
 
-function fmtGnf(n: number): string {
-  if (n === 0) return "0 GNF";
-  return `${n.toLocaleString("fr-FR")} GNF`;
-}
 
 export function RevenueCard({ stats }: { stats: CreatorRevenueStats }) {
   return (
@@ -46,22 +43,22 @@ export function RevenueCard({ stats }: { stats: CreatorRevenueStats }) {
       <CardContent className="divide-bordure divide-y">
         <Row
           label="Solde wallet"
-          value={fmtGnf(stats.wallet_balance_gnf)}
+          value={formatGnf(stats.wallet_balance_gnf)}
           accent
         />
         <Row
           label="Royalties payées"
-          value={fmtGnf(stats.paid_royalties_gnf)}
+          value={formatGnf(stats.paid_royalties_gnf)}
           sub="Cycles distribués"
         />
         <Row
           label="Royalties en attente"
-          value={fmtGnf(stats.pending_royalties_gnf)}
+          value={formatGnf(stats.pending_royalties_gnf)}
           sub="Cycles en cours · non encore versés"
         />
         <Row
           label="Total crédité"
-          value={fmtGnf(stats.total_credited_gnf)}
+          value={formatGnf(stats.total_credited_gnf)}
           sub="Toutes sources confondues"
         />
         <Row
@@ -85,7 +82,7 @@ export function RevenueCard({ stats }: { stats: CreatorRevenueStats }) {
           label="Projection mensuelle estimée"
           value={
             stats.estimated_monthly_gnf > 0
-              ? fmtGnf(stats.estimated_monthly_gnf)
+              ? formatGnf(stats.estimated_monthly_gnf)
               : "—"
           }
           sub={

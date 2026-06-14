@@ -5,6 +5,7 @@ import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
 import { createPayoutService } from "@sonafrik/api/payout";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { formatGnf, formatDateTime } from "@/lib/formatters";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
@@ -16,20 +17,6 @@ const STATUS_COLORS: Record<WithdrawalStatus, { bg: string; text: string }> = {
   failed:     { bg: "#FF444422", text: "#FF6666" },
   cancelled:  { bg: "#55555522", text: "#888888" },
 };
-
-function fmtGnf(n: number) {
-  return new Intl.NumberFormat("fr-GN").format(n) + " GNF";
-}
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 interface Props {
   initialQueue: AdminPayoutEntry[];
@@ -217,7 +204,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-semibold" style={{ color: textMain }}>
-                        {fmtGnf(entry.net_amount_gnf)}
+                        {formatGnf(entry.net_amount_gnf)}
                       </p>
                       <span
                         className="rounded-full px-2 py-0.5 text-xs font-medium"
@@ -235,7 +222,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                         : ""}
                     </p>
                     <p className="mt-0.5 text-xs" style={{ color: textSub }}>
-                      Demandé le {fmtDate(entry.created_at)}
+                      Demandé le {formatDateTime(entry.created_at)}
                     </p>
                     {entry.reference && (
                       <p className="mt-0.5 text-xs" style={{ color: "#00D26A" }}>

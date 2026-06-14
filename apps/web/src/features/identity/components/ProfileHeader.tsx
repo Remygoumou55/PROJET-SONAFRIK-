@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import type { IdentityContext } from "@sonafrik/types";
 import { ACCOUNT_TYPE_OPTIONS } from "@sonafrik/types";
+import { formatDate } from "@/lib/formatters";
 
 interface ProfileHeaderProps {
   context: IdentityContext;
@@ -122,8 +123,3 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(
-    new Date(iso),
-  );
-}

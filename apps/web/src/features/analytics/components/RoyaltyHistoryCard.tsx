@@ -1,5 +1,6 @@
 import type { CreatorRoyaltyHistoryEntry } from "@sonafrik/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
+import { formatGnf, formatMonthYear } from "@/lib/formatters";
 
 const CALC_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:  { label: "En attente",  color: "text-or-solaire" },
@@ -8,12 +9,8 @@ const CALC_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled:{ label: "Annulé",      color: "text-texte-desactive" },
 };
 
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", { month: "short", year: "numeric" });
-}
-
 function fmtGnf(n: number): string {
-  return n > 0 ? `${n.toLocaleString("fr-FR")} GNF` : "—";
+  return n > 0 ? formatGnf(n) : "—";
 }
 
 export function RoyaltyHistoryCard({
@@ -66,7 +63,7 @@ export function RoyaltyHistoryCard({
               >
                 <div>
                   <p className="text-texte-principal text-sm font-medium">
-                    {fmtDate(entry.cycle_start)} – {fmtDate(entry.cycle_end)}
+                    {formatMonthYear(entry.cycle_start)} – {formatMonthYear(entry.cycle_end)}
                   </p>
                   <p className="text-texte-desactive text-xs">
                     {entry.valid_listen_count.toLocaleString("fr-FR")} écoutes ·{" "}
