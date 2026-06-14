@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { TrendingTrack, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
+import { formatCount } from "@/lib/utils";
 
 function toTrackWithMeta(t: TrendingTrack): TrackWithMeta {
   return {
@@ -42,12 +43,6 @@ const CARD_GRADIENTS = [
   { from: "#14B8A6", to: "#0F766E" },
   { from: "#EF4444", to: "#B91C1C" },
 ] as const;
-
-function formatCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return n.toString();
-}
 
 interface Props {
   tracks: TrendingTrack[];

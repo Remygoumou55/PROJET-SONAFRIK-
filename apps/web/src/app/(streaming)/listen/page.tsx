@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { DiscoveryAlbum, DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "@/features/streaming/components/HomepageTrendingRow";
 import { HomepageDiscoverySection } from "@/features/streaming/components/HomepageDiscoverySection";
 
@@ -26,10 +27,6 @@ const CARD_GRADIENTS = [
 const ARTIST_RING_COLORS = [
   "#00D26A", "#FFC20E", "#A855F7", "#3B82F6", "#F97316", "#EC4899",
 ] as const;
-
-function getInitials(name: string): string {
-  return name.split(" ").map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
-}
 
 // ─── Fetch données homepage ────────────────────────────────────────────────────
 async function getHomepageContent() {
