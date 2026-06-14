@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { AlbumWithMeta, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
+import { CoverImage } from "@/components/CoverImage";
 
 interface FavoritesListProps {
   tracks: TrackWithMeta[];
@@ -83,24 +84,24 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
                     border: isActive ? "1px solid #00D26A33" : "1px solid transparent",
                   }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center"
-                    style={{ backgroundColor: "#1F1F1F" }}
-                  >
-                    {isActive && isPlaying ? (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="#00D26A">
-                        <rect x="2" y="2" width="4" height="12" rx="1" />
-                        <rect x="10" y="2" width="4" height="12" rx="1" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill={isActive ? "#00D26A" : "#A0A0A0"}
+                  <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
+                    <CoverImage coverPath={track.cover_url ?? null} alt={track.title} />
+                    {isActive && (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.5)" }}
                       >
-                        <path d="M4 2l10 6-10 6V2z" />
-                      </svg>
+                        {isPlaying ? (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="#00D26A">
+                            <rect x="2" y="2" width="4" height="12" rx="1" />
+                            <rect x="10" y="2" width="4" height="12" rx="1" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="#00D26A">
+                            <path d="M4 2l10 6-10 6V2z" />
+                          </svg>
+                        )}
+                      </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -135,11 +136,9 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
                 className="rounded-xl p-3"
                 style={{ backgroundColor: "#1F1F1F" }}
               >
-                <div
-                  className="w-full aspect-square rounded-lg mb-2"
-                  style={{ backgroundColor: "#2A2A2A" }}
-                  aria-hidden="true"
-                />
+                <div className="w-full aspect-square rounded-lg mb-2 relative overflow-hidden">
+                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} />
+                </div>
                 <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>
                   {album.title}
                 </p>
