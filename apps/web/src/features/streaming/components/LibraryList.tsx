@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Playlist } from "@sonafrik/types";
 import { useLibrary } from "../hooks/useLibrary";
 
@@ -15,25 +16,27 @@ function PlaylistCard({
       className="rounded-xl p-4 flex items-center gap-4 group"
       style={{ backgroundColor: "#1F1F1F" }}
     >
-      <div
-        className="w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
-        style={{ backgroundColor: "#2A2A2A" }}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="#00D26A">
-          <path d="M4 6h12M4 10h8M4 14h10" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-        </svg>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold truncate" style={{ color: "#FFFFFF" }}>
-          {playlist.title}
-        </p>
-        <p className="text-sm" style={{ color: "#A0A0A0" }}>
-          {playlist.track_count ?? 0} morceau{(playlist.track_count ?? 0) !== 1 ? "x" : ""}
-        </p>
-      </div>
+      <Link href={`/library/playlist/${playlist.id}`} className="flex items-center gap-4 flex-1 min-w-0">
+        <div
+          className="w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
+          style={{ backgroundColor: "#2A2A2A" }}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="#00D26A">
+            <path d="M4 6h12M4 10h8M4 14h10" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold truncate" style={{ color: "#FFFFFF" }}>
+            {playlist.title}
+          </p>
+          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+            {playlist.track_count ?? 0} morceau{(playlist.track_count ?? 0) !== 1 ? "x" : ""}
+          </p>
+        </div>
+      </Link>
       <button
         onClick={() => onDelete(playlist.id)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg"
+        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg flex-shrink-0"
         style={{ color: "#555555" }}
         aria-label="Supprimer la playlist"
       >

@@ -5,6 +5,7 @@ import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { CoverImage } from "@/components/CoverImage";
 import { formatTime } from "@/lib/formatters";
+import { AddToPlaylistButton } from "./AddToPlaylistButton";
 
 function TrackRow({
   track,
@@ -20,52 +21,57 @@ function TrackRow({
   onPlay: (track: TrackWithMeta) => void;
 }) {
   return (
-    <button
-      onClick={() => onPlay(track)}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors"
+    <div
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
       style={{
         backgroundColor: isActive ? "#00D26A11" : "transparent",
         border: `1px solid ${isActive ? "#00D26A33" : "transparent"}`,
       }}
     >
-      <div className="w-8 text-center flex-shrink-0">
-        {isActive ? (
-          isPlaying ? (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
-              <rect x="1" y="1" width="4" height="12" rx="1" />
-              <rect x="9" y="1" width="4" height="12" rx="1" />
-            </svg>
+      {/* Zone cliquable = lecture */}
+      <button
+        onClick={() => onPlay(track)}
+        className="flex items-center gap-3 flex-1 min-w-0 text-left"
+        aria-label={`Lire ${track.title}`}
+      >
+        <div className="w-8 text-center flex-shrink-0">
+          {isActive ? (
+            isPlaying ? (
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+                <rect x="1" y="1" width="4" height="12" rx="1" />
+                <rect x="9" y="1" width="4" height="12" rx="1" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+                <path d="M3 1l10 6-10 6V1z" />
+              </svg>
+            )
           ) : (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
-              <path d="M3 1l10 6-10 6V1z" />
-            </svg>
-          )
-        ) : (
-          <span className="text-sm" style={{ color: "#555555" }}>{index + 1}</span>
-        )}
-      </div>
-      <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
-        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p
-          className="text-sm font-medium truncate"
-          style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}
-        >
-          {track.title}
-        </p>
-        {track.artist_name && (
-          <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
-            {track.artist_name}
+            <span className="text-sm" style={{ color: "#555555" }}>{index + 1}</span>
+          )}
+        </div>
+        <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
+          <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate" style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}>
+            {track.title}
           </p>
-        )}
-      </div>
+          {track.artist_name && (
+            <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+              {track.artist_name}
+            </p>
+          )}
+        </div>
+      </button>
+
       {track.duration_seconds ? (
         <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: "#555555" }}>
           {formatTime(track.duration_seconds)}
         </span>
       ) : null}
-    </button>
+      <AddToPlaylistButton trackId={track.id} />
+    </div>
   );
 }
 
