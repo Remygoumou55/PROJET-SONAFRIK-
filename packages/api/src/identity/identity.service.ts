@@ -173,9 +173,9 @@ export class IdentityService {
     }
   }
 
-  async markAllNotificationsRead(): Promise<number> {
-    await this.requireUserId();
-    return this.repository.markAllNotificationsRead();
+  async markAllNotificationsRead(): Promise<void> {
+    const userId = await this.requireUserId();
+    await this.repository.markAllNotificationsRead(userId);
   }
 
   async getActiveSessions(): Promise<UserSession[]> {

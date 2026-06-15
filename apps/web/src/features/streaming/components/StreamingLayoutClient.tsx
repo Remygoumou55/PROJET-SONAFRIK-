@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PlayerProvider } from "../lib/playerContext";
 import { WebPlayer } from "./WebPlayer";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 const NAV_ITEMS = [
-  { href: "/listen", label: "Accueil", icon: "home" },
-  { href: "/search", label: "Explorer", icon: "search" },
-  { href: "/library", label: "Bibliothèque", icon: "library" },
-  { href: "/profile", label: "Profil", icon: "profile" },
+  { href: "/listen",        label: "Accueil",      icon: "home" },
+  { href: "/search",        label: "Explorer",     icon: "search" },
+  { href: "/library",       label: "Bibliothèque", icon: "library" },
+  { href: "/notifications", label: "Alertes",      icon: "bell" },
+  { href: "/profile",       label: "Profil",       icon: "profile" },
 ] as const;
 
 function isNavActive(href: string, pathname: string) {
@@ -45,6 +47,14 @@ function NavIcon({ icon, size = 22 }: { icon: string; size?: number }) {
       </svg>
     );
   }
+  if (icon === "bell") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg>
+    );
+  }
   if (icon === "profile") {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -75,7 +85,13 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function DesktopNav() {
+function DesktopNav({
+  userId,
+  initialUnreadCount,
+}: {
+  userId: string;
+  initialUnreadCount: number;
+}) {
   const pathname = usePathname();
   return (
     <nav
@@ -87,6 +103,24 @@ function DesktopNav() {
       </div>
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(item.href, pathname);
+        if (item.icon === "bell") {
+          return (
+            <div
+              key={item.href}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+              style={{
+                backgroundColor: isActive ? "#00D26A18" : "transparent",
+                color: isActive ? "#00D26A" : "#A0A0A0",
+              }}
+            >
+              <NotificationBell
+                initialCount={initialUnreadCount}
+                userId={userId}
+              />
+              <span className="text-sm font-medium">{item.label}</span>
+            </div>
+          );
+        }
         return (
           <Link
             key={item.href}
@@ -106,7 +140,13 @@ function DesktopNav() {
   );
 }
 
-function MobileBottomNav() {
+function MobileBottomNav({
+  userId,
+  initialUnreadCount,
+}: {
+  userId: string;
+  initialUnreadCount: number;
+}) {
   const pathname = usePathname();
   return (
     <nav
@@ -119,6 +159,22 @@ function MobileBottomNav() {
     >
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(item.href, pathname);
+        if (item.icon === "bell") {
+          return (
+            <div
+              key={item.href}
+              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1"
+            >
+              <NotificationBell initialCount={initialUnreadCount} userId={userId} />
+              <span
+                className="text-[9px] font-semibold tracking-wide"
+                style={{ color: isActive ? "#00D26A" : "#555555" }}
+              >
+                Alertes
+              </span>
+            </div>
+          );
+        }
         return (
           <Link
             key={item.href}
@@ -140,7 +196,17 @@ function MobileBottomNav() {
   );
 }
 
-export function StreamingLayoutClient({ children }: { children: React.ReactNode }) {
+interface StreamingLayoutClientProps {
+  children: React.ReactNode;
+  userId: string;
+  initialUnreadCount: number;
+}
+
+export function StreamingLayoutClient({
+  children,
+  userId,
+  initialUnreadCount,
+}: StreamingLayoutClientProps) {
   return (
     <PlayerProvider>
       {/* ── Desktop : sidebar + main ──────────────────────── */}
@@ -148,7 +214,7 @@ export function StreamingLayoutClient({ children }: { children: React.ReactNode 
         className="hidden md:flex h-screen overflow-hidden"
         style={{ backgroundColor: "#0D0D0D" }}
       >
-        <DesktopNav />
+        <DesktopNav userId={userId} initialUnreadCount={initialUnreadCount} />
         <main className="flex-1 overflow-y-auto pb-24">{children}</main>
       </div>
 
@@ -158,7 +224,7 @@ export function StreamingLayoutClient({ children }: { children: React.ReactNode 
         style={{ backgroundColor: "#0D0D0D" }}
       >
         <main className="pb-40">{children}</main>
-        <MobileBottomNav />
+        <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
       </div>
 
       <WebPlayer />

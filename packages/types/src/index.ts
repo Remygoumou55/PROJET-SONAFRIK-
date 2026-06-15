@@ -49,8 +49,13 @@ export interface Profile {
   deleted_at: string | null;
 }
 
-export type NotificationCategory = "system" | "social" | "artist" | "billing" | "security";
-export type NotificationPriority = "low" | "normal" | "high";
+export type NotificationType =
+  | "stream_milestone"
+  | "royalty_paid"
+  | "verification_updated"
+  | "rights_claim_updated"
+  | "system";
+
 export type AppLanguage = "fr" | "en";
 export type AudioQualityPreference = "64" | "128" | "256" | "auto";
 export type ProfileVisibility = "public" | "private";
@@ -80,13 +85,11 @@ export interface UserPreferences {
 export interface Notification {
   id: string;
   user_id: string;
-  category: NotificationCategory;
+  type: NotificationType;
   title: string;
   body: string;
-  action_url: string | null;
+  data: Record<string, unknown>;
   read_at: string | null;
-  priority: NotificationPriority;
-  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -193,12 +196,19 @@ export const AUDIO_QUALITY_OPTIONS: { value: AudioQualityPreference; label: stri
   { value: "256", label: "256 kbps — Premium" },
 ];
 
-export const NOTIFICATION_CATEGORY_LABELS: Record<NotificationCategory, string> = {
-  system: "Système",
-  social: "Social",
-  artist: "Artiste",
-  billing: "Facturation",
-  security: "Sécurité",
+export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
+  stream_milestone:     "Jalon d'écoutes",
+  royalty_paid:         "Royalties",
+  verification_updated: "Vérification",
+  rights_claim_updated: "Droits",
+  system:               "Système",
+};
+
+export const NOTIFICATION_ERROR_MESSAGES: Record<string, string> = {
+  unauthorized: "Accès non autorisé.",
+  list_failed:  "Impossible de charger les notifications.",
+  mark_failed:  "Impossible de marquer comme lue.",
+  unknown:      "Une erreur est survenue.",
 };
 
 // ---------------------------------------------------------------------------
@@ -1439,3 +1449,4 @@ export const RIGHTS_ERROR_MESSAGES: Record<string, string> = {
   claim_create_failed:     "Impossible de soumettre la revendication.",
   unknown:                 "Une erreur est survenue. Réessayez.",
 };
+

@@ -97,14 +97,13 @@ export class IdentityRepository {
   async getNotifications(userId: string, limit = 50): Promise<Notification[]> {
     const { data, error } = await this.client
       .from("notifications")
-      .select("*")
+      .select("id, user_id, type, title, body, data, read_at, created_at")
       .eq("user_id", userId)
-      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) throw error;
-    return (data ?? []) as Notification[];
+    return (data ?? []) as unknown as Notification[];
   }
 
   async getUnreadCount(userId: string): Promise<number> {
@@ -112,24 +111,25 @@ export class IdentityRepository {
       .from("notifications")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId)
-      .is("read_at", null)
-      .is("deleted_at", null);
+      .is("read_at", null);
 
     if (error) throw error;
     return count ?? 0;
   }
 
   async markNotificationRead(notificationId: string): Promise<void> {
-    const { error } = await this.client.rpc("mark_notification_read", {
-      p_notification_id: notificationId,
-    });
+    const { error } = await this.client
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", notificationId);
     if (error) throw error;
   }
 
-  async markAllNotificationsRead(): Promise<number> {
-    const { data, error } = await this.client.rpc("mark_all_notifications_read");
+  async markAllNotificationsRead(userId: string): Promise<void> {
+    const { error } = await this.client.rpc("mark_all_notifications_read" as never, {
+      p_user_id: userId,
+    } as never);
     if (error) throw error;
-    return (data as number) ?? 0;
   }
 
   async getUserRoles(userId: string): Promise<UserRole[]> {

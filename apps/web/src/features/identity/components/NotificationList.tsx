@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge, Button, Card, CardContent } from "@sonafrik/ui";
 import {
-  NOTIFICATION_CATEGORY_LABELS,
+  NOTIFICATION_TYPE_LABELS,
   type Notification,
 } from "@sonafrik/types";
 import { useIdentityService } from "../hooks/useIdentity";
@@ -76,7 +76,7 @@ export function NotificationList({ notifications: initial }: NotificationListPro
             <CardContent className="space-y-2 py-4">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline">
-                  {NOTIFICATION_CATEGORY_LABELS[notification.category]}
+                  {NOTIFICATION_TYPE_LABELS[notification.type]}
                 </Badge>
                 {!notification.read_at ? <Badge variant="primary">Non lue</Badge> : null}
                 <span className="text-texte-desactive ml-auto text-xs">

@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import type { Notification } from "@sonafrik/types";
-import { NOTIFICATION_CATEGORY_LABELS } from "@sonafrik/types";
+import { NOTIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
 import { useIdentityService } from "../../../features/identity/useIdentity";
 
@@ -66,7 +66,7 @@ export default function NotificationsScreen() {
       }
       renderItem={({ item }) => (
         <View style={[styles.card, !item.read_at && styles.unread]}>
-          <Text style={styles.category}>{NOTIFICATION_CATEGORY_LABELS[item.category]}</Text>
+          <Text style={styles.category}>{NOTIFICATION_TYPE_LABELS[item.type]}</Text>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.body}>{item.body}</Text>
           {!item.read_at ? (

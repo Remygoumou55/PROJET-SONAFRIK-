@@ -60,6 +60,10 @@
     "./rights": {
       "types": "./dist/rights/index.d.ts",
       "default": "./dist/rights/index.js"
+    },
+    "./notifications": {
+      "types": "./dist/notifications/index.d.ts",
+      "default": "./dist/notifications/index.js"
     }
   },
   "scripts": {
