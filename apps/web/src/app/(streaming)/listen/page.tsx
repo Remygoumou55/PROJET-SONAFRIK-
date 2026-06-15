@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { DiscoveryAlbum, DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
+import type { DiscoveryArtist, DiscoveryTrack, NewReleasesResult, TrendingTrack } from "@sonafrik/types";
+import { createRecommendationService } from "@sonafrik/api/recommendation";
+import { createDiscoveryService } from "@sonafrik/api/discovery";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getInitials } from "@/lib/utils";
@@ -22,31 +24,35 @@ const ARTIST_RING_COLORS = [
 async function getHomepageContent() {
   try {
     const supabase = await getSupabaseServerClient();
+    const recommendation = createRecommendationService(supabase);
+    const discovery = createDiscoveryService(supabase);
+
     const [
       playlistsResult,
       artistsResult,
       genresResult,
-      trendingResult,
-      discoveryResult,
-      newAlbumsResult,
-      suggestedArtistsResult,
+      trending,
+      discoveries,
+      newReleasesResult,
+      suggestedArtists,
     ] = await Promise.all([
       supabase.from("playlists").select("id, title, track_count").eq("is_public", true).is("deleted_at", null).order("updated_at", { ascending: false }).limit(8),
       supabase.from("artist_profiles").select("creator_id, stage_name, genres").eq("is_public", true).order("created_at", { ascending: false }).limit(8),
       supabase.from("genres").select("id, name").eq("is_active", true).is("deleted_at", null).order("sort_order").limit(14),
-      supabase.rpc("get_trending_tracks", { p_window: "7d", p_limit: 10 }),
-      supabase.rpc("get_discovery_feed", { p_limit: 8 }),
-      supabase.rpc("get_new_releases", { p_type: "album", p_days: 60, p_limit: 8 }),
-      supabase.rpc("get_suggested_artists", { p_limit: 8 }),
+      recommendation.getTrendingTracks({ window: "7d", limit: 10 }).catch((err: unknown): TrendingTrack[] => { console.error("[Homepage] Tendances échouées", err); return []; }),
+      discovery.getDiscoveryFeed({ limit: 8 }).catch((err: unknown): DiscoveryTrack[] => { console.error("[Homepage] Découvertes échouées", err); return []; }),
+      discovery.getNewReleases({ type: "album", days: 60, limit: 8 }).catch((err: unknown): NewReleasesResult => { console.error("[Homepage] Nouvelles sorties échouées", err); return { tracks: [], albums: [], artists: [] }; }),
+      discovery.getSuggestedArtists({ limit: 8 }).catch((err: unknown): DiscoveryArtist[] => { console.error("[Homepage] Artistes suggérés échoués", err); return []; }),
     ]);
+
     return {
       playlists: (playlistsResult.data ?? []) as Array<{ id: string; title: string; track_count: number }>,
       artists: (artistsResult.data ?? []) as Array<{ creator_id: string; stage_name: string; genres: string[] }>,
       genres: (genresResult.data ?? []) as Array<{ id: string; name: string }>,
-      trending: (trendingResult.data ?? []) as unknown as TrendingTrack[],
-      discoveries: (discoveryResult.data ?? []) as unknown as DiscoveryTrack[],
-      newAlbums: ((newAlbumsResult.data as unknown as { albums?: DiscoveryAlbum[] } | null)?.albums ?? []) as DiscoveryAlbum[],
-      suggestedArtists: (suggestedArtistsResult.data ?? []) as unknown as DiscoveryArtist[],
+      trending,
+      discoveries,
+      newAlbums: newReleasesResult.albums,
+      suggestedArtists,
       hadError: false,
     };
   } catch (err) {
