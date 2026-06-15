@@ -34,7 +34,7 @@ export function useEngagementStats(entityType: string, entityId: string) {
     social
       .getEngagementStats({ entityType: entityType as never, entityId })
       .then((data) => { if (!cancelled) setStats(data); })
-      .catch(() => {})
+      .catch((err: unknown) => { console.error("[Social] getEngagementStats échoué", err); })
       .finally(() => { if (!cancelled) setIsLoading(false); });
 
     return () => { cancelled = true; };
@@ -56,7 +56,7 @@ export function useCreatorEngagementStats(creatorId: string) {
     social
       .getCreatorEngagementStats({ creatorId })
       .then((data) => { if (!cancelled) setStats(data); })
-      .catch(() => {})
+      .catch((err: unknown) => { console.error("[Social] getCreatorEngagementStats échoué", err); })
       .finally(() => { if (!cancelled) setIsLoading(false); });
 
     return () => { cancelled = true; };

@@ -91,7 +91,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         duration,
       }));
 
-      audio.play().catch(() => {
+      audio.play().catch((err: unknown) => {
+        console.error("[Player] Lecture audio échouée", err);
         setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
       });
 
@@ -133,7 +134,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const resume = useCallback(() => {
     if (!audioRef.current) return;
-    audioRef.current.play().catch(() => {});
+    audioRef.current.play().catch((err: unknown) => { console.error("[Player] Reprise audio échouée", err); });
     setState((prev) => ({ ...prev, isPlaying: true }));
     startHeartbeat();
   }, [startHeartbeat]);

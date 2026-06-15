@@ -24,7 +24,7 @@ export function useFollow(entityType: FollowEntityType, entityId: string) {
           setFollowerCount(count);
         }
       })
-      .catch(() => {});
+      .catch((err: unknown) => { console.error("[Social] Chargement follow échoué", err); });
 
     return () => { cancelled = true; };
   }, [entityType, entityId, social]);

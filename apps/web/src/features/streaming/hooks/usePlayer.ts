@@ -14,8 +14,8 @@ export function usePlayer() {
       if (!player.sessionId) return;
       try {
         await streaming.sendHeartbeat({ sessionId: player.sessionId, positionSeconds });
-      } catch {
-        // heartbeat silencieux
+      } catch (err) {
+        console.error("[Player] Heartbeat échoué", err);
       }
     });
 
@@ -28,8 +28,8 @@ export function usePlayer() {
           positionSeconds: accumulated,
           totalDurationSeconds: player.duration,
         });
-      } catch {
-        // completion silencieuse
+      } catch (err) {
+        console.error("[Player] Complétion de session échouée", err);
       }
     });
   }, [player, streaming]);
@@ -55,7 +55,7 @@ export function usePlayer() {
       await streaming.savePosition({
         trackId: player.currentTrack.id,
         positionSeconds: Math.floor(player.currentPosition),
-      }).catch(() => {});
+      }).catch((err: unknown) => { console.error("[Player] Sauvegarde position échouée", err); });
     }
   }, [player, streaming]);
 

@@ -23,7 +23,7 @@ export function useLike(trackId: string) {
           setLikeCount(count);
         }
       })
-      .catch(() => {});
+      .catch((err: unknown) => { console.error("[Social] Chargement like échoué", err); });
 
     return () => { cancelled = true; };
   }, [trackId, social]);
