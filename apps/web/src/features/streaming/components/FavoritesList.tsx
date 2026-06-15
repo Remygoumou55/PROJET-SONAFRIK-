@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { AlbumWithMeta, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { CoverImage } from "@/components/CoverImage";
@@ -46,14 +47,21 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
 
   if (tracks.length === 0 && albums.length === 0) {
     return (
-      <div className="py-8 text-center">
+      <div className="py-10 text-center">
         <p className="text-4xl mb-4">❤️</p>
         <p className="font-semibold mb-1" style={{ color: "#FFFFFF" }}>
-          Aucun favori
+          Vous n&apos;avez pas encore de favoris
         </p>
-        <p className="text-sm" style={{ color: "#A0A0A0" }}>
+        <p className="text-sm mb-5" style={{ color: "#A0A0A0" }}>
           Ajoutez des morceaux et albums en favoris pour les retrouver ici.
         </p>
+        <Link
+          href="/search"
+          className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
+          style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+        >
+          Explorer la musique
+        </Link>
       </div>
     );
   }

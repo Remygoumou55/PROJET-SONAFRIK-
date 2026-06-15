@@ -70,12 +70,13 @@ export function LibraryList() {
   return (
     <div className="space-y-4">
       {playlists.length === 0 ? (
-        <div className="py-8 text-center">
+        <div className="py-10 text-center">
+          <p className="text-4xl mb-4">🎵</p>
           <p className="text-lg font-semibold mb-2" style={{ color: "#FFFFFF" }}>
-            Aucune playlist
+            Vous n&apos;avez pas encore de playlists
           </p>
-          <p style={{ color: "#A0A0A0" }}>
-            Créez votre première playlist pour organiser votre musique.
+          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+            Utilisez le bouton <span style={{ color: "#00D26A" }}>+ Nouvelle playlist</span> ci-dessus pour commencer.
           </p>
         </div>
       ) : (
