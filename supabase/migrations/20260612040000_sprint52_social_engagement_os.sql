@@ -24,6 +24,11 @@ CREATE INDEX IF NOT EXISTS idx_follows_follower
 
 ALTER TABLE public.follows ENABLE ROW LEVEL SECURITY;
 
+-- DROP IF EXISTS pour idempotence (évite SQLSTATE 42710 sur ré-application Supabase Preview)
+DROP POLICY IF EXISTS "follows_select_authenticated" ON public.follows;
+DROP POLICY IF EXISTS "follows_insert_own" ON public.follows;
+DROP POLICY IF EXISTS "follows_delete_own" ON public.follows;
+
 -- Lecture : les utilisateurs authentifiés voient tous les follows (pour les compteurs)
 CREATE POLICY "follows_select_authenticated" ON public.follows
   FOR SELECT TO authenticated USING (true);

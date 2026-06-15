@@ -32,7 +32,7 @@ ALTER TABLE public.withdrawals
 -- ===========================================================================
 -- 2. payout_batches — groupes de virements administratifs
 -- ===========================================================================
-CREATE TABLE public.payout_batches (
+CREATE TABLE IF NOT EXISTS public.payout_batches (
   id             UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
   name           TEXT          NOT NULL,
   status         TEXT          NOT NULL DEFAULT 'open' CHECK (status IN (
@@ -47,6 +47,7 @@ CREATE TABLE public.payout_batches (
   updated_at     TIMESTAMPTZ   NOT NULL DEFAULT now()
 );
 
+DROP TRIGGER IF EXISTS payout_batches_set_updated_at ON public.payout_batches;
 CREATE TRIGGER payout_batches_set_updated_at
   BEFORE UPDATE ON public.payout_batches
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
@@ -54,7 +55,7 @@ CREATE TRIGGER payout_batches_set_updated_at
 -- ===========================================================================
 -- 3. payout_audit_logs — journal immuable de chaque action admin
 -- ===========================================================================
-CREATE TABLE public.payout_audit_logs (
+CREATE TABLE IF NOT EXISTS public.payout_audit_logs (
   id             UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
   withdrawal_id  UUID    NOT NULL REFERENCES public.withdrawals(id) ON DELETE CASCADE,
   action         TEXT    NOT NULL CHECK (action IN (
@@ -69,9 +70,9 @@ CREATE TABLE public.payout_audit_logs (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_payout_audit_withdrawal   ON public.payout_audit_logs(withdrawal_id);
-CREATE INDEX idx_payout_audit_performed_by ON public.payout_audit_logs(performed_by);
-CREATE INDEX idx_payout_audit_created_at   ON public.payout_audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_payout_audit_withdrawal   ON public.payout_audit_logs(withdrawal_id);
+CREATE INDEX IF NOT EXISTS idx_payout_audit_performed_by ON public.payout_audit_logs(performed_by);
+CREATE INDEX IF NOT EXISTS idx_payout_audit_created_at   ON public.payout_audit_logs(created_at DESC);
 
 -- ===========================================================================
 -- 4. ALTER withdrawals — add batch_id (FK à payout_batches)
@@ -95,10 +96,12 @@ ALTER TABLE public.payout_batches    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payout_audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- payout_batches : admin only
+DROP POLICY IF EXISTS "payout_batches_admin" ON public.payout_batches;
 CREATE POLICY "payout_batches_admin" ON public.payout_batches
   USING (public.is_admin(auth.uid()));
 
 -- payout_audit_logs : utilisateur voit les logs de ses propres retraits ; admin voit tout
+DROP POLICY IF EXISTS "payout_audit_select_own" ON public.payout_audit_logs;
 CREATE POLICY "payout_audit_select_own" ON public.payout_audit_logs
   FOR SELECT USING (
     public.is_admin(auth.uid())
