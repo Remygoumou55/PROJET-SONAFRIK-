@@ -51,7 +51,13 @@ const TrackRow = memo(function TrackRow({
 
 const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) {
   return (
-    <div className="flex items-center gap-3 w-full p-3 rounded-lg">
+    <Link
+      href={`/listen/artist/${artist.creator_id}`}
+      className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors"
+      style={{ backgroundColor: "transparent" }}
+      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.backgroundColor = "#1F1F1F")}
+      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.backgroundColor = "transparent")}
+    >
       <div
         className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
         style={{ backgroundColor: "#2A2A2A", color: "#00D26A" }}
@@ -71,7 +77,10 @@ const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) 
           </p>
         )}
       </div>
-    </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "#555555", flexShrink: 0 }}>
+        <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </Link>
   );
 });
 
