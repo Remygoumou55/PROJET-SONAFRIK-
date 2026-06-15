@@ -40,13 +40,15 @@ interface Props {
 }
 
 export function HomepageTrendingSection({ tracks }: Props) {
-  const { loadAndPlay, currentTrack, isPlaying } = usePlayer();
+  const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
+  const tracksWithMeta = tracks.map(toTrackWithMeta);
 
   async function handlePlay(track: TrendingTrack) {
+    const index = tracks.findIndex((t) => t.track_id === track.track_id);
     setPlayError(null);
     try {
-      await loadAndPlay(toTrackWithMeta(track));
+      await loadQueueAndPlay(tracksWithMeta, index >= 0 ? index : 0);
     } catch {
       setPlayError("Impossible de lancer la lecture. Réessayez.");
     }

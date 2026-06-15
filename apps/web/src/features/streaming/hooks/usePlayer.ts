@@ -20,16 +20,29 @@ export function usePlayer() {
     });
 
     player.onComplete(async () => {
-      if (!player.sessionId || !player.duration) return;
-      const accumulated = player.getAccumulatedListenSeconds();
-      try {
-        await streaming.completeStream({
-          sessionId: player.sessionId,
-          positionSeconds: accumulated,
-          totalDurationSeconds: player.duration,
-        });
-      } catch (err) {
-        console.error("[Player] Complétion de session échouée", err);
+      // Finaliser la session courante
+      if (player.sessionId && player.duration) {
+        const accumulated = player.getAccumulatedListenSeconds();
+        try {
+          await streaming.completeStream({
+            sessionId: player.sessionId,
+            positionSeconds: accumulated,
+            totalDurationSeconds: player.duration,
+          });
+        } catch (err) {
+          console.error("[Player] Complétion de session échouée", err);
+        }
+      }
+
+      // Auto-avancement vers le morceau suivant dans la queue
+      const nextTrack = player.advanceQueue();
+      if (nextTrack) {
+        try {
+          const result = await streaming.startStream({ trackId: nextTrack.id, platform: "web" });
+          player.play(nextTrack, result.signedUrl, result.sessionId, result.durationSeconds);
+        } catch (err) {
+          console.error("[Player] Auto-avancement queue échoué", err);
+        }
       }
     });
   }, [player, streaming]);
@@ -49,6 +62,40 @@ export function usePlayer() {
     [streaming, player],
   );
 
+  const loadQueueAndPlay = useCallback(
+    async (tracks: TrackWithMeta[], startIndex = 0): Promise<void> => {
+      const track = tracks[startIndex];
+      if (!track) return;
+      player.setQueue(tracks, startIndex);
+      await loadAndPlay(track);
+    },
+    [player, loadAndPlay],
+  );
+
+  const playNext = useCallback(async (): Promise<void> => {
+    const next = player.advanceQueue();
+    if (next) {
+      try {
+        const result = await streaming.startStream({ trackId: next.id, platform: "web" });
+        player.play(next, result.signedUrl, result.sessionId, result.durationSeconds);
+      } catch (err) {
+        console.error("[Player] Morceau suivant échoué", err);
+      }
+    }
+  }, [player, streaming]);
+
+  const playPrev = useCallback(async (): Promise<void> => {
+    const prev = player.retreatQueue();
+    if (prev) {
+      try {
+        const result = await streaming.startStream({ trackId: prev.id, platform: "web" });
+        player.play(prev, result.signedUrl, result.sessionId, result.durationSeconds);
+      } catch (err) {
+        console.error("[Player] Morceau précédent échoué", err);
+      }
+    }
+  }, [player, streaming]);
+
   const pauseAndSave = useCallback(async () => {
     player.pause();
     if (player.currentTrack?.id && player.currentPosition > 0) {
@@ -62,6 +109,9 @@ export function usePlayer() {
   return {
     ...player,
     loadAndPlay,
+    loadQueueAndPlay,
+    playNext,
+    playPrev,
     pauseAndSave,
   };
 }

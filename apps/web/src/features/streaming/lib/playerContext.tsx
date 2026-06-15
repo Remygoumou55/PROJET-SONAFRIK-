@@ -9,6 +9,15 @@ import type {
 } from "@sonafrik/types";
 import { REAL_LISTEN_THRESHOLD_PERCENT, STREAM_HEARTBEAT_INTERVAL_MS } from "@sonafrik/types";
 
+type RepeatMode = "off" | "one" | "all";
+
+interface QueueState {
+  queue: TrackWithMeta[];
+  queueIndex: number;
+  shuffle: boolean;
+  repeatMode: RepeatMode;
+}
+
 interface PlayerActions {
   play: (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number) => void;
   pause: () => void;
@@ -19,9 +28,15 @@ interface PlayerActions {
   getAccumulatedListenSeconds: () => number;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
   onComplete: (callback: () => void) => void;
+  // Queue management
+  setQueue: (tracks: TrackWithMeta[], startIndex?: number) => void;
+  advanceQueue: () => TrackWithMeta | null;
+  retreatQueue: () => TrackWithMeta | null;
+  toggleShuffle: () => void;
+  cycleRepeat: () => void;
 }
 
-interface PlayerContextValue extends PlayerState, PlayerActions {}
+interface PlayerContextValue extends PlayerState, QueueState, PlayerActions {}
 
 const initialState: PlayerState = {
   currentTrack: null,
@@ -38,14 +53,31 @@ const initialState: PlayerState = {
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
+function buildShuffledOrder(length: number, currentIndex: number): number[] {
+  const indices = Array.from({ length }, (_, i) => i).filter((i) => i !== currentIndex);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j]!, indices[i]!];
+  }
+  return [currentIndex, ...indices];
+}
+
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<PlayerState>(initialState);
+  const [queueState, setQueueState] = useState<QueueState>({
+    queue: [],
+    queueIndex: -1,
+    shuffle: false,
+    repeatMode: "off",
+  });
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHeartbeatCallbackRef = useRef<((pos: number) => void) | null>(null);
   const onCompleteCallbackRef = useRef<(() => void) | null>(null);
-  // Secondes réellement écoutées en lecture continue — jamais incrémenté par seek()
   const accumulatedListenSecondsRef = useRef<number>(0);
+  // Shuffled play order (indices into queue array)
+  const shuffledOrderRef = useRef<number[]>([]);
 
   const clearHeartbeat = useCallback(() => {
     if (heartbeatRef.current) {
@@ -54,8 +86,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Démarre le heartbeat 10s — remplace l'interval précédent s'il existe (C-2.3)
-  // Envoie accumulatedListenSeconds (temps réel écouté) et non la position courante
   const startHeartbeat = useCallback(() => {
     clearHeartbeat();
     heartbeatRef.current = setInterval(() => {
@@ -96,7 +126,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
       });
 
-      // Durée réelle depuis les métadonnées HTML5 — fallback si duration_seconds = 0 en DB
       audio.onloadedmetadata = () => {
         if (audio.duration > 0 && isFinite(audio.duration)) {
           setState((prev) => ({ ...prev, duration: audio.duration }));
@@ -119,6 +148,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         clearHeartbeat();
         setState((prev) => ({ ...prev, isPlaying: false, currentPosition: prev.duration }));
         onCompleteCallbackRef.current?.();
+      };
+
+      // URL signée expirée ou source inaccessible — stopper proprement
+      audio.onerror = () => {
+        console.error("[Player] Erreur source audio — URL probablement expirée ou inaccessible");
+        clearHeartbeat();
+        setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
       };
 
       startHeartbeat();
@@ -154,7 +190,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, volume: clampedVolume }));
   }, []);
 
-  // Déplace la tête de lecture — bornes clampées [0, duration]
   const seek = useCallback((positionSeconds: number) => {
     if (!audioRef.current) return;
     const clamped = Math.max(0, Math.min(positionSeconds, audioRef.current.duration || 0));
@@ -174,6 +209,113 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     onCompleteCallbackRef.current = cb;
   }, []);
 
+  // ── Queue Management ────────────────────────────────────────────────────────
+
+  const setQueue = useCallback((tracks: TrackWithMeta[], startIndex = 0) => {
+    setQueueState((prev) => {
+      const order = prev.shuffle ? buildShuffledOrder(tracks.length, startIndex) : [];
+      shuffledOrderRef.current = order;
+      return { ...prev, queue: tracks, queueIndex: startIndex };
+    });
+  }, []);
+
+  const advanceQueue = useCallback((): TrackWithMeta | null => {
+    let next: TrackWithMeta | null = null;
+
+    setQueueState((prev) => {
+      const { queue, queueIndex, shuffle, repeatMode } = prev;
+      if (!queue.length) return prev;
+
+      if (repeatMode === "one") {
+        next = queue[queueIndex] ?? null;
+        return prev;
+      }
+
+      let nextIndex: number;
+      if (shuffle) {
+        const pos = shuffledOrderRef.current.indexOf(queueIndex);
+        const nextPos = pos + 1;
+        if (nextPos >= shuffledOrderRef.current.length) {
+          if (repeatMode === "all") {
+            // Re-shuffle and start again
+            shuffledOrderRef.current = buildShuffledOrder(queue.length, shuffledOrderRef.current[0] ?? 0);
+            nextIndex = shuffledOrderRef.current[0] ?? 0;
+          } else {
+            return prev;
+          }
+        } else {
+          nextIndex = shuffledOrderRef.current[nextPos] ?? 0;
+        }
+      } else {
+        nextIndex = queueIndex + 1;
+        if (nextIndex >= queue.length) {
+          if (repeatMode === "all") {
+            nextIndex = 0;
+          } else {
+            return prev;
+          }
+        }
+      }
+
+      next = queue[nextIndex] ?? null;
+      return { ...prev, queueIndex: nextIndex };
+    });
+
+    return next;
+  }, []);
+
+  const retreatQueue = useCallback((): TrackWithMeta | null => {
+    let prev: TrackWithMeta | null = null;
+
+    setQueueState((prevState) => {
+      const { queue, queueIndex, shuffle, repeatMode } = prevState;
+      if (!queue.length) return prevState;
+
+      // If > 3s played, restart current track instead of going back
+      if (accumulatedListenSecondsRef.current > 3) {
+        prev = queue[queueIndex] ?? null;
+        return prevState;
+      }
+
+      let prevIndex: number;
+      if (shuffle) {
+        const pos = shuffledOrderRef.current.indexOf(queueIndex);
+        prevIndex = pos > 0
+          ? (shuffledOrderRef.current[pos - 1] ?? 0)
+          : repeatMode === "all" ? (shuffledOrderRef.current[shuffledOrderRef.current.length - 1] ?? 0) : queueIndex;
+      } else {
+        prevIndex = queueIndex - 1;
+        if (prevIndex < 0) {
+          prevIndex = repeatMode === "all" ? queue.length - 1 : 0;
+        }
+      }
+
+      prev = queue[prevIndex] ?? null;
+      return { ...prevState, queueIndex: prevIndex };
+    });
+
+    return prev;
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setQueueState((prev) => {
+      const newShuffle = !prev.shuffle;
+      if (newShuffle && prev.queue.length > 0) {
+        shuffledOrderRef.current = buildShuffledOrder(prev.queue.length, prev.queueIndex);
+      } else {
+        shuffledOrderRef.current = [];
+      }
+      return { ...prev, shuffle: newShuffle };
+    });
+  }, []);
+
+  const cycleRepeat = useCallback(() => {
+    setQueueState((prev) => {
+      const next: RepeatMode = prev.repeatMode === "off" ? "all" : prev.repeatMode === "all" ? "one" : "off";
+      return { ...prev, repeatMode: next };
+    });
+  }, []);
+
   useEffect(() => {
     return () => {
       clearHeartbeat();
@@ -188,6 +330,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     <PlayerContext.Provider
       value={{
         ...state,
+        ...queueState,
         play,
         pause,
         resume,
@@ -197,6 +340,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         getAccumulatedListenSeconds,
         onHeartbeat,
         onComplete,
+        setQueue,
+        advanceQueue,
+        retreatQueue,
+        toggleShuffle,
+        cycleRepeat,
       }}
     >
       {children}
