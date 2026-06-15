@@ -1,7 +1,8 @@
 "use client";
 
 import { memo, useCallback, useState } from "react";
-import type { ArtistResult, SearchResult, TrackWithMeta } from "@sonafrik/types";
+import Link from "next/link";
+import type { AlbumWithMeta, ArtistResult, SearchResult, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { getInitials } from "@/lib/utils";
 import { CoverImage } from "@/components/CoverImage";
@@ -75,19 +76,21 @@ const ArtistRow = memo(function ArtistRow({ artist }: { artist: ArtistResult }) 
 });
 
 export function SearchResults({ results, isSearching }: SearchResultsProps) {
-  const { loadAndPlay } = usePlayer();
+  const { loadQueueAndPlay } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
 
   const handlePlay = useCallback(
     async (track: TrackWithMeta) => {
+      if (!results) return;
+      const index = results.tracks.findIndex((t) => t.id === track.id);
       setPlayError(null);
       try {
-        await loadAndPlay(track);
+        await loadQueueAndPlay(results.tracks, index >= 0 ? index : 0);
       } catch {
         setPlayError("Impossible de lire ce morceau. Réessayez.");
       }
     },
-    [loadAndPlay],
+    [results, loadQueueAndPlay],
   );
 
   if (isSearching) {
@@ -146,11 +149,12 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
             Albums
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {results.albums.map((album) => (
-              <div
+            {results.albums.map((album: AlbumWithMeta) => (
+              <Link
                 key={album.id}
-                className="rounded-xl p-3 flex flex-col gap-2"
-                style={{ backgroundColor: "#1F1F1F" }}
+                href={`/listen/album/${album.id}`}
+                className="rounded-xl p-3 flex flex-col gap-2 transition-colors"
+                style={{ backgroundColor: "#1F1F1F", display: "flex" }}
               >
                 <div className="aspect-square rounded-lg w-full relative overflow-hidden">
                   <CoverImage coverPath={album.cover_url ?? null} alt={album.title} />
@@ -163,7 +167,7 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
                     {album.artist_name}
                   </p>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </section>
