@@ -60,6 +60,8 @@ export async function updateSession(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
+  // En développement local, les gardes d'auth sont inactifs — toutes les routes
+  // sont accessibles sans session. En production, les blocs ci-dessous s'appliquent.
   if (process.env.NODE_ENV !== "development") {
     // Route protégée sans session → redirection login avec retour préservé
     if (isProtected && !user) {
