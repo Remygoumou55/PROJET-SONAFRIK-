@@ -60,7 +60,6 @@ export async function updateSession(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
-  // DEV_BYPASS : désactivé temporairement pour contrôle visuel — À RÉACTIVER
   if (process.env.NODE_ENV !== "development") {
     // Route protégée sans session → redirection login avec retour préservé
     if (isProtected && !user) {

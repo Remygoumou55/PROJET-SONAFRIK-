@@ -171,6 +171,10 @@ function ContentSkeleton() {
 function HomepageContentSections({ content }: { content: HomepageContent }) {
   const { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists, hadError } = content;
 
+  const hasContent =
+    trending.length > 0 || playlists.length > 0 || artists.length > 0 ||
+    discoveries.length > 0 || newAlbums.length > 0 || suggestedArtists.length > 0 || genres.length > 0;
+
   return (
     <div className="pb-8">
 
@@ -181,6 +185,35 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
           role="alert"
         >
           Contenu temporairement indisponible. Réessayez dans quelques instants.
+        </div>
+      )}
+
+      {/* ── EMPTY STATE — aucun contenu dans Supabase ────────────────────── */}
+      {!hadError && !hasContent && (
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+            style={{ background: "linear-gradient(135deg, #00D26A1A, #00D26A0A)", border: "1px solid #00D26A30" }}
+          >
+            <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
+              <path d="M9 18V5l12-2v13" stroke="#00D26A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="6" cy="18" r="3" fill="#00D26A" opacity="0.7" />
+              <circle cx="18" cy="16" r="3" fill="#00D26A" opacity="0.4" />
+            </svg>
+          </div>
+          <p className="text-xl font-extrabold mb-2" style={{ color: "#FFFFFF" }}>
+            La musique arrive bientôt
+          </p>
+          <p className="text-sm leading-relaxed max-w-xs" style={{ color: "#666666" }}>
+            Les artistes guinéens rejoignent SONAFRIK. En attendant, explorez et recherchez votre musique préférée.
+          </p>
+          <Link
+            href="/search"
+            className="mt-6 px-6 py-3 rounded-2xl text-sm font-black"
+            style={{ background: "#00D26A", color: "#000", boxShadow: "0 0 20px rgba(0,210,106,0.35)" }}
+          >
+            Explorer la musique
+          </Link>
         </div>
       )}
 
