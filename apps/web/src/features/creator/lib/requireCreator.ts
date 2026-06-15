@@ -60,7 +60,7 @@ const fetchCreatorContext = cache(async () => {
   try {
     return await creator.getCreatorContext();
   } catch {
-    throw new Error("CREATOR_NOT_FOUND");
+    redirect("/profile");
   }
 });
 
