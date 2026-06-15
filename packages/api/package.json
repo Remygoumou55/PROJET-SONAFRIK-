@@ -64,6 +64,10 @@
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
       "default": "./dist/notifications/index.js"
+    },
+    "./admin": {
+      "types": "./dist/admin/index.d.ts",
+      "default": "./dist/admin/index.js"
     }
   },
   "scripts": {

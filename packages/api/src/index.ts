@@ -30,3 +30,4 @@ export * from "./royalties";
 export * from "./payout";
 export * from "./rights";
 export * from "./notifications";
+export * from "./admin";
