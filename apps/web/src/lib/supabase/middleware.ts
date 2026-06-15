@@ -60,9 +60,13 @@ export async function updateSession(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
-  // En développement local, les gardes d'auth sont inactifs — toutes les routes
-  // sont accessibles sans session. En production, les blocs ci-dessous s'appliquent.
-  if (process.env.NODE_ENV !== "development") {
+  // Bypass dev : BYPASS_AUTH=true dans .env.local OU NODE_ENV=development.
+  // Jamais actif en production Vercel (VERCEL="1").
+  const isBypassMode =
+    (process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development") &&
+    process.env.VERCEL !== "1";
+
+  if (!isBypassMode) {
     // Route protégée sans session → redirection login avec retour préservé
     if (isProtected && !user) {
       const redirectUrl = request.nextUrl.clone();
@@ -84,7 +88,7 @@ export async function updateSession(request: NextRequest) {
       redirectUrl.search = "";
       return NextResponse.redirect(redirectUrl);
     }
-  }
+  } // end !isBypassMode
 
   return supabaseResponse;
 }
