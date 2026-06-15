@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CoverImage } from "@/components/CoverImage";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
+import { FollowButton } from "@/features/social/components/FollowButton";
 import type { TrackWithMeta } from "@sonafrik/types";
 
 interface ArtistRow {
@@ -140,6 +141,10 @@ export default async function ArtistPublicPage({
             {artist.genres.join(" · ")}
           </p>
         )}
+
+        <div className="mb-4">
+          <FollowButton entityType="artist" entityId={artist.creator_id} showCount />
+        </div>
 
         {artist.bio && (
           <p className="text-sm leading-relaxed max-w-xl mb-6" style={{ color: "#A0A0A0" }}>

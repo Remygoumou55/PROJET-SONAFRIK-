@@ -5,6 +5,7 @@ import { usePlayer } from "../hooks/usePlayer";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
+import { LikeButton } from "@/features/social/components/LikeButton";
 
 export const WebPlayer = memo(function WebPlayer() {
   const { currentTrack, currentPosition, duration, setVolume, volume, seek } = usePlayer();
@@ -24,7 +25,7 @@ export const WebPlayer = memo(function WebPlayer() {
             <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">
               <CoverImage coverPath={currentTrack.cover_url ?? null} alt={currentTrack.title} />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p
                 className="text-sm font-semibold truncate"
                 style={{ color: "#FFFFFF" }}
@@ -37,6 +38,7 @@ export const WebPlayer = memo(function WebPlayer() {
                 </p>
               )}
             </div>
+            <LikeButton trackId={currentTrack.id} size="sm" />
           </div>
 
           {/* Controls */}
