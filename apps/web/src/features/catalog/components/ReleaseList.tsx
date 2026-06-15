@@ -101,6 +101,11 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <Badge variant="outline">{RELEASE_TYPE_LABELS[album.release_type]}</Badge>
               <Badge variant="primary">{PUBLICATION_STATUS_LABELS[album.publication_status]}</Badge>
             </div>
+            {album.publication_status === "rejected" && album.rejection_reason && (
+              <p className="rounded-lg px-3 py-2 text-xs" style={{ backgroundColor: "#FF444418", color: "#FF6666" }}>
+                <span className="font-semibold">Motif de rejet : </span>{album.rejection_reason}
+              </p>
+            )}
             {album.upc ? <p className="text-texte-desactive text-xs">UPC · {album.upc}</p> : null}
 
             {/* Pochette actuelle */}
