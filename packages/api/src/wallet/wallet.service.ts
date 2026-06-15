@@ -54,9 +54,11 @@ export class WalletService {
       .eq("id", userId)
       .single();
 
+    // premium_expires_at doit être non-null et futur — null = jamais acheté, pas "illimité"
     const isPremium = !!(
       profile?.is_premium &&
-      (!profile.premium_expires_at || new Date(profile.premium_expires_at) > new Date())
+      profile.premium_expires_at &&
+      new Date(profile.premium_expires_at) > new Date()
     );
 
     const gracePeriodEnd = profile?.created_at
