@@ -23,7 +23,7 @@ const DEV_MOCK_IDENTITY: IdentityContext = {
     fraud_score: 0,
     onboarding_completed: true,
     is_premium: true,
-    premium_expires_at: null,
+    premium_expires_at: "2027-12-31T23:59:59Z",
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
     deleted_at: null,
