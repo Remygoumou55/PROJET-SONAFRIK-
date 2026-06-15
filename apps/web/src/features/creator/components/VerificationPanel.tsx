@@ -21,6 +21,8 @@ export function VerificationPanel({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Track which verifications had a successful doc upload in this session
+  const [uploadedIds, setUploadedIds] = useState<Set<string>>(new Set());
 
   async function create(type: "identity" | "artist" | "label") {
     setLoading(true);
@@ -43,22 +45,27 @@ export function VerificationPanel({
   }
 
   async function uploadDoc(verificationId: string, file: File) {
-    await creatorService.requestAssetUploadUrl({
+    const { signedUrl, token } = await creatorService.requestAssetUploadUrl({
       creatorId: creator.id,
       assetKind: "verification",
       contentType: file.type as "image/jpeg" | "image/png" | "image/webp" | "application/pdf",
       verificationId,
-    }).then(async ({ signedUrl, token }) => {
-      await fetch(signedUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
-        body: file,
-      });
     });
+
+    const res = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
+      body: file,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Erreur envoi document (${res.status})`);
+    }
   }
 
   async function submit(id: string) {
     setLoading(true);
+    setError(null);
     try {
       await creatorService.submitVerification(id);
       setVerifications((current) =>
@@ -66,7 +73,11 @@ export function VerificationPanel({
           v.id === id ? { ...v, status: "pending", submitted_at: new Date().toISOString() } : v,
         ),
       );
+      // Clear upload success indicator once submitted
+      setUploadedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
       router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de soumettre. Réessayez.");
     } finally {
       setLoading(false);
     }
@@ -103,14 +114,20 @@ export function VerificationPanel({
         onChange={async (event) => {
           const file = event.target.files?.[0];
           if (!file || !activeId) return;
+          const targetId = activeId;
           setLoading(true);
+          setError(null);
           try {
-            await uploadDoc(activeId, file);
+            await uploadDoc(targetId, file);
+            setUploadedIds((prev) => new Set(prev).add(targetId));
             router.refresh();
+          } catch (err) {
+            setError(err instanceof Error ? err.message : "Échec de l'envoi du document.");
           } finally {
             setLoading(false);
             setActiveId(null);
           }
+          event.target.value = "";
         }}
       />
 
@@ -131,6 +148,14 @@ export function VerificationPanel({
               {v.rejection_reason ? (
                 <p className="text-rouge-alerte text-sm">{v.rejection_reason}</p>
               ) : null}
+
+              {/* Feedback succès upload */}
+              {uploadedIds.has(v.id) && (
+                <p className="text-sm font-medium" style={{ color: "#00D26A" }}>
+                  ✓ Document joint. Vous pouvez maintenant soumettre.
+                </p>
+              )}
+
               <div className="flex flex-wrap gap-2">
                 {v.status === "draft" || v.status === "rejected" ? (
                   <>
@@ -142,10 +167,14 @@ export function VerificationPanel({
                         fileRef.current?.click();
                       }}
                     >
-                      Joindre document
+                      {uploadedIds.has(v.id) ? "Remplacer document" : "Joindre document"}
                     </Button>
-                    <Button size="sm" disabled={loading || !v.document_path} onClick={() => submit(v.id)}>
-                      Soumettre
+                    <Button
+                      size="sm"
+                      disabled={loading || (!v.document_path && !uploadedIds.has(v.id))}
+                      onClick={() => submit(v.id)}
+                    >
+                      {loading ? "Envoi…" : "Soumettre"}
                     </Button>
                   </>
                 ) : null}
