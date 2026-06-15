@@ -8,7 +8,7 @@ import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/social/components/LikeButton";
 
 export const WebPlayer = memo(function WebPlayer() {
-  const { currentTrack, currentPosition, duration, setVolume, volume, seek } = usePlayer();
+  const { currentTrack, currentPosition, duration, setVolume, volume, seek, audioError, clearAudioError } = usePlayer();
 
   if (!currentTrack) return null;
 
@@ -17,6 +17,21 @@ export const WebPlayer = memo(function WebPlayer() {
       className="fixed left-0 right-0 z-50 px-4 py-3 bottom-16 md:bottom-0"
       style={{ backgroundColor: "#1A1A1A", borderTop: "1px solid #2A2A2A" }}
     >
+      {audioError && (
+        <div
+          className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-lg text-xs"
+          style={{ backgroundColor: "#FF444418", border: "1px solid #FF444433", color: "#FF9999" }}
+        >
+          <span>{audioError}</span>
+          <button
+            onClick={clearAudioError}
+            className="ml-3 text-xs opacity-60 hover:opacity-100 transition-opacity"
+            aria-label="Fermer l'erreur"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       <div className="max-w-screen-xl mx-auto">
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
         <div className="flex items-center gap-4 mt-3">

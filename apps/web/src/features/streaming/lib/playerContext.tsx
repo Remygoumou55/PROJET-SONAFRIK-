@@ -10,6 +10,7 @@ import type {
 import { REAL_LISTEN_THRESHOLD_PERCENT, STREAM_HEARTBEAT_INTERVAL_MS } from "@sonafrik/types";
 
 type RepeatMode = "off" | "one" | "all";
+export type AudioErrorType = "expired" | "network" | "codec";
 
 interface QueueState {
   queue: TrackWithMeta[];
@@ -28,6 +29,8 @@ interface PlayerActions {
   getAccumulatedListenSeconds: () => number;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
   onComplete: (callback: () => void) => void;
+  onError: (callback: (type: AudioErrorType, positionSeconds: number) => void) => void;
+  clearAudioError: () => void;
   // Queue management
   setQueue: (tracks: TrackWithMeta[], startIndex?: number) => void;
   advanceQueue: () => TrackWithMeta | null;
@@ -36,9 +39,11 @@ interface PlayerActions {
   cycleRepeat: () => void;
 }
 
-interface PlayerContextValue extends PlayerState, QueueState, PlayerActions {}
+interface PlayerStateExtended extends PlayerState {
+  audioError: string | null;
+}
 
-const initialState: PlayerState = {
+const initialState: PlayerStateExtended = {
   currentTrack: null,
   sessionId: null,
   signedUrl: null,
@@ -49,7 +54,10 @@ const initialState: PlayerState = {
   volume: 1,
   platform: "web" as StreamingPlatform,
   quality: 128 as AudioQualityKbps,
+  audioError: null,
 };
+
+interface PlayerContextValue extends PlayerStateExtended, QueueState, PlayerActions {}
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
@@ -63,7 +71,7 @@ function buildShuffledOrder(length: number, currentIndex: number): number[] {
 }
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<PlayerState>(initialState);
+  const [state, setState] = useState<PlayerStateExtended>(initialState);
   const [queueState, setQueueState] = useState<QueueState>({
     queue: [],
     queueIndex: -1,
@@ -75,6 +83,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHeartbeatCallbackRef = useRef<((pos: number) => void) | null>(null);
   const onCompleteCallbackRef = useRef<(() => void) | null>(null);
+  const onErrorCallbackRef = useRef<((type: AudioErrorType, positionSeconds: number) => void) | null>(null);
   const accumulatedListenSecondsRef = useRef<number>(0);
   // Shuffled play order (indices into queue array)
   const shuffledOrderRef = useRef<number[]>([]);
@@ -119,6 +128,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         isLoading: true,
         currentPosition: 0,
         duration,
+        audioError: null,
       }));
 
       audio.play().catch((err: unknown) => {
@@ -150,11 +160,22 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onCompleteCallbackRef.current?.();
       };
 
-      // URL signée expirée ou source inaccessible — stopper proprement
+      // URL signée expirée ou source inaccessible
       audio.onerror = () => {
-        console.error("[Player] Erreur source audio — URL probablement expirée ou inaccessible");
+        const mediaErr = audio.error;
+        // MEDIA_ERR_DECODE (3) = problème codec ; tout le reste = réseau/URL expirée
+        const errorType: AudioErrorType =
+          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ? "codec" :
+          mediaErr?.code === MediaError.MEDIA_ERR_ABORTED ? "network" :
+          "expired";
+        const errorMsg =
+          errorType === "codec"   ? "Format audio non supporté." :
+          errorType === "network" ? "Erreur réseau — vérifiez votre connexion." :
+                                    "Lien audio expiré. Rechargement en cours…";
+        console.error("[Player] Erreur audio", errorType, mediaErr?.code);
         clearHeartbeat();
-        setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
+        setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: errorMsg }));
+        onErrorCallbackRef.current?.(errorType, audio.currentTime);
       };
 
       startHeartbeat();
@@ -207,6 +228,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const onComplete = useCallback((cb: () => void) => {
     onCompleteCallbackRef.current = cb;
+  }, []);
+
+  const onError = useCallback((cb: (type: AudioErrorType, positionSeconds: number) => void) => {
+    onErrorCallbackRef.current = cb;
+  }, []);
+
+  const clearAudioError = useCallback(() => {
+    setState((prev) => ({ ...prev, audioError: null }));
   }, []);
 
   // ── Queue Management ────────────────────────────────────────────────────────
@@ -340,6 +369,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         getAccumulatedListenSeconds,
         onHeartbeat,
         onComplete,
+        onError,
+        clearAudioError,
         setQueue,
         advanceQueue,
         retreatQueue,

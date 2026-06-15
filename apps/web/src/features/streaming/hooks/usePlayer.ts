@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayerContext } from "../lib/playerContext";
 import { useStreamingService } from "./useStreaming";
@@ -8,6 +8,8 @@ import { useStreamingService } from "./useStreaming";
 export function usePlayer() {
   const player = usePlayerContext();
   const streaming = useStreamingService();
+  // Limite à 1 tentative de rechargement par erreur pour éviter les boucles infinies
+  const retryAttemptRef = useRef(false);
 
   useEffect(() => {
     player.onHeartbeat(async (positionSeconds) => {
@@ -20,6 +22,7 @@ export function usePlayer() {
     });
 
     player.onComplete(async () => {
+      retryAttemptRef.current = false;
       // Finaliser la session courante
       if (player.sessionId && player.duration) {
         const accumulated = player.getAccumulatedListenSeconds();
@@ -43,6 +46,35 @@ export function usePlayer() {
         } catch (err) {
           console.error("[Player] Auto-avancement queue échoué", err);
         }
+      }
+    });
+
+    // Récupération automatique sur URL expirée (une seule tentative par erreur)
+    player.onError(async (errorType, positionSeconds) => {
+      if (errorType === "codec") {
+        // Codec incompatible — pas de retry possible
+        retryAttemptRef.current = false;
+        return;
+      }
+      if (retryAttemptRef.current || !player.currentTrack) {
+        // Déjà tenté, ou pas de track — on abandonne
+        retryAttemptRef.current = false;
+        return;
+      }
+      retryAttemptRef.current = true;
+      const trackToRetry = player.currentTrack;
+      const savedPosition = positionSeconds;
+      try {
+        const result = await streaming.startStream({ trackId: trackToRetry.id, platform: "web" });
+        player.play(trackToRetry, result.signedUrl, result.sessionId, result.durationSeconds);
+        // Reprendre à la position sauvegardée après chargement (~1s)
+        if (savedPosition > 1) {
+          setTimeout(() => { player.seek(savedPosition); }, 1000);
+        }
+        retryAttemptRef.current = false;
+      } catch (err) {
+        console.error("[Player] Rechargement URL échoué", err);
+        retryAttemptRef.current = false;
       }
     });
   }, [player, streaming]);
