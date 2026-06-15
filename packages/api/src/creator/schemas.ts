@@ -36,8 +36,14 @@ export const creatorAssetUploadSchema = z.object({
   labelId: z.string().uuid().optional(),
 });
 
+export const updateLabelSchema = z.object({
+  name: z.string().trim().min(2).max(FIELD_LIMITS.LABEL_NAME),
+  description: z.string().trim().max(FIELD_LIMITS.LABEL_DESCRIPTION).optional().nullable(),
+});
+
 export type UpdateArtistProfileInput = z.infer<typeof updateArtistProfileSchema>;
 export type CreateLabelInput = z.infer<typeof createLabelSchema>;
+export type UpdateLabelInput = z.infer<typeof updateLabelSchema>;
 export type InviteTeamMemberInput = z.infer<typeof inviteTeamMemberSchema>;
 export type CreateVerificationInput = z.infer<typeof createVerificationSchema>;
 export type CreatorAssetUploadInput = z.infer<typeof creatorAssetUploadSchema>;

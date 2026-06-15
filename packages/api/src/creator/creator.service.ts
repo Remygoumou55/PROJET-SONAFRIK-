@@ -15,11 +15,13 @@ import {
   creatorAssetUploadSchema,
   inviteTeamMemberSchema,
   updateArtistProfileSchema,
+  updateLabelSchema,
   type CreateLabelInput,
   type CreateVerificationInput,
   type CreatorAssetUploadInput,
   type InviteTeamMemberInput,
   type UpdateArtistProfileInput,
+  type UpdateLabelInput,
 } from "./schemas";
 
 export class CreatorService {
@@ -126,6 +128,26 @@ export class CreatorService {
   async getMyLabels(): Promise<Label[]> {
     const userId = await this.requireUserId();
     return this.repository.getLabelsForOwner(userId);
+  }
+
+  async updateLabel(labelId: string, input: UpdateLabelInput): Promise<Label> {
+    const parsed = updateLabelSchema.safeParse(input);
+    if (!parsed.success) throw new CreatorError("invalid_label");
+
+    const userId = await this.requireUserId();
+    const label = await this.repository.updateLabel(labelId, userId, {
+      name: parsed.data.name,
+      description: parsed.data.description,
+    });
+
+    await this.repository.logAudit("creator.label.updated", "labels", labelId);
+    return label;
+  }
+
+  async deleteLabel(labelId: string): Promise<void> {
+    const userId = await this.requireUserId();
+    await this.repository.deleteLabel(labelId, userId);
+    await this.repository.logAudit("creator.label.deleted", "labels", labelId);
   }
 
   async getTeam(): Promise<CreatorTeamMember[]> {

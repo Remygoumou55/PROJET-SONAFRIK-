@@ -212,6 +212,34 @@ export class CreatorRepository {
     return data as Label;
   }
 
+  async updateLabel(
+    labelId: string,
+    ownerId: string,
+    updates: { name?: string; description?: string | null },
+  ): Promise<Label> {
+    const { data, error } = await this.client
+      .from("labels")
+      .update({ ...updates, updated_by: ownerId })
+      .eq("id", labelId)
+      .eq("owner_id", ownerId)
+      .is("deleted_at", null)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return data as Label;
+  }
+
+  async deleteLabel(labelId: string, ownerId: string): Promise<void> {
+    const { error } = await this.client
+      .from("labels")
+      .update({ deleted_at: new Date().toISOString(), updated_by: ownerId })
+      .eq("id", labelId)
+      .eq("owner_id", ownerId);
+
+    if (error) throw error;
+  }
+
   async getLabelMembers(labelId: string): Promise<LabelMember[]> {
     const { data, error } = await this.client
       .from("label_members")
