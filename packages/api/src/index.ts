@@ -28,3 +28,4 @@ export * from "./discovery";
 export * from "./analytics";
 export * from "./royalties";
 export * from "./payout";
+export * from "./rights";

@@ -56,6 +56,10 @@
     "./payout": {
       "types": "./dist/payout/index.d.ts",
       "default": "./dist/payout/index.js"
+    },
+    "./rights": {
+      "types": "./dist/rights/index.d.ts",
+      "default": "./dist/rights/index.js"
     }
   },
   "scripts": {

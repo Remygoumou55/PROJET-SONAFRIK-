@@ -15,6 +15,7 @@ export function CreatorNav({ activePath, pendingVerifications = 0 }: CreatorNavP
     { href: "/creator/catalog/tracks", label: "Morceaux" },
     { href: "/creator/identity", label: "Identité artiste" },
     { href: "/creator/verification", label: "Vérification", badge: pendingVerifications },
+    { href: "/creator/rights", label: "Droits & Contrats" },
     { href: "/creator/labels", label: "Labels" },
     { href: "/creator/team", label: "Équipe" },
   ];

@@ -25,9 +25,11 @@ export function CreatorLayoutClient({
               ? "Vérification"
               : pathname.startsWith("/creator/labels")
                 ? "Labels"
-                : pathname.startsWith("/creator/team")
-                  ? "Équipe"
-                  : "Dashboard créateur";
+                : pathname.startsWith("/creator/rights")
+                  ? "Droits & Contrats"
+                  : pathname.startsWith("/creator/team")
+                    ? "Équipe"
+                    : "Dashboard créateur";
 
   return (
     <div className="min-h-screen bg-noir-profond">
