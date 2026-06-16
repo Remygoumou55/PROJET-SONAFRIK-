@@ -16,7 +16,6 @@ const NAV_ITEMS = [
 ] as const;
 
 function isNavActive(href: string, pathname: string) {
-  if (href === "/listen") return pathname === "/listen" || pathname === "/";
   return pathname.startsWith(href);
 }
 
