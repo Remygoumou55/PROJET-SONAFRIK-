@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { formatDateTime } from "@/lib/formatters";
 
 interface FraudSession {
@@ -34,16 +35,62 @@ export function AdminFraudCenter({ sessions }: Props) {
   const cardBg = "#1F1F1F";
   const border = "#2A2A2A";
 
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
+
+  const filteredSessions = useMemo(() => {
+    return sessions.filter((s) => {
+      if (!s.started_at) return true;
+      const date = s.started_at.slice(0, 10);
+      if (filterFrom && date < filterFrom) return false;
+      if (filterTo && date > filterTo) return false;
+      return true;
+    });
+  }, [sessions, filterFrom, filterTo]);
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold" style={{ color: textMain }}>Sessions Fraude</h1>
         <p className="mt-1 text-sm" style={{ color: textSub }}>
-          Sessions avec au moins un flag anti-fraude levé — {sessions.length} session{sessions.length !== 1 ? "s" : ""}
+          Sessions avec au moins un flag anti-fraude levé — {filteredSessions.length} session{filteredSessions.length !== 1 ? "s" : ""}{filteredSessions.length !== sessions.length ? ` / ${sessions.length} total` : ""}
         </p>
       </div>
 
-      {sessions.length === 0 ? (
+      {/* Filtre plage de dates */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <label className="text-xs" style={{ color: textSub }}>Du</label>
+          <input
+            type="date"
+            value={filterFrom}
+            onChange={(e) => setFilterFrom(e.target.value)}
+            className="rounded-lg px-3 py-1.5 text-xs outline-none"
+            style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textMain, colorScheme: "dark" }}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs" style={{ color: textSub }}>Au</label>
+          <input
+            type="date"
+            value={filterTo}
+            onChange={(e) => setFilterTo(e.target.value)}
+            className="rounded-lg px-3 py-1.5 text-xs outline-none"
+            style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textMain, colorScheme: "dark" }}
+          />
+        </div>
+        {(filterFrom || filterTo) && (
+          <button
+            onClick={() => { setFilterFrom(""); setFilterTo(""); }}
+            className="text-xs px-2 py-1 rounded-lg"
+            style={{ backgroundColor: "#2A2A2A", color: textSub }}
+          >
+            Réinitialiser
+          </button>
+        )}
+      </div>
+
+      {filteredSessions.length === 0 ? (
         <div className="rounded-xl py-12 text-center" style={{ backgroundColor: cardBg }}>
           <p className="text-2xl mb-2">✅</p>
           <p className="text-sm" style={{ color: textSub }}>
@@ -52,7 +99,7 @@ export function AdminFraudCenter({ sessions }: Props) {
         </div>
       ) : (
         <div className="space-y-3">
-          {sessions.map((s) => (
+          {filteredSessions.map((s) => (
             <div
               key={s.id}
               className="rounded-xl p-4 space-y-3"

@@ -108,7 +108,7 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                 )}
                 {/* Play/pause hover overlay */}
                 <div
-                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 motion-reduce:transition-none flex items-center justify-center"
                   style={{ background: "rgba(0,0,0,0.55)" }}
                 >
                   <div className="w-8 h-8 rounded-full flex items-center justify-center"

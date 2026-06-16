@@ -168,7 +168,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="animate-pulse rounded-xl p-5"
+              className="animate-pulse motion-reduce:animate-none rounded-xl p-5"
               style={{ backgroundColor: cardBg, animationDelay: `${i * 80}ms` }}
             >
               <div className="flex justify-between">
