@@ -1,4 +1,4 @@
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
 import { SUBSCRIPTION_PLANS, REVENUE_POOL_PERCENT, TRANSACTION_TYPE_LABELS } from "@sonafrik/types";
 import { useWallet } from "../../features/wallet/useWallet";
@@ -37,10 +37,24 @@ export default function WalletTab() {
         <Text style={styles.balanceLabel}>Solde disponible</Text>
         <Text style={styles.balanceAmount}>{formatGnf(wallet.balance_gnf)}</Text>
         <View style={styles.balanceActions}>
-          <TouchableOpacity style={styles.actionBtn}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => Alert.alert(
+              "Recharger",
+              "La recharge de wallet est disponible sur l'application web SONAFRIK.",
+              [{ text: "OK" }],
+            )}
+          >
             <Text style={styles.actionBtnText}>Recharger</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => Alert.alert(
+              "Retirer",
+              "Les retraits sont disponibles sur l'application web SONAFRIK.",
+              [{ text: "OK" }],
+            )}
+          >
             <Text style={styles.actionBtnText}>Retirer</Text>
           </TouchableOpacity>
         </View>

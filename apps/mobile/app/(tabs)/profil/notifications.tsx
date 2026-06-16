@@ -11,6 +11,7 @@ import type { Notification } from "@sonafrik/types";
 import { NOTIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
 import { useIdentityService } from "../../../features/identity/useIdentity";
+import { getSupabaseMobileClient } from "../../../lib/supabase";
 
 export default function NotificationsScreen() {
   const identity = useIdentityService();
@@ -26,6 +27,30 @@ export default function NotificationsScreen() {
 
   useEffect(() => {
     void load();
+
+    const supabase = getSupabaseMobileClient();
+    let channelRef: ReturnType<typeof supabase.channel> | null = null;
+
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      channelRef = supabase
+        .channel(`notifs_mobile_${user.id}`)
+        .on(
+          "postgres_changes" as "system",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          } as Parameters<ReturnType<typeof supabase.channel>["on"]>[1],
+          () => { void load(); },
+        )
+        .subscribe();
+    });
+
+    return () => {
+      if (channelRef) void supabase.removeChannel(channelRef);
+    };
   }, [load]);
 
   async function markRead(id: string) {
