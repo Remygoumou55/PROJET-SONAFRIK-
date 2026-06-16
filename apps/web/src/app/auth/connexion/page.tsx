@@ -90,8 +90,8 @@ function ConnexionPageInner() {
           </Link>
         </p>
 
-        <p className="text-center text-xs" style={{ color: "#555555" }}>
-          <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "#555555" }}>
+        <p className="text-center text-xs" style={{ color: "#A0A0A0" }}>
+          <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "#A0A0A0" }}>
             Problème d&apos;accès à votre compte ?
           </Link>
         </p>
