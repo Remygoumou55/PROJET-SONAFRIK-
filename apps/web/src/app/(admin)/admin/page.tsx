@@ -31,15 +31,15 @@ export default async function AdminPage() {
     fraudSessions,
     pendingWithdrawals,
   ] = await Promise.all([
-    qCount(supabase.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null) as unknown as Q),
-    qCount(supabase.from("profiles").select("*", { count: "exact", head: true }).eq("is_premium", true).gt("premium_expires_at", nowIso) as unknown as Q),
-    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }).gte("started_at", today.toISOString()) as unknown as Q),
-    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }) as unknown as Q),
-    qCount(supabase.from("albums").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null) as unknown as Q),
-    qCount(supabase.from("tracks").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null) as unknown as Q),
-    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }).filter("fraud_flags", "neq", "{}") as unknown as Q),
-    qCount((supabase.from("withdrawals" as never) as ReturnType<typeof supabase.from>).select("*", { count: "exact", head: true }).eq("status", "pending") as unknown as Q),
-  ]).catch(() => [0, 0, 0, 0, 0, 0, 0, 0] as number[]);
+    qCount(supabase.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("profiles").select("*", { count: "exact", head: true }).eq("is_premium", true).gt("premium_expires_at", nowIso) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }).gte("started_at", today.toISOString()) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("albums").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("tracks").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null) as unknown as Q).catch(() => 0),
+    qCount(supabase.from("stream_sessions").select("*", { count: "exact", head: true }).filter("fraud_flags", "neq", "{}") as unknown as Q).catch(() => 0),
+    qCount((supabase.from("withdrawals" as never) as ReturnType<typeof supabase.from>).select("*", { count: "exact", head: true }).eq("status", "pending") as unknown as Q).catch(() => 0),
+  ]);
 
   // Compteur pré-lancement (CDC Règle #7)
   let launchCurrent = 0;

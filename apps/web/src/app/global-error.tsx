@@ -32,8 +32,13 @@ export default function GlobalError({
             SONA<span style={{ color: "#00D26A" }}>FRIK</span>
           </h1>
           <p style={{ fontSize: "0.875rem", color: "#A0A0A0", textAlign: "center", margin: 0 }}>
-            {error.message || "Une erreur critique est survenue."}
+            Une erreur inattendue est survenue. Nos équipes en sont informées.
           </p>
+          {process.env.NODE_ENV !== "production" && error.message && (
+            <p style={{ fontSize: "0.75rem", color: "#555555", textAlign: "center", margin: 0, fontFamily: "monospace" }}>
+              {error.message}
+            </p>
+          )}
           <button
             onClick={reset}
             style={{
