@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/admin/catalog", label: "Catalogue" },
   { href: "/admin/finance", label: "Finances" },
   { href: "/admin/fraud", label: "Fraude" },
+  { href: "/admin/rights", label: "Droits" },
   { href: "/admin/flags", label: "Flags" },
   { href: "/admin/settings", label: "Paramètres" },
 ] as const;
