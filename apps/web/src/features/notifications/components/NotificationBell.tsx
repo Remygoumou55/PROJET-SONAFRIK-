@@ -35,11 +35,16 @@ export function NotificationBell({ initialCount, userId }: Props) {
           table: "notifications",
           filter: `user_id=eq.${userId}`,
         } as Parameters<ReturnType<typeof supabase.channel>["on"]>[1],
-        (payload: unknown) => {
-          const p = payload as { new: { read_at: string | null } };
-          if (p.new.read_at !== null) {
-            setCount((prev) => Math.max(0, prev - 1));
-          }
+        () => {
+          // Refetch depuis le serveur pour éviter la dérive en multi-onglet
+          void supabase
+            .from("notifications")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .is("read_at", null)
+            .then(({ count }) => {
+              if (count !== null) setCount(count);
+            });
         },
       )
       .subscribe();

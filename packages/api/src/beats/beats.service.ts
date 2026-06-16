@@ -81,10 +81,11 @@ export class BeatsService {
     const userId = await this.requireUserId();
     const purchaseId = await this.repository
       .purchaseBeat(userId, beatId)
-      .catch((err: Error) => {
+      .catch((err: Error & { code?: string }) => {
+        // code 23505 = unique constraint violation (beat déjà acheté au niveau DB)
+        if (err.code === "23505" || err.message?.includes("already_purchased")) throw new BeatsError("already_purchased");
         if (err.message?.includes("insufficient_balance")) throw new BeatsError("insufficient_balance");
-        if (err.message?.includes("already_purchased"))   throw new BeatsError("already_purchased");
-        if (err.message?.includes("beat_not_found"))      throw new BeatsError("beat_not_found");
+        if (err.message?.includes("beat_not_found"))       throw new BeatsError("beat_not_found");
         throw new BeatsError("purchase_failed");
       });
     return purchaseId;

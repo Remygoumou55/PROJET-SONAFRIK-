@@ -86,16 +86,25 @@ export class StreamingService {
 
     await this.requireUserId();
 
-    // Route via l'Edge Function stream-progress pour activer l'anti-fraude
-    // et enregistrer les events heartbeat dans stream_events.
-    const { error } = await this.client.functions.invoke("stream-progress", {
-      body: {
-        sessionId: parsed.data.sessionId,
-        positionSeconds: parsed.data.positionSeconds,
-      },
-    });
+    // Timeout 5s : évite l'accumulation de requêtes pendantes si le réseau est lent
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5_000);
 
-    if (error) throw new StreamingError("session_not_found");
+    try {
+      // Route via l'Edge Function stream-progress pour activer l'anti-fraude
+      // et enregistrer les events heartbeat dans stream_events.
+      const { error } = await this.client.functions.invoke("stream-progress", {
+        body: {
+          sessionId: parsed.data.sessionId,
+          positionSeconds: parsed.data.positionSeconds,
+        },
+        signal: controller.signal,
+      });
+
+      if (error) throw new StreamingError("session_not_found");
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   /** Real Listen V7.2 — retourne true si l'écoute est valide (≥90%) */

@@ -36,9 +36,12 @@ async function getHomepageContent() {
       newReleasesResult,
       suggestedArtists,
     ] = await Promise.all([
-      supabase.from("playlists").select("id, title, track_count").eq("is_public", true).is("deleted_at", null).order("updated_at", { ascending: false }).limit(8),
-      supabase.from("artist_profiles").select("creator_id, stage_name, genres").eq("is_public", true).order("created_at", { ascending: false }).limit(8),
-      supabase.from("genres").select("id, name").eq("is_active", true).is("deleted_at", null).order("sort_order").limit(14),
+      Promise.resolve(supabase.from("playlists").select("id, title, track_count").eq("is_public", true).is("deleted_at", null).order("updated_at", { ascending: false }).limit(8))
+        .catch((err: unknown) => { console.error("[Homepage] Playlists échouées", err); return { data: null }; }),
+      Promise.resolve(supabase.from("artist_profiles").select("creator_id, stage_name, genres").eq("is_public", true).order("created_at", { ascending: false }).limit(8))
+        .catch((err: unknown) => { console.error("[Homepage] Artistes échoués", err); return { data: null }; }),
+      Promise.resolve(supabase.from("genres").select("id, name").eq("is_active", true).is("deleted_at", null).order("sort_order").limit(14))
+        .catch((err: unknown) => { console.error("[Homepage] Genres échoués", err); return { data: null }; }),
       recommendation.getTrendingTracks({ window: "7d", limit: 10 }).catch((err: unknown): TrendingTrack[] => { console.error("[Homepage] Tendances échouées", err); return []; }),
       discovery.getDiscoveryFeed({ limit: 8 }).catch((err: unknown): DiscoveryTrack[] => { console.error("[Homepage] Découvertes échouées", err); return []; }),
       discovery.getNewReleases({ type: "album", days: 60, limit: 8 }).catch((err: unknown): NewReleasesResult => { console.error("[Homepage] Nouvelles sorties échouées", err); return { tracks: [], albums: [], artists: [] }; }),

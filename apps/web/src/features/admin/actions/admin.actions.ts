@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminService } from "@sonafrik/api/admin";
@@ -19,13 +20,22 @@ export async function toggleFeatureFlagAction(
   }
 }
 
+// Contraintes métier par clé — empêche de sauver revenue_pool_percent=200 ou target=0
+const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
+  revenue_pool_percent:         z.number().min(0).max(100),
+  tip_commission_percent:       z.number().min(0).max(100),
+  beat_store_commission_percent:z.number().min(0).max(100),
+  launch_subscriber_target:     z.number().int().min(1),
+  grace_period_days:            z.number().int().min(0),
+  min_withdrawal_gnf:           z.number().int().min(0),
+  max_stream_sessions:          z.number().int().min(1),
+};
+
 export async function updateSystemSettingAction(
   key: string,
   value: string,
 ): Promise<{ error?: string }> {
   try {
-    const supabase = await getSupabaseServerClient();
-    const service = createAdminService(supabase);
     // Les valeurs sont stockées en JSONB — on tente le parse JSON, sinon string brute
     let parsedValue: unknown = value;
     try {
@@ -33,6 +43,18 @@ export async function updateSystemSettingAction(
     } catch {
       parsedValue = value;
     }
+
+    const schema = SETTING_SCHEMAS[key];
+    if (schema) {
+      const result = schema.safeParse(parsedValue);
+      if (!result.success) {
+        return { error: `Valeur invalide pour « ${key} » : ${result.error.issues[0]?.message ?? "format incorrect"}.` };
+      }
+      parsedValue = result.data;
+    }
+
+    const supabase = await getSupabaseServerClient();
+    const service = createAdminService(supabase);
     await service.updateSystemSetting(key, parsedValue);
     revalidatePath("/admin/settings");
     return {};
