@@ -209,21 +209,23 @@ export function StreamingLayoutClient({
 }: StreamingLayoutClientProps) {
   return (
     <PlayerProvider>
-      {/* ── Desktop : sidebar + main ──────────────────────── */}
-      <div
-        className="hidden md:flex h-screen overflow-hidden"
-        style={{ backgroundColor: "#0D0D0D" }}
-      >
-        <DesktopNav userId={userId} initialUnreadCount={initialUnreadCount} />
-        <main className="flex-1 overflow-y-auto pb-24">{children}</main>
-      </div>
+      {/*
+       * Layout unique responsive — {children} rendu UNE SEULE fois.
+       * Desktop (md+) : flex-row, sidebar fixe + main scrollable.
+       * Mobile (<md)  : block, main plein-écran + bottom nav fixe.
+       */}
+      <div style={{ backgroundColor: "#0D0D0D", minHeight: "100dvh" }}>
+        <div className="md:flex md:h-screen md:overflow-hidden">
+          {/* Sidebar — hidden sur mobile (hidden md:flex géré dans DesktopNav) */}
+          <DesktopNav userId={userId} initialUnreadCount={initialUnreadCount} />
 
-      {/* ── Mobile : plein écran + bottom nav fixe ────────── */}
-      <div
-        className="md:hidden min-h-screen"
-        style={{ backgroundColor: "#0D0D0D" }}
-      >
-        <main className="pb-40">{children}</main>
+          {/* Contenu principal — pb-40 mobile (player+nav), pb-24 desktop */}
+          <main className="flex-1 overflow-y-auto pb-40 md:pb-24 md:min-h-screen">
+            {children}
+          </main>
+        </div>
+
+        {/* Navigation bottom — fixe sur mobile, cachée sur desktop (md:hidden dans MobileBottomNav) */}
         <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
       </div>
 
