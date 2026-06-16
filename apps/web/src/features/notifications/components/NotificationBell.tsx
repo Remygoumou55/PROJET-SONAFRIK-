@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 
 interface Props {
   initialCount: number;
@@ -11,46 +12,35 @@ interface Props {
 
 export function NotificationBell({ initialCount, userId }: Props) {
   const [count, setCount] = useState(initialCount);
+  const supabase = getSupabaseBrowserClient();
 
-  useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-
-    const channel = supabase
-      .channel(`notif_bell_${userId}`)
-      .on(
-        "postgres_changes" as "system",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        } as Parameters<ReturnType<typeof supabase.channel>["on"]>[1],
-        () => { setCount((prev) => prev + 1); },
-      )
-      .on(
-        "postgres_changes" as "system",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        } as Parameters<ReturnType<typeof supabase.channel>["on"]>[1],
-        () => {
-          // Refetch depuis le serveur pour éviter la dérive en multi-onglet
+  useRealtimeChannel(
+    `notif_bell_${userId}`,
+    [
+      {
+        event: "INSERT",
+        table: "notifications",
+        filter: `user_id=eq.${userId}`,
+        onEvent: () => setCount((prev) => prev + 1),
+      },
+      {
+        event: "UPDATE",
+        table: "notifications",
+        filter: `user_id=eq.${userId}`,
+        onEvent: () => {
           void supabase
             .from("notifications")
             .select("*", { count: "exact", head: true })
             .eq("user_id", userId)
             .is("read_at", null)
-            .then(({ count }) => {
-              if (count !== null) setCount(count);
+            .then(({ count: c }) => {
+              if (c !== null) setCount(c);
             });
         },
-      )
-      .subscribe();
-
-    return () => { void supabase.removeChannel(channel); };
-  }, [userId]);
+      },
+    ],
+    !!userId,
+  );
 
   return (
     <Link

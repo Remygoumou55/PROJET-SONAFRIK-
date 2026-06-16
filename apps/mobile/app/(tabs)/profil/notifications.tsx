@@ -29,12 +29,15 @@ export default function NotificationsScreen() {
     void load();
 
     const supabase = getSupabaseMobileClient();
+    let mounted = true;
     let channelRef: ReturnType<typeof supabase.channel> | null = null;
 
     void supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      // Ne pas créer le channel si le composant a déjà été démonté
+      if (!user || !mounted) return;
+      // Nom unique par montage → évite "cannot add callbacks after subscribe"
       channelRef = supabase
-        .channel(`notifs_mobile_${user.id}`)
+        .channel(`notifs_mobile_${user.id}_${Date.now()}`)
         .on(
           "postgres_changes" as "system",
           {
@@ -49,6 +52,7 @@ export default function NotificationsScreen() {
     });
 
     return () => {
+      mounted = false;
       if (channelRef) void supabase.removeChannel(channelRef);
     };
   }, [load]);
