@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
 
@@ -15,6 +15,13 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,10 +37,12 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
   }
 
   async function handleResend() {
+    if (cooldown > 0) return;
     setError(null);
     setResending(true);
     try {
       await onResend();
+      setCooldown(60);
     } catch (err) {
       setError(err instanceof AuthError ? err.message : "Impossible de renvoyer le code.");
     } finally {
@@ -65,8 +74,15 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
       <Button type="submit" fullWidth isLoading={loading}>
         Vérifier
       </Button>
-      <Button type="button" variant="ghost" fullWidth isLoading={resending} onClick={handleResend}>
-        Renvoyer le code
+      <Button
+        type="button"
+        variant="ghost"
+        fullWidth
+        isLoading={resending}
+        disabled={cooldown > 0 || resending}
+        onClick={handleResend}
+      >
+        {cooldown > 0 ? `Renvoyer dans ${cooldown}s` : "Renvoyer le code"}
       </Button>
     </form>
   );

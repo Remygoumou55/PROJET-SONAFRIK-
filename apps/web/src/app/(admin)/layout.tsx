@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#FFC20E" }}>
               Admin SONAFRIK
             </p>
-            <Link href="/" className="text-xs transition-colors" style={{ color: "#555555" }}>
+            <Link href="/listen" className="text-xs transition-colors" style={{ color: "#555555" }}>
               ← Retour à l&apos;app
             </Link>
           </div>

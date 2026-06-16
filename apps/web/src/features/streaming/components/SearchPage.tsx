@@ -102,7 +102,7 @@ export function SearchPage({ initialGenre }: Props) {
         )}
       </div>
       {error && (
-        <p className="text-sm mb-4" style={{ color: "#A0A0A0" }}>
+        <p className="text-sm mb-4" role="alert" style={{ color: "#FF4D4F" }}>
           {error}
         </p>
       )}

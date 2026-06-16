@@ -101,11 +101,7 @@ function InscriptionPageInner() {
         accountType,
       });
 
-      if (accountType === "auditeur") {
-        router.push("/listen");
-      } else {
-        router.push("/creator");
-      }
+      router.push("/listen");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'inscription. Réessayez.");
     } finally {

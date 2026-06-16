@@ -85,13 +85,14 @@ function TrackRow({
 
 interface Props {
   playlist: Playlist;
+  initialTracks?: TrackWithMeta[];
 }
 
-export function PlaylistDetail({ playlist }: Props) {
+export function PlaylistDetail({ playlist, initialTracks }: Props) {
   const streaming = useStreamingService();
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
-  const [tracks, setTracks] = useState<TrackWithMeta[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [tracks, setTracks] = useState<TrackWithMeta[]>(initialTracks ?? []);
+  const [isLoading, setIsLoading] = useState(!initialTracks);
   const [error, setError] = useState<string | null>(null);
   const [playError, setPlayError] = useState<string | null>(null);
 
@@ -132,7 +133,10 @@ export function PlaylistDetail({ playlist }: Props) {
     }
   }, [streaming, playlist.id]);
 
-  useEffect(() => { void loadTracks(); }, [loadTracks]);
+  useEffect(() => {
+    if (initialTracks) return;
+    void loadTracks();
+  }, [loadTracks, initialTracks]);
 
   const handlePlay = useCallback(async (track: TrackWithMeta) => {
     const index = tracks.findIndex((t) => t.id === track.id);

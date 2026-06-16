@@ -87,10 +87,11 @@ export default async function ArtistPublicPage({
   ]);
 
   const albums = (albumsRes.data ?? []) as unknown as AlbumRow[];
+  const albumCoverMap = new Map(albums.map((a) => [a.id, a.cover_url]));
   const tracks: TrackWithMeta[] = (tracksRes.data ?? []).map((t) => ({
     ...(t as unknown as TrackWithMeta),
     artist_name: artist.stage_name,
-    cover_url: null,
+    cover_url: albumCoverMap.get((t as unknown as { album_id?: string }).album_id ?? "") ?? null,
   }));
 
   return (

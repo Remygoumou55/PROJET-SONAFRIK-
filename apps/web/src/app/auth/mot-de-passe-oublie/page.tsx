@@ -81,6 +81,17 @@ export default function MotDePasseOubliePage() {
             vous connecter avec Google
           </Link>
         </p>
+
+        <p className="text-center text-sm" style={{ color: "#555555" }}>
+          Toujours bloqué ?{" "}
+          <a
+            href="mailto:support@sonafrik.com"
+            className="hover:underline"
+            style={{ color: "#A0A0A0" }}
+          >
+            Contacter le support
+          </a>
+        </p>
       </div>
     </AuthPageShell>
   );
