@@ -1,10 +1,31 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CoverImage } from "@/components/CoverImage";
 import { formatDate } from "@/lib/formatters";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
 import type { TrackWithMeta } from "@sonafrik/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("albums")
+    .select("title, artist_profiles(stage_name)")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) return { title: "Album — SONAFRIK" };
+  const ap = (data as unknown as { artist_profiles: { stage_name: string } | null }).artist_profiles;
+  const artist = ap?.stage_name;
+  return {
+    title: artist ? `${data.title} — ${artist} | SONAFRIK` : `${data.title} — SONAFRIK`,
+  };
+}
 
 interface AlbumRow {
   id: string;

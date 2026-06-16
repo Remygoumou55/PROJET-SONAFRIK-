@@ -91,7 +91,7 @@ export default async function LancementPage() {
           <Link
             href="/auth/inscription"
             className="rounded-full px-8 py-3 text-sm font-bold transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "#00CC44", color: "#000000" }}
+            style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
           >
             Rejoindre SONAFRIK
           </Link>
