@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Button, Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
 
+const OTP_RESEND_COOLDOWN_S = 60;
+
 interface OtpFormProps {
   phone: string;
   onSubmit: (token: string) => Promise<void>;
@@ -42,7 +44,7 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
     setResending(true);
     try {
       await onResend();
-      setCooldown(60);
+      setCooldown(OTP_RESEND_COOLDOWN_S);
     } catch (err) {
       setError(err instanceof AuthError ? err.message : "Impossible de renvoyer le code.");
     } finally {

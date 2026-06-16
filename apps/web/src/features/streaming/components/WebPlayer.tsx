@@ -34,7 +34,7 @@ export const WebPlayer = memo(function WebPlayer() {
       )}
       <div className="max-w-screen-xl mx-auto">
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center gap-2 md:gap-4 mt-3">
           {/* Track info */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">

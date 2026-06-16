@@ -66,7 +66,7 @@ export function PlayerControls() {
   const hasQueue = queue.length > 1;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {/* Shuffle */}
       {hasQueue && (
         <button
@@ -163,7 +163,7 @@ export function PlayerControls() {
       {/* Stop */}
       <button
         onClick={stop}
-        className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+        className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center transition-colors"
         style={{ backgroundColor: "#2A2A2A" }}
         aria-label="Arrêter"
       >

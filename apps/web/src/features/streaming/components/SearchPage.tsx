@@ -106,7 +106,9 @@ export function SearchPage({ initialGenre }: Props) {
           {error}
         </p>
       )}
-      <SearchResults results={results} isSearching={isSearching} />
+      <div aria-live="polite" aria-atomic="false">
+        <SearchResults results={results} isSearching={isSearching} />
+      </div>
       {!query && !activeGenre && (
         <div className="text-center py-12">
           <p className="text-4xl mb-4">🎵</p>
