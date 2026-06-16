@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface AuthPageShellProps {
   title: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function AuthPageShell({ title, subtitle, children }: AuthPageShellProps) {

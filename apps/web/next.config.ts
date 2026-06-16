@@ -44,9 +44,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Redirect depuis l'URL accentuée (tapée manuellement) vers la version ASCII
+      // Redirect depuis l'URL accentuée (URL-encodée par les navigateurs) vers la version ASCII
       {
-        source: "/auth/mot-de-passe-oublié",
+        source: "/auth/mot-de-passe-oubli%C3%A9",
         destination: "/auth/mot-de-passe-oublie",
         permanent: true,
       },
