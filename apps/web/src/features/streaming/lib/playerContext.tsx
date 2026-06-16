@@ -27,6 +27,7 @@ interface PlayerActions {
   setVolume: (volume: number) => void;
   seek: (positionSeconds: number) => void;
   getAccumulatedListenSeconds: () => number;
+  restartCurrentTrack: () => void;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
   onComplete: (callback: () => void) => void;
   onError: (callback: (type: AudioErrorType, positionSeconds: number) => void) => void;
@@ -80,6 +81,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const volumeRef = useRef<number>(1); // ref stable pour éviter la closure stale dans play()
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHeartbeatCallbackRef = useRef<((pos: number) => void) | null>(null);
   const onCompleteCallbackRef = useRef<(() => void) | null>(null);
@@ -116,7 +118,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }
       const audio = audioRef.current;
       audio.src = signedUrl;
-      audio.volume = state.volume;
+      audio.volume = volumeRef.current; // volumeRef évite la closure stale sur state.volume
       audio.load();
 
       setState((prev) => ({
@@ -180,7 +182,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
       startHeartbeat();
     },
-    [state.volume, clearHeartbeat, startHeartbeat],
+    [clearHeartbeat, startHeartbeat],
   );
 
   const pause = useCallback(() => {
@@ -207,6 +209,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const setVolume = useCallback((volume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, volume));
+    volumeRef.current = clampedVolume; // maintenir le ref en sync avec l'état
     if (audioRef.current) audioRef.current.volume = clampedVolume;
     setState((prev) => ({ ...prev, volume: clampedVolume }));
   }, []);
@@ -220,6 +223,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const getAccumulatedListenSeconds = useCallback(() => {
     return accumulatedListenSecondsRef.current;
+  }, []);
+
+  // Remet la piste courante à 0 sans créer une nouvelle session streaming
+  // Utilisé par playPrev quand > 3s de lecture ont été accumulées
+  const restartCurrentTrack = useCallback(() => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = 0;
+    accumulatedListenSecondsRef.current = 0;
+    setState((prev) => ({ ...prev, currentPosition: 0 }));
   }, []);
 
   const onHeartbeat = useCallback((cb: (pos: number) => void) => {
@@ -367,6 +379,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setVolume,
         seek,
         getAccumulatedListenSeconds,
+        restartCurrentTrack,
         onHeartbeat,
         onComplete,
         onError,

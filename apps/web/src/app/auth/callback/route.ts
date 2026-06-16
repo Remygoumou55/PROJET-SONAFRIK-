@@ -43,7 +43,11 @@ export async function GET(request: NextRequest) {
       if (process.env.NODE_ENV !== "production") {
         console.error("[OAuth callback error]", error.message, error.code ?? "");
       }
-      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=${encodeURIComponent(error.message)}`);
+      // Ne jamais exposer le message d'erreur brut en production (logs, analytics, historique navigateur)
+      const errParams = process.env.NODE_ENV !== "production"
+        ? `?error=oauth&reason=${encodeURIComponent(error.message)}`
+        : "?error=oauth";
+      return NextResponse.redirect(`${origin}/auth/connexion${errParams}`);
     }
 
     const {
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=no_user`);
+      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth`);
     }
 
     const { data: profile } = await supabase
@@ -67,5 +71,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/listen`);
   }
 
-  return NextResponse.redirect(`${origin}/auth/connexion?error=oauth&reason=no_code`);
+  return NextResponse.redirect(`${origin}/auth/connexion?error=oauth`);
 }

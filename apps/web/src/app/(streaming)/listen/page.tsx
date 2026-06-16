@@ -605,7 +605,7 @@ export default async function ListenPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <Link href="/settings/notifications" className="relative" aria-label={`Notifications${unreadNotifications > 0 ? ` (${unreadNotifications} non lues)` : ""}`}>
+            <Link href="/notifications" className="relative" aria-label={`Notifications${unreadNotifications > 0 ? ` (${unreadNotifications} non lues)` : ""}`}>
               <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />

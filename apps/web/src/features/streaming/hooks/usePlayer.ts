@@ -118,13 +118,18 @@ export function usePlayer() {
 
   const playPrev = useCallback(async (): Promise<void> => {
     const prev = player.retreatQueue();
-    if (prev) {
-      try {
-        const result = await streaming.startStream({ trackId: prev.id, platform: "web" });
-        player.play(prev, result.signedUrl, result.sessionId, result.durationSeconds);
-      } catch (err) {
-        console.error("[Player] Morceau précédent échoué", err);
-      }
+    if (!prev) return;
+    // retreatQueue retourne la piste courante quand > 3s sont écoulées (restart)
+    // → seek(0) sans créer de nouvelle session (évite le double-comptage de streams)
+    if (prev.id === player.currentTrack?.id) {
+      player.restartCurrentTrack();
+      return;
+    }
+    try {
+      const result = await streaming.startStream({ trackId: prev.id, platform: "web" });
+      player.play(prev, result.signedUrl, result.sessionId, result.durationSeconds);
+    } catch (err) {
+      console.error("[Player] Morceau précédent échoué", err);
     }
   }, [player, streaming]);
 

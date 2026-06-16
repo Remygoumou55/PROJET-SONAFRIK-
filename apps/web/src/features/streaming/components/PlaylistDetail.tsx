@@ -103,8 +103,8 @@ export function PlaylistDetail({ playlist }: Props) {
       const tracksWithMeta: TrackWithMeta[] = playlistTracks.map((pt) => ({
         ...(pt.track as unknown as TrackWithMeta),
         id: pt.track_id,
-        creator_id: "",
-        album_id: null,
+        creator_id: (pt.track as { creator_id?: string })?.creator_id ?? "",
+        album_id: (pt.track as { album_id?: string | null })?.album_id ?? null,
         title: (pt.track as { title?: string })?.title ?? "Morceau",
         slug: "",
         track_number: pt.position,

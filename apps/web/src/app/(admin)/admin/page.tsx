@@ -9,7 +9,7 @@ export default async function AdminPage() {
   const supabase = await getSupabaseServerClient();
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0); // UTC pour cohérence avec Supabase (timezone serveur Vercel variable)
   const nowIso = new Date().toISOString();
 
   async function qCount(

@@ -56,7 +56,7 @@ export default async function ArtistPublicPage({
   if (!artistRaw) notFound();
   const artist = artistRaw as unknown as ArtistRow;
 
-  // Feature flag tips
+  // Feature flag tips — SQL RLS : voir apps/web/src/lib/sql/feature_flags.sql
   const { data: tipFlagRow } = await supabase
     .from("feature_flags" as never)
     .select("enabled")
