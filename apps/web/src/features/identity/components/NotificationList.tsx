@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Badge, Button, Card, CardContent } from "@sonafrik/ui";
 import {
   NOTIFICATION_TYPE_LABELS,
@@ -14,7 +13,6 @@ interface NotificationListProps {
 }
 
 export function NotificationList({ notifications: initial }: NotificationListProps) {
-  const router = useRouter();
   const identity = useIdentityService();
   const [notifications, setNotifications] = useState(initial);
   const [loading, setLoading] = useState<string | null>(null);
@@ -28,7 +26,6 @@ export function NotificationList({ notifications: initial }: NotificationListPro
           item.id === id ? { ...item, read_at: new Date().toISOString() } : item,
         ),
       );
-      router.refresh();
     } finally {
       setLoading(null);
     }
@@ -41,7 +38,6 @@ export function NotificationList({ notifications: initial }: NotificationListPro
       setNotifications((current) =>
         current.map((item) => ({ ...item, read_at: item.read_at ?? new Date().toISOString() })),
       );
-      router.refresh();
     } finally {
       setLoading(null);
     }

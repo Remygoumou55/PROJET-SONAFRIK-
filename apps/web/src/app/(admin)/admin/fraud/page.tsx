@@ -13,7 +13,7 @@ export default async function AdminFraudPage() {
     .select("id, user_id, track_id, platform, started_at, total_listened_seconds, total_duration_seconds, listen_percentage, fraud_flags, is_valid_listen, ip_address")
     .filter("fraud_flags", "neq", "{}")
     .order("started_at", { ascending: false })
-    .limit(200);
+    .limit(50);
 
   type FraudRow = Parameters<typeof AdminFraudCenter>[0]["sessions"][number];
   return (

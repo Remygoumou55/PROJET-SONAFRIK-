@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { DiscoveryTrack, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
@@ -42,7 +42,7 @@ interface Props {
 export function HomepageDiscoverySection({ tracks }: Props) {
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
-  const tracksWithMeta = tracks.map(toTrackWithMeta);
+  const tracksWithMeta = useMemo(() => tracks.map(toTrackWithMeta), [tracks]);
 
   async function handlePlay(track: DiscoveryTrack) {
     const index = tracks.findIndex((t) => t.track_id === track.track_id);

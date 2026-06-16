@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { memo } from "react";
 import { usePathname } from "next/navigation";
 import { PlayerProvider } from "../lib/playerContext";
 import { WebPlayer } from "./WebPlayer";
@@ -19,7 +20,7 @@ function isNavActive(href: string, pathname: string) {
   return pathname.startsWith(href);
 }
 
-function NavIcon({ icon, size = 22 }: { icon: string; size?: number }) {
+const NavIcon = memo(function NavIcon({ icon, size = 22 }: { icon: string; size?: number }) {
   if (icon === "home") {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -64,7 +65,7 @@ function NavIcon({ icon, size = 22 }: { icon: string; size?: number }) {
     );
   }
   return null;
-}
+});
 
 function BrandLogo({ compact = false }: { compact?: boolean }) {
   return (
