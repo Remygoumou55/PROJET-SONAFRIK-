@@ -42,6 +42,16 @@ const nextConfig: NextConfig = {
       "@sonafrik/api",
     ],
   },
+  async redirects() {
+    return [
+      // Redirect depuis l'URL accentuée (tapée manuellement) vers la version ASCII
+      {
+        source: "/auth/mot-de-passe-oublié",
+        destination: "/auth/mot-de-passe-oublie",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
@@ -57,23 +58,7 @@ function ConnexionPageInner() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <header className="text-center">
-          {/* Marque SONAFRIK */}
-          <div className="mb-4">
-            <p className="text-2xl font-extrabold tracking-tight leading-none">
-              <span style={{ color: "#FFFFFF" }}>SONA</span>
-              <span style={{ color: "#00D26A" }}>FRIK</span>
-            </p>
-            <p className="text-[9px] font-bold tracking-[0.2em] mt-1" style={{ color: "#FFC20E" }}>
-              NOTRE BIEN COMMUN
-            </p>
-          </div>
-          <h1 className="text-2xl font-bold text-texte-principal">Connexion</h1>
-          <p className="mt-1 text-sm text-texte-secondaire">Entrez votre numéro pour recevoir un code SMS</p>
-        </header>
-
+    <AuthPageShell title="Connexion" subtitle="Entrez votre numéro pour recevoir un code SMS">
         {step === "phone" && (
           <>
             <PhoneForm onSubmit={handlePhoneSubmit} submitLabel="Envoyer le code" />
@@ -104,8 +89,13 @@ function ConnexionPageInner() {
             S&apos;inscrire
           </Link>
         </p>
-      </div>
-    </main>
+
+        <p className="text-center text-xs" style={{ color: "#555555" }}>
+          <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "#555555" }}>
+            Problème d&apos;accès à votre compte ?
+          </Link>
+        </p>
+    </AuthPageShell>
   );
 }
 

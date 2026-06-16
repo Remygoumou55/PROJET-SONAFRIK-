@@ -7,6 +7,7 @@ import type { AccountType } from "@sonafrik/types";
 import { Button, Input } from "@sonafrik/ui";
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { AccountTypeSelector } from "@/features/auth/components/AccountTypeSelector";
+import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
@@ -128,22 +129,7 @@ function InscriptionPageInner() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <header className="text-center">
-          <div className="mb-4">
-            <p className="text-2xl font-extrabold tracking-tight leading-none">
-              <span style={{ color: "#FFFFFF" }}>SONA</span>
-              <span style={{ color: "#00D26A" }}>FRIK</span>
-            </p>
-            <p className="text-[9px] font-bold tracking-[0.2em] mt-1" style={{ color: "#FFC20E" }}>
-              NOTRE BIEN COMMUN
-            </p>
-          </div>
-          <h1 className="text-2xl font-bold text-texte-principal">Créer un compte</h1>
-          <p className="mt-1 text-sm text-texte-secondaire">Écoute · Participe · Prospère</p>
-        </header>
-
+    <AuthPageShell title="Créer un compte" subtitle="Écoute · Participe · Prospère">
         {step === "phone" && (
           <>
             <PhoneForm onSubmit={handlePhoneSubmit} />
@@ -212,8 +198,7 @@ function InscriptionPageInner() {
             Se connecter
           </Link>
         </p>
-      </div>
-    </main>
+    </AuthPageShell>
   );
 }
 
