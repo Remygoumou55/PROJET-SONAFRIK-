@@ -81,7 +81,7 @@ export default async function AlbumDetailPage({
     <div className="p-6 max-w-3xl">
       {/* Retour */}
       <Link
-        href="/search"
+        href="/listen"
         className="inline-flex items-center gap-1.5 text-sm mb-6"
         style={{ color: "#A0A0A0" }}
       >

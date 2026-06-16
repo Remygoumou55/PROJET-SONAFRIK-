@@ -99,14 +99,14 @@ export default async function ArtistPublicPage({
       {/* Lien retour */}
       <div className="px-6 pt-5">
         <Link
-          href="/search"
+          href="/listen"
           className="inline-flex items-center gap-1.5 text-sm"
           style={{ color: "#A0A0A0" }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9 2L3 7l6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Recherche
+          Retour
         </Link>
       </div>
 
