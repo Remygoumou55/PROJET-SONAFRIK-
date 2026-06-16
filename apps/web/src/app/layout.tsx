@@ -2,7 +2,6 @@
 import { Montserrat } from "next/font/google";
 import { SONAFRIK_BRAND } from "@sonafrik/types";
 import "./globals.css";
-import "@sonafrik/ui/styles.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
