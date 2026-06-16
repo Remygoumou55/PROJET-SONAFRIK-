@@ -43,6 +43,8 @@ interface Props {
     pendingCatalog: number;
     pendingWithdrawals: number;
     fraudSessions: number;
+    launchCurrent: number;
+    launchTarget: number;
   };
 }
 
@@ -109,6 +111,56 @@ export function AdminDashboard({ kpis }: Props) {
             accent={kpis.pendingWithdrawals > 0 ? "#FFC20E" : "#555555"}
             href="/admin/finance"
           />
+        </div>
+      </section>
+
+      {/* Lancement CDC Règle #7 */}
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#555555" }}>
+          Objectif de lancement — CDC Règle #7
+        </h2>
+        <div
+          className="rounded-2xl p-5"
+          style={{ backgroundColor: "#1F1F1F", border: "1px solid #2A2A2A" }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <span className="text-3xl font-black tabular-nums" style={{ color: "#00CC44" }}>
+                {kpis.launchCurrent.toLocaleString("fr-FR")}
+              </span>
+              <span className="text-lg ml-1" style={{ color: "#444444" }}>
+                /{kpis.launchTarget.toLocaleString("fr-FR")}
+              </span>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-black" style={{ color: kpis.launchCurrent >= kpis.launchTarget ? "#00CC44" : "#FFC20E" }}>
+                {Math.min(((kpis.launchCurrent / Math.max(kpis.launchTarget, 1)) * 100), 100).toFixed(1)}%
+              </p>
+              <p className="text-xs" style={{ color: "#555555" }}>abonnés payants actifs</p>
+            </div>
+          </div>
+          <div
+            className="h-2.5 w-full overflow-hidden rounded-full"
+            style={{ backgroundColor: "#0D0D0D", border: "1px solid #333333" }}
+          >
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${Math.min((kpis.launchCurrent / Math.max(kpis.launchTarget, 1)) * 100, 100)}%`,
+                backgroundColor: kpis.launchCurrent >= kpis.launchTarget ? "#00CC44" : "#FFC20E",
+                transition: "width 0.6s ease",
+              }}
+            />
+          </div>
+          {kpis.launchCurrent >= kpis.launchTarget ? (
+            <p className="mt-2 text-xs font-semibold" style={{ color: "#00CC44" }}>
+              🚀 Objectif atteint — lancement autorisé
+            </p>
+          ) : (
+            <p className="mt-2 text-xs" style={{ color: "#555555" }}>
+              {(kpis.launchTarget - kpis.launchCurrent).toLocaleString("fr-FR")} abonnés payants manquants
+            </p>
+          )}
         </div>
       </section>
 

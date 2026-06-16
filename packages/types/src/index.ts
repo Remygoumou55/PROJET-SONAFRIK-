@@ -1571,6 +1571,13 @@ export const TIPS_ERROR_MESSAGES: Record<string, string> = {
   unknown:             "Une erreur est survenue.",
 };
 
+export interface LaunchProgress {
+  current:  number;
+  target:   number;
+  percent:  number;
+  launched: boolean;
+}
+
 export const BEATS_ERROR_MESSAGES: Record<string, string> = {
   unauthorized:        "Accès non autorisé.",
   beat_not_found:      "Beat introuvable.",
