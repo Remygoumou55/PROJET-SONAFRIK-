@@ -31,3 +31,5 @@ export * from "./payout";
 export * from "./rights";
 export * from "./notifications";
 export * from "./admin";
+export * from "./tips";
+export * from "./beats";

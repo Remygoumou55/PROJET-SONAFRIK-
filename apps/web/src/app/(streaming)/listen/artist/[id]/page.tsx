@@ -4,6 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CoverImage } from "@/components/CoverImage";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
 import { FollowButton } from "@/features/social/components/FollowButton";
+import { TipButton } from "@/features/marketplace/components/TipButton";
 import type { TrackWithMeta } from "@sonafrik/types";
 
 interface ArtistRow {
@@ -54,6 +55,17 @@ export default async function ArtistPublicPage({
 
   if (!artistRaw) notFound();
   const artist = artistRaw as unknown as ArtistRow;
+
+  // Feature flag tips
+  const { data: tipFlagRow } = await supabase
+    .from("feature_flags" as never)
+    .select("enabled")
+    .eq("name" as never, "tips")
+    .maybeSingle();
+  const tipsEnabled = (tipFlagRow as { enabled: boolean } | null)?.enabled ?? false;
+
+  // user_id de l'artiste (creator_id = profiles.id dans notre schéma)
+  const artistUserId = artist.creator_id;
 
   const [albumsRes, tracksRes] = await Promise.all([
     supabase
@@ -142,8 +154,11 @@ export default async function ArtistPublicPage({
           </p>
         )}
 
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
           <FollowButton entityType="artist" entityId={artist.creator_id} showCount />
+          {tipsEnabled ? (
+            <TipButton recipientId={artistUserId} recipientName={artist.stage_name} />
+          ) : null}
         </div>
 
         {artist.bio && (

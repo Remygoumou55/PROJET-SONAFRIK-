@@ -68,6 +68,14 @@
     "./admin": {
       "types": "./dist/admin/index.d.ts",
       "default": "./dist/admin/index.js"
+    },
+    "./tips": {
+      "types": "./dist/tips/index.d.ts",
+      "default": "./dist/tips/index.js"
+    },
+    "./beats": {
+      "types": "./dist/beats/index.d.ts",
+      "default": "./dist/beats/index.js"
     }
   },
   "scripts": {
