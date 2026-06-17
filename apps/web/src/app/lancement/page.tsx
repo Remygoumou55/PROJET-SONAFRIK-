@@ -165,6 +165,67 @@ export default async function LancementPage() {
             </div>
           ))}
         </div>
+
+        {/* Preuve sociale — artistes fondateurs */}
+        <div className="mt-12 mb-8 w-full max-w-2xl text-center">
+          <p className="text-base font-bold mb-1" style={{ color: "#FFFFFF" }}>
+            Déjà sur SONAFRIK
+          </p>
+          <p className="mb-6" style={{ color: "#A0A0A0", fontSize: "14px" }}>
+            Les premiers artistes qui font confiance à la plateforme
+          </p>
+
+          {/* Avatars — 5 artistes fondateurs */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {([
+              { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",      bg: "#00D26A" },
+              { initials: "F",  name: "Faya",         genre: "R&B Africain",  bg: "#FFC20E" },
+              { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel",  bg: "#A855F7" },
+              { initials: "MF", name: "MC Fly",        genre: "Rap GN",       bg: "#3B82F6" },
+              { initials: "S",  name: "SeK",           genre: "Gospel",        bg: "#F97316" },
+            ] as const).map(({ initials, name, genre, bg }) => (
+              <div key={name} className="flex flex-col items-center" style={{ width: "72px" }}>
+                <div
+                  className="flex items-center justify-center rounded-full mb-2"
+                  style={{
+                    width: "52px",
+                    height: "52px",
+                    backgroundColor: `${bg}28`,
+                    border: `2px solid ${bg}60`,
+                    color: "#FFFFFF",
+                    fontWeight: 600,
+                    fontSize: "16px",
+                  }}
+                >
+                  {initials}
+                </div>
+                <p style={{ fontSize: "12px", color: "#FFFFFF", fontWeight: 500, lineHeight: "1.3" }}>
+                  {name}
+                </p>
+                <p style={{ fontSize: "11px", color: "#A0A0A0", lineHeight: "1.3" }}>
+                  {genre}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Badge stats */}
+          <div className="mt-5 inline-block">
+            <span
+              style={{
+                display: "inline-block",
+                backgroundColor: "#1F1F1F",
+                border: "1px solid #2A2A2A",
+                borderRadius: "20px",
+                padding: "6px 16px",
+                fontSize: "12px",
+                color: "#A0A0A0",
+              }}
+            >
+              🎵 5 artistes · 30 morceaux · Guinée Conakry
+            </span>
+          </div>
+        </div>
       </main>
 
       {/* Footer */}
