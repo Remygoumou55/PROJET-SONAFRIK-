@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { DiscoveryTrack, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
@@ -43,6 +43,9 @@ export function HomepageDiscoverySection({ tracks }: Props) {
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
   const tracksWithMeta = useMemo(() => tracks.map(toTrackWithMeta), [tracks]);
+
+  // Réinitialise l'erreur à chaque montage — évite qu'elle persiste via le router cache
+  useEffect(() => { setPlayError(null); }, []);
 
   async function handlePlay(track: DiscoveryTrack) {
     const index = tracks.findIndex((t) => t.track_id === track.track_id);
