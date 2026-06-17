@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
+import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
 
 const SubscriptionModal = dynamic(
@@ -22,9 +23,9 @@ const TopupModal = dynamic(
 );
 
 export function WalletClient() {
-  const { context, isLoading, error } = useWallet();
+  const { context, isLoading, error, reload } = useWallet();
   const [showSubscription, setShowSubscription] = useState(false);
-  const [showTopup, setShowTopup] = useState(false);
+  const [showTopup, setShowTopup]               = useState(false);
 
   if (isLoading) {
     return (
@@ -49,8 +50,18 @@ export function WalletClient() {
         onSubscribe={() => setShowSubscription(true)}
         onTopup={() => setShowTopup(true)}
       />
+
+      <div className="mt-8 px-4 max-w-xl mx-auto">
+        <PaymentHistory />
+      </div>
+
       {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} />}
-      {showTopup && <TopupModal onClose={() => setShowTopup(false)} />}
+      {showTopup && (
+        <TopupModal
+          onClose={() => setShowTopup(false)}
+          onSuccess={() => { reload(); }}
+        />
+      )}
     </>
   );
 }
