@@ -55,15 +55,17 @@ const nextConfig: NextConfig = {
   async headers() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://*.supabase.co";
     const supabaseOrigin = supabaseUrl.startsWith("http") ? new URL(supabaseUrl).origin : supabaseUrl;
+    const supabaseWss    = supabaseOrigin.replace("https://", "wss://");
     const csp = [
       "default-src 'self'",
       // Next.js requires 'unsafe-eval' in dev; 'unsafe-inline' for HMR + styled-jsx
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`,
       "style-src 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: ${supabaseOrigin} https://lh3.googleusercontent.com`,
       `media-src 'self' blob: ${supabaseOrigin}`,
-      `connect-src 'self' ${supabaseOrigin} ${supabaseOrigin.replace("https://", "wss://")} https://accounts.google.com`,
+      `connect-src 'self' ${supabaseOrigin} ${supabaseWss} https://accounts.google.com https://vitals.vercel-insights.com`,
       "frame-src https://accounts.google.com",
+      "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -78,6 +80,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
           { key: "Content-Security-Policy", value: csp },
         ],
       },

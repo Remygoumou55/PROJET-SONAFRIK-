@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.58.0",
     "@sonafrik/api": "workspace:*",
     "@sonafrik/database": "workspace:*",
     "@sonafrik/shared": "workspace:*",

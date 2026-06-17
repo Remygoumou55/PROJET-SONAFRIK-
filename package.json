@@ -8,12 +8,15 @@
     "typecheck": "turbo run typecheck",
     "storybook": "turbo run storybook --filter=@sonafrik/ui",
     "build-storybook": "turbo run build-storybook --filter=@sonafrik/ui",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json,mjs}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,mjs}\"",
+    "smoke": "npx tsx scripts/smoke-test.ts",
+    "check-env": "npx tsx scripts/check-env.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "eslint": "^9.28.0",
     "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.1"
