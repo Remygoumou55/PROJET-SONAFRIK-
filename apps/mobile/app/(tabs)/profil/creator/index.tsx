@@ -65,7 +65,7 @@ export default function CreatorDashboardScreen() {
       <MenuItem label="Équipe" onPress={() => router.push("/(tabs)/profil/creator/team")} />
       <MenuItem
         label="Catalogue musical"
-        onPress={() => router.push("/(tabs)/profil/creator/catalog/index")}
+        onPress={() => router.push("/(tabs)/profil/creator/catalog")}
       />
     </ScrollView>
   );

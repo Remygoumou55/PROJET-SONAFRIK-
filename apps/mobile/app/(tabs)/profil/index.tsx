@@ -101,7 +101,7 @@ export default function ProfilScreen() {
       {profile.account_type === "artiste" || profile.account_type === "auditeur_artiste" ? (
         <MenuItem
           label="Espace créateur (Creator OS)"
-          onPress={() => router.push("/(tabs)/profil/creator/index")}
+          onPress={() => router.push("/(tabs)/profil/creator")}
         />
       ) : null}
       <MenuItem label="Préférences" onPress={() => router.push("/(tabs)/profil/preferences")} />
