@@ -267,7 +267,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <path d="M16 7h6v6" stroke="#00D26A" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Tendances</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🇬🇳 Tendances en Guinée</h2>
             </div>
             <span
               className="text-[10px] font-bold px-2.5 py-1 rounded-full"
@@ -294,7 +294,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Pour vous</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🎯 Recommandé pour vous</h2>
             </div>
             <Link href="/library" className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#1A1A1A", color: "#00D26A", border: "1px solid #2A2A2A" }}>
@@ -333,7 +333,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Top artistes</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>⭐ Artistes populaires</h2>
             </div>
             <Link href="/search" className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#1A1A1A", color: "#00D26A", border: "1px solid #2A2A2A" }}>
@@ -389,7 +389,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Découvertes</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🔍 À découvrir maintenant</h2>
             </div>
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#3B82F614", color: "#3B82F6", border: "1px solid #3B82F622" }}>
@@ -413,7 +413,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Nouveautés</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🎵 Dernières sorties</h2>
             </div>
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#F973161A", color: "#F97316", border: "1px solid #F9731633" }}>
@@ -442,7 +442,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       {suggestedArtists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
-            <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Artistes à découvrir</h2>
+            <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🌟 Nouveaux talents</h2>
           </div>
           <div className="flex gap-5 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
             {suggestedArtists.map((artist, i) => {
