@@ -1,7 +1,6 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Tip } from "@sonafrik/types";
 import { TipsError } from "./errors";
-import { TipsRepository } from "./tips.repository";
+import { TipsRepository, type TipResult } from "./tips.repository";
 import { sendTipSchema } from "./schemas";
 
 export class TipsService {
@@ -11,46 +10,21 @@ export class TipsService {
     this.repository = new TipsRepository(client);
   }
 
-  private async requireUserId(): Promise<string> {
-    const {
-      data: { user },
-    } = await this.client.auth.getUser();
-    if (!user) throw new TipsError("unauthorized");
-    return user.id;
-  }
-
-  async sendTip(params: {
-    recipientId: string;
-    amountGnf: number;
-    message?: string;
-  }): Promise<string> {
+  async sendTip(params: { receiverCreatorId: string; amountGnf: 5000 | 10000 | 20000 }): Promise<TipResult> {
     const parsed = sendTipSchema.safeParse(params);
-    if (!parsed.success) throw new TipsError("amount_too_low");
+    if (!parsed.success) throw new TipsError("invalid_amount");
 
-    const senderId = await this.requireUserId();
-    if (senderId === params.recipientId) throw new TipsError("self_tip");
-
-    const tipId = await this.repository
-      .sendTip(senderId, params.recipientId, params.amountGnf, params.message)
+    return this.repository
+      .sendTip(parsed.data.receiverCreatorId, parsed.data.amountGnf)
       .catch((err: Error) => {
-        if (err.message?.includes("insufficient_balance")) throw new TipsError("insufficient_balance");
+        const msg = err.message ?? "";
+        if (msg.includes("insufficient_balance")) throw new TipsError("insufficient_balance");
+        if (msg.includes("invalid_amount"))       throw new TipsError("invalid_amount");
+        if (msg.includes("receiver_not_found"))   throw new TipsError("receiver_not_found");
+        if (msg.includes("self_tip"))             throw new TipsError("self_tip");
+        if (msg.includes("unauthorized"))         throw new TipsError("unauthorized");
         throw new TipsError("send_failed");
       });
-    return tipId;
-  }
-
-  async getSentTips(): Promise<Tip[]> {
-    const userId = await this.requireUserId();
-    return this.repository.getSentTips(userId).catch(() => {
-      throw new TipsError("list_failed");
-    });
-  }
-
-  async getReceivedTips(): Promise<Tip[]> {
-    const userId = await this.requireUserId();
-    return this.repository.getReceivedTips(userId).catch(() => {
-      throw new TipsError("list_failed");
-    });
   }
 }
 

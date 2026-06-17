@@ -64,9 +64,6 @@ export default async function ArtistPublicPage({
     .maybeSingle();
   const tipsEnabled = (tipFlagRow as { enabled: boolean } | null)?.enabled ?? false;
 
-  // user_id de l'artiste (creator_id = profiles.id dans notre schéma)
-  const artistUserId = artist.creator_id;
-
   const [albumsRes, tracksRes] = await Promise.all([
     supabase
       .from("albums")
@@ -158,7 +155,7 @@ export default async function ArtistPublicPage({
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <FollowButton entityType="artist" entityId={artist.creator_id} showCount />
           {tipsEnabled ? (
-            <TipButton recipientId={artistUserId} recipientName={artist.stage_name} />
+            <TipButton receiverCreatorId={artist.creator_id} recipientName={artist.stage_name} />
           ) : null}
         </div>
 

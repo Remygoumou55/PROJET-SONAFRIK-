@@ -1564,7 +1564,8 @@ export const TIP_STATUS_LABELS: Record<TipStatus, string> = {
 export const TIPS_ERROR_MESSAGES: Record<string, string> = {
   unauthorized:        "Accès non autorisé.",
   insufficient_balance:"Solde insuffisant.",
-  amount_too_low:      "Montant minimum : 100 GNF.",
+  invalid_amount:      "Montant invalide.",
+  receiver_not_found:  "Artiste introuvable.",
   self_tip:            "Vous ne pouvez pas vous envoyer un pourboire.",
   send_failed:         "Impossible d'envoyer le pourboire.",
   list_failed:         "Impossible de charger les pourboires.",

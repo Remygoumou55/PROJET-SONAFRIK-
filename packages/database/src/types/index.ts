@@ -1108,6 +1108,13 @@ export interface Database {
         Args: { p_limit?: number };
         Returns: Json;
       };
+      send_tip: {
+        Args: {
+          p_receiver_creator_id: string;
+          p_amount_gnf: number;
+        };
+        Returns: Json;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
