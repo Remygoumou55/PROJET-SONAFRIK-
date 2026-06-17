@@ -40,7 +40,7 @@ export function useSearch() {
             setIsSearching(false);
           }
         }
-      }, 300);
+      }, 450);
     },
     [streaming],
   );

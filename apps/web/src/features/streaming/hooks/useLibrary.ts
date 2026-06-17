@@ -36,38 +36,44 @@ export function useLibrary() {
     async (entityType: Favorite["entity_type"], entityId: string) => {
       try {
         const isFav = await streaming.toggleFavorite({ entityType, entityId });
-        await loadLibrary();
+        setLibrary((prev) =>
+          isFav
+            ? prev.find((i) => i.entity_id === entityId)
+              ? prev
+              : [...prev, { entity_type: entityType, entity_id: entityId } as LibraryItem]
+            : prev.filter((i) => i.entity_id !== entityId),
+        );
         return isFav;
       } catch {
         return false;
       }
     },
-    [streaming, loadLibrary],
+    [streaming],
   );
 
   const createPlaylist = useCallback(
     async (title: string, description?: string, isPublic = false) => {
       try {
         const playlist = await streaming.createPlaylist({ title, description, isPublic });
-        await loadLibrary();
+        setPlaylists((prev) => [playlist, ...prev]);
         return playlist;
       } catch (err) {
         throw new Error(err instanceof Error ? err.message : "Impossible de créer la playlist.");
       }
     },
-    [streaming, loadLibrary],
+    [streaming],
   );
 
   const deletePlaylist = useCallback(
     async (playlistId: string) => {
       try {
         await streaming.deletePlaylist(playlistId);
-        await loadLibrary();
+        setPlaylists((prev) => prev.filter((p) => p.id !== playlistId));
       } catch (err) {
         throw new Error(err instanceof Error ? err.message : "Impossible de supprimer la playlist.");
       }
     },
-    [streaming, loadLibrary],
+    [streaming],
   );
 
   return {

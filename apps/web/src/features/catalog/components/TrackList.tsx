@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Track } from "@sonafrik/types";
@@ -12,7 +11,6 @@ import { AudioUploader } from "./AudioUploader";
 const ISRC_MAX = 12;
 
 export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; creatorId: string }) {
-  const router = useRouter();
   const catalog = useCatalogService();
   const [tracks, setTracks] = useState(initial);
   const [title, setTitle] = useState("");
@@ -28,7 +26,6 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
       setTracks((current) => [track, ...current]);
       setTitle("");
       setIsrc("");
-      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -41,7 +38,6 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
         t.id === trackId ? { ...t, publication_status: "pending_review" } : t,
       ),
     );
-    router.refresh();
   }
 
   return (
@@ -105,7 +101,6 @@ export function TrackList({ tracks: initial, creatorId }: { tracks: Track[]; cre
                         t.id === track.id ? { ...t, duration_seconds: dur } : t,
                       ),
                     );
-                    router.refresh();
                   }}
                 />
                 <button

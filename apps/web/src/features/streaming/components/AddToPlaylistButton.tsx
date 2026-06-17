@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
+const playlistsCache: { data: import("@sonafrik/types").Playlist[]; at: number } = { data: [], at: 0 };
+const CACHE_TTL = 60_000;
 import type { Playlist } from "@sonafrik/types";
 import { useStreamingService } from "../hooks/useStreaming";
 
@@ -32,10 +35,16 @@ export function AddToPlaylistButton({ trackId }: Props) {
   const handleOpen = useCallback(async () => {
     if (open) { setOpen(false); return; }
     setOpen(true);
+    if (Date.now() - playlistsCache.at < CACHE_TTL) {
+      setPlaylists(playlistsCache.data);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const list = await streaming.listPlaylists();
+      playlistsCache.data = list;
+      playlistsCache.at = Date.now();
       setPlaylists(list);
     } catch {
       setError("Impossible de charger les playlists.");
