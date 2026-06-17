@@ -109,7 +109,7 @@ export default async function LancementPage() {
           {[
             { rule: "#3", label: "65% reversés aux artistes", icon: "🎵" },
             { rule: "#4", label: "Beat Store à 0% de commission", icon: "🎹" },
-            { rule: "#5", label: "Pourboires avec 5% de frais", icon: "💸" },
+            { rule: "#5", label: "Pourboires directs aux artistes", icon: "💸" },
           ].map(({ rule, label, icon }) => (
             <div
               key={rule}
