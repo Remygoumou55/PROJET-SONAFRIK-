@@ -8,6 +8,7 @@ import { requireIdentityContext } from "@/features/identity/lib/requireIdentity"
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getInitials } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
+import { getDailyProverb } from "@/lib/proverbs";
 import { HomepageTrendingSection } from "@/features/streaming/components/HomepageTrendingRow";
 import { HomepageDiscoverySection } from "@/features/streaming/components/HomepageDiscoverySection";
 
@@ -582,6 +583,7 @@ export default async function ListenPage() {
   const firstName = profile.full_name?.split(" ")[0] ?? "là";
   const hour = new Date().getUTCHours(); // Guinée = UTC+0 (GMT)
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
+  const proverb = getDailyProverb();
 
   return (
     <div style={{ backgroundColor: "#0A0A0A", minHeight: "100%" }}>
@@ -617,6 +619,12 @@ export default async function ListenPage() {
             </h1>
             <p className="text-sm mt-1.5" style={{ color: "#666666" }}>
               Découvrez la musique africaine
+            </p>
+            <p className="text-xs mt-2 italic leading-relaxed" style={{ color: "#A0A0A0" }}>
+              🌍 &ldquo;{proverb.text}&rdquo;
+              <span className="not-italic block text-[10px] mt-0.5" style={{ color: "#666666" }}>
+                — {proverb.origin}
+              </span>
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
