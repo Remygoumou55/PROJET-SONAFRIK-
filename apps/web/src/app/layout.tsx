@@ -58,6 +58,8 @@ export default function RootLayout({
         <link rel="preconnect" href={SUPABASE_HOST} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={SUPABASE_HOST} />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+        <link rel="prefetch" href="/listen" as="document" />
       </head>
       <body className={`${montserrat.variable} antialiased`}>{children}</body>
     </html>

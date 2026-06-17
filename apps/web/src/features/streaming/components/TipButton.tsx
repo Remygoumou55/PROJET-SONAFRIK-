@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useTipService } from "../hooks/useTipService";
 import { TipsError } from "@sonafrik/api/tips";
 
@@ -12,7 +12,7 @@ interface Props {
   artistName: string;
 }
 
-export function TipButton({ creatorId, artistName }: Props) {
+export const TipButton = memo(function TipButton({ creatorId, artistName }: Props) {
   const tip = useTipService();
   const [loading, setLoading]           = useState(false);
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -77,4 +77,4 @@ export function TipButton({ creatorId, artistName }: Props) {
       )}
     </div>
   );
-}
+});
