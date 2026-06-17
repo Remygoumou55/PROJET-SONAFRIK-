@@ -4,6 +4,7 @@ import { memo } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
+import { TipButton } from "./TipButton";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/social/components/LikeButton";
 
@@ -33,6 +34,9 @@ export const WebPlayer = memo(function WebPlayer() {
         </div>
       )}
       <div className="max-w-screen-xl mx-auto">
+        {currentTrack.creator_id && (
+          <TipButton creatorId={currentTrack.creator_id} artistName={currentTrack.artist_name ?? "l'artiste"} />
+        )}
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
         <div className="flex items-center gap-2 md:gap-4 mt-3">
           {/* Track info */}
