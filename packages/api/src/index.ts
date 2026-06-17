@@ -33,3 +33,4 @@ export * from "./notifications";
 export * from "./admin";
 export * from "./tips";
 export * from "./beats";
+export * from "./payments";

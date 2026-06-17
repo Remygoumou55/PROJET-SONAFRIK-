@@ -917,6 +917,55 @@ export interface Database {
         Update: Record<string, never>;
         Relationships: [];
       };
+      payment_intents: {
+        Row: {
+          id: string;
+          user_id: string;
+          wallet_id: string;
+          provider: string;
+          purpose: string;
+          amount_gnf: number;
+          currency: string;
+          provider_ref: string | null;
+          provider_phone: string;
+          status: string;
+          metadata: Json;
+          initiated_at: string;
+          confirmed_at: string | null;
+          failed_at: string | null;
+          expires_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          wallet_id: string;
+          provider: string;
+          purpose: string;
+          amount_gnf: number;
+          currency?: string;
+          provider_ref?: string | null;
+          provider_phone: string;
+          status?: string;
+          metadata?: Json;
+          initiated_at?: string;
+          confirmed_at?: string | null;
+          failed_at?: string | null;
+          expires_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          status?: string;
+          provider_ref?: string | null;
+          confirmed_at?: string | null;
+          failed_at?: string | null;
+          metadata?: Json;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -1114,6 +1163,14 @@ export interface Database {
           p_amount_gnf: number;
         };
         Returns: Json;
+      };
+      confirm_payment_intent: {
+        Args: { p_intent_id: string; p_provider_ref: string };
+        Returns: Json;
+      };
+      expire_stale_payment_intents: {
+        Args: Record<string, never>;
+        Returns: number;
       };
     };
     Enums: Record<string, never>;

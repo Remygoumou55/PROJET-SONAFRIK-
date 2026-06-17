@@ -76,6 +76,10 @@
     "./beats": {
       "types": "./dist/beats/index.d.ts",
       "default": "./dist/beats/index.js"
+    },
+    "./payments": {
+      "types": "./dist/payments/index.d.ts",
+      "default": "./dist/payments/index.js"
     }
   },
   "scripts": {
