@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { LaunchCounter } from "@/features/launch/components/LaunchCounter";
 import type { LaunchProgress } from "@sonafrik/types";
 
 export const metadata: Metadata = {
@@ -83,7 +82,49 @@ export default async function LancementPage() {
           <p className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "#555555" }}>
             Objectif de lancement — CDC Règle #7
           </p>
-          <LaunchCounter {...progress} />
+
+          {/* Chiffres */}
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <span className="text-6xl font-black tabular-nums leading-none" style={{ color: "#00D26A" }}>
+                {progress.current.toLocaleString("fr-FR")}
+              </span>
+              <span className="ml-2 text-2xl font-bold" style={{ color: "#444444" }}>
+                /{progress.target.toLocaleString("fr-FR")}
+              </span>
+            </div>
+            <span className="text-lg font-semibold" style={{ color: "#00D26A" }}>
+              {progress.percent.toFixed(1)} %
+            </span>
+          </div>
+
+          {/* Barre de progression */}
+          <div
+            style={{
+              height: "8px",
+              width: "100%",
+              backgroundColor: "#1F1F1F",
+              border: "1px solid #2A2A2A",
+              borderRadius: "4px",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${progress.percent}%`,
+                backgroundColor: "#00D26A",
+                borderRadius: "4px",
+                transition: "width 0.6s ease",
+              }}
+            />
+          </div>
+
+          <p className="mt-3 text-sm text-center" style={{ color: "#555555" }}>
+            {progress.launched
+              ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
+              : `${(progress.target - progress.current).toLocaleString("fr-FR")} abonnés manquants pour le lancement`}
+          </p>
         </div>
 
         {/* CTA */}
