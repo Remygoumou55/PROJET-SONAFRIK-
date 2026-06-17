@@ -191,9 +191,24 @@ function SectionEmptyHint({ label }: { label: string }) {
 function HomepageContentSections({ content }: { content: HomepageContent }) {
   const { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists, hadError } = content;
 
-  const hasContent =
+  // Contenu musical (hors genres) — détermine l'empty state central
+  const hasMusicContent =
     trending.length > 0 || playlists.length > 0 || artists.length > 0 ||
-    discoveries.length > 0 || newAlbums.length > 0 || suggestedArtists.length > 0 || genres.length > 0;
+    discoveries.length > 0 || newAlbums.length > 0 || suggestedArtists.length > 0;
+
+  const hasContent = hasMusicContent || genres.length > 0;
+
+  // Nb de sections non-vides : si >= 2, on masque silencieusement les sections vides
+  const filledCount = [
+    trending.length > 0,
+    playlists.length > 0,
+    artists.length > 0,
+    discoveries.length > 0,
+    newAlbums.length > 0,
+    suggestedArtists.length > 0,
+    genres.length > 0,
+  ].filter(Boolean).length;
+  const showHints = filledCount < 2;
 
   return (
     <div className="pb-8">
@@ -208,8 +223,8 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
         </div>
       )}
 
-      {/* ── EMPTY STATE — aucun contenu dans Supabase ────────────────────── */}
-      {!hadError && !hasContent && (
+      {/* ── EMPTY STATE — toutes les sections musicales sont vides ─────── */}
+      {!hadError && !hasMusicContent && (
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center mb-5"
@@ -238,7 +253,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── TENDANCES ──────────────────────────────────────────────────────── */}
-      {trending.length === 0 && hasContent && <SectionEmptyHint label="Tendances" />}
+      {trending.length === 0 && hasContent && showHints && <SectionEmptyHint label="Tendances" />}
       {trending.length > 0 && (
         <section className="mt-8 mb-2">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -266,7 +281,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── POUR VOUS (playlists) ─────────────────────────────────────────── */}
-      {playlists.length === 0 && hasContent && <SectionEmptyHint label="Pour vous" />}
+      {playlists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Pour vous" />}
       {playlists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -304,7 +319,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── TOP ARTISTES ─────────────────────────────────────────────────── */}
-      {artists.length === 0 && hasContent && <SectionEmptyHint label="Top artistes" />}
+      {artists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Top artistes" />}
       {artists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -363,7 +378,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── DÉCOUVERTES ─────────────────────────────────────────────────────── */}
-      {discoveries.length === 0 && hasContent && <SectionEmptyHint label="Découvertes" />}
+      {discoveries.length === 0 && hasContent && showHints && <SectionEmptyHint label="Découvertes" />}
       {discoveries.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -386,7 +401,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── NOUVEAUTÉS — Albums ───────────────────────────────────────────── */}
-      {newAlbums.length === 0 && hasContent && <SectionEmptyHint label="Nouveautés" />}
+      {newAlbums.length === 0 && hasContent && showHints && <SectionEmptyHint label="Nouveautés" />}
       {newAlbums.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -423,7 +438,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── ARTISTES À DÉCOUVRIR ─────────────────────────────────────────── */}
-      {suggestedArtists.length === 0 && hasContent && <SectionEmptyHint label="Artistes à découvrir" />}
+      {suggestedArtists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Artistes à découvrir" />}
       {suggestedArtists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -471,7 +486,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       )}
 
       {/* ── GENRES ───────────────────────────────────────────────────────── */}
-      {genres.length === 0 && hasContent && <SectionEmptyHint label="Genres" />}
+      {genres.length === 0 && hasContent && showHints && <SectionEmptyHint label="Genres" />}
       {genres.length > 0 && (
         <section className="mt-8 px-6">
           <div className="flex items-center gap-2 mb-4">
