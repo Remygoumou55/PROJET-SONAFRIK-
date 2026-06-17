@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { SearchResults } from "./SearchResults";
 
@@ -12,6 +12,7 @@ export function SearchPage({ initialGenre }: Props) {
   const [query, setQuery] = useState(initialGenre ?? "");
   const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const { results, isSearching, error, search, clearSearch } = useSearch();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (initialGenre) {
@@ -22,8 +23,9 @@ export function SearchPage({ initialGenre }: Props) {
   const handleChange = (value: string) => {
     setQuery(value);
     setActiveGenre(undefined);
-    search(value);
-    if (!value) clearSearch();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!value) { clearSearch(); return; }
+    debounceRef.current = setTimeout(() => { search(value); }, 300);
   };
 
   const clearGenreFilter = () => {

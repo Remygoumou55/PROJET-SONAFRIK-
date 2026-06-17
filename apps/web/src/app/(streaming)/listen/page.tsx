@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { DiscoveryArtist, DiscoveryTrack, NewReleasesResult, TrendingTrack } from "@sonafrik/types";
@@ -22,7 +22,8 @@ const ARTIST_RING_COLORS = [
 ] as const;
 
 // ─── Fetch données homepage ────────────────────────────────────────────────────
-async function getHomepageContent() {
+// cache() déduplique les appels concurrents sur le même render React tree
+const getHomepageContent = cache(async function getHomepageContent() {
   try {
     const supabase = await getSupabaseServerClient();
     const recommendation = createRecommendationService(supabase);
@@ -63,7 +64,7 @@ async function getHomepageContent() {
     console.error("[Homepage] getHomepageContent failed:", err);
     return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [], hadError: true };
   }
-}
+});
 
 type HomepageContent = Awaited<ReturnType<typeof getHomepageContent>>;
 

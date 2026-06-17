@@ -64,6 +64,10 @@ export function CoverImage({
           onError={() => setError(true)}
           sizes={resolvedSizes}
           priority={priority}
+          loading={priority ? "eager" : "lazy"}
+          quality={priority ? 80 : 55}
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect fill='%23222222' width='40' height='40'/%3E%3C/svg%3E"
         />
       ) : (
         <GradientPlaceholder seed={gradientSeed} />

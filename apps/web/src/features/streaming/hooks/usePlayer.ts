@@ -4,10 +4,12 @@ import { useCallback, useEffect, useRef } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayerContext } from "../lib/playerContext";
 import { useStreamingService } from "./useStreaming";
+import { useStreamQuality } from "./useStreamQuality";
 
 export function usePlayer() {
   const player = usePlayerContext();
   const streaming = useStreamingService();
+  const { bitrate } = useStreamQuality();
   // Limite à 1 tentative de rechargement par erreur pour éviter les boucles infinies
   const retryAttemptRef = useRef(false);
 
@@ -41,7 +43,7 @@ export function usePlayer() {
       const nextTrack = player.advanceQueue();
       if (nextTrack) {
         try {
-          const result = await streaming.startStream({ trackId: nextTrack.id, platform: "web" });
+          const result = await streaming.startStream({ trackId: nextTrack.id, platform: "web", qualityKbps: bitrate });
           player.play(nextTrack, result.signedUrl, result.sessionId, result.durationSeconds);
         } catch (err) {
           console.error("[Player] Auto-avancement queue échoué", err);
@@ -65,7 +67,7 @@ export function usePlayer() {
       const trackToRetry = player.currentTrack;
       const savedPosition = positionSeconds;
       try {
-        const result = await streaming.startStream({ trackId: trackToRetry.id, platform: "web" });
+        const result = await streaming.startStream({ trackId: trackToRetry.id, platform: "web", qualityKbps: bitrate });
         player.play(trackToRetry, result.signedUrl, result.sessionId, result.durationSeconds);
         // Reprendre à la position sauvegardée après chargement (~1s)
         if (savedPosition > 1) {
@@ -77,7 +79,7 @@ export function usePlayer() {
         retryAttemptRef.current = false;
       }
     });
-  }, [player, streaming]);
+  }, [player, streaming, bitrate]);
 
   const loadAndPlay = useCallback(
     async (track: TrackWithMeta): Promise<void> => {
@@ -85,13 +87,14 @@ export function usePlayer() {
         const result = await streaming.startStream({
           trackId: track.id,
           platform: "web",
+          qualityKbps: bitrate,
         });
         player.play(track, result.signedUrl, result.sessionId, result.durationSeconds);
       } catch (err) {
         throw new Error(err instanceof Error ? err.message : "Impossible de démarrer la lecture.");
       }
     },
-    [streaming, player],
+    [streaming, player, bitrate],
   );
 
   const loadQueueAndPlay = useCallback(

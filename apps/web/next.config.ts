@@ -99,7 +99,14 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Fichiers media publics (covers, avatars depuis storage Supabase)
+        // Covers et visuels catalogue — contenu stable, cache 7 jours
+        source: "/storage/v1/object/public/catalog-visuals/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        // Autres fichiers storage (avatars, pièces jointes) — cache 1h
         source: "/storage/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=3600, stale-while-revalidate=600" },
