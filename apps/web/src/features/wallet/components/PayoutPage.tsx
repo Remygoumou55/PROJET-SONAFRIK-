@@ -3,11 +3,10 @@
 import { memo, useState } from "react";
 import type { AddPayoutAccountInput } from "@sonafrik/api/wallet";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS } from "@sonafrik/types";
-import { usePayoutAccounts, useWithdrawals, useRequestWithdrawal } from "../hooks/useWallet";
+import { usePayoutPageData, useRequestWithdrawal } from "../hooks/useWallet";
 
 export const PayoutPage = memo(function PayoutPage() {
-  const { accounts, isLoading: accountsLoading, addAccount, removeAccount } = usePayoutAccounts();
-  const { withdrawals, isLoading: withdrawalsLoading } = useWithdrawals();
+  const { accounts, withdrawals, isLoading, addAccount, removeAccount } = usePayoutPageData();
   const requestWithdrawal = useRequestWithdrawal();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -129,7 +128,7 @@ export const PayoutPage = memo(function PayoutPage() {
           </form>
         )}
 
-        {accountsLoading ? (
+        {isLoading ? (
           <div className="space-y-2">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}>
@@ -229,7 +228,7 @@ export const PayoutPage = memo(function PayoutPage() {
       {/* Historique des retraits */}
       <section>
         <h2 className="text-base font-semibold mb-4" style={{ color: "#FFFFFF" }}>Historique des retraits</h2>
-        {withdrawalsLoading ? (
+        {isLoading ? (
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 70}ms` }}>

@@ -142,6 +142,52 @@ export function useRequestWithdrawal() {
   }, [service]);
 }
 
+/** Charge comptes de retrait + historique en parallèle — une seule phase de chargement pour PayoutPage. */
+export function usePayoutPageData() {
+  const service = useWalletService();
+  const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
+  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const reloadAccounts = useCallback(async () => {
+    const data = await service.getPayoutAccounts().catch(() => [] as PayoutAccount[]);
+    setAccounts(data);
+  }, [service]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    Promise.all([
+      service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
+      service.getWithdrawals().catch(() => [] as Withdrawal[]),
+    ])
+      .then(([accs, wds]) => {
+        setAccounts(accs);
+        setWithdrawals(wds);
+      })
+      .finally(() => { setIsLoading(false); });
+  }, [service]);
+
+  const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
+    try {
+      await service.addPayoutAccount(input);
+      await reloadAccounts();
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
+    }
+  }, [service, reloadAccounts]);
+
+  const removeAccount = useCallback(async (id: string) => {
+    try {
+      await service.removePayoutAccount(id);
+      await reloadAccounts();
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
+    }
+  }, [service, reloadAccounts]);
+
+  return { accounts, withdrawals, isLoading, addAccount, removeAccount };
+}
+
 export function useRoyalties() {
   const service = useWalletService();
   const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
