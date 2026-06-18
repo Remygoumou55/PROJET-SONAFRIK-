@@ -60,6 +60,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <link rel="prefetch" href="/listen" as="document" />
+        <link rel="prefetch" href="/auth/inscription" as="document" />
       </head>
       <body className={`${montserrat.variable} antialiased`}>{children}</body>
     </html>

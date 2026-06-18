@@ -47,13 +47,16 @@ export default async function LandingV5Page({
 }) {
   const params = await searchParams;
 
-  // Supabase redirige parfois le code OAuth vers la racine si la redirect URL
-  // n'est pas encore dans la liste autorisée du dashboard
+  // OAuth code redirigé vers la racine par Supabase si la redirect URL n'est pas configurée
   if (params.code) {
     const qs = new URLSearchParams({ code: params.code });
     if (params.next) qs.set("next", params.next);
     redirect(`/auth/callback?${qs.toString()}`);
   }
+
+  // Démarrage parallèle : subscriber count (cache 5 min, client anon) + auth check
+  // Pour un visiteur anonyme, les deux fetch s'exécutent simultanément → gain ~50-100ms
+  const subscriberCountPromise = getSubscriberCount();
 
   const supabase = await getSupabaseServerClient();
   const auth = createAuthService(supabase);
@@ -67,7 +70,8 @@ export default async function LandingV5Page({
   if (profile?.onboarding_completed) redirect("/listen");
   if (profile && !profile.onboarding_completed) redirect("/auth/inscription");
 
-  const subscriberCount = await getSubscriberCount();
+  // subscriberCount est déjà résolu (en cache ou fetch parallèle)
+  const subscriberCount = await subscriberCountPromise;
 
   return (
     <LandingPage>

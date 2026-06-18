@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
       "@sonafrik/ui",
       "@sonafrik/types",
       "@sonafrik/api",
+      "@sonafrik/shared",
       "@sentry/nextjs",
     ],
   },
