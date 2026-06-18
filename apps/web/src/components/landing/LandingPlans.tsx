@@ -1,3 +1,5 @@
+import { LandingSectionHeader } from "./LandingSectionHeader";
+
 const PAYMENT_ORANGE = {
   dot: "#FF6600",
   name: "Orange Money",
@@ -169,29 +171,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function LandingPlans() {
   return (
     <section style={{ marginBottom: "28px" }}>
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          textAlign: "center",
-          marginBottom: "10px",
-        }}
-      >
-        ABONNEMENTS
-      </p>
-      <h2
-        style={{
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#ffffff",
-          textAlign: "center",
-          marginBottom: "24px",
-        }}
-      >
-        Choisissez votre formule
-      </h2>
+      <LandingSectionHeader label="ABONNEMENTS" title="Choisissez votre formule" />
 
       {/* Grille 4 formules */}
       <div

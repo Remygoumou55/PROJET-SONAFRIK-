@@ -9,3 +9,4 @@ export { LandingPlans } from "./LandingPlans";
 export { LandingTransparencyNote } from "./LandingTransparencyNote";
 export { LandingComingSoon } from "./LandingComingSoon";
 export { LandingFinalCTA } from "./LandingFinalCTA";
+export { LandingSectionHeader } from "./LandingSectionHeader";

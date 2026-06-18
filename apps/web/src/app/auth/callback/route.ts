@@ -20,6 +20,11 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
 
+  // NEXT_PUBLIC_APP_URL est la destination stable (prod Vercel) — plus fiable
+  // que `origin` qui peut être l'URL interne derrière le reverse proxy Vercel
+  const redirectBase =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? origin;
+
   if (code) {
     const cookieStore = await cookies();
     const { url, anonKey } = getSupabaseEnv();
@@ -43,11 +48,10 @@ export async function GET(request: NextRequest) {
       if (process.env.NODE_ENV !== "production") {
         console.error("[OAuth callback error]", error.message, error.code ?? "");
       }
-      // Ne jamais exposer le message d'erreur brut en production (logs, analytics, historique navigateur)
       const errParams = process.env.NODE_ENV !== "production"
         ? `?error=oauth&reason=${encodeURIComponent(error.message)}`
         : "?error=oauth";
-      return NextResponse.redirect(`${origin}/auth/connexion${errParams}`);
+      return NextResponse.redirect(`${redirectBase}/auth/connexion${errParams}`);
     }
 
     const {
@@ -55,7 +59,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.redirect(`${origin}/auth/connexion?error=oauth`);
+      return NextResponse.redirect(`${redirectBase}/auth/connexion?error=oauth`);
     }
 
     const { data: profile } = await supabase
@@ -65,11 +69,11 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!profile?.onboarding_completed) {
-      return NextResponse.redirect(`${origin}/auth/inscription`);
+      return NextResponse.redirect(`${redirectBase}/auth/inscription`);
     }
 
-    return NextResponse.redirect(`${origin}/listen`);
+    return NextResponse.redirect(`${redirectBase}/listen`);
   }
 
-  return NextResponse.redirect(`${origin}/auth/connexion?error=oauth`);
+  return NextResponse.redirect(`${redirectBase}/auth/connexion?error=oauth`);
 }

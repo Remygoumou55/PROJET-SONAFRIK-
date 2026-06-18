@@ -1,3 +1,5 @@
+import { LandingSectionHeader } from "./LandingSectionHeader";
+
 const STEPS = [
   {
     number: "1",
@@ -22,29 +24,7 @@ const STEPS = [
 export function LandingHowItWorks() {
   return (
     <section style={{ marginBottom: "56px" }}>
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          textAlign: "center",
-          marginBottom: "10px",
-        }}
-      >
-        COMMENT ÇA MARCHE
-      </p>
-      <h2
-        style={{
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#ffffff",
-          textAlign: "center",
-          marginBottom: "32px",
-        }}
-      >
-        Simple comme bonjour
-      </h2>
+      <LandingSectionHeader label="COMMENT ÇA MARCHE" title="Simple comme bonjour" />
 
       <div
         className="landing-steps-grid"

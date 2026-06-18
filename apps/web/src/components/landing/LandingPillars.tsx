@@ -1,3 +1,5 @@
+import { LandingSectionHeader } from "./LandingSectionHeader";
+
 const PILLARS = [
   {
     iconBg: "rgba(0,210,106,0.12)",
@@ -25,32 +27,10 @@ const PILLARS = [
 export function LandingPillars() {
   return (
     <section style={{ marginBottom: "56px" }}>
-      {/* Label section */}
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          textAlign: "center",
-          marginBottom: "10px",
-        }}
-      >
-        POURQUOI SONAFRIK
-      </p>
-
-      {/* Titre */}
-      <h2
-        style={{
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#ffffff",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
-        Construit pour les artistes guinéens
-      </h2>
+      <LandingSectionHeader
+        label="POURQUOI SONAFRIK"
+        title="Construit pour les artistes guinéens"
+      />
 
       {/* Texte intro */}
       <div

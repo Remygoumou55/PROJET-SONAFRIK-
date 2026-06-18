@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingSectionHeader } from "./LandingSectionHeader";
 
 const CARDS = [
   {
@@ -66,42 +67,11 @@ const CARDS = [
 export function LandingComingSoon() {
   return (
     <section style={{ marginBottom: "48px" }}>
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          textAlign: "center",
-          marginBottom: "10px",
-        }}
-      >
-        CE QUI ARRIVE BIENTÔT
-      </p>
-      <h2
-        style={{
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#ffffff",
-          textAlign: "center",
-          marginBottom: "10px",
-        }}
-      >
-        SONAFRIK, c&apos;est bien plus qu&apos;une appli de musique
-      </h2>
-      <p
-        style={{
-          fontSize: "14px",
-          color: "rgba(255,255,255,0.4)",
-          textAlign: "center",
-          maxWidth: "600px",
-          margin: "0 auto 28px",
-          lineHeight: 1.6,
-        }}
-      >
-        Chaque créateur — musicien, podcasteur, influenceur, vlogeur — trouvera sa place ici.
-        Voici ce que nous construisons pour vous.
-      </p>
+      <LandingSectionHeader
+        label="CE QUI ARRIVE BIENTÔT"
+        title="SONAFRIK, c'est bien plus qu'une appli de musique"
+        subtitle="Chaque créateur — musicien, podcasteur, influenceur, vlogeur — trouvera sa place ici. Voici ce que nous construisons pour vous."
+      />
 
       {/* Grille 5 cartes */}
       <div

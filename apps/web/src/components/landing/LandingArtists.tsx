@@ -1,3 +1,5 @@
+import { LandingSectionHeader } from "./LandingSectionHeader";
+
 const ARTISTS = [
   { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",     bg: "#0F6E56", text: "#9FE1CB" },
   { initials: "F",  name: "Faya",         genre: "R&B Africain", bg: "#0C447C", text: "#B5D4F4" },
@@ -9,27 +11,7 @@ const ARTISTS = [
 export function LandingArtists() {
   return (
     <section style={{ marginBottom: "56px", textAlign: "center" }}>
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          marginBottom: "10px",
-        }}
-      >
-        DÉJÀ SUR SONAFRIK
-      </p>
-      <h2
-        style={{
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#ffffff",
-          marginBottom: "28px",
-        }}
-      >
-        Les artistes fondateurs
-      </h2>
+      <LandingSectionHeader label="DÉJÀ SUR SONAFRIK" title="Les artistes fondateurs" />
 
       {/* Cartes artistes */}
       <div
