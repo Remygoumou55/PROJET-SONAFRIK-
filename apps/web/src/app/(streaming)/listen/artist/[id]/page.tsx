@@ -56,15 +56,7 @@ export default async function ArtistPublicPage({
   if (!artistRaw) notFound();
   const artist = artistRaw as unknown as ArtistRow;
 
-  // Feature flag tips — SQL RLS : voir apps/web/src/lib/sql/feature_flags.sql
-  const { data: tipFlagRow } = await supabase
-    .from("feature_flags" as never)
-    .select("enabled")
-    .eq("name" as never, "tips")
-    .maybeSingle();
-  const tipsEnabled = (tipFlagRow as { enabled: boolean } | null)?.enabled ?? false;
-
-  const [albumsRes, tracksRes] = await Promise.all([
+  const [albumsRes, tracksRes, tipFlagRow] = await Promise.all([
     supabase
       .from("albums")
       .select("id, title, release_type, cover_url, release_date")
@@ -81,7 +73,13 @@ export default async function ArtistPublicPage({
       .is("deleted_at", null)
       .order("published_at", { ascending: false })
       .limit(10),
+    supabase
+      .from("feature_flags" as never)
+      .select("enabled")
+      .eq("name" as never, "tips")
+      .maybeSingle(),
   ]);
+  const tipsEnabled = (tipFlagRow.data as { enabled: boolean } | null)?.enabled ?? false;
 
   const albums = (albumsRes.data ?? []) as unknown as AlbumRow[];
   const albumCoverMap = new Map(albums.map((a) => [a.id, a.cover_url]));

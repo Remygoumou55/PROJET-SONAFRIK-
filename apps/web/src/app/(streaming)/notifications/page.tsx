@@ -3,6 +3,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
 import { NotificationsList } from "@/features/notifications/components/NotificationsList";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Notifications — SONAFRIK" };
 
 export default async function NotificationsPage() {

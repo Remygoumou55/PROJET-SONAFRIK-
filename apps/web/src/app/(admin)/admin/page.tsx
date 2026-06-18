@@ -3,7 +3,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
 
 export const metadata = { title: "Dashboard Admin — SONAFRIK" };
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   await requireAdmin();
