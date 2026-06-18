@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 import type { LaunchProgress } from "@sonafrik/types";
 
 export const metadata: Metadata = {

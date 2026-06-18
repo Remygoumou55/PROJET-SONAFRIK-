@@ -1,5 +1,7 @@
 import { Suspense, cache } from "react";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import type { DiscoveryArtist, DiscoveryTrack, NewReleasesResult, TrendingTrack } from "@sonafrik/types";
 import { createRecommendationService } from "@sonafrik/api/recommendation";
