@@ -134,8 +134,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }));
 
       audio.play().catch((err: unknown) => {
-        console.error("[Player] Lecture audio échouée", err);
-        setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
+        const isAbort = (err as { name?: string })?.name === "AbortError";
+        if (isAbort) {
+          // Interruption normale (nouvelle source chargée) — pas une erreur visible
+          setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
+        } else {
+          // Autoplay bloqué par le navigateur ou erreur inattendue
+          console.error("[Player] Lecture audio échouée", err);
+          const msg = "Lecture bloquée. Appuyez sur play pour démarrer.";
+          setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: msg }));
+          onErrorCallbackRef.current?.("network", 0);
+        }
       });
 
       audio.onloadedmetadata = () => {

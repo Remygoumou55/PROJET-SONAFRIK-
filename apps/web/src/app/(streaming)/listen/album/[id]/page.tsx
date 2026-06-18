@@ -34,7 +34,8 @@ interface AlbumRow {
   cover_url: string | null;
   release_type: string;
   release_date: string | null;
-  artist_profiles: { stage_name: string } | null;
+  creator_id: string;
+  artist_profiles: { stage_name: string; creator_id: string } | null;
 }
 
 export default async function AlbumDetailPage({
@@ -45,28 +46,30 @@ export default async function AlbumDetailPage({
   const { id } = await params;
   const supabase = await getSupabaseServerClient();
 
-  const { data: albumRaw } = await supabase
-    .from("albums")
-    .select("id, title, description, cover_url, release_type, release_date, artist_profiles(stage_name)")
-    .eq("id", id)
-    .eq("publication_status", "published")
-    .is("deleted_at", null)
-    .maybeSingle();
+  const [albumRes, tracksRes] = await Promise.all([
+    supabase
+      .from("albums")
+      .select("id, title, description, cover_url, release_type, release_date, creator_id, artist_profiles(stage_name, creator_id)")
+      .eq("id", id)
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .maybeSingle(),
+    supabase
+      .from("tracks")
+      .select("id, title, duration_seconds, track_number, creator_id, publication_status")
+      .eq("album_id", id)
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .order("track_number", { ascending: true }),
+  ]);
 
-  if (!albumRaw) notFound();
+  if (!albumRes.data) notFound();
 
-  const album = albumRaw as unknown as AlbumRow;
+  const album = albumRes.data as unknown as AlbumRow;
   const artistName = album.artist_profiles?.stage_name ?? null;
+  const artistId = album.artist_profiles?.creator_id ?? album.creator_id ?? null;
 
-  const { data: rawTracks } = await supabase
-    .from("tracks")
-    .select("id, title, duration_seconds, track_number, creator_id, publication_status")
-    .eq("album_id", id)
-    .eq("publication_status", "published")
-    .is("deleted_at", null)
-    .order("track_number", { ascending: true });
-
-  const tracks: TrackWithMeta[] = (rawTracks ?? []).map((t) => ({
+  const tracks: TrackWithMeta[] = (tracksRes.data ?? []).map((t) => ({
     ...(t as unknown as TrackWithMeta),
     artist_name: artistName ?? undefined,
     cover_url: album.cover_url,
@@ -108,7 +111,16 @@ export default async function AlbumDetailPage({
           <h1 className="text-2xl font-bold" style={{ color: "#FFFFFF" }}>
             {album.title}
           </h1>
-          {artistName && (
+          {artistName && artistId && (
+            <Link
+              href={`/listen/artist/${artistId}`}
+              className="text-sm mt-1 hover:underline"
+              style={{ color: "#A0A0A0" }}
+            >
+              {artistName}
+            </Link>
+          )}
+          {artistName && !artistId && (
             <p className="text-sm mt-1" style={{ color: "#A0A0A0" }}>
               {artistName}
             </p>
