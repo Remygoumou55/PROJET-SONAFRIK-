@@ -7,3 +7,4 @@ export { LandingHowItWorks } from "./LandingHowItWorks";
 export { LandingArtists } from "./LandingArtists";
 export { LandingPlans } from "./LandingPlans";
 export { LandingTransparencyNote } from "./LandingTransparencyNote";
+export { LandingComingSoon } from "./LandingComingSoon";
