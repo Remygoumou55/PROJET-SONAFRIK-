@@ -102,6 +102,20 @@ export async function requireIdentityContext(): Promise<IdentityContext> {
   }
 }
 
+export function redirectIfOnboardingIncomplete(profile: {
+  onboarding_completed: boolean;
+  account_type: string | null;
+}): void {
+  if (profile.onboarding_completed) return;
+  if (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") {
+    redirect("/onboarding/artist");
+  } else if (profile.account_type === "auditeur") {
+    redirect("/onboarding/listener");
+  } else {
+    redirect("/onboarding/role");
+  }
+}
+
 export async function getOptionalAvatarUrl() {
   const supabase = await getSupabaseServerClient();
   const identity = createIdentityService(supabase);

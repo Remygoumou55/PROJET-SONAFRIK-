@@ -1,7 +1,8 @@
-import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
+import { requireIdentityContext, redirectIfOnboardingIncomplete } from "@/features/identity/lib/requireIdentity";
 import { WalletLayoutClient } from "@/features/wallet/components/WalletLayoutClient";
 
 export default async function WalletLayout({ children }: { children: React.ReactNode }) {
-  await requireIdentityContext();
+  const context = await requireIdentityContext();
+  redirectIfOnboardingIncomplete(context.profile);
   return <WalletLayoutClient>{children}</WalletLayoutClient>;
 }

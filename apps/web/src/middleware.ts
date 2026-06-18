@@ -89,49 +89,35 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Session active — récupère le profil pour le routing
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("account_type, onboarding_completed")
-    .eq("id", user.id)
-    .single();
+  // Session active : fetch profil uniquement pour les routes nécessitant
+  // une décision de routing (pages auth + onboarding).
+  // Pour les routes protégées, les layouts gèrent le check onboarding et le rôle
+  // via requireIdentityContext() + redirectIfOnboardingIncomplete() → économise
+  // 1 round-trip DB par navigation.
+  if (
+    (isAuthRoute && !pathname.startsWith("/auth/inscription")) ||
+    isOnboarding
+  ) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_type, onboarding_completed")
+      .eq("id", user.id)
+      .single();
 
-  const role = mapAccountType(profile?.account_type);
-  const onboardingCompleted = profile?.onboarding_completed ?? false;
+    const role = mapAccountType(profile?.account_type);
+    const onboardingCompleted = profile?.onboarding_completed ?? false;
 
-  // Connecté sur une page auth (hors callback et inscription) + onboarding terminé → home
-  if (isAuthRoute && !pathname.startsWith("/auth/inscription") && onboardingCompleted) {
-    return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
-  }
+    // Connecté sur une page auth + onboarding terminé → home par rôle
+    if (isAuthRoute && onboardingCompleted) {
+      return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
+    }
 
-  // Onboarding non terminé + route protégée → forcer onboarding
-  if (!onboardingCompleted && (isProtected || isAdminRoute)) {
-    const dest =
-      role === "artist"
-        ? "/onboarding/artist"
-        : role === "listener"
-          ? "/onboarding/listener"
-          : "/onboarding/role";
-    return NextResponse.redirect(new URL(dest, request.url));
-  }
+    // Onboarding terminé + sur une page onboarding → home
+    if (isOnboarding && onboardingCompleted) {
+      return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
+    }
 
-  // Onboarding terminé + sur une page onboarding → home
-  if (onboardingCompleted && isOnboarding) {
-    return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
-  }
-
-  // Auditeur ne peut pas accéder à /creator
-  if (pathname.startsWith("/creator") && role === "listener") {
-    return NextResponse.redirect(new URL("/listen", request.url));
-  }
-
-  // /admin : seul superadmin — listener et artist redirigés vers leur home
-  // Le layout /admin fait un double-check via requireAdmin() pour la granularité
-  if (isAdminRoute && role === "listener") {
-    return NextResponse.redirect(new URL("/listen", request.url));
-  }
-  if (isAdminRoute && role === "artist") {
-    return NextResponse.redirect(new URL("/creator", request.url));
+    return response;
   }
 
   return response;

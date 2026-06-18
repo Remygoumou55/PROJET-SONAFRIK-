@@ -1,5 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 const EXPECTED_FUNCTIONS = [
   "audit-log",
   "stream-start",

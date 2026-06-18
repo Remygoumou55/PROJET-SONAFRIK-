@@ -87,6 +87,13 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Pages auth et onboarding — non indexables par les moteurs de recherche
+        source: "/(auth|onboarding)/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
         // Assets statiques Next.js — cache 1 an (immutable car hash dans le nom)
         source: "/_next/static/:path*",
         headers: [
