@@ -57,3 +57,12 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes landing-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.landing-pulse-dot {
+  animation: landing-pulse 2s ease-in-out infinite;
+}
