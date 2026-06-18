@@ -44,6 +44,15 @@ export interface Profile {
   onboarding_completed: boolean;
   is_premium: boolean;
   premium_expires_at: string | null;
+  role: "listener" | "artist" | "superadmin" | null;
+  stage_name: string | null;
+  main_genre: string | null;
+  song_language: string | null;
+  origin_region: string | null;
+  orange_money_number: string | null;
+  mtn_money_number: string | null;
+  preferred_language: string | null;
+  backup_email: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

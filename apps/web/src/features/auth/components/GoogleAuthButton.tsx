@@ -5,9 +5,13 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface GoogleAuthButtonProps {
   label?: string;
+  role?: "artist" | "listener";
 }
 
-export function GoogleAuthButton({ label = "Continuer avec Google" }: GoogleAuthButtonProps) {
+export function GoogleAuthButton({
+  label = "Continuer avec Google",
+  role,
+}: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,11 +23,12 @@ export function GoogleAuthButton({ label = "Continuer avec Google" }: GoogleAuth
     // NEXT_PUBLIC_APP_URL fixe l'URL stable (prod Vercel) pour éviter que les
     // URLs de preview changeantes soient rejetées par Supabase Redirect URLs
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+    const roleParam = role ? `?role=${role}` : "";
 
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${appUrl}/auth/callback`,
+        redirectTo: `${appUrl}/auth/callback${roleParam}`,
       },
     });
 

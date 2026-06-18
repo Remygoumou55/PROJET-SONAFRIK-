@@ -20,6 +20,15 @@ export interface Database {
           onboarding_completed: boolean;
           is_premium: boolean;
           premium_expires_at: string | null;
+          role: "listener" | "artist" | "superadmin" | null;
+          stage_name: string | null;
+          main_genre: string | null;
+          song_language: string | null;
+          origin_region: string | null;
+          orange_money_number: string | null;
+          mtn_money_number: string | null;
+          preferred_language: string | null;
+          backup_email: string | null;
           created_at: string;
           updated_at: string;
           created_by: string | null;
@@ -42,6 +51,15 @@ export interface Database {
           onboarding_completed?: boolean;
           is_premium?: boolean;
           premium_expires_at?: string | null;
+          role?: "listener" | "artist" | "superadmin" | null;
+          stage_name?: string | null;
+          main_genre?: string | null;
+          song_language?: string | null;
+          origin_region?: string | null;
+          orange_money_number?: string | null;
+          mtn_money_number?: string | null;
+          preferred_language?: string | null;
+          backup_email?: string | null;
           created_by?: string | null;
           updated_by?: string | null;
         };
@@ -60,6 +78,15 @@ export interface Database {
           onboarding_completed?: boolean;
           is_premium?: boolean;
           premium_expires_at?: string | null;
+          role?: "listener" | "artist" | "superadmin" | null;
+          stage_name?: string | null;
+          main_genre?: string | null;
+          song_language?: string | null;
+          origin_region?: string | null;
+          orange_money_number?: string | null;
+          mtn_money_number?: string | null;
+          preferred_language?: string | null;
+          backup_email?: string | null;
           updated_by?: string | null;
           deleted_at?: string | null;
         };
@@ -976,6 +1003,13 @@ export interface Database {
           p_assigned_by?: string;
         };
         Returns: undefined;
+      };
+      complete_onboarding: {
+        Args: {
+          p_full_name: string;
+          p_account_type: string;
+        };
+        Returns: Json;
       };
       log_audit_event: {
         Args: {

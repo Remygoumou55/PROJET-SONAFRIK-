@@ -33,15 +33,32 @@ function ConnexionPageInner() {
       if (!user) return;
       supabase
         .from("profiles")
-        .select("onboarding_completed")
+        .select("account_type, onboarding_completed")
         .eq("id", user.id)
         .single()
         .then(({ data: profile }) => {
           if (!profile?.onboarding_completed) {
-            router.replace("/auth/inscription");
+            const dest =
+              profile?.account_type === "artiste" ||
+              profile?.account_type === "auditeur_artiste"
+                ? "/onboarding/artist"
+                : profile?.account_type === "auditeur"
+                  ? "/onboarding/listener"
+                  : "/onboarding/role";
+            router.replace(dest);
           } else {
+            const home =
+              profile.account_type === "auditeur"
+                ? "/listen"
+                : profile.account_type === "artiste" ||
+                    profile.account_type === "auditeur_artiste"
+                  ? "/creator"
+                  : "/listen";
             const next = searchParams.get("next");
-            const dest = next && next.startsWith("/") && !next.startsWith("/auth") ? next : "/listen";
+            const dest =
+              next && next.startsWith("/") && !next.startsWith("/auth")
+                ? next
+                : home;
             router.replace(dest);
           }
         });
@@ -65,7 +82,14 @@ function ConnexionPageInner() {
       const { profile } = await auth.verifyOtp({ phone, token });
 
       if (!profile?.onboarding_completed) {
-        router.push("/auth/inscription");
+        const dest =
+          profile?.account_type === "artiste" ||
+          profile?.account_type === "auditeur_artiste"
+            ? "/onboarding/artist"
+            : profile?.account_type === "auditeur"
+              ? "/onboarding/listener"
+              : "/onboarding/role";
+        router.push(dest);
         return;
       }
 
@@ -74,9 +98,16 @@ function ConnexionPageInner() {
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       }).catch(() => {});
 
-      // P1 — Respecter la destination d'origine si le middleware a ajouté ?next
+      const home =
+        profile.account_type === "auditeur"
+          ? "/listen"
+          : profile.account_type === "artiste" ||
+              profile.account_type === "auditeur_artiste"
+            ? "/creator"
+            : "/listen";
       const next = searchParams.get("next");
-      const dest = next && next.startsWith("/") && !next.startsWith("/auth") ? next : "/listen";
+      const dest =
+        next && next.startsWith("/") && !next.startsWith("/auth") ? next : home;
       router.push(dest);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Code invalide. Réessayez.");

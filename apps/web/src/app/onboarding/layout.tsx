@@ -1,0 +1,27 @@
+import type { ReactNode } from "react";
+import Link from "next/link";
+
+export default function OnboardingLayout({ children }: { children: ReactNode }) {
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#0D0D0D" }}>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "24px 0 20px",
+          borderBottom: "0.5px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <Link href="/" style={{ textDecoration: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "#CE1126" }}>S</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "#FCD116" }}>O</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "#009460" }}>N</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "#ffffff" }}>AFRIK</span>
+          </div>
+        </Link>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+}
