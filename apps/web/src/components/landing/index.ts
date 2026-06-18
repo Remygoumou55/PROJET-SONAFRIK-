@@ -4,3 +4,4 @@ export { LandingHero } from "./LandingHero";
 export { LandingProgress } from "./LandingProgress";
 export { LandingPillars } from "./LandingPillars";
 export { LandingHowItWorks } from "./LandingHowItWorks";
+export { LandingArtists } from "./LandingArtists";
