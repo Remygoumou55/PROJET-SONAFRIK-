@@ -76,7 +76,9 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Utilisateur connecté sur une route auth → redirection profil
-    const AUTH_PASSTHROUGH = ["/auth/callback", "/auth/inscription"];
+    // /auth/connexion est en passthrough : la page détecte elle-même la session
+    // et redirige vers /auth/inscription (onboarding incomplet) ou ?next / /listen
+    const AUTH_PASSTHROUGH = ["/auth/callback", "/auth/inscription", "/auth/connexion"];
     if (
       user &&
       pathname.startsWith(AUTH_PREFIX) &&

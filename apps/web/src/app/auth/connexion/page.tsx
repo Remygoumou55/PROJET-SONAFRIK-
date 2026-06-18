@@ -8,6 +8,7 @@ import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Step = "phone" | "otp";
 
@@ -19,11 +20,33 @@ function ConnexionPageInner() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // P3 — Détecte une session active au montage (utilisateur avec onboarding incomplet
+  // redirigé ici par le middleware depuis /profile au lieu de /auth/inscription)
+  // P1 — Lit ?next pour rediriger vers la destination d'origine après connexion
   useEffect(() => {
     if (searchParams.get("error") === "oauth") {
       setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
+      return;
     }
-  }, [searchParams]);
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single()
+        .then(({ data: profile }) => {
+          if (!profile?.onboarding_completed) {
+            router.replace("/auth/inscription");
+          } else {
+            const next = searchParams.get("next");
+            const dest = next && next.startsWith("/") && !next.startsWith("/auth") ? next : "/listen";
+            router.replace(dest);
+          }
+        });
+    });
+  }, [searchParams, router]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);
@@ -51,7 +74,10 @@ function ConnexionPageInner() {
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       }).catch(() => {});
 
-      router.push("/listen");
+      // P1 — Respecter la destination d'origine si le middleware a ajouté ?next
+      const next = searchParams.get("next");
+      const dest = next && next.startsWith("/") && !next.startsWith("/auth") ? next : "/listen";
+      router.push(dest);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Code invalide. Réessayez.");
     }
