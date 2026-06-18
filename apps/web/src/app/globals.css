@@ -66,3 +66,29 @@ body {
 .landing-pulse-dot {
   animation: landing-pulse 2s ease-in-out infinite;
 }
+
+/* Landing responsive — ≤700px */
+@media (max-width: 700px) {
+  .landing-plans-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .landing-diaspora-inner {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-hero-h1 {
+    font-size: 30px !important;
+  }
+}
+
+/* Landing responsive — ≤480px */
+@media (max-width: 480px) {
+  .landing-plans-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-steps-connector {
+    display: none !important;
+  }
+}

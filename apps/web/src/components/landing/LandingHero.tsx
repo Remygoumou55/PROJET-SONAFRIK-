@@ -38,8 +38,9 @@ export function LandingHero({ children }: LandingHeroProps) {
 
       {/* Titre H1 */}
       <h1
+        className="landing-hero-h1"
         style={{
-          fontSize: "clamp(30px, 5vw, 44px)",
+          fontSize: "44px",
           fontWeight: 600,
           lineHeight: 1.2,
           color: "#ffffff",

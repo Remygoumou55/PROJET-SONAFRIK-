@@ -47,6 +47,7 @@ export function LandingHowItWorks() {
       </h2>
 
       <div
+        className="landing-steps-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
@@ -56,6 +57,7 @@ export function LandingHowItWorks() {
       >
         {/* Ligne horizontale de connexion */}
         <div
+          className="landing-steps-connector"
           style={{
             position: "absolute",
             top: "19px",

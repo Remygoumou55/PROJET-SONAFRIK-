@@ -2,6 +2,20 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createAuthService } from "@sonafrik/api/auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSubscriberCount } from "@/lib/landing/getSubscriberCount";
+import {
+  LandingPage,
+  LandingNav,
+  LandingHero,
+  LandingProgress,
+  LandingPillars,
+  LandingHowItWorks,
+  LandingArtists,
+  LandingPlans,
+  LandingTransparencyNote,
+  LandingComingSoon,
+  LandingFinalCTA,
+} from "@/components/landing";
 
 export const metadata: Metadata = {
   title: "SONAFRIK — Notre Bien Commun",
@@ -14,7 +28,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function LandingPage({
+function Divider() {
+  return (
+    <hr
+      style={{
+        border: "none",
+        borderTop: "0.5px solid rgba(255,255,255,0.06)",
+        margin: "0 0 56px",
+      }}
+    />
+  );
+}
+
+export default async function LandingV5Page({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
@@ -41,10 +67,24 @@ export default async function LandingPage({
   if (profile?.onboarding_completed) redirect("/listen");
   if (profile && !profile.onboarding_completed) redirect("/auth/inscription");
 
-  // Visiteur anonyme → landing V5 (contenu assemblé en Tâche 10)
+  const subscriberCount = await getSubscriberCount();
+
   return (
-    <div style={{ backgroundColor: "#0D0D0D", minHeight: "100vh", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>Landing V5 — en construction</p>
-    </div>
+    <LandingPage>
+      <LandingNav />
+      <LandingHero>
+        <LandingProgress subscriberCount={subscriberCount} />
+      </LandingHero>
+      <Divider />
+      <LandingPillars />
+      <LandingHowItWorks />
+      <Divider />
+      <LandingArtists />
+      <LandingPlans />
+      <LandingTransparencyNote />
+      <Divider />
+      <LandingComingSoon />
+      <LandingFinalCTA />
+    </LandingPage>
   );
 }
