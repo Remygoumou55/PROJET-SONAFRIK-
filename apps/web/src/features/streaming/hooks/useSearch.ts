@@ -22,6 +22,7 @@ export function useSearch() {
       }
 
       debounceRef.current = setTimeout(async () => {
+        // searchIdRef garantit que seul le dernier appel met à jour l'état
         const currentId = ++searchIdRef.current;
         setIsSearching(true);
         setError(null);
@@ -40,7 +41,7 @@ export function useSearch() {
             setIsSearching(false);
           }
         }
-      }, 450);
+      }, 350);
     },
     [streaming],
   );

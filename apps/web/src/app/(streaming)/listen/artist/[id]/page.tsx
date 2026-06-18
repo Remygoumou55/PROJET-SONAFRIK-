@@ -54,7 +54,17 @@ export default async function ArtistPublicPage({
     .maybeSingle();
 
   if (!artistRaw) notFound();
-  const artist = artistRaw as unknown as ArtistRow;
+  const raw = artistRaw as Record<string, unknown>;
+  const artist: ArtistRow = {
+    creator_id:  String(raw.creator_id ?? ""),
+    stage_name:  String(raw.stage_name ?? ""),
+    bio:         (raw.bio as string | null) ?? null,
+    genres:      Array.isArray(raw.genres) ? (raw.genres as string[]) : [],
+    cover_path:  (raw.cover_path as string | null) ?? null,
+    banner_path: (raw.banner_path as string | null) ?? null,
+    verified:    Boolean(raw.verified),
+    is_public:   Boolean(raw.is_public),
+  };
 
   const [albumsRes, tracksRes, tipFlagRow] = await Promise.all([
     supabase
@@ -81,13 +91,31 @@ export default async function ArtistPublicPage({
   ]);
   const tipsEnabled = (tipFlagRow.data as { enabled: boolean } | null)?.enabled ?? false;
 
-  const albums = (albumsRes.data ?? []) as unknown as AlbumRow[];
+  const albums: AlbumRow[] = (albumsRes.data ?? []).map((a) => {
+    const r = a as unknown as Record<string, unknown>;
+    return {
+      id:           String(r.id ?? ""),
+      title:        String(r.title ?? ""),
+      release_type: String(r.release_type ?? "album"),
+      cover_url:    (r.cover_url as string | null) ?? null,
+      release_date: (r.release_date as string | null) ?? null,
+    };
+  });
   const albumCoverMap = new Map(albums.map((a) => [a.id, a.cover_url]));
-  const tracks: TrackWithMeta[] = (tracksRes.data ?? []).map((t) => ({
-    ...(t as unknown as TrackWithMeta),
-    artist_name: artist.stage_name,
-    cover_url: albumCoverMap.get((t as unknown as { album_id?: string }).album_id ?? "") ?? null,
-  }));
+  const tracks: TrackWithMeta[] = (tracksRes.data ?? []).map((t) => {
+    const r = t as Record<string, unknown>;
+    return {
+      id:                 String(r.id ?? ""),
+      title:              String(r.title ?? ""),
+      duration_seconds:   typeof r.duration_seconds === "number" ? r.duration_seconds : null,
+      track_number:       typeof r.track_number === "number" ? r.track_number : null,
+      creator_id:         String(r.creator_id ?? ""),
+      publication_status: String(r.publication_status ?? ""),
+      album_id:           (r.album_id as string | null) ?? null,
+      artist_name:        artist.stage_name,
+      cover_url:          albumCoverMap.get((r.album_id as string) ?? "") ?? null,
+    } as TrackWithMeta;
+  });
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>

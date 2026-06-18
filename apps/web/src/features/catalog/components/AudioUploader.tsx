@@ -40,11 +40,19 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
 }
 
+// Singleton — les navigateurs limitent le nombre de AudioContext simultanés (~25 sur Chrome)
+let _audioCtx: AudioContext | null = null;
+function getAudioCtx(): AudioContext {
+  if (!_audioCtx || _audioCtx.state === "closed") {
+    _audioCtx = new AudioContext();
+  }
+  return _audioCtx;
+}
+
 async function getAudioDuration(file: File): Promise<number> {
   const arrayBuffer = await file.arrayBuffer();
-  const audioCtx = new AudioContext();
-  const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-  await audioCtx.close();
+  // slice(0) évite la détachement du buffer sur certains navigateurs
+  const decoded = await getAudioCtx().decodeAudioData(arrayBuffer.slice(0));
   return decoded.duration;
 }
 

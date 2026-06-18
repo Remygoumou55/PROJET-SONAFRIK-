@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { SearchResults } from "./SearchResults";
 
@@ -12,7 +12,6 @@ export function SearchPage({ initialGenre }: Props) {
   const [query, setQuery] = useState(initialGenre ?? "");
   const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const { results, isSearching, error, search, clearSearch } = useSearch();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (initialGenre) {
@@ -20,12 +19,12 @@ export function SearchPage({ initialGenre }: Props) {
     }
   }, [initialGenre, search]);
 
+  // Le debounce + protection contre les résultats périmés sont gérés dans useSearch
   const handleChange = (value: string) => {
     setQuery(value);
     setActiveGenre(undefined);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!value) { clearSearch(); return; }
-    debounceRef.current = setTimeout(() => { search(value); }, 300);
+    search(value);
   };
 
   const clearGenreFilter = () => {

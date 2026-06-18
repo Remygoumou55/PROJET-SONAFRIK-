@@ -65,7 +65,18 @@ export default async function AlbumDetailPage({
 
   if (!albumRes.data) notFound();
 
-  const album = albumRes.data as unknown as AlbumRow;
+  const raw = albumRes.data as unknown as Record<string, unknown>;
+  const ap = raw.artist_profiles as { stage_name?: string; creator_id?: string } | null;
+  const album: AlbumRow = {
+    id:             String(raw.id ?? ""),
+    title:          String(raw.title ?? ""),
+    description:    (raw.description as string | null) ?? null,
+    cover_url:      (raw.cover_url as string | null) ?? null,
+    release_type:   String(raw.release_type ?? "album"),
+    release_date:   (raw.release_date as string | null) ?? null,
+    creator_id:     String(raw.creator_id ?? ""),
+    artist_profiles: ap ? { stage_name: ap.stage_name ?? "", creator_id: ap.creator_id ?? "" } : null,
+  };
   const artistName = album.artist_profiles?.stage_name ?? null;
   const artistId = album.artist_profiles?.creator_id ?? album.creator_id ?? null;
 
