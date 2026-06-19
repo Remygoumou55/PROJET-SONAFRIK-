@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FIELD_LIMITS } from "@sonafrik/shared";
+import { PlaylistPrivacyToggle } from "@/components/playlist/PlaylistPrivacyToggle";
 
 interface Props {
   isOpen: boolean;
@@ -165,38 +166,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
           </div>
 
           {/* Visibilité */}
-          <div
-            className="flex items-center justify-between rounded-xl px-4 py-3"
-            style={{ backgroundColor: "#2A2A2A", border: "1px solid #333333" }}
-          >
-            <div>
-              <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
-                Playlist publique
-              </p>
-              <p className="text-xs mt-0.5" style={{ color: "#555555" }}>
-                {isPublic
-                  ? "Visible par tous les utilisateurs"
-                  : "Visible par vous uniquement"}
-              </p>
-            </div>
-            {/* Toggle */}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isPublic}
-              onClick={() => setIsPublic((v) => !v)}
-              className="relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0"
-              style={{ backgroundColor: isPublic ? "#00D26A" : "#444444" }}
-            >
-              <span
-                className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  transform: isPublic ? "translateX(20px)" : "translateX(0)",
-                }}
-              />
-            </button>
-          </div>
+          <PlaylistPrivacyToggle isPublic={isPublic} onChange={setIsPublic} />
 
           {/* Erreur */}
           {error && (
