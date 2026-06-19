@@ -1357,6 +1357,16 @@ export const TRACK_CREDIT_ROLE_ORDER: TrackCreditRole[] = [
   "mastering",
 ];
 
+export interface TrackAppearance {
+  trackId: string;
+  trackTitle: string;
+  albumId: string | null;
+  coverUrl: string | null;
+  mainArtistName: string;
+  mainArtistCreatorId: string;
+  creditRole: TrackCreditRole;
+}
+
 // ---------------------------------------------------------------------------
 // Rights OS — Sprint 9
 // CDC : works, contributors, ownerships, ownership_versions, contracts, rights_claims

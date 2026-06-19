@@ -1,5 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Album, CatalogContext, Genre, Track, TrackCredit } from "@sonafrik/types";
+import type { Album, CatalogContext, Genre, Track, TrackAppearance, TrackCredit } from "@sonafrik/types";
 import { CatalogError } from "./errors";
 import { CatalogRepository } from "./catalog.repository";
 import {
@@ -201,6 +201,10 @@ export class CatalogService {
 
   async getTrackCredits(trackId: string): Promise<TrackCredit[]> {
     return this.repository.getTrackCredits(trackId);
+  }
+
+  async getTracksFeaturingCreator(creatorId: string): Promise<TrackAppearance[]> {
+    return this.repository.getTracksFeaturingCreator(creatorId);
   }
 
   async setTrackCredits(input: SetTrackCreditsInput): Promise<void> {

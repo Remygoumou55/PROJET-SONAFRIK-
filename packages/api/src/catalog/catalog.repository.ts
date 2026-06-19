@@ -1,6 +1,6 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
-import type { Album, Genre, Track, TrackCredit, TrackFile } from "@sonafrik/types";
+import type { Album, Genre, Track, TrackAppearance, TrackCredit, TrackCreditRole, TrackFile } from "@sonafrik/types";
 import type { TrackCreditItem } from "./schemas";
 
 function slugify(value: string): string {
@@ -284,6 +284,75 @@ export class CatalogRepository {
       })),
     );
     if (error) throw error;
+  }
+
+  async getTracksFeaturingCreator(creatorId: string): Promise<TrackAppearance[]> {
+    // 1. Crédits de ce créateur (hors rôle artiste_principal)
+    const { data: credits, error: creditsErr } = await this.client
+      .from("track_credits")
+      .select("role, track_id")
+      .eq("contributor_profile_id", creatorId)
+      .neq("role", "artiste_principal");
+
+    if (creditsErr) throw creditsErr;
+    if (!credits?.length) return [];
+
+    const rawCredits = credits as unknown as Array<{ role: string; track_id: string }>;
+    const trackIds = rawCredits.map((c) => c.track_id);
+    const roleByTrackId = new Map(rawCredits.map((c) => [c.track_id, c.role as TrackCreditRole]));
+
+    // 2. Détails des morceaux — on exclut ceux où ce créateur est déjà l'artiste principal
+    const { data: tracks, error: tracksErr } = await this.client
+      .from("tracks")
+      .select("id, title, album_id, creator_id")
+      .in("id", trackIds)
+      .eq("publication_status", "published")
+      .neq("creator_id", creatorId);
+
+    if (tracksErr) throw tracksErr;
+    if (!tracks?.length) return [];
+
+    const rawTracks = tracks as unknown as Array<{
+      id: string;
+      title: string;
+      album_id: string | null;
+      creator_id: string;
+    }>;
+
+    const albumIds = [...new Set(rawTracks.flatMap((t) => (t.album_id ? [t.album_id] : [])))];
+    const creatorIds = [...new Set(rawTracks.map((t) => t.creator_id))];
+
+    // 3. Covers albums + noms artistes en parallèle
+    const [albumsRes, profilesRes] = await Promise.all([
+      albumIds.length
+        ? this.client.from("albums").select("id, cover_url").in("id", albumIds)
+        : { data: [], error: null },
+      this.client
+        .from("artist_profiles")
+        .select("creator_id, stage_name")
+        .in("creator_id", creatorIds),
+    ]);
+
+    const coverByAlbumId = new Map(
+      ((albumsRes.data ?? []) as unknown as Array<{ id: string; cover_url: string | null }>).map(
+        (a) => [a.id, a.cover_url],
+      ),
+    );
+    const nameByCreatorId = new Map(
+      ((profilesRes.data ?? []) as unknown as Array<{ creator_id: string; stage_name: string }>).map(
+        (p) => [p.creator_id, p.stage_name],
+      ),
+    );
+
+    return rawTracks.map((t) => ({
+      trackId: t.id,
+      trackTitle: t.title,
+      albumId: t.album_id,
+      coverUrl: t.album_id ? (coverByAlbumId.get(t.album_id) ?? null) : null,
+      mainArtistName: nameByCreatorId.get(t.creator_id) ?? "",
+      mainArtistCreatorId: t.creator_id,
+      creditRole: roleByTrackId.get(t.id) ?? "featuring",
+    }));
   }
 
   buildSlug(title: string, suffix: string): string {
