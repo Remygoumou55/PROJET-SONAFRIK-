@@ -5,27 +5,37 @@
 -- Règle CDC : ownership total = 100% par work (trigger)
 -- ============================================================
 
--- ─── Types énumérés ──────────────────────────────────────────────────────────
+-- ─── Types énumérés (idempotents — safe pour re-run en Preview) ──────────────
 
-CREATE TYPE contributor_role AS ENUM (
-  'author', 'composer', 'lyricist', 'producer', 'arranger', 'performer'
-);
+DO $$ BEGIN
+  CREATE TYPE contributor_role AS ENUM (
+    'author', 'composer', 'lyricist', 'producer', 'arranger', 'performer'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE ownership_type AS ENUM (
-  'master', 'publishing', 'neighboring'
-);
+DO $$ BEGIN
+  CREATE TYPE ownership_type AS ENUM (
+    'master', 'publishing', 'neighboring'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE contract_type AS ENUM (
-  'sync', 'license', 'distribution', 'publishing', 'management'
-);
+DO $$ BEGIN
+  CREATE TYPE contract_type AS ENUM (
+    'sync', 'license', 'distribution', 'publishing', 'management'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE rights_claim_type AS ENUM (
-  'ownership', 'infringement', 'takedown'
-);
+DO $$ BEGIN
+  CREATE TYPE rights_claim_type AS ENUM (
+    'ownership', 'infringement', 'takedown'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE rights_claim_status AS ENUM (
-  'pending', 'accepted', 'rejected', 'escalated'
-);
+DO $$ BEGIN
+  CREATE TYPE rights_claim_status AS ENUM (
+    'pending', 'accepted', 'rejected', 'escalated'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ─── works ───────────────────────────────────────────────────────────────────
 
