@@ -10,9 +10,18 @@ export function OnboardingProgressBadge({ currentStep, totalSteps = 5 }: Props) 
 
   return (
     <div style={{ marginBottom: '28px' }}>
+      {/* Responsive: cercle réduit à 40px sur très petit écran */}
+      <style>{`
+        @media (max-width: 380px) {
+          .ob-badge-circle { width: 40px !important; height: 40px !important; }
+          .ob-step-wrapper { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+      `}</style>
+
       {/* Cercle fraction */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
         <div
+          className="ob-badge-circle"
           style={{
             width: '48px',
             height: '48px',
