@@ -32,7 +32,7 @@ export default function CreatorError({
       ) : (
         <>
           <p className="text-sm text-center" style={{ color: "#A0A0A0" }}>
-            {error.message || "Impossible de charger l'espace créateur."}
+            {"Impossible de charger l'espace créateur."}
           </p>
           <button
             onClick={reset}

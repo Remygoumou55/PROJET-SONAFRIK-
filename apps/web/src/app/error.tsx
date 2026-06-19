@@ -53,7 +53,7 @@ export default function RootError({
       ) : (
         <>
           <p className="text-sm text-center" style={{ color: "#A0A0A0" }}>
-            {error.message || "Une erreur inattendue est survenue."}
+            {"Une erreur inattendue est survenue."}
           </p>
           <button
             onClick={reset}

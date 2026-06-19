@@ -1,7 +1,7 @@
 "use client";
 
 export default function AuthError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -13,7 +13,7 @@ export default function AuthError({
       style={{ backgroundColor: "#0D0D0D" }}
     >
       <p className="text-sm text-center" style={{ color: "#A0A0A0" }}>
-        {error.message || "Une erreur est survenue lors de l'authentification."}
+        {"Une erreur est survenue lors de l'authentification."}
       </p>
       <button
         onClick={reset}

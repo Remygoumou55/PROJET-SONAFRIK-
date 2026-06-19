@@ -1,7 +1,7 @@
 "use client";
 
 export default function WalletError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -13,7 +13,7 @@ export default function WalletError({
       style={{ backgroundColor: "#0D0D0D" }}
     >
       <p className="text-sm text-center" style={{ color: "#A0A0A0" }}>
-        {error.message || "Impossible de charger le portefeuille."}
+        {"Impossible de charger le portefeuille."}
       </p>
       <button
         onClick={reset}
