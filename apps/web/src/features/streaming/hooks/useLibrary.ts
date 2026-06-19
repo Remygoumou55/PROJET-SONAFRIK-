@@ -76,6 +76,19 @@ export function useLibrary() {
     [streaming],
   );
 
+  const updatePlaylist = useCallback(
+    async (playlistId: string, updates: { isPublic?: boolean; title?: string; description?: string }) => {
+      try {
+        const updated = await streaming.updatePlaylist(playlistId, updates);
+        setPlaylists((prev) => prev.map((p) => (p.id === playlistId ? updated : p)));
+        return updated;
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de modifier la playlist.");
+      }
+    },
+    [streaming],
+  );
+
   return {
     library,
     playlists,
@@ -83,6 +96,7 @@ export function useLibrary() {
     error,
     toggleFavorite,
     createPlaylist,
+    updatePlaylist,
     deletePlaylist,
     refresh: loadLibrary,
   };

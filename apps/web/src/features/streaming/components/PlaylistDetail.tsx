@@ -7,6 +7,8 @@ import { useStreamingService } from "../hooks/useStreaming";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatTime } from "@/lib/formatters";
 import { CoverImage } from "@/components/CoverImage";
+import { PlaylistPrivacyToggle } from "@/components/playlist/PlaylistPrivacyToggle";
+import { PlaylistVisibilityBadge } from "@/components/playlist/PlaylistVisibilityBadge";
 
 function TrackRow({
   track,
@@ -86,15 +88,18 @@ function TrackRow({
 interface Props {
   playlist: Playlist;
   initialTracks?: TrackWithMeta[];
+  currentUserId?: string;
 }
 
-export function PlaylistDetail({ playlist, initialTracks }: Props) {
+export function PlaylistDetail({ playlist, initialTracks, currentUserId }: Props) {
   const streaming = useStreamingService();
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
   const [tracks, setTracks] = useState<TrackWithMeta[]>(initialTracks ?? []);
   const [isLoading, setIsLoading] = useState(!initialTracks);
   const [error, setError] = useState<string | null>(null);
   const [playError, setPlayError] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(playlist.is_public);
+  const isOwner = !!currentUserId && currentUserId === playlist.user_id;
 
   const loadTracks = useCallback(async () => {
     setIsLoading(true);
@@ -158,6 +163,16 @@ export function PlaylistDetail({ playlist, initialTracks }: Props) {
     }
   }, [tracks, loadQueueAndPlay]);
 
+  const handlePrivacyChange = useCallback(async (newIsPublic: boolean) => {
+    setIsPublic(newIsPublic);
+    try {
+      await streaming.updatePlaylist(playlist.id, { isPublic: newIsPublic });
+    } catch {
+      setIsPublic(!newIsPublic);
+      setError("Impossible de modifier la visibilité.");
+    }
+  }, [streaming, playlist.id]);
+
   const handleRemove = useCallback(async (trackId: string) => {
     try {
       await streaming.removeTrackFromPlaylist(playlist.id, trackId);
@@ -180,8 +195,11 @@ export function PlaylistDetail({ playlist, initialTracks }: Props) {
             <path d="M9 2L3 7l6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
-        <div>
-          <h1 className="text-xl font-bold" style={{ color: "#FFFFFF" }}>{playlist.title}</h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl font-bold" style={{ color: "#FFFFFF" }}>{playlist.title}</h1>
+            <PlaylistVisibilityBadge isPublic={isPublic} />
+          </div>
           {playlist.description && (
             <p className="text-sm mt-0.5" style={{ color: "#A0A0A0" }}>{playlist.description}</p>
           )}
@@ -191,6 +209,11 @@ export function PlaylistDetail({ playlist, initialTracks }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Toggle de confidentialité — visible uniquement par le propriétaire */}
+      {isOwner && (
+        <PlaylistPrivacyToggle isPublic={isPublic} onChange={handlePrivacyChange} />
+      )}
 
       {tracks.length > 0 && (
         <button

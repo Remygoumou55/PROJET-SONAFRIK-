@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Playlist } from "@sonafrik/types";
 import { useLibrary } from "../hooks/useLibrary";
+import { PlaylistVisibilityBadge } from "@/components/playlist/PlaylistVisibilityBadge";
 
 function PlaylistCard({
   playlist,
@@ -26,9 +27,12 @@ function PlaylistCard({
           </svg>
         </div>
         <div className="min-w-0">
-          <p className="font-semibold truncate" style={{ color: "#FFFFFF" }}>
-            {playlist.title}
-          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold truncate" style={{ color: "#FFFFFF" }}>
+              {playlist.title}
+            </p>
+            <PlaylistVisibilityBadge isPublic={playlist.is_public} />
+          </div>
           <p className="text-sm" style={{ color: "#A0A0A0" }}>
             {playlist.track_count ?? 0} morceau{(playlist.track_count ?? 0) !== 1 ? "x" : ""}
           </p>

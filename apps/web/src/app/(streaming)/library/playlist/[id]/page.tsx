@@ -27,7 +27,10 @@ export default async function PlaylistPage({
   const supabase = await getSupabaseServerClient();
   const streaming = createStreamingService(supabase);
 
-  const playlist = await streaming.getPlaylist(id).catch(() => null);
+  const [playlist, { data: { user } }] = await Promise.all([
+    streaming.getPlaylist(id).catch(() => null),
+    supabase.auth.getUser(),
+  ]);
   if (!playlist) notFound();
 
   const { data: rawTracks } = await supabase
@@ -63,7 +66,7 @@ export default async function PlaylistPage({
 
   return (
     <div className="p-6 max-w-2xl">
-      <PlaylistDetail playlist={playlist} initialTracks={initialTracks} />
+      <PlaylistDetail playlist={playlist} initialTracks={initialTracks} currentUserId={user?.id} />
     </div>
   );
 }
