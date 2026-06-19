@@ -28,41 +28,37 @@ function ConnexionPageInner() {
       setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
       return;
     }
-    const supabase = getSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      supabase
-        .from("profiles")
-        .select("account_type, onboarding_completed")
-        .eq("id", user.id)
-        .single()
-        .then(({ data: profile }) => {
-          if (!profile?.onboarding_completed) {
-            const dest =
-              profile?.account_type === "artiste" ||
-              profile?.account_type === "auditeur_artiste"
-                ? "/onboarding/artist"
-                : profile?.account_type === "auditeur"
-                  ? "/onboarding/listener"
-                  : "/onboarding/role";
-            router.replace(dest);
-          } else {
-            const home =
-              profile.account_type === "auditeur"
-                ? "/listen"
-                : profile.account_type === "artiste" ||
-                    profile.account_type === "auditeur_artiste"
-                  ? "/creator"
-                  : "/listen";
-            const next = searchParams.get("next");
-            const dest =
-              next && next.startsWith("/") && !next.startsWith("/auth")
-                ? next
-                : home;
-            router.replace(dest);
-          }
-        });
-    });
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const supabase = getSupabaseBrowserClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (cancelled || !user) return;
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("account_type, onboarding_completed")
+          .eq("id", user.id)
+          .single();
+        if (cancelled) return;
+        if (!profile?.onboarding_completed) {
+          const dest =
+            profile?.account_type === "artiste" || profile?.account_type === "auditeur_artiste"
+              ? "/onboarding/artist"
+              : profile?.account_type === "auditeur" ? "/onboarding/listener"
+              : "/onboarding/role";
+          router.replace(dest);
+        } else {
+          const home =
+            profile.account_type === "auditeur" ? "/listen"
+            : (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") ? "/creator"
+            : "/listen";
+          const next = searchParams.get("next");
+          router.replace(next && next.startsWith("/") && !next.startsWith("/auth") ? next : home);
+        }
+      } catch { /* Supabase indisponible ou clé absente — rester sur la page */ }
+    };
+    void run();
+    return () => { cancelled = true; };
   }, [searchParams, router]);
 
   async function handlePhoneSubmit(p: string) {

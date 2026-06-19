@@ -25,43 +25,42 @@ function InscriptionPageInner() {
   const roleParam = searchParams.get("role") as "artist" | "listener" | null;
 
   // Détection de session active au montage
-  // → utilisateur existant complet : home | utilisateur sans onboarding : onboarding
   useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        setDetecting(false);
-        return;
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const supabase = getSupabaseBrowserClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (!user) { setDetecting(false); return; }
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("account_type, onboarding_completed")
+          .eq("id", user.id)
+          .single();
+
+        if (cancelled) return;
+        if (profile?.onboarding_completed) {
+          const home =
+            profile.account_type === "auditeur" ? "/listen"
+            : (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") ? "/creator"
+            : "/listen";
+          router.replace(home);
+          return;
+        }
+        const dest =
+          roleParam === "artist" ? "/onboarding/artist"
+          : roleParam === "listener" ? "/onboarding/listener"
+          : "/onboarding/role";
+        router.replace(dest);
+      } catch {
+        // Supabase indisponible ou clé manquante en dev → afficher le formulaire
+        if (!cancelled) setDetecting(false);
       }
-
-      supabase
-        .from("profiles")
-        .select("account_type, onboarding_completed")
-        .eq("id", user.id)
-        .single()
-        .then(({ data: profile }) => {
-          if (profile?.onboarding_completed) {
-            const home =
-              profile.account_type === "auditeur"
-                ? "/listen"
-                : profile.account_type === "artiste" ||
-                    profile.account_type === "auditeur_artiste"
-                  ? "/creator"
-                  : "/listen";
-            router.replace(home);
-            return;
-          }
-
-          // Session mais onboarding incomplet → onboarding
-          const dest =
-            roleParam === "artist"
-              ? "/onboarding/artist"
-              : roleParam === "listener"
-                ? "/onboarding/listener"
-                : "/onboarding/role";
-          router.replace(dest);
-        });
-    });
+    };
+    void run();
+    return () => { cancelled = true; };
   }, [router, roleParam]);
 
   async function handlePhoneSubmit(p: string) {
