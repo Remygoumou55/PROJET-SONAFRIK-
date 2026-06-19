@@ -19,6 +19,15 @@ function isBypassActive(): boolean {
   );
 }
 
+// Race Supabase contre un timeout — évite de bloquer le middleware indéfiniment
+// sur cold start Supabase (free tier peut prendre 10-30s à répondre).
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -47,15 +56,16 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Rafraîchissement du token Supabase — ne jamais remplacer par getSession()
-  let user: Awaited<
-    ReturnType<typeof supabase.auth.getUser>
-  >["data"]["user"] = null;
+  // Rafraîchissement du token — timeout 4s pour éviter l'écran noir sur cold start
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
   try {
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
+    user = await withTimeout(
+      supabase.auth.getUser().then((r) => r.data.user),
+      4000,
+      null,
+    );
   } catch {
-    // Supabase indisponible → routes publiques passent
+    // Supabase indisponible → on laisse passer (redirect si route protégée)
   }
 
   if (isBypassActive()) return response;
@@ -91,28 +101,28 @@ export async function middleware(request: NextRequest) {
 
   // Session active : fetch profil uniquement pour les routes nécessitant
   // une décision de routing (pages auth + onboarding).
-  // Pour les routes protégées, les layouts gèrent le check onboarding et le rôle
-  // via requireIdentityContext() + redirectIfOnboardingIncomplete() → économise
-  // 1 round-trip DB par navigation.
   if (
     (isAuthRoute && !pathname.startsWith("/auth/inscription")) ||
     isOnboarding
   ) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("account_type, onboarding_completed")
-      .eq("id", user.id)
-      .single();
-
+    const profile = await withTimeout(
+      Promise.resolve(
+        supabase
+          .from("profiles")
+          .select("account_type, onboarding_completed")
+          .eq("id", user.id)
+          .single()
+      ).then((r) => r.data),
+      4000,
+      null,
+    );
     const role = mapAccountType(profile?.account_type);
     const onboardingCompleted = profile?.onboarding_completed ?? false;
 
-    // Connecté sur une page auth + onboarding terminé → home par rôle
     if (isAuthRoute && onboardingCompleted) {
       return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
     }
 
-    // Onboarding terminé + sur une page onboarding → home
     if (isOnboarding && onboardingCompleted) {
       return NextResponse.redirect(new URL(getHomeByRole(role), request.url));
     }

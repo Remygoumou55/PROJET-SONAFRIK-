@@ -86,19 +86,19 @@ export async function requireIdentityContext(): Promise<IdentityContext> {
   }
 
   try {
-    return await fetchIdentityContext();
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), 12000)
+    );
+    return await Promise.race([fetchIdentityContext(), timeout]);
   } catch (err) {
-    // Utilisateur non authentifié → connexion
     if (err instanceof IdentityError && err.code === "unauthorized") {
       redirect("/auth/connexion");
     }
-    // Profil introuvable (compte Google sans trigger) → compléter l'onboarding
     if (err instanceof IdentityError && err.code === "profile_not_found") {
       redirect("/auth/inscription");
     }
-    const supabase = await getSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    redirect(user ? "/auth/inscription" : "/auth/connexion");
+    // timeout ou erreur réseau → retour connexion
+    redirect("/auth/connexion");
   }
 }
 

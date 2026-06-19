@@ -58,7 +58,10 @@ const fetchCreatorContext = cache(async () => {
   const creator = createCreatorService(supabase);
 
   try {
-    return await creator.getCreatorContext();
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), 12000)
+    );
+    return await Promise.race([creator.getCreatorContext(), timeout]);
   } catch {
     redirect("/profile");
   }
