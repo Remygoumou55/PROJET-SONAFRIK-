@@ -10,15 +10,17 @@ export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNav
   const items: SidebarNavItem[] = [
     { href: "/profile", label: "Profil", exact: true },
     { href: "/settings", label: "Paramètres", exact: true },
-    { href: "/settings/preferences", label: "Préférences" },
-    { href: "/settings/notifications", label: "Notifications", badge: unreadNotifications },
-    { href: "/settings/sessions", label: "Sessions" },
     { href: "/settings/account", label: "Compte" },
+    { href: "/settings/payment", label: "Paiement" },
+    { href: "/settings/sessions", label: "Sécurité et confidentialité" },
+    { href: "/settings/notifications", label: "Notifications", badge: unreadNotifications },
+    { href: "/settings/preferences", label: "Préférences" },
+    { href: "/settings/help", label: "Aide" },
   ];
 
   return (
     <SidebarNav
-      title="Identity OS"
+      title="Paramètres"
       items={items}
       activePath={activePath}
       backHref="/"

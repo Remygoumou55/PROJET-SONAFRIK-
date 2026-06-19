@@ -8,9 +8,19 @@ interface SettingsOverviewProps {
 
 const SECTIONS = [
   {
-    href: "/settings/preferences",
-    title: "Préférences",
-    description: "Langue, audio, confidentialité et alertes contenu.",
+    href: "/settings/account",
+    title: "Compte",
+    description: "Informations personnelles et suppression du compte.",
+  },
+  {
+    href: "/settings/payment",
+    title: "Paiement",
+    description: "Portefeuille, transactions et comptes de retrait artiste.",
+  },
+  {
+    href: "/settings/sessions",
+    title: "Sécurité et confidentialité",
+    description: "Appareils connectés, déconnexion globale et vie privée.",
   },
   {
     href: "/settings/notifications",
@@ -18,14 +28,14 @@ const SECTIONS = [
     description: "Centre de notifications in-app et historique.",
   },
   {
-    href: "/settings/sessions",
-    title: "Sessions actives",
-    description: "Appareils connectés et révocation à distance.",
+    href: "/settings/preferences",
+    title: "Préférences",
+    description: "Langue, audio, alertes contenu et paramètres avancés.",
   },
   {
-    href: "/settings/account",
-    title: "Compte",
-    description: "Suppression de compte et données personnelles.",
+    href: "/settings/help",
+    title: "Aide et à propos",
+    description: "Support, informations légales et version de l'application.",
   },
 ] as const;
 
@@ -34,7 +44,7 @@ export function SettingsOverview({ context }: SettingsOverviewProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Résumé Identity OS</CardTitle>
+          <CardTitle>Résumé du compte</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <Metric label="Langue" value={context.preferences.language === "en" ? "English" : "Français"} />
