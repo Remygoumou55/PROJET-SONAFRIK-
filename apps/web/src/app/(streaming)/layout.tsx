@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { StreamingLayoutClient } from "@/features/streaming/components/StreamingLayoutClient";
 import { requireIdentityContext, redirectIfOnboardingIncomplete } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
+import StreamingLoading from "./loading";
 
-export default async function StreamingLayout({ children }: { children: React.ReactNode }) {
+async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
   redirectIfOnboardingIncomplete(context.profile);
 
@@ -18,5 +20,13 @@ export default async function StreamingLayout({ children }: { children: React.Re
     >
       {children}
     </StreamingLayoutClient>
+  );
+}
+
+export default function StreamingLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<StreamingLoading />}>
+      <StreamingGuard>{children}</StreamingGuard>
+    </Suspense>
   );
 }

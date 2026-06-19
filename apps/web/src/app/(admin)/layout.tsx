@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { AdminNavLink } from "@/features/admin/components/AdminNavLink";
+import AdminLoading from "./loading";
 
 const NAV_LINKS = [
   { href: "/admin", label: "Dashboard" },
@@ -12,7 +14,7 @@ const NAV_LINKS = [
   { href: "/admin/settings", label: "Paramètres" },
 ] as const;
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+async function AdminGuard({ children }: { children: React.ReactNode }) {
   await requireAdmin();
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>
@@ -35,5 +37,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </div>
       <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
     </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<AdminLoading />}>
+      <AdminGuard>{children}</AdminGuard>
+    </Suspense>
   );
 }
