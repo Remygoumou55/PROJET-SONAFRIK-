@@ -1,15 +1,19 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
+import { useTrackCredits } from "../hooks/useTrackCredits";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { TipButton } from "./TipButton";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/social/components/LikeButton";
+import { TrackCredits } from "@/components/track/TrackCredits";
 
 export const WebPlayer = memo(function WebPlayer() {
   const { currentTrack, currentPosition, duration, setVolume, volume, seek, audioError, clearAudioError } = usePlayer();
+  const [showCredits, setShowCredits] = useState(false);
+  const { credits } = useTrackCredits(showCredits ? currentTrack?.id : null);
 
   if (!currentTrack) return null;
 
@@ -58,6 +62,18 @@ export const WebPlayer = memo(function WebPlayer() {
               )}
             </div>
             <LikeButton trackId={currentTrack.id} size="sm" />
+            <button
+              onClick={() => setShowCredits((v) => !v)}
+              className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
+              style={{
+                color: showCredits ? "#00D26A" : "#A0A0A0",
+                backgroundColor: showCredits ? "#00D26A18" : "transparent",
+              }}
+              aria-label="Afficher les crédits"
+              title="Crédits"
+            >
+              Crédits
+            </button>
           </div>
 
           {/* Controls */}
@@ -86,6 +102,14 @@ export const WebPlayer = memo(function WebPlayer() {
             </div>
           </div>
         </div>
+        {showCredits && credits.length > 0 && (
+          <div
+            className="mt-3 pt-3 px-1"
+            style={{ borderTop: "1px solid #2A2A2A" }}
+          >
+            <TrackCredits credits={credits} />
+          </div>
+        )}
       </div>
     </div>
   );

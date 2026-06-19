@@ -5,7 +5,8 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CoverImage } from "@/components/CoverImage";
 import { formatDate } from "@/lib/formatters";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
-import type { TrackWithMeta } from "@sonafrik/types";
+import { TrackCredits } from "@/components/track/TrackCredits";
+import type { TrackCredit, TrackWithMeta } from "@sonafrik/types";
 
 export async function generateMetadata({
   params,
@@ -86,6 +87,22 @@ export default async function AlbumDetailPage({
     cover_url: album.cover_url,
   }));
 
+  // Crédits : une seule requête pour tous les morceaux de l'album
+  const trackIds = tracks.map((t) => t.id);
+  const allCredits: TrackCredit[] = trackIds.length
+    ? ((await supabase
+        .from("track_credits")
+        .select("*")
+        .in("track_id", trackIds)
+        .order("display_order")
+        .then(({ data }) => data ?? [])) as TrackCredit[])
+    : [];
+
+  const creditsByTrack = allCredits.reduce<Record<string, TrackCredit[]>>((acc, c) => {
+    (acc[c.track_id] ??= []).push(c);
+    return acc;
+  }, {});
+
   const releaseLabel =
     album.release_type === "single" ? "Single"
     : album.release_type === "ep" ? "EP"
@@ -163,6 +180,27 @@ export default async function AlbumDetailPage({
         </div>
       ) : (
         <AlbumTracksClient tracks={tracks} />
+      )}
+
+      {/* Crédits par morceau (affichés si au moins un morceau a des crédits) */}
+      {tracks.some((t) => (creditsByTrack[t.id]?.length ?? 0) > 0) && (
+        <div className="mt-8 space-y-4">
+          <h2 className="text-sm font-semibold" style={{ color: "#A0A0A0" }}>
+            Crédits
+          </h2>
+          {tracks.map((track) => {
+            const trackCredits = creditsByTrack[track.id] ?? [];
+            if (!trackCredits.length) return null;
+            return (
+              <div key={track.id} className="space-y-1">
+                <p className="text-xs font-semibold" style={{ color: "#555555" }}>
+                  {track.title}
+                </p>
+                <TrackCredits credits={trackCredits} />
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
