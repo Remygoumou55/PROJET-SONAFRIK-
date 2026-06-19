@@ -7,6 +7,8 @@ export {
   createTrackSchema,
   updateTrackSchema,
   catalogAssetUploadSchema,
+  setTrackCreditsSchema,
+  trackCreditItemSchema,
 } from "./schemas";
 export type {
   CreateAlbumInput,
@@ -14,4 +16,6 @@ export type {
   CreateTrackInput,
   UpdateTrackInput,
   CatalogAssetUploadInput,
+  SetTrackCreditsInput,
+  TrackCreditItem,
 } from "./schemas";

@@ -1309,6 +1309,55 @@ export const PAYOUT_ENGINE_ERROR_MESSAGES: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// Track Credits — Sprint Credits
+// Crédits d'affichage par morceau (distinct des droits rights_os/contributors).
+// Visible publiquement dans le lecteur et la page album.
+// ---------------------------------------------------------------------------
+
+export type TrackCreditRole =
+  | "artiste_principal"
+  | "featuring"
+  | "auteur"
+  | "compositeur"
+  | "producteur"
+  | "beatmaker"
+  | "mixage"
+  | "mastering";
+
+export interface TrackCredit {
+  id: string;
+  track_id: string;
+  contributor_profile_id: string | null;
+  contributor_name: string;
+  role: TrackCreditRole;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const TRACK_CREDIT_ROLE_LABELS: Record<TrackCreditRole, string> = {
+  artiste_principal: "Artiste",
+  featuring:         "Avec",
+  auteur:            "Paroles",
+  compositeur:       "Composition",
+  producteur:        "Production",
+  beatmaker:         "Beatmaker",
+  mixage:            "Mixage",
+  mastering:         "Mastering",
+};
+
+export const TRACK_CREDIT_ROLE_ORDER: TrackCreditRole[] = [
+  "artiste_principal",
+  "featuring",
+  "auteur",
+  "compositeur",
+  "producteur",
+  "beatmaker",
+  "mixage",
+  "mastering",
+];
+
+// ---------------------------------------------------------------------------
 // Rights OS — Sprint 9
 // CDC : works, contributors, ownerships, ownership_versions, contracts, rights_claims
 // Règle : ownership total = 100% par work

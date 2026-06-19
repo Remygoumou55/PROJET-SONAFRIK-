@@ -1,16 +1,18 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Album, CatalogContext, Genre, Track } from "@sonafrik/types";
+import type { Album, CatalogContext, Genre, Track, TrackCredit } from "@sonafrik/types";
 import { CatalogError } from "./errors";
 import { CatalogRepository } from "./catalog.repository";
 import {
   catalogAssetUploadSchema,
   createAlbumSchema,
   createTrackSchema,
+  setTrackCreditsSchema,
   updateAlbumSchema,
   updateTrackSchema,
   type CatalogAssetUploadInput,
   type CreateAlbumInput,
   type CreateTrackInput,
+  type SetTrackCreditsInput,
   type UpdateAlbumInput,
   type UpdateTrackInput,
 } from "./schemas";
@@ -195,6 +197,18 @@ export class CatalogService {
     } catch {
       throw new CatalogError("publish_submit_failed");
     }
+  }
+
+  async getTrackCredits(trackId: string): Promise<TrackCredit[]> {
+    return this.repository.getTrackCredits(trackId);
+  }
+
+  async setTrackCredits(input: SetTrackCreditsInput): Promise<void> {
+    const parsed = setTrackCreditsSchema.safeParse(input);
+    if (!parsed.success) throw new CatalogError("invalid_track");
+    await this.requireUserId();
+    await this.repository.setTrackCredits(parsed.data.trackId, parsed.data.credits);
+    await this.repository.logAudit("catalog.track.credits_updated", "track_credits", parsed.data.trackId);
   }
 
   async requestAssetUploadUrl(input: CatalogAssetUploadInput): Promise<{

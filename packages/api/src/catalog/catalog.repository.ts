@@ -1,6 +1,7 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
-import type { Album, Genre, Track, TrackFile } from "@sonafrik/types";
+import type { Album, Genre, Track, TrackCredit, TrackFile } from "@sonafrik/types";
+import type { TrackCreditItem } from "./schemas";
 
 function slugify(value: string): string {
   return value
@@ -256,6 +257,32 @@ export class CatalogRepository {
       p_entity_id: entityId,
       p_metadata: (metadata ?? {}) as Json,
     });
+    if (error) throw error;
+  }
+
+  async getTrackCredits(trackId: string): Promise<TrackCredit[]> {
+    const { data, error } = await this.client
+      .from("track_credits")
+      .select("*")
+      .eq("track_id", trackId)
+      .order("display_order");
+
+    if (error) throw error;
+    return (data ?? []) as TrackCredit[];
+  }
+
+  async setTrackCredits(trackId: string, credits: TrackCreditItem[]): Promise<void> {
+    await this.client.from("track_credits").delete().eq("track_id", trackId);
+    if (!credits.length) return;
+    const { error } = await this.client.from("track_credits").insert(
+      credits.map((c, i) => ({
+        track_id:               trackId,
+        contributor_name:       c.contributorName,
+        role:                   c.role,
+        display_order:          c.displayOrder ?? i,
+        contributor_profile_id: c.contributorProfileId ?? null,
+      })),
+    );
     if (error) throw error;
   }
 

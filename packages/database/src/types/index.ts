@@ -761,6 +761,33 @@ export interface Database {
         };
         Relationships: [];
       };
+      track_credits: {
+        Row: {
+          id: string;
+          track_id: string;
+          contributor_profile_id: string | null;
+          contributor_name: string;
+          role: "artiste_principal" | "featuring" | "auteur" | "compositeur" | "producteur" | "beatmaker" | "mixage" | "mastering";
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          track_id: string;
+          contributor_profile_id?: string | null;
+          contributor_name: string;
+          role: "artiste_principal" | "featuring" | "auteur" | "compositeur" | "producteur" | "beatmaker" | "mixage" | "mastering";
+          display_order?: number;
+        };
+        Update: {
+          contributor_profile_id?: string | null;
+          contributor_name?: string;
+          role?: "artiste_principal" | "featuring" | "auteur" | "compositeur" | "producteur" | "beatmaker" | "mixage" | "mastering";
+          display_order?: number;
+        };
+        Relationships: [];
+      };
       playlist_tracks: {
         Row: {
           playlist_id: string;
