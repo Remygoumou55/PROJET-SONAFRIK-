@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createCatalogService } from "@sonafrik/api/catalog";
 import { CoverImage } from "@/components/CoverImage";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
+import { AppearsOnSection } from "@/components/track/AppearsOnSection";
 import { FollowButton } from "@/features/social/components/FollowButton";
 import { TipButton } from "@/features/marketplace/components/TipButton";
 import type { TrackWithMeta } from "@sonafrik/types";
@@ -66,7 +68,9 @@ export default async function ArtistPublicPage({
     is_public:   Boolean(raw.is_public),
   };
 
-  const [albumsRes, tracksRes, tipFlagRow] = await Promise.all([
+  const catalog = createCatalogService(supabase);
+
+  const [albumsRes, tracksRes, tipFlagRow, appearances] = await Promise.all([
     supabase
       .from("albums")
       .select("id, title, release_type, cover_url, release_date")
@@ -88,6 +92,7 @@ export default async function ArtistPublicPage({
       .select("enabled")
       .eq("name" as never, "tips")
       .maybeSingle(),
+    catalog.getTracksFeaturingCreator(id),
   ]);
   const tipsEnabled = (tipFlagRow.data as { enabled: boolean } | null)?.enabled ?? false;
 
@@ -221,7 +226,7 @@ export default async function ArtistPublicPage({
 
         {/* Morceaux populaires */}
         {tracks.length > 0 && (
-          <section>
+          <section className="mb-8">
             <h2 className="text-sm font-semibold mb-3 uppercase tracking-wider" style={{ color: "#555555" }}>
               Morceaux
             </h2>
@@ -229,7 +234,10 @@ export default async function ArtistPublicPage({
           </section>
         )}
 
-        {albums.length === 0 && tracks.length === 0 && (
+        {/* Apparaît sur — crédits croisés */}
+        <AppearsOnSection appearances={appearances} />
+
+        {albums.length === 0 && tracks.length === 0 && !appearances.length && (
           <div className="py-10 text-center rounded-xl" style={{ backgroundColor: "#1F1F1F" }}>
             <p className="text-sm" style={{ color: "#555555" }}>
               Aucune musique publiée pour le moment.
