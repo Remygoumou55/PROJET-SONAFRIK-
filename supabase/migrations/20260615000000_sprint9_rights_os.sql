@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS works (
   deleted_at  TIMESTAMPTZ
 );
 
-CREATE INDEX idx_works_creator_id ON works (creator_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_works_creator_id ON works (creator_id) WHERE deleted_at IS NULL;
 
 -- ─── contributors ─────────────────────────────────────────────────────────────
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS contributors (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_contributors_work_id ON contributors (work_id);
+CREATE INDEX IF NOT EXISTS idx_contributors_work_id ON contributors (work_id);
 
 -- ─── ownerships ───────────────────────────────────────────────────────────────
 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS ownerships (
   UNIQUE (work_id, contributor_id, ownership_type, territory)
 );
 
-CREATE INDEX idx_ownerships_work_id ON ownerships (work_id);
+CREATE INDEX IF NOT EXISTS idx_ownerships_work_id ON ownerships (work_id);
 
 -- Trigger : total des parts par (work_id, ownership_type, territory) ≤ 100
 CREATE OR REPLACE FUNCTION check_ownership_total()
@@ -109,6 +109,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS trg_check_ownership_total ON ownerships;
 CREATE TRIGGER trg_check_ownership_total
   BEFORE INSERT OR UPDATE ON ownerships
   FOR EACH ROW EXECUTE FUNCTION check_ownership_total();
@@ -125,7 +126,7 @@ CREATE TABLE IF NOT EXISTS ownership_versions (
   UNIQUE (work_id, version_number)
 );
 
-CREATE INDEX idx_ownership_versions_work_id ON ownership_versions (work_id);
+CREATE INDEX IF NOT EXISTS idx_ownership_versions_work_id ON ownership_versions (work_id);
 
 -- ─── contracts ────────────────────────────────────────────────────────────────
 
@@ -146,8 +147,8 @@ CREATE TABLE IF NOT EXISTS contracts (
   CHECK (end_date IS NULL OR end_date >= start_date)
 );
 
-CREATE INDEX idx_contracts_work_id     ON contracts (work_id)     WHERE deleted_at IS NULL;
-CREATE INDEX idx_contracts_creator_id  ON contracts (creator_id)  WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_contracts_work_id     ON contracts (work_id)     WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_contracts_creator_id  ON contracts (creator_id)  WHERE deleted_at IS NULL;
 
 -- ─── rights_claims ────────────────────────────────────────────────────────────
 
@@ -165,9 +166,9 @@ CREATE TABLE IF NOT EXISTS rights_claims (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_rights_claims_work_id     ON rights_claims (work_id);
-CREATE INDEX idx_rights_claims_claimant_id ON rights_claims (claimant_id);
-CREATE INDEX idx_rights_claims_status      ON rights_claims (status) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_rights_claims_work_id     ON rights_claims (work_id);
+CREATE INDEX IF NOT EXISTS idx_rights_claims_claimant_id ON rights_claims (claimant_id);
+CREATE INDEX IF NOT EXISTS idx_rights_claims_status      ON rights_claims (status) WHERE status = 'pending';
 
 -- ─── Mise à jour automatique de updated_at ────────────────────────────────────
 
