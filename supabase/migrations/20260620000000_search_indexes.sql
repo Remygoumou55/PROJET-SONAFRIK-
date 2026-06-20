@@ -23,7 +23,4 @@ CREATE INDEX IF NOT EXISTS idx_playlists_title_trgm
   ON public.playlists USING gin (title gin_trgm_ops)
   WHERE deleted_at IS NULL AND is_public = true;
 
--- Beats
-CREATE INDEX IF NOT EXISTS idx_beats_title_trgm
-  ON public.beats USING gin (title gin_trgm_ops)
-  WHERE deleted_at IS NULL AND publication_status = 'published';
+-- Beats : index cree dans 20260621000000_lot_a1_beats_store.sql (table beats creee apres)
