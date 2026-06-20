@@ -1,4 +1,4 @@
-﻿-- Sprint 4 — RLS Creator OS
+-- Sprint 4 — RLS Creator OS
 
 ALTER TABLE public.labels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.creators ENABLE ROW LEVEL SECURITY;

@@ -1,4 +1,4 @@
-﻿-- Sprint 6 — RLS Streaming OS
+-- Sprint 6 — RLS Streaming OS
 -- playlists · playlist_tracks · favorites · stream_sessions · stream_events · playback_positions
 -- Storage audio · Permissions streaming
 

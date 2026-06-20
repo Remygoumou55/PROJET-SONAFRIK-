@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- Sprint 9 — Rights OS
 -- Tables : works, contributors, ownerships, ownership_versions,
 --           contracts, rights_claims

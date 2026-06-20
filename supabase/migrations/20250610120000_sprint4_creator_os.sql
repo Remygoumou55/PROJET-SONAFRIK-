@@ -1,4 +1,4 @@
-﻿-- Sprint 4 — Creator OS complet
+-- Sprint 4 — Creator OS complet
 -- Artist Identity · Verification · Labels · Teams · Studios
 
 -- ---------------------------------------------------------------------------

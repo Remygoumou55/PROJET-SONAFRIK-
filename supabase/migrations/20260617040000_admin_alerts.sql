@@ -1,4 +1,4 @@
-﻿-- SONAFRIK — Sprint 13 · Alertes admin + vue stats
+-- SONAFRIK — Sprint 13 · Alertes admin + vue stats
 -- Fichier : supabase/migrations/20260617040000_admin_alerts.sql
 
 -- ---------------------------------------------------------------------------

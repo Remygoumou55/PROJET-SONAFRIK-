@@ -1,6 +1,6 @@
-﻿-- SONAFRIK — Sprint G-4 · Infrastructure paiements mobiles africains
+-- SONAFRIK - Sprint G-4 - Infrastructure paiements mobiles africains
 -- Table payment_intents + webhook confirmation RPC
--- RÈGLE FINANCIÈRE : jamais de crédit wallet avant confirmation opérateur (confirm_payment_intent)
+-- REGLE FINANCIERE : jamais de credit wallet avant confirmation operateur (confirm_payment_intent)
 
 -- ---------------------------------------------------------------------------
 -- Table : payment_intents

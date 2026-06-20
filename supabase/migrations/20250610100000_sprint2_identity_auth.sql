@@ -1,4 +1,4 @@
-﻿-- Sprint 2 — Identity OS + AUDIT_LOG
+-- Sprint 2 — Identity OS + AUDIT_LOG
 -- SONAFRIK CDC V9.0
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

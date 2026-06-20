@@ -1,4 +1,4 @@
-﻿-- Sprint 6 — Streaming OS complet
+-- Sprint 6 — Streaming OS complet
 -- playlists · playlist_tracks · favorites · stream_sessions · stream_events · playback_positions
 -- Real Listen V7.2 · Anti-fraude · Reprise lecture · Permissions streaming
 

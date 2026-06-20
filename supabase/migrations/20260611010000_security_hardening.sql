@@ -1,4 +1,4 @@
-﻿-- Security Hardening — SONAFRIK Enterprise Zero Trust
+-- Security Hardening — SONAFRIK Enterprise Zero Trust
 -- 20260611010000_security_hardening.sql
 
 -- ---------------------------------------------------------------------------

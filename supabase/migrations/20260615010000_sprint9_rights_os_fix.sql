@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- Sprint 9 Rights OS — Migration corrective idempotente
 -- Gère les tables déjà existantes avec un schéma différent
 -- Exécuter APRÈS (ou À LA PLACE DE) 20260615000000_sprint9_rights_os.sql

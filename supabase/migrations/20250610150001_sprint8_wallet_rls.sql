@@ -1,4 +1,4 @@
-﻿-- Sprint 8 — Wallet OS RLS + permissions
+-- Sprint 8 — Wallet OS RLS + permissions
 -- SONAFRIK CDC V9.0
 
 -- ---------------------------------------------------------------------------

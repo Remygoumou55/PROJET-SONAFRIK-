@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- track_credits : crédits d'affichage par morceau
 -- Distinct de contributors/works (droits SOCAN/BSDA) — ce système
 -- concerne l'affichage public des contributeurs côté streaming.

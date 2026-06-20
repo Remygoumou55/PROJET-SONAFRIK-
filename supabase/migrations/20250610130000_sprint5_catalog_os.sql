@@ -1,4 +1,4 @@
-﻿-- Sprint 5 — Catalog OS complet
+-- Sprint 5 — Catalog OS complet
 -- Genres · Albums · Singles · Tracks · Metadata · ISRC · UPC · Assets
 
 -- ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-﻿-- Migration : playlists_private_by_default
+-- Migration : playlists_private_by_default
 -- CONTEXTE : la colonne is_public (DEFAULT false) existe déjà dans sprint6_streaming_os.sql.
 -- Cette migration ajoute le commentaire documentaire et harmonise les noms des politiques RLS.
 -- À exécuter manuellement dans Supabase SQL Editor par Mr Rémy — NE PAS COMMITTER SANS VALIDATION.

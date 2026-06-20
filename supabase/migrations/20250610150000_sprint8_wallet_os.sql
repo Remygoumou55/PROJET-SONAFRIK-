@@ -1,4 +1,4 @@
-﻿-- Sprint 8 — Wallet OS
+-- Sprint 8 — Wallet OS
 -- SONAFRIK CDC V9.0 · Revenue Pool 65% · wallet_ledger INSERT ONLY
 
 -- ---------------------------------------------------------------------------

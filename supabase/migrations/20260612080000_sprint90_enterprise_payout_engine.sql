@@ -1,4 +1,4 @@
-﻿-- Sprint 9.0 — Enterprise Payout Engine
+-- Sprint 9.0 — Enterprise Payout Engine
 -- SONAFRIK CDC V9.0
 --
 -- Depends on:

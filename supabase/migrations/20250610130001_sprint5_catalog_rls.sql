@@ -1,4 +1,4 @@
-﻿-- Sprint 5 — RLS Catalog OS
+-- Sprint 5 — RLS Catalog OS
 
 ALTER TABLE public.genres ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.albums ENABLE ROW LEVEL SECURITY;

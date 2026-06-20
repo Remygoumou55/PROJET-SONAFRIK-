@@ -1,4 +1,4 @@
-﻿-- Sprint 3 — RLS Identity OS
+-- Sprint 3 — RLS Identity OS
 
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;

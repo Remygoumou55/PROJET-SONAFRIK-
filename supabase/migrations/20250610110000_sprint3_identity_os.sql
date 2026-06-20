@@ -1,4 +1,4 @@
-﻿-- Sprint 3 — Identity OS complet
+-- Sprint 3 — Identity OS complet
 -- Profils étendus · Préférences · Notifications · Storage avatars
 
 -- ---------------------------------------------------------------------------

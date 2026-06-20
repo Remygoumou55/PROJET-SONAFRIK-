@@ -1,4 +1,4 @@
-﻿-- Sprint 2 — RLS Identity OS (Zero Trust — DENY ALL par défaut)
+-- Sprint 2 — RLS Identity OS (Zero Trust — DENY ALL par défaut)
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.roles ENABLE ROW LEVEL SECURITY;

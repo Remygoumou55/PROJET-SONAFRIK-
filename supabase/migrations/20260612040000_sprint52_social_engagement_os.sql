@@ -1,4 +1,4 @@
-﻿-- Sprint 5.2 — Social & Engagement OS
+-- Sprint 5.2 — Social & Engagement OS
 -- follows · toggle_follow · is_following · get_follow_count
 -- get_like_count · get_engagement_stats · get_creator_engagement_stats
 -- Likes = favorites (entity_type='track') — réutilise l'infra Sprint 6
