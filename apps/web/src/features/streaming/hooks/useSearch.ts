@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { SearchResult } from "@sonafrik/types";
+import type { SearchResult, SearchType } from "@sonafrik/types";
 import { useStreamingService } from "./useStreaming";
 
 export function useSearch() {
@@ -13,21 +13,20 @@ export function useSearch() {
   const searchIdRef = useRef(0);
 
   const search = useCallback(
-    (query: string) => {
+    (query: string, type: SearchType = "all") => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
 
-      if (!query.trim()) {
+      if (!query.trim() || query.trim().length < 2) {
         setResults(null);
         return;
       }
 
       debounceRef.current = setTimeout(async () => {
-        // searchIdRef garantit que seul le dernier appel met à jour l'état
         const currentId = ++searchIdRef.current;
         setIsSearching(true);
         setError(null);
         try {
-          const data = await streaming.search({ query, limit: 20 });
+          const data = await streaming.search({ query, limit: 20, type });
           if (currentId === searchIdRef.current) {
             setResults(data);
           }
@@ -41,7 +40,7 @@ export function useSearch() {
             setIsSearching(false);
           }
         }
-      }, 350);
+      }, 300);
     },
     [streaming],
   );
