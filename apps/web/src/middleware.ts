@@ -31,6 +31,10 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Court-circuit total en dev — aucun appel Supabase, aucune redirection auth.
+  // BYPASS_AUTH ne doit JAMAIS être actif sur Vercel (vérification dans requireXxx).
+  if (isBypassActive()) return NextResponse.next({ request });
+
   // Réponse initiale — sera mutée si les cookies auth changent
   let response = NextResponse.next({ request });
 
@@ -67,8 +71,6 @@ export async function middleware(request: NextRequest) {
   } catch {
     // Supabase indisponible → on laisse passer (redirect si route protégée)
   }
-
-  if (isBypassActive()) return response;
 
   const isAuthRoute =
     pathname.startsWith("/auth/") && pathname !== "/auth/callback";

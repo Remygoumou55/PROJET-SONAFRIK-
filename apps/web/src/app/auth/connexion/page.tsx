@@ -16,6 +16,7 @@ function ConnexionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const auth = useAuthService();
+  const bypassActive = process.env.NEXT_PUBLIC_BYPASS_AUTH === "true";
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +29,7 @@ function ConnexionPageInner() {
       setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
       return;
     }
+    if (bypassActive) return;
     let cancelled = false;
     const run = async () => {
       try {
@@ -59,7 +61,7 @@ function ConnexionPageInner() {
     };
     void run();
     return () => { cancelled = true; };
-  }, [searchParams, router]);
+  }, [searchParams, router, bypassActive]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);

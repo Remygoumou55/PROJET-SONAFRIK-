@@ -16,16 +16,18 @@ function InscriptionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const auth = useAuthService();
+  const bypassActive = process.env.NEXT_PUBLIC_BYPASS_AUTH === "true";
   const [step, setStep] = useState<Step>("phone");
-  const [detecting, setDetecting] = useState(true);
+  const [detecting, setDetecting] = useState(!bypassActive);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   // Paramètre rôle depuis la landing page ou l'URL
   const roleParam = searchParams.get("role") as "artist" | "listener" | null;
 
-  // Détection de session active au montage
+  // Détection de session active au montage — ignorée si bypass actif
   useEffect(() => {
+    if (bypassActive) return;
     let cancelled = false;
     const run = async () => {
       try {
@@ -61,7 +63,7 @@ function InscriptionPageInner() {
     };
     void run();
     return () => { cancelled = true; };
-  }, [router, roleParam]);
+  }, [router, roleParam, bypassActive]);
 
   async function handlePhoneSubmit(p: string) {
     setError(null);
