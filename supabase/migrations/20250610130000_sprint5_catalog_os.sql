@@ -1,10 +1,10 @@
--- Sprint 5 — Catalog OS complet
+﻿-- Sprint 5 — Catalog OS complet
 -- Genres · Albums · Singles · Tracks · Metadata · ISRC · UPC · Assets
 
 -- ---------------------------------------------------------------------------
 -- genres
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.genres (
+CREATE TABLE IF NOT EXISTS public.genres (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   slug TEXT NOT NULL UNIQUE,
@@ -16,7 +16,7 @@ CREATE TABLE public.genres (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_genres_active ON public.genres(sort_order) WHERE deleted_at IS NULL AND is_active = true;
+CREATE INDEX IF NOT EXISTS idx_genres_active ON public.genres(sort_order) WHERE deleted_at IS NULL AND is_active = true;
 
 CREATE TRIGGER genres_set_updated_at
   BEFORE UPDATE ON public.genres
@@ -35,7 +35,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- ---------------------------------------------------------------------------
 -- albums (album · single · ep)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.albums (
+CREATE TABLE IF NOT EXISTS public.albums (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.creators(id) ON DELETE CASCADE,
   label_id UUID REFERENCES public.labels(id) ON DELETE SET NULL,
@@ -63,9 +63,9 @@ CREATE TABLE public.albums (
 ALTER TABLE public.albums
   ADD CONSTRAINT albums_upc_format CHECK (upc IS NULL OR upc ~ '^\d{12,14}$');
 
-CREATE INDEX idx_albums_creator ON public.albums(creator_id, created_at DESC) WHERE deleted_at IS NULL;
-CREATE INDEX idx_albums_status ON public.albums(publication_status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_albums_published ON public.albums(release_date DESC)
+CREATE INDEX IF NOT EXISTS idx_albums_creator ON public.albums(creator_id, created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_albums_status ON public.albums(publication_status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_albums_published ON public.albums(release_date DESC)
   WHERE deleted_at IS NULL AND publication_status = 'published';
 
 CREATE TRIGGER albums_set_updated_at
@@ -75,7 +75,7 @@ CREATE TRIGGER albums_set_updated_at
 -- ---------------------------------------------------------------------------
 -- album_genres
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.album_genres (
+CREATE TABLE IF NOT EXISTS public.album_genres (
   album_id UUID NOT NULL REFERENCES public.albums(id) ON DELETE CASCADE,
   genre_id UUID NOT NULL REFERENCES public.genres(id) ON DELETE CASCADE,
   PRIMARY KEY (album_id, genre_id)
@@ -84,7 +84,7 @@ CREATE TABLE public.album_genres (
 -- ---------------------------------------------------------------------------
 -- tracks
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.tracks (
+CREATE TABLE IF NOT EXISTS public.tracks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.creators(id) ON DELETE CASCADE,
   album_id UUID REFERENCES public.albums(id) ON DELETE SET NULL,
@@ -114,9 +114,9 @@ CREATE TABLE public.tracks (
 ALTER TABLE public.tracks
   ADD CONSTRAINT tracks_isrc_format CHECK (isrc IS NULL OR isrc ~ '^[A-Z]{2}[A-Z0-9]{3}\d{7}$');
 
-CREATE INDEX idx_tracks_album ON public.tracks(album_id, track_number) WHERE deleted_at IS NULL;
-CREATE INDEX idx_tracks_creator ON public.tracks(creator_id, created_at DESC) WHERE deleted_at IS NULL;
-CREATE INDEX idx_tracks_isrc ON public.tracks(isrc) WHERE isrc IS NOT NULL AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_tracks_album ON public.tracks(album_id, track_number) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_tracks_creator ON public.tracks(creator_id, created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_tracks_isrc ON public.tracks(isrc) WHERE isrc IS NOT NULL AND deleted_at IS NULL;
 
 CREATE TRIGGER tracks_set_updated_at
   BEFORE UPDATE ON public.tracks
@@ -125,7 +125,7 @@ CREATE TRIGGER tracks_set_updated_at
 -- ---------------------------------------------------------------------------
 -- track_genres
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.track_genres (
+CREATE TABLE IF NOT EXISTS public.track_genres (
   track_id UUID NOT NULL REFERENCES public.tracks(id) ON DELETE CASCADE,
   genre_id UUID NOT NULL REFERENCES public.genres(id) ON DELETE CASCADE,
   PRIMARY KEY (track_id, genre_id)
@@ -134,7 +134,7 @@ CREATE TABLE public.track_genres (
 -- ---------------------------------------------------------------------------
 -- track_files — assets audio (URLs signées uniquement)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.track_files (
+CREATE TABLE IF NOT EXISTS public.track_files (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   track_id UUID NOT NULL REFERENCES public.tracks(id) ON DELETE CASCADE,
   format TEXT NOT NULL CHECK (format IN ('mp3', 'aac', 'flac', 'wav')),
@@ -149,8 +149,8 @@ CREATE TABLE public.track_files (
   updated_by UUID REFERENCES auth.users(id)
 );
 
-CREATE INDEX idx_track_files_track ON public.track_files(track_id);
-CREATE UNIQUE INDEX idx_track_files_primary ON public.track_files(track_id) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_track_files_track ON public.track_files(track_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_track_files_primary ON public.track_files(track_id) WHERE is_primary = true;
 
 CREATE TRIGGER track_files_set_updated_at
   BEFORE UPDATE ON public.track_files

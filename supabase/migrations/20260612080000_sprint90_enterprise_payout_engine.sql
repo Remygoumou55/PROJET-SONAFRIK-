@@ -1,4 +1,4 @@
--- Sprint 9.0 — Enterprise Payout Engine
+﻿-- Sprint 9.0 — Enterprise Payout Engine
 -- SONAFRIK CDC V9.0
 --
 -- Depends on:
@@ -97,12 +97,12 @@ ALTER TABLE public.payout_audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- payout_batches : admin only
 DROP POLICY IF EXISTS "payout_batches_admin" ON public.payout_batches;
-CREATE POLICY "payout_batches_admin" ON public.payout_batches
+CREATE POLICY IF NOT EXISTS "payout_batches_admin" ON public.payout_batches
   USING (public.is_admin(auth.uid()));
 
 -- payout_audit_logs : utilisateur voit les logs de ses propres retraits ; admin voit tout
 DROP POLICY IF EXISTS "payout_audit_select_own" ON public.payout_audit_logs;
-CREATE POLICY "payout_audit_select_own" ON public.payout_audit_logs
+CREATE POLICY IF NOT EXISTS "payout_audit_select_own" ON public.payout_audit_logs
   FOR SELECT USING (
     public.is_admin(auth.uid())
     OR EXISTS (

@@ -1,4 +1,4 @@
--- SONAFRIK — Sprint 13 · Alertes admin + vue stats
+﻿-- SONAFRIK — Sprint 13 · Alertes admin + vue stats
 -- Fichier : supabase/migrations/20260617040000_admin_alerts.sql
 
 -- ---------------------------------------------------------------------------
@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_admin_notif_unread
 
 ALTER TABLE public.admin_notifications ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admin uniquement"
+CREATE POLICY IF NOT EXISTS "Admin uniquement"
   ON public.admin_notifications FOR ALL
   USING (
     EXISTS (

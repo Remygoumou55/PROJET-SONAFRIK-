@@ -1,10 +1,10 @@
--- Sprint 4 — Creator OS complet
+﻿-- Sprint 4 — Creator OS complet
 -- Artist Identity · Verification · Labels · Teams · Studios
 
 -- ---------------------------------------------------------------------------
 -- labels (créé avant creators pour éviter dépendances circulaires)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.labels (
+CREATE TABLE IF NOT EXISTS public.labels (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
@@ -21,8 +21,8 @@ CREATE TABLE public.labels (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_labels_owner ON public.labels(owner_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_labels_slug ON public.labels(slug) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_labels_owner ON public.labels(owner_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_labels_slug ON public.labels(slug) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER labels_set_updated_at
   BEFORE UPDATE ON public.labels
@@ -31,7 +31,7 @@ CREATE TRIGGER labels_set_updated_at
 -- ---------------------------------------------------------------------------
 -- creators — entité professionnelle artiste
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.creators (
+CREATE TABLE IF NOT EXISTS public.creators (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   label_id UUID REFERENCES public.labels(id) ON DELETE SET NULL,
@@ -45,8 +45,8 @@ CREATE TABLE public.creators (
   UNIQUE (owner_id)
 );
 
-CREATE INDEX idx_creators_status ON public.creators(status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_creators_label ON public.creators(label_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_creators_status ON public.creators(status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_creators_label ON public.creators(label_id) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER creators_set_updated_at
   BEFORE UPDATE ON public.creators
@@ -55,7 +55,7 @@ CREATE TRIGGER creators_set_updated_at
 -- ---------------------------------------------------------------------------
 -- artist_profiles — identité publique artiste (1:1 creator)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.artist_profiles (
+CREATE TABLE IF NOT EXISTS public.artist_profiles (
   creator_id UUID PRIMARY KEY REFERENCES public.creators(id) ON DELETE CASCADE,
   stage_name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
@@ -72,8 +72,8 @@ CREATE TABLE public.artist_profiles (
   updated_by UUID REFERENCES auth.users(id)
 );
 
-CREATE INDEX idx_artist_profiles_slug ON public.artist_profiles(slug);
-CREATE INDEX idx_artist_profiles_public ON public.artist_profiles(is_public) WHERE is_public = true;
+CREATE INDEX IF NOT EXISTS idx_artist_profiles_slug ON public.artist_profiles(slug);
+CREATE INDEX IF NOT EXISTS idx_artist_profiles_public ON public.artist_profiles(is_public) WHERE is_public = true;
 
 ALTER TABLE public.artist_profiles
   ADD CONSTRAINT artist_profiles_bio_length CHECK (bio IS NULL OR char_length(bio) <= 1000);
@@ -85,7 +85,7 @@ CREATE TRIGGER artist_profiles_set_updated_at
 -- ---------------------------------------------------------------------------
 -- creator_roles — équipe & permissions internes
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.creator_roles (
+CREATE TABLE IF NOT EXISTS public.creator_roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.creators(id) ON DELETE CASCADE,
   member_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -99,8 +99,8 @@ CREATE TABLE public.creator_roles (
   UNIQUE (creator_id, member_id)
 );
 
-CREATE INDEX idx_creator_roles_member ON public.creator_roles(member_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_creator_roles_creator ON public.creator_roles(creator_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_creator_roles_member ON public.creator_roles(member_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_creator_roles_creator ON public.creator_roles(creator_id) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER creator_roles_set_updated_at
   BEFORE UPDATE ON public.creator_roles
@@ -109,7 +109,7 @@ CREATE TRIGGER creator_roles_set_updated_at
 -- ---------------------------------------------------------------------------
 -- label_members — équipe label
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.label_members (
+CREATE TABLE IF NOT EXISTS public.label_members (
   label_id UUID NOT NULL REFERENCES public.labels(id) ON DELETE CASCADE,
   member_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'a_and_r', 'member')),
@@ -122,7 +122,7 @@ CREATE TABLE public.label_members (
   PRIMARY KEY (label_id, member_id)
 );
 
-CREATE INDEX idx_label_members_member ON public.label_members(member_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_label_members_member ON public.label_members(member_id) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER label_members_set_updated_at
   BEFORE UPDATE ON public.label_members
@@ -131,7 +131,7 @@ CREATE TRIGGER label_members_set_updated_at
 -- ---------------------------------------------------------------------------
 -- studios — espace de création (CDC Creator OS)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.studios (
+CREATE TABLE IF NOT EXISTS public.studios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.creators(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE public.studios (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_studios_creator ON public.studios(creator_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_studios_creator ON public.studios(creator_id) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER studios_set_updated_at
   BEFORE UPDATE ON public.studios
@@ -155,7 +155,7 @@ CREATE TRIGGER studios_set_updated_at
 -- ---------------------------------------------------------------------------
 -- creator_verifications — workflow KYC / artiste / label
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.creator_verifications (
+CREATE TABLE IF NOT EXISTS public.creator_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES public.creators(id) ON DELETE CASCADE,
   label_id UUID REFERENCES public.labels(id) ON DELETE SET NULL,
@@ -175,8 +175,8 @@ CREATE TABLE public.creator_verifications (
   updated_by UUID REFERENCES auth.users(id)
 );
 
-CREATE INDEX idx_creator_verifications_creator ON public.creator_verifications(creator_id, created_at DESC);
-CREATE INDEX idx_creator_verifications_pending ON public.creator_verifications(status)
+CREATE INDEX IF NOT EXISTS idx_creator_verifications_creator ON public.creator_verifications(creator_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_creator_verifications_pending ON public.creator_verifications(status)
   WHERE status = 'pending';
 
 CREATE TRIGGER creator_verifications_set_updated_at

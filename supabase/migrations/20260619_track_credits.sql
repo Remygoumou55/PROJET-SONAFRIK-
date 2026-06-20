@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- track_credits : crédits d'affichage par morceau
 -- Distinct de contributors/works (droits SOCAN/BSDA) — ce système
 -- concerne l'affichage public des contributeurs côté streaming.
@@ -48,13 +48,13 @@ ALTER TABLE public.track_credits ENABLE ROW LEVEL SECURITY;
 
 -- Lecture publique (information non sensible, visible par tous les visiteurs)
 DROP POLICY IF EXISTS "track_credits_select_public" ON public.track_credits;
-CREATE POLICY "track_credits_select_public"
+CREATE POLICY IF NOT EXISTS "track_credits_select_public"
   ON public.track_credits FOR SELECT
   USING (true);
 
 -- INSERT : uniquement le propriétaire du morceau
 DROP POLICY IF EXISTS "track_credits_insert_owner" ON public.track_credits;
-CREATE POLICY "track_credits_insert_owner"
+CREATE POLICY IF NOT EXISTS "track_credits_insert_owner"
   ON public.track_credits FOR INSERT
   WITH CHECK (
     EXISTS (
@@ -66,7 +66,7 @@ CREATE POLICY "track_credits_insert_owner"
 
 -- UPDATE : uniquement le propriétaire du morceau
 DROP POLICY IF EXISTS "track_credits_update_owner" ON public.track_credits;
-CREATE POLICY "track_credits_update_owner"
+CREATE POLICY IF NOT EXISTS "track_credits_update_owner"
   ON public.track_credits FOR UPDATE
   USING (
     EXISTS (
@@ -78,7 +78,7 @@ CREATE POLICY "track_credits_update_owner"
 
 -- DELETE : uniquement le propriétaire du morceau
 DROP POLICY IF EXISTS "track_credits_delete_owner" ON public.track_credits;
-CREATE POLICY "track_credits_delete_owner"
+CREATE POLICY IF NOT EXISTS "track_credits_delete_owner"
   ON public.track_credits FOR DELETE
   USING (
     EXISTS (

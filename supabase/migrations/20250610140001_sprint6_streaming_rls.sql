@@ -1,4 +1,4 @@
--- Sprint 6 — RLS Streaming OS
+﻿-- Sprint 6 — RLS Streaming OS
 -- playlists · playlist_tracks · favorites · stream_sessions · stream_events · playback_positions
 -- Storage audio · Permissions streaming
 
@@ -17,7 +17,7 @@ ALTER TABLE public.playback_positions ENABLE ROW LEVEL SECURITY;
 -- ---------------------------------------------------------------------------
 
 -- Lecture : playlists publiques + propres playlists
-CREATE POLICY playlists_select ON public.playlists
+CREATE POLICY IF NOT EXISTS playlists_select ON public.playlists
   FOR SELECT TO authenticated
   USING (
     deleted_at IS NULL
@@ -25,18 +25,18 @@ CREATE POLICY playlists_select ON public.playlists
   );
 
 -- Création : pour soi-même uniquement
-CREATE POLICY playlists_insert ON public.playlists
+CREATE POLICY IF NOT EXISTS playlists_insert ON public.playlists
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
 -- Modification : propriétaire ou admin
-CREATE POLICY playlists_update ON public.playlists
+CREATE POLICY IF NOT EXISTS playlists_update ON public.playlists
   FOR UPDATE TO authenticated
   USING (user_id = auth.uid() OR public.is_admin(auth.uid()))
   WITH CHECK (user_id = auth.uid() OR public.is_admin(auth.uid()));
 
 -- Soft delete : propriétaire ou admin
-CREATE POLICY playlists_delete ON public.playlists
+CREATE POLICY IF NOT EXISTS playlists_delete ON public.playlists
   FOR DELETE TO authenticated
   USING (user_id = auth.uid() OR public.is_admin(auth.uid()));
 
@@ -45,7 +45,7 @@ CREATE POLICY playlists_delete ON public.playlists
 -- ---------------------------------------------------------------------------
 
 -- Lecture : playlists accessibles
-CREATE POLICY playlist_tracks_select ON public.playlist_tracks
+CREATE POLICY IF NOT EXISTS playlist_tracks_select ON public.playlist_tracks
   FOR SELECT TO authenticated
   USING (
     EXISTS (
@@ -57,7 +57,7 @@ CREATE POLICY playlist_tracks_select ON public.playlist_tracks
   );
 
 -- Ajout : propriétaire de la playlist uniquement
-CREATE POLICY playlist_tracks_insert ON public.playlist_tracks
+CREATE POLICY IF NOT EXISTS playlist_tracks_insert ON public.playlist_tracks
   FOR INSERT TO authenticated
   WITH CHECK (
     EXISTS (
@@ -69,7 +69,7 @@ CREATE POLICY playlist_tracks_insert ON public.playlist_tracks
   );
 
 -- Réordonnancement : propriétaire uniquement
-CREATE POLICY playlist_tracks_update ON public.playlist_tracks
+CREATE POLICY IF NOT EXISTS playlist_tracks_update ON public.playlist_tracks
   FOR UPDATE TO authenticated
   USING (
     EXISTS (
@@ -79,7 +79,7 @@ CREATE POLICY playlist_tracks_update ON public.playlist_tracks
   );
 
 -- Suppression : propriétaire uniquement
-CREATE POLICY playlist_tracks_delete ON public.playlist_tracks
+CREATE POLICY IF NOT EXISTS playlist_tracks_delete ON public.playlist_tracks
   FOR DELETE TO authenticated
   USING (
     EXISTS (
@@ -93,17 +93,17 @@ CREATE POLICY playlist_tracks_delete ON public.playlist_tracks
 -- ---------------------------------------------------------------------------
 
 -- Lecture : ses propres favoris uniquement
-CREATE POLICY favorites_select ON public.favorites
+CREATE POLICY IF NOT EXISTS favorites_select ON public.favorites
   FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
 -- Les RPCs toggle_favorite / is_favorited utilisent SECURITY DEFINER
 -- Pour l'accès direct :
-CREATE POLICY favorites_insert ON public.favorites
+CREATE POLICY IF NOT EXISTS favorites_insert ON public.favorites
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY favorites_delete ON public.favorites
+CREATE POLICY IF NOT EXISTS favorites_delete ON public.favorites
   FOR DELETE TO authenticated
   USING (user_id = auth.uid());
 
@@ -112,18 +112,18 @@ CREATE POLICY favorites_delete ON public.favorites
 -- ---------------------------------------------------------------------------
 
 -- Lecture : ses propres sessions uniquement
-CREATE POLICY stream_sessions_select ON public.stream_sessions
+CREATE POLICY IF NOT EXISTS stream_sessions_select ON public.stream_sessions
   FOR SELECT TO authenticated
   USING (user_id = auth.uid() OR public.is_admin(auth.uid()));
 
 -- Insertion : via RPC start_stream_session (SECURITY DEFINER)
 -- Politique permissive pour les RPCs
-CREATE POLICY stream_sessions_insert ON public.stream_sessions
+CREATE POLICY IF NOT EXISTS stream_sessions_insert ON public.stream_sessions
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
 -- Mise à jour : via RPCs heartbeat/complete (SECURITY DEFINER)
-CREATE POLICY stream_sessions_update ON public.stream_sessions
+CREATE POLICY IF NOT EXISTS stream_sessions_update ON public.stream_sessions
   FOR UPDATE TO authenticated
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
@@ -133,12 +133,12 @@ CREATE POLICY stream_sessions_update ON public.stream_sessions
 -- ---------------------------------------------------------------------------
 
 -- Lecture : ses propres événements
-CREATE POLICY stream_events_select ON public.stream_events
+CREATE POLICY IF NOT EXISTS stream_events_select ON public.stream_events
   FOR SELECT TO authenticated
   USING (user_id = auth.uid() OR public.is_admin(auth.uid()));
 
 -- Insertion uniquement
-CREATE POLICY stream_events_insert ON public.stream_events
+CREATE POLICY IF NOT EXISTS stream_events_insert ON public.stream_events
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
@@ -149,16 +149,16 @@ CREATE POLICY stream_events_insert ON public.stream_events
 -- ---------------------------------------------------------------------------
 
 -- Lecture : ses propres positions
-CREATE POLICY playback_positions_select ON public.playback_positions
+CREATE POLICY IF NOT EXISTS playback_positions_select ON public.playback_positions
   FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
 -- Gestion via RPC save_playback_position (SECURITY DEFINER)
-CREATE POLICY playback_positions_insert ON public.playback_positions
+CREATE POLICY IF NOT EXISTS playback_positions_insert ON public.playback_positions
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY playback_positions_update ON public.playback_positions
+CREATE POLICY IF NOT EXISTS playback_positions_update ON public.playback_positions
   FOR UPDATE TO authenticated
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
@@ -173,7 +173,7 @@ CREATE POLICY playback_positions_update ON public.playback_positions
 -- Pas de politique SELECT pour 'audio' depuis les clients normaux
 
 -- Insertion : créateurs vérifient le chemin
-CREATE POLICY audio_insert ON storage.objects
+CREATE POLICY IF NOT EXISTS audio_insert ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'audio'
@@ -181,7 +181,7 @@ CREATE POLICY audio_insert ON storage.objects
   );
 
 -- Mise à jour : créateurs uniquement
-CREATE POLICY audio_update ON storage.objects
+CREATE POLICY IF NOT EXISTS audio_update ON storage.objects
   FOR UPDATE TO authenticated
   USING (
     bucket_id = 'audio'
@@ -189,7 +189,7 @@ CREATE POLICY audio_update ON storage.objects
   );
 
 -- Suppression : créateurs ou admin
-CREATE POLICY audio_delete ON storage.objects
+CREATE POLICY IF NOT EXISTS audio_delete ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'audio'

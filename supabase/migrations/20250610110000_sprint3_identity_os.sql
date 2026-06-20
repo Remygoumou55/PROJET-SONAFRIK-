@@ -1,4 +1,4 @@
--- Sprint 3 — Identity OS complet
+﻿-- Sprint 3 — Identity OS complet
 -- Profils étendus · Préférences · Notifications · Storage avatars
 
 -- ---------------------------------------------------------------------------
@@ -18,7 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_city ON public.profiles(city) WHERE dele
 -- ---------------------------------------------------------------------------
 -- user_preferences — 1:1 avec profiles
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.user_preferences (
+CREATE TABLE IF NOT EXISTS public.user_preferences (
   user_id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
   language TEXT NOT NULL DEFAULT 'fr' CHECK (language IN ('fr', 'en')),
   audio_quality TEXT NOT NULL DEFAULT 'auto' CHECK (audio_quality IN ('64', '128', '256', 'auto')),
@@ -48,7 +48,7 @@ CREATE TRIGGER user_preferences_set_updated_at
 -- ---------------------------------------------------------------------------
 -- notifications — in-app (Identity OS)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.notifications (
+CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   category TEXT NOT NULL CHECK (category IN ('system', 'social', 'artist', 'billing', 'security')),
@@ -62,10 +62,10 @@ CREATE TABLE public.notifications (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_notifications_user_unread ON public.notifications(user_id, created_at DESC)
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON public.notifications(user_id, created_at DESC)
   WHERE read_at IS NULL AND deleted_at IS NULL;
 
-CREATE INDEX idx_notifications_user_id ON public.notifications(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id, created_at DESC);
 
 -- ---------------------------------------------------------------------------
 -- Auto-création préférences + notification bienvenue

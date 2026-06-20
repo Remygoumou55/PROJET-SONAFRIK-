@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- Sprint 9 Rights OS — Migration corrective idempotente
 -- Gère les tables déjà existantes avec un schéma différent
 -- Exécuter APRÈS (ou À LA PLACE DE) 20260615000000_sprint9_rights_os.sql
@@ -69,7 +69,7 @@ CREATE TYPE rights_claim_status AS ENUM (
 
 -- ─── 6. Recréer les tables ───────────────────────────────────────────────────
 
-CREATE TABLE works (
+CREATE TABLE IF NOT EXISTS works (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id  UUID NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
   title       TEXT NOT NULL CHECK (char_length(title) BETWEEN 1 AND 200),
@@ -83,9 +83,9 @@ CREATE TABLE works (
   deleted_at  TIMESTAMPTZ
 );
 
-CREATE INDEX idx_works_creator_id ON works (creator_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_works_creator_id ON works (creator_id) WHERE deleted_at IS NULL;
 
-CREATE TABLE contributors (
+CREATE TABLE IF NOT EXISTS contributors (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_id      UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
   profile_id   UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -96,9 +96,9 @@ CREATE TABLE contributors (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_contributors_work_id ON contributors (work_id);
+CREATE INDEX IF NOT EXISTS idx_contributors_work_id ON contributors (work_id);
 
-CREATE TABLE ownerships (
+CREATE TABLE IF NOT EXISTS ownerships (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_id        UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
   contributor_id UUID NOT NULL REFERENCES contributors(id) ON DELETE CASCADE,
@@ -111,7 +111,7 @@ CREATE TABLE ownerships (
   UNIQUE (work_id, contributor_id, ownership_type, territory)
 );
 
-CREATE INDEX idx_ownerships_work_id ON ownerships (work_id);
+CREATE INDEX IF NOT EXISTS idx_ownerships_work_id ON ownerships (work_id);
 
 -- Trigger : total parts ≤ 100% par (work_id, ownership_type, territory)
 CREATE OR REPLACE FUNCTION check_ownership_total()
@@ -139,7 +139,7 @@ CREATE TRIGGER trg_check_ownership_total
   BEFORE INSERT OR UPDATE ON ownerships
   FOR EACH ROW EXECUTE FUNCTION check_ownership_total();
 
-CREATE TABLE ownership_versions (
+CREATE TABLE IF NOT EXISTS ownership_versions (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_id        UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
   version_number INTEGER NOT NULL DEFAULT 1,
@@ -149,9 +149,9 @@ CREATE TABLE ownership_versions (
   UNIQUE (work_id, version_number)
 );
 
-CREATE INDEX idx_ownership_versions_work_id ON ownership_versions (work_id);
+CREATE INDEX IF NOT EXISTS idx_ownership_versions_work_id ON ownership_versions (work_id);
 
-CREATE TABLE contracts (
+CREATE TABLE IF NOT EXISTS contracts (
   id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_id               UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
   creator_id            UUID NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
@@ -168,10 +168,10 @@ CREATE TABLE contracts (
   CHECK (end_date IS NULL OR end_date >= start_date)
 );
 
-CREATE INDEX idx_contracts_work_id    ON contracts (work_id)    WHERE deleted_at IS NULL;
-CREATE INDEX idx_contracts_creator_id ON contracts (creator_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_contracts_work_id    ON contracts (work_id)    WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_contracts_creator_id ON contracts (creator_id) WHERE deleted_at IS NULL;
 
-CREATE TABLE rights_claims (
+CREATE TABLE IF NOT EXISTS rights_claims (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_id      UUID NOT NULL REFERENCES works(id) ON DELETE CASCADE,
   claimant_id  UUID NOT NULL REFERENCES profiles(id),
@@ -185,9 +185,9 @@ CREATE TABLE rights_claims (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_rights_claims_work_id     ON rights_claims (work_id);
-CREATE INDEX idx_rights_claims_claimant_id ON rights_claims (claimant_id);
-CREATE INDEX idx_rights_claims_status      ON rights_claims (status) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_rights_claims_work_id     ON rights_claims (work_id);
+CREATE INDEX IF NOT EXISTS idx_rights_claims_claimant_id ON rights_claims (claimant_id);
+CREATE INDEX IF NOT EXISTS idx_rights_claims_status      ON rights_claims (status) WHERE status = 'pending';
 
 -- ─── 7. Triggers updated_at ──────────────────────────────────────────────────
 
@@ -224,7 +224,7 @@ ALTER TABLE contracts          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rights_claims      ENABLE ROW LEVEL SECURITY;
 
 -- works
-CREATE POLICY works_select ON works FOR SELECT
+CREATE POLICY IF NOT EXISTS works_select ON works FOR SELECT
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
     OR EXISTS (
@@ -234,18 +234,18 @@ CREATE POLICY works_select ON works FOR SELECT
     )
   );
 
-CREATE POLICY works_insert ON works FOR INSERT
+CREATE POLICY IF NOT EXISTS works_insert ON works FOR INSERT
   WITH CHECK (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
-CREATE POLICY works_update ON works FOR UPDATE
+CREATE POLICY IF NOT EXISTS works_update ON works FOR UPDATE
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
 -- contributors
-CREATE POLICY contributors_select ON contributors FOR SELECT
+CREATE POLICY IF NOT EXISTS contributors_select ON contributors FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -255,7 +255,7 @@ CREATE POLICY contributors_select ON contributors FOR SELECT
     OR profile_id = auth.uid()
   );
 
-CREATE POLICY contributors_insert ON contributors FOR INSERT
+CREATE POLICY IF NOT EXISTS contributors_insert ON contributors FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -264,7 +264,7 @@ CREATE POLICY contributors_insert ON contributors FOR INSERT
     )
   );
 
-CREATE POLICY contributors_update ON contributors FOR UPDATE
+CREATE POLICY IF NOT EXISTS contributors_update ON contributors FOR UPDATE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -274,7 +274,7 @@ CREATE POLICY contributors_update ON contributors FOR UPDATE
   );
 
 -- ownerships
-CREATE POLICY ownerships_select ON ownerships FOR SELECT
+CREATE POLICY IF NOT EXISTS ownerships_select ON ownerships FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -283,7 +283,7 @@ CREATE POLICY ownerships_select ON ownerships FOR SELECT
     )
   );
 
-CREATE POLICY ownerships_insert ON ownerships FOR INSERT
+CREATE POLICY IF NOT EXISTS ownerships_insert ON ownerships FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -292,7 +292,7 @@ CREATE POLICY ownerships_insert ON ownerships FOR INSERT
     )
   );
 
-CREATE POLICY ownerships_update ON ownerships FOR UPDATE
+CREATE POLICY IF NOT EXISTS ownerships_update ON ownerships FOR UPDATE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -301,7 +301,7 @@ CREATE POLICY ownerships_update ON ownerships FOR UPDATE
     )
   );
 
-CREATE POLICY ownerships_delete ON ownerships FOR DELETE
+CREATE POLICY IF NOT EXISTS ownerships_delete ON ownerships FOR DELETE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -311,7 +311,7 @@ CREATE POLICY ownerships_delete ON ownerships FOR DELETE
   );
 
 -- ownership_versions
-CREATE POLICY ownership_versions_select ON ownership_versions FOR SELECT
+CREATE POLICY IF NOT EXISTS ownership_versions_select ON ownership_versions FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -320,7 +320,7 @@ CREATE POLICY ownership_versions_select ON ownership_versions FOR SELECT
     )
   );
 
-CREATE POLICY ownership_versions_insert ON ownership_versions FOR INSERT
+CREATE POLICY IF NOT EXISTS ownership_versions_insert ON ownership_versions FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -330,7 +330,7 @@ CREATE POLICY ownership_versions_insert ON ownership_versions FOR INSERT
   );
 
 -- contracts
-CREATE POLICY contracts_select ON contracts FOR SELECT
+CREATE POLICY IF NOT EXISTS contracts_select ON contracts FOR SELECT
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
     OR EXISTS (
@@ -340,18 +340,18 @@ CREATE POLICY contracts_select ON contracts FOR SELECT
     )
   );
 
-CREATE POLICY contracts_insert ON contracts FOR INSERT
+CREATE POLICY IF NOT EXISTS contracts_insert ON contracts FOR INSERT
   WITH CHECK (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
-CREATE POLICY contracts_update ON contracts FOR UPDATE
+CREATE POLICY IF NOT EXISTS contracts_update ON contracts FOR UPDATE
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
 -- rights_claims
-CREATE POLICY rights_claims_select ON rights_claims FOR SELECT
+CREATE POLICY IF NOT EXISTS rights_claims_select ON rights_claims FOR SELECT
   USING (
     claimant_id = auth.uid()
     OR work_id IN (
@@ -366,7 +366,7 @@ CREATE POLICY rights_claims_select ON rights_claims FOR SELECT
     )
   );
 
-CREATE POLICY rights_claims_insert ON rights_claims FOR INSERT
+CREATE POLICY IF NOT EXISTS rights_claims_insert ON rights_claims FOR INSERT
   WITH CHECK (claimant_id = auth.uid());
 
 -- ─── 9. Grants ───────────────────────────────────────────────────────────────

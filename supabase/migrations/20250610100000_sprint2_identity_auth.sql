@@ -1,4 +1,4 @@
--- Sprint 2 — Identity OS + AUDIT_LOG
+﻿-- Sprint 2 — Identity OS + AUDIT_LOG
 -- SONAFRIK CDC V9.0
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -17,7 +17,7 @@ $$ LANGUAGE plpgsql;
 -- ---------------------------------------------------------------------------
 -- profiles
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone TEXT UNIQUE,
   email TEXT,
@@ -36,8 +36,8 @@ CREATE TABLE public.profiles (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_profiles_phone ON public.profiles(phone) WHERE deleted_at IS NULL;
-CREATE INDEX idx_profiles_account_type ON public.profiles(account_type) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_profiles_phone ON public.profiles(phone) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_profiles_account_type ON public.profiles(account_type) WHERE deleted_at IS NULL;
 
 CREATE TRIGGER profiles_set_updated_at
   BEFORE UPDATE ON public.profiles
@@ -46,7 +46,7 @@ CREATE TRIGGER profiles_set_updated_at
 -- ---------------------------------------------------------------------------
 -- roles
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.roles (
+CREATE TABLE IF NOT EXISTS public.roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -64,7 +64,7 @@ CREATE TRIGGER roles_set_updated_at
 -- ---------------------------------------------------------------------------
 -- permissions
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.permissions (
+CREATE TABLE IF NOT EXISTS public.permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -82,7 +82,7 @@ CREATE TRIGGER permissions_set_updated_at
 -- ---------------------------------------------------------------------------
 -- role_permissions
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.role_permissions (
+CREATE TABLE IF NOT EXISTS public.role_permissions (
   role_id UUID NOT NULL REFERENCES public.roles(id) ON DELETE CASCADE,
   permission_id UUID NOT NULL REFERENCES public.permissions(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -93,7 +93,7 @@ CREATE TABLE public.role_permissions (
 -- ---------------------------------------------------------------------------
 -- user_roles
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   role_id UUID NOT NULL REFERENCES public.roles(id) ON DELETE CASCADE,
   assigned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -101,12 +101,12 @@ CREATE TABLE public.user_roles (
   PRIMARY KEY (user_id, role_id)
 );
 
-CREATE INDEX idx_user_roles_user_id ON public.user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON public.user_roles(user_id);
 
 -- ---------------------------------------------------------------------------
 -- user_sessions
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.user_sessions (
+CREATE TABLE IF NOT EXISTS public.user_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   device_id TEXT,
@@ -124,8 +124,8 @@ CREATE TABLE public.user_sessions (
   updated_by UUID REFERENCES auth.users(id)
 );
 
-CREATE INDEX idx_user_sessions_user_id ON public.user_sessions(user_id);
-CREATE INDEX idx_user_sessions_active ON public.user_sessions(user_id)
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON public.user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON public.user_sessions(user_id)
   WHERE revoked_at IS NULL;
 
 CREATE TRIGGER user_sessions_set_updated_at
@@ -135,7 +135,7 @@ CREATE TRIGGER user_sessions_set_updated_at
 -- ---------------------------------------------------------------------------
 -- audit_logs — INSERT ONLY (Règle #6 CDC)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.audit_logs (
+CREATE TABLE IF NOT EXISTS public.audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   actor_id UUID REFERENCES auth.users(id),
   action TEXT NOT NULL,
@@ -147,9 +147,9 @@ CREATE TABLE public.audit_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_audit_logs_actor ON public.audit_logs(actor_id);
-CREATE INDEX idx_audit_logs_action ON public.audit_logs(action);
-CREATE INDEX idx_audit_logs_created_at ON public.audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_actor ON public.audit_logs(actor_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON public.audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON public.audit_logs(created_at DESC);
 
 CREATE OR REPLACE FUNCTION public.prevent_audit_logs_mutation()
 RETURNS TRIGGER AS $$

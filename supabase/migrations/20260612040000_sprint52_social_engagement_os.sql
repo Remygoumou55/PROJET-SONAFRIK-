@@ -1,4 +1,4 @@
--- Sprint 5.2 — Social & Engagement OS
+﻿-- Sprint 5.2 — Social & Engagement OS
 -- follows · toggle_follow · is_following · get_follow_count
 -- get_like_count · get_engagement_stats · get_creator_engagement_stats
 -- Likes = favorites (entity_type='track') — réutilise l'infra Sprint 6
@@ -30,15 +30,15 @@ DROP POLICY IF EXISTS "follows_insert_own" ON public.follows;
 DROP POLICY IF EXISTS "follows_delete_own" ON public.follows;
 
 -- Lecture : les utilisateurs authentifiés voient tous les follows (pour les compteurs)
-CREATE POLICY "follows_select_authenticated" ON public.follows
+CREATE POLICY IF NOT EXISTS "follows_select_authenticated" ON public.follows
   FOR SELECT TO authenticated USING (true);
 
 -- Insertion : uniquement pour soi-même
-CREATE POLICY "follows_insert_own" ON public.follows
+CREATE POLICY IF NOT EXISTS "follows_insert_own" ON public.follows
   FOR INSERT TO authenticated WITH CHECK (auth.uid() = follower_id);
 
 -- Suppression : uniquement pour soi-même
-CREATE POLICY "follows_delete_own" ON public.follows
+CREATE POLICY IF NOT EXISTS "follows_delete_own" ON public.follows
   FOR DELETE TO authenticated USING (auth.uid() = follower_id);
 
 -- ---------------------------------------------------------------------------

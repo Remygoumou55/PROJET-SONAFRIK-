@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- Sprint 9 — Rights OS
 -- Tables : works, contributors, ownerships, ownership_versions,
 --           contracts, rights_claims
@@ -230,7 +230,7 @@ DROP POLICY IF EXISTS rights_claims_select     ON rights_claims;
 DROP POLICY IF EXISTS rights_claims_insert     ON rights_claims;
 
 -- works : le créateur voit et modifie ses œuvres
-CREATE POLICY works_select ON works FOR SELECT
+CREATE POLICY IF NOT EXISTS works_select ON works FOR SELECT
   USING (
     auth.uid() IN (
       SELECT owner_id FROM creators WHERE id = creator_id
@@ -238,23 +238,23 @@ CREATE POLICY works_select ON works FOR SELECT
     OR EXISTS (SELECT 1 FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = auth.uid() AND r.name = 'admin')
   );
 
-CREATE POLICY works_insert ON works FOR INSERT
+CREATE POLICY IF NOT EXISTS works_insert ON works FOR INSERT
   WITH CHECK (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
-CREATE POLICY works_update ON works FOR UPDATE
+CREATE POLICY IF NOT EXISTS works_update ON works FOR UPDATE
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
-CREATE POLICY works_delete ON works FOR UPDATE
+CREATE POLICY IF NOT EXISTS works_delete ON works FOR UPDATE
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
 -- contributors : accessible par le créateur de l'œuvre
-CREATE POLICY contributors_select ON contributors FOR SELECT
+CREATE POLICY IF NOT EXISTS contributors_select ON contributors FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -264,7 +264,7 @@ CREATE POLICY contributors_select ON contributors FOR SELECT
     OR profile_id = auth.uid()
   );
 
-CREATE POLICY contributors_insert ON contributors FOR INSERT
+CREATE POLICY IF NOT EXISTS contributors_insert ON contributors FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -273,7 +273,7 @@ CREATE POLICY contributors_insert ON contributors FOR INSERT
     )
   );
 
-CREATE POLICY contributors_update ON contributors FOR UPDATE
+CREATE POLICY IF NOT EXISTS contributors_update ON contributors FOR UPDATE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -283,7 +283,7 @@ CREATE POLICY contributors_update ON contributors FOR UPDATE
   );
 
 -- ownerships : même règle que contributors
-CREATE POLICY ownerships_select ON ownerships FOR SELECT
+CREATE POLICY IF NOT EXISTS ownerships_select ON ownerships FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -292,7 +292,7 @@ CREATE POLICY ownerships_select ON ownerships FOR SELECT
     )
   );
 
-CREATE POLICY ownerships_insert ON ownerships FOR INSERT
+CREATE POLICY IF NOT EXISTS ownerships_insert ON ownerships FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -301,7 +301,7 @@ CREATE POLICY ownerships_insert ON ownerships FOR INSERT
     )
   );
 
-CREATE POLICY ownerships_update ON ownerships FOR UPDATE
+CREATE POLICY IF NOT EXISTS ownerships_update ON ownerships FOR UPDATE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -310,7 +310,7 @@ CREATE POLICY ownerships_update ON ownerships FOR UPDATE
     )
   );
 
-CREATE POLICY ownerships_delete ON ownerships FOR DELETE
+CREATE POLICY IF NOT EXISTS ownerships_delete ON ownerships FOR DELETE
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -320,7 +320,7 @@ CREATE POLICY ownerships_delete ON ownerships FOR DELETE
   );
 
 -- ownership_versions : lecture seule pour le créateur de l'œuvre
-CREATE POLICY ownership_versions_select ON ownership_versions FOR SELECT
+CREATE POLICY IF NOT EXISTS ownership_versions_select ON ownership_versions FOR SELECT
   USING (
     work_id IN (
       SELECT w.id FROM works w
@@ -329,7 +329,7 @@ CREATE POLICY ownership_versions_select ON ownership_versions FOR SELECT
     )
   );
 
-CREATE POLICY ownership_versions_insert ON ownership_versions FOR INSERT
+CREATE POLICY IF NOT EXISTS ownership_versions_insert ON ownership_versions FOR INSERT
   WITH CHECK (
     work_id IN (
       SELECT w.id FROM works w
@@ -339,24 +339,24 @@ CREATE POLICY ownership_versions_insert ON ownership_versions FOR INSERT
   );
 
 -- contracts : créateur de l'œuvre
-CREATE POLICY contracts_select ON contracts FOR SELECT
+CREATE POLICY IF NOT EXISTS contracts_select ON contracts FOR SELECT
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
     OR EXISTS (SELECT 1 FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = auth.uid() AND r.name = 'admin')
   );
 
-CREATE POLICY contracts_insert ON contracts FOR INSERT
+CREATE POLICY IF NOT EXISTS contracts_insert ON contracts FOR INSERT
   WITH CHECK (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
-CREATE POLICY contracts_update ON contracts FOR UPDATE
+CREATE POLICY IF NOT EXISTS contracts_update ON contracts FOR UPDATE
   USING (
     creator_id IN (SELECT id FROM creators WHERE owner_id = auth.uid())
   );
 
 -- rights_claims : claimant voit ses propres claims; admin voit tout
-CREATE POLICY rights_claims_select ON rights_claims FOR SELECT
+CREATE POLICY IF NOT EXISTS rights_claims_select ON rights_claims FOR SELECT
   USING (
     claimant_id = auth.uid()
     OR work_id IN (
@@ -367,7 +367,7 @@ CREATE POLICY rights_claims_select ON rights_claims FOR SELECT
     OR EXISTS (SELECT 1 FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = auth.uid() AND r.name = 'admin')
   );
 
-CREATE POLICY rights_claims_insert ON rights_claims FOR INSERT
+CREATE POLICY IF NOT EXISTS rights_claims_insert ON rights_claims FOR INSERT
   WITH CHECK (claimant_id = auth.uid());
 
 -- ─── Grants ──────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
--- SONAFRIK — Sprint G-4 · Infrastructure paiements mobiles africains
+﻿-- SONAFRIK — Sprint G-4 · Infrastructure paiements mobiles africains
 -- Table payment_intents + webhook confirmation RPC
 -- RÈGLE FINANCIÈRE : jamais de crédit wallet avant confirmation opérateur (confirm_payment_intent)
 
@@ -7,7 +7,7 @@
 -- Représente une intention de paiement en attente de confirmation opérateur.
 -- Cycle de vie : initiated → pending → confirmed | failed | expired
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.payment_intents (
+CREATE TABLE IF NOT EXISTS public.payment_intents (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id        UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   wallet_id      UUID NOT NULL REFERENCES public.wallets(id),
@@ -40,20 +40,20 @@ CREATE TRIGGER payment_intents_set_updated_at
   BEFORE UPDATE ON public.payment_intents
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_payment_intents_user_status ON public.payment_intents(user_id, status);
-CREATE INDEX idx_payment_intents_provider_ref ON public.payment_intents(provider_ref) WHERE provider_ref IS NOT NULL;
-CREATE INDEX idx_payment_intents_expires_at   ON public.payment_intents(expires_at)   WHERE status IN ('initiated', 'pending');
+CREATE INDEX IF NOT EXISTS idx_payment_intents_user_status ON public.payment_intents(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_payment_intents_provider_ref ON public.payment_intents(provider_ref) WHERE provider_ref IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_payment_intents_expires_at   ON public.payment_intents(expires_at)   WHERE status IN ('initiated', 'pending');
 
 -- ---------------------------------------------------------------------------
 -- RLS : l'utilisateur voit ses propres intents ; service_role voit tout
 -- ---------------------------------------------------------------------------
 ALTER TABLE public.payment_intents ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Utilisateur — voir ses payment_intents"
+CREATE POLICY IF NOT EXISTS "Utilisateur — voir ses payment_intents"
   ON public.payment_intents FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Utilisateur — créer ses payment_intents"
+CREATE POLICY IF NOT EXISTS "Utilisateur — créer ses payment_intents"
   ON public.payment_intents FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 

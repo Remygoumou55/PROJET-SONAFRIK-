@@ -1,4 +1,4 @@
--- Sprint 8 — Wallet OS RLS + permissions
+﻿-- Sprint 8 — Wallet OS RLS + permissions
 -- SONAFRIK CDC V9.0
 
 -- ---------------------------------------------------------------------------
@@ -15,97 +15,97 @@ ALTER TABLE public.royalty_calculations ENABLE ROW LEVEL SECURITY;
 -- ---------------------------------------------------------------------------
 -- wallets
 -- ---------------------------------------------------------------------------
-CREATE POLICY "wallets_select_own" ON public.wallets
+CREATE POLICY IF NOT EXISTS "wallets_select_own" ON public.wallets
   FOR SELECT USING (
     user_id = auth.uid()
     OR public.is_admin(auth.uid())
   );
 
 -- INSERT only via create_wallet_for_new_profile trigger (SECURITY DEFINER)
-CREATE POLICY "wallets_insert_trigger" ON public.wallets
+CREATE POLICY IF NOT EXISTS "wallets_insert_trigger" ON public.wallets
   FOR INSERT WITH CHECK (false);
 
 -- UPDATE only via RPCs (SECURITY DEFINER)
-CREATE POLICY "wallets_update_rpc" ON public.wallets
+CREATE POLICY IF NOT EXISTS "wallets_update_rpc" ON public.wallets
   FOR UPDATE USING (false);
 
 -- ---------------------------------------------------------------------------
 -- wallet_ledger (INSERT ONLY — trigger bloque UPDATE/DELETE)
 -- ---------------------------------------------------------------------------
-CREATE POLICY "wallet_ledger_select_own" ON public.wallet_ledger
+CREATE POLICY IF NOT EXISTS "wallet_ledger_select_own" ON public.wallet_ledger
   FOR SELECT USING (
     user_id = auth.uid()
     OR public.is_admin(auth.uid())
   );
 
 -- INSERT via RPCs (SECURITY DEFINER) uniquement
-CREATE POLICY "wallet_ledger_insert_rpc" ON public.wallet_ledger
+CREATE POLICY IF NOT EXISTS "wallet_ledger_insert_rpc" ON public.wallet_ledger
   FOR INSERT WITH CHECK (false);
 
 -- ---------------------------------------------------------------------------
 -- transactions
 -- ---------------------------------------------------------------------------
-CREATE POLICY "transactions_select_own" ON public.transactions
+CREATE POLICY IF NOT EXISTS "transactions_select_own" ON public.transactions
   FOR SELECT USING (
     user_id = auth.uid()
     OR public.is_admin(auth.uid())
   );
 
 -- INSERT/UPDATE via Edge Functions (service_role bypass RLS)
-CREATE POLICY "transactions_insert_service" ON public.transactions
+CREATE POLICY IF NOT EXISTS "transactions_insert_service" ON public.transactions
   FOR INSERT WITH CHECK (false);
 
-CREATE POLICY "transactions_update_admin" ON public.transactions
+CREATE POLICY IF NOT EXISTS "transactions_update_admin" ON public.transactions
   FOR UPDATE USING (public.is_admin(auth.uid()));
 
 -- ---------------------------------------------------------------------------
 -- withdrawals
 -- ---------------------------------------------------------------------------
-CREATE POLICY "withdrawals_select_own" ON public.withdrawals
+CREATE POLICY IF NOT EXISTS "withdrawals_select_own" ON public.withdrawals
   FOR SELECT USING (
     user_id = auth.uid()
     OR public.is_admin(auth.uid())
   );
 
 -- INSERT via request_withdrawal RPC (SECURITY DEFINER)
-CREATE POLICY "withdrawals_insert_rpc" ON public.withdrawals
+CREATE POLICY IF NOT EXISTS "withdrawals_insert_rpc" ON public.withdrawals
   FOR INSERT WITH CHECK (false);
 
-CREATE POLICY "withdrawals_update_admin" ON public.withdrawals
+CREATE POLICY IF NOT EXISTS "withdrawals_update_admin" ON public.withdrawals
   FOR UPDATE USING (public.is_admin(auth.uid()));
 
 -- ---------------------------------------------------------------------------
 -- payout_accounts
 -- ---------------------------------------------------------------------------
-CREATE POLICY "payout_accounts_select_own" ON public.payout_accounts
+CREATE POLICY IF NOT EXISTS "payout_accounts_select_own" ON public.payout_accounts
   FOR SELECT USING (user_id = auth.uid() AND deleted_at IS NULL);
 
 -- INSERT via add_payout_account RPC (SECURITY DEFINER)
-CREATE POLICY "payout_accounts_insert_rpc" ON public.payout_accounts
+CREATE POLICY IF NOT EXISTS "payout_accounts_insert_rpc" ON public.payout_accounts
   FOR INSERT WITH CHECK (false);
 
-CREATE POLICY "payout_accounts_update_own" ON public.payout_accounts
+CREATE POLICY IF NOT EXISTS "payout_accounts_update_own" ON public.payout_accounts
   FOR UPDATE USING (user_id = auth.uid() AND deleted_at IS NULL);
 
 -- ---------------------------------------------------------------------------
 -- royalty_cycles — lecture publique pour les artistes
 -- ---------------------------------------------------------------------------
-CREATE POLICY "royalty_cycles_select_auth" ON public.royalty_cycles
+CREATE POLICY IF NOT EXISTS "royalty_cycles_select_auth" ON public.royalty_cycles
   FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "royalty_cycles_manage_admin" ON public.royalty_cycles
+CREATE POLICY IF NOT EXISTS "royalty_cycles_manage_admin" ON public.royalty_cycles
   FOR ALL USING (public.is_admin(auth.uid()));
 
 -- ---------------------------------------------------------------------------
 -- royalty_calculations
 -- ---------------------------------------------------------------------------
-CREATE POLICY "royalty_calculations_select_own" ON public.royalty_calculations
+CREATE POLICY IF NOT EXISTS "royalty_calculations_select_own" ON public.royalty_calculations
   FOR SELECT USING (
     artist_id = auth.uid()
     OR public.is_admin(auth.uid())
   );
 
-CREATE POLICY "royalty_calculations_manage_admin" ON public.royalty_calculations
+CREATE POLICY IF NOT EXISTS "royalty_calculations_manage_admin" ON public.royalty_calculations
   FOR ALL USING (public.is_admin(auth.uid()));
 
 -- ---------------------------------------------------------------------------

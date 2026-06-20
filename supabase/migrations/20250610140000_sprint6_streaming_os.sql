@@ -1,11 +1,11 @@
--- Sprint 6 — Streaming OS complet
+﻿-- Sprint 6 — Streaming OS complet
 -- playlists · playlist_tracks · favorites · stream_sessions · stream_events · playback_positions
 -- Real Listen V7.2 · Anti-fraude · Reprise lecture · Permissions streaming
 
 -- ---------------------------------------------------------------------------
 -- playlists
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.playlists (
+CREATE TABLE IF NOT EXISTS public.playlists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL CHECK (char_length(trim(title)) BETWEEN 2 AND 200),
@@ -19,8 +19,8 @@ CREATE TABLE public.playlists (
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_playlists_user ON public.playlists(user_id, updated_at DESC) WHERE deleted_at IS NULL;
-CREATE INDEX idx_playlists_public ON public.playlists(is_public, updated_at DESC) WHERE deleted_at IS NULL AND is_public = true;
+CREATE INDEX IF NOT EXISTS idx_playlists_user ON public.playlists(user_id, updated_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_playlists_public ON public.playlists(is_public, updated_at DESC) WHERE deleted_at IS NULL AND is_public = true;
 
 CREATE TRIGGER playlists_set_updated_at
   BEFORE UPDATE ON public.playlists
@@ -29,7 +29,7 @@ CREATE TRIGGER playlists_set_updated_at
 -- ---------------------------------------------------------------------------
 -- playlist_tracks
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.playlist_tracks (
+CREATE TABLE IF NOT EXISTS public.playlist_tracks (
   playlist_id UUID NOT NULL REFERENCES public.playlists(id) ON DELETE CASCADE,
   track_id UUID NOT NULL REFERENCES public.tracks(id) ON DELETE CASCADE,
   position INTEGER NOT NULL DEFAULT 0 CHECK (position >= 0),
@@ -38,7 +38,7 @@ CREATE TABLE public.playlist_tracks (
   PRIMARY KEY (playlist_id, track_id)
 );
 
-CREATE INDEX idx_playlist_tracks_order ON public.playlist_tracks(playlist_id, position);
+CREATE INDEX IF NOT EXISTS idx_playlist_tracks_order ON public.playlist_tracks(playlist_id, position);
 
 -- Maintenir track_count dénormalisé
 CREATE OR REPLACE FUNCTION public.update_playlist_track_count()
@@ -70,7 +70,7 @@ CREATE TRIGGER playlist_tracks_count
 -- ---------------------------------------------------------------------------
 -- favorites — polymorphique (track · album · artist · playlist)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.favorites (
+CREATE TABLE IF NOT EXISTS public.favorites (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   entity_type TEXT NOT NULL CHECK (entity_type IN ('track', 'album', 'artist', 'playlist')),
   entity_id UUID NOT NULL,
@@ -78,13 +78,13 @@ CREATE TABLE public.favorites (
   PRIMARY KEY (user_id, entity_type, entity_id)
 );
 
-CREATE INDEX idx_favorites_user ON public.favorites(user_id, created_at DESC);
-CREATE INDEX idx_favorites_entity ON public.favorites(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user ON public.favorites(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_favorites_entity ON public.favorites(entity_type, entity_id);
 
 -- ---------------------------------------------------------------------------
 -- stream_sessions — Real Listen V7.2
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.stream_sessions (
+CREATE TABLE IF NOT EXISTS public.stream_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   track_id UUID NOT NULL REFERENCES public.tracks(id) ON DELETE CASCADE,
@@ -107,9 +107,9 @@ CREATE TABLE public.stream_sessions (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_stream_sessions_user ON public.stream_sessions(user_id, started_at DESC);
-CREATE INDEX idx_stream_sessions_track ON public.stream_sessions(track_id, started_at DESC);
-CREATE INDEX idx_stream_sessions_valid ON public.stream_sessions(track_id, started_at DESC)
+CREATE INDEX IF NOT EXISTS idx_stream_sessions_user ON public.stream_sessions(user_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_stream_sessions_track ON public.stream_sessions(track_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_stream_sessions_valid ON public.stream_sessions(track_id, started_at DESC)
   WHERE is_valid_listen = true;
 
 CREATE TRIGGER stream_sessions_set_updated_at
@@ -119,7 +119,7 @@ CREATE TRIGGER stream_sessions_set_updated_at
 -- ---------------------------------------------------------------------------
 -- stream_events — INSERT ONLY (audit immuable)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.stream_events (
+CREATE TABLE IF NOT EXISTS public.stream_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID NOT NULL REFERENCES public.stream_sessions(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -130,8 +130,8 @@ CREATE TABLE public.stream_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_stream_events_session ON public.stream_events(session_id, created_at);
-CREATE INDEX idx_stream_events_user ON public.stream_events(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_stream_events_session ON public.stream_events(session_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_stream_events_user ON public.stream_events(user_id, created_at DESC);
 
 -- Bloquer UPDATE et DELETE (INSERT ONLY)
 CREATE OR REPLACE FUNCTION public.prevent_stream_events_mutation()
@@ -169,7 +169,7 @@ CREATE TRIGGER stream_events_fill_track_id
 -- ---------------------------------------------------------------------------
 -- playback_positions — reprise de lecture
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.playback_positions (
+CREATE TABLE IF NOT EXISTS public.playback_positions (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   track_id UUID NOT NULL REFERENCES public.tracks(id) ON DELETE CASCADE,
   position_seconds INTEGER NOT NULL DEFAULT 0 CHECK (position_seconds >= 0),
@@ -177,7 +177,7 @@ CREATE TABLE public.playback_positions (
   PRIMARY KEY (user_id, track_id)
 );
 
-CREATE INDEX idx_playback_positions_user ON public.playback_positions(user_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_playback_positions_user ON public.playback_positions(user_id, updated_at DESC);
 
 -- ---------------------------------------------------------------------------
 -- RPC : start_stream_session

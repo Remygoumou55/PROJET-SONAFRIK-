@@ -1,4 +1,4 @@
--- Sprint 8 — Wallet OS
+﻿-- Sprint 8 — Wallet OS
 -- SONAFRIK CDC V9.0 · Revenue Pool 65% · wallet_ledger INSERT ONLY
 
 -- ---------------------------------------------------------------------------
@@ -15,7 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_premium
 -- ---------------------------------------------------------------------------
 -- wallets — un portefeuille par utilisateur (créé automatiquement)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.wallets (
+CREATE TABLE IF NOT EXISTS public.wallets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   balance_gnf NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance_gnf >= 0),
@@ -30,12 +30,12 @@ CREATE TRIGGER wallets_set_updated_at
   BEFORE UPDATE ON public.wallets
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_wallets_user_id ON public.wallets(user_id);
+CREATE INDEX IF NOT EXISTS idx_wallets_user_id ON public.wallets(user_id);
 
 -- ---------------------------------------------------------------------------
 -- wallet_ledger — INSERT ONLY (CDC identique à audit_logs)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.wallet_ledger (
+CREATE TABLE IF NOT EXISTS public.wallet_ledger (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   wallet_id UUID NOT NULL REFERENCES public.wallets(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -62,14 +62,14 @@ CREATE TRIGGER wallet_ledger_insert_only
   BEFORE UPDATE OR DELETE ON public.wallet_ledger
   FOR EACH ROW EXECUTE FUNCTION public.prevent_wallet_ledger_mutation();
 
-CREATE INDEX idx_wallet_ledger_wallet_id ON public.wallet_ledger(wallet_id);
-CREATE INDEX idx_wallet_ledger_user_id ON public.wallet_ledger(user_id);
-CREATE INDEX idx_wallet_ledger_created_at ON public.wallet_ledger(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_wallet_ledger_wallet_id ON public.wallet_ledger(wallet_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_ledger_user_id ON public.wallet_ledger(user_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_ledger_created_at ON public.wallet_ledger(created_at DESC);
 
 -- ---------------------------------------------------------------------------
 -- transactions — paiements, top-ups, abonnements
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   wallet_id UUID NOT NULL REFERENCES public.wallets(id),
@@ -98,15 +98,15 @@ CREATE TRIGGER transactions_set_updated_at
   BEFORE UPDATE ON public.transactions
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_transactions_user_id ON public.transactions(user_id);
-CREATE INDEX idx_transactions_status ON public.transactions(status);
-CREATE INDEX idx_transactions_type ON public.transactions(type);
-CREATE INDEX idx_transactions_created_at ON public.transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_status ON public.transactions(status);
+CREATE INDEX IF NOT EXISTS idx_transactions_type ON public.transactions(type);
+CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(created_at DESC);
 
 -- ---------------------------------------------------------------------------
 -- withdrawals — demandes de retrait
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.withdrawals (
+CREATE TABLE IF NOT EXISTS public.withdrawals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   wallet_id UUID NOT NULL REFERENCES public.wallets(id),
@@ -129,13 +129,13 @@ CREATE TRIGGER withdrawals_set_updated_at
   BEFORE UPDATE ON public.withdrawals
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_withdrawals_user_id ON public.withdrawals(user_id);
-CREATE INDEX idx_withdrawals_status ON public.withdrawals(status);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_user_id ON public.withdrawals(user_id);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_status ON public.withdrawals(status);
 
 -- ---------------------------------------------------------------------------
 -- payout_accounts — comptes de retrait (Orange Money, MTN, Wave, virement)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.payout_accounts (
+CREATE TABLE IF NOT EXISTS public.payout_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL CHECK (type IN ('orange_money', 'mtn_momo', 'wave', 'bank_transfer')),
@@ -156,13 +156,13 @@ CREATE TRIGGER payout_accounts_set_updated_at
   BEFORE UPDATE ON public.payout_accounts
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_payout_accounts_user ON public.payout_accounts(user_id)
+CREATE INDEX IF NOT EXISTS idx_payout_accounts_user ON public.payout_accounts(user_id)
   WHERE deleted_at IS NULL;
 
 -- ---------------------------------------------------------------------------
 -- royalty_cycles — cycles de distribution (mensuel)
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.royalty_cycles (
+CREATE TABLE IF NOT EXISTS public.royalty_cycles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   period_start DATE NOT NULL,
   period_end DATE NOT NULL,
@@ -187,7 +187,7 @@ CREATE TRIGGER royalty_cycles_set_updated_at
 -- ---------------------------------------------------------------------------
 -- royalty_calculations — calculs par artiste par cycle
 -- ---------------------------------------------------------------------------
-CREATE TABLE public.royalty_calculations (
+CREATE TABLE IF NOT EXISTS public.royalty_calculations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   cycle_id UUID NOT NULL REFERENCES public.royalty_cycles(id) ON DELETE CASCADE,
   artist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -210,8 +210,8 @@ CREATE TRIGGER royalty_calculations_set_updated_at
   BEFORE UPDATE ON public.royalty_calculations
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-CREATE INDEX idx_royalty_calculations_cycle ON public.royalty_calculations(cycle_id);
-CREATE INDEX idx_royalty_calculations_artist ON public.royalty_calculations(artist_id);
+CREATE INDEX IF NOT EXISTS idx_royalty_calculations_cycle ON public.royalty_calculations(cycle_id);
+CREATE INDEX IF NOT EXISTS idx_royalty_calculations_artist ON public.royalty_calculations(artist_id);
 
 -- ---------------------------------------------------------------------------
 -- Auto-create wallet when profile is created

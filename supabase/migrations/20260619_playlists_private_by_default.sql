@@ -1,4 +1,4 @@
--- Migration : playlists_private_by_default
+﻿-- Migration : playlists_private_by_default
 -- CONTEXTE : la colonne is_public (DEFAULT false) existe déjà dans sprint6_streaming_os.sql.
 -- Cette migration ajoute le commentaire documentaire et harmonise les noms des politiques RLS.
 -- À exécuter manuellement dans Supabase SQL Editor par Mr Rémy — NE PAS COMMITTER SANS VALIDATION.
@@ -15,7 +15,7 @@ COMMENT ON COLUMN public.playlists.is_public IS
 DROP POLICY IF EXISTS "playlists_select" ON public.playlists;
 DROP POLICY IF EXISTS "playlists_select_policy" ON public.playlists;
 
-CREATE POLICY "playlists_select_policy"
+CREATE POLICY IF NOT EXISTS "playlists_select_policy"
   ON public.playlists FOR SELECT
   USING (
     is_public = TRUE
@@ -27,6 +27,6 @@ CREATE POLICY "playlists_select_policy"
 DROP POLICY IF EXISTS "playlists_update" ON public.playlists;
 DROP POLICY IF EXISTS "playlists_update_policy" ON public.playlists;
 
-CREATE POLICY "playlists_update_policy"
+CREATE POLICY IF NOT EXISTS "playlists_update_policy"
   ON public.playlists FOR UPDATE
   USING (auth.uid() = user_id);

@@ -1,4 +1,4 @@
--- Sprint 4 — RLS Creator OS
+﻿-- Sprint 4 — RLS Creator OS
 
 ALTER TABLE public.labels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.creators ENABLE ROW LEVEL SECURITY;
@@ -11,22 +11,22 @@ ALTER TABLE public.creator_verifications ENABLE ROW LEVEL SECURITY;
 -- ---------------------------------------------------------------------------
 -- labels
 -- ---------------------------------------------------------------------------
-CREATE POLICY labels_select_public ON public.labels
+CREATE POLICY IF NOT EXISTS labels_select_public ON public.labels
   FOR SELECT TO authenticated
   USING (deleted_at IS NULL AND verified = true);
 
-CREATE POLICY labels_select_member ON public.labels
+CREATE POLICY IF NOT EXISTS labels_select_member ON public.labels
   FOR SELECT TO authenticated
   USING (public.is_label_member(id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY labels_insert_artist ON public.labels
+CREATE POLICY IF NOT EXISTS labels_insert_artist ON public.labels
   FOR INSERT TO authenticated
   WITH CHECK (
     owner_id = auth.uid()
     AND public.is_artist_account(auth.uid())
   );
 
-CREATE POLICY labels_update_manage ON public.labels
+CREATE POLICY IF NOT EXISTS labels_update_manage ON public.labels
   FOR UPDATE TO authenticated
   USING (public.can_manage_label(id))
   WITH CHECK (public.can_manage_label(id));
@@ -34,11 +34,11 @@ CREATE POLICY labels_update_manage ON public.labels
 -- ---------------------------------------------------------------------------
 -- creators
 -- ---------------------------------------------------------------------------
-CREATE POLICY creators_select_member ON public.creators
+CREATE POLICY IF NOT EXISTS creators_select_member ON public.creators
   FOR SELECT TO authenticated
   USING (public.is_creator_member(id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY creators_select_public_active ON public.creators
+CREATE POLICY IF NOT EXISTS creators_select_public_active ON public.creators
   FOR SELECT TO anon, authenticated
   USING (
     deleted_at IS NULL
@@ -49,11 +49,11 @@ CREATE POLICY creators_select_public_active ON public.creators
     )
   );
 
-CREATE POLICY creators_insert_own ON public.creators
+CREATE POLICY IF NOT EXISTS creators_insert_own ON public.creators
   FOR INSERT TO authenticated
   WITH CHECK (owner_id = auth.uid() AND public.is_artist_account(auth.uid()));
 
-CREATE POLICY creators_update_manage ON public.creators
+CREATE POLICY IF NOT EXISTS creators_update_manage ON public.creators
   FOR UPDATE TO authenticated
   USING (public.can_manage_creator(id))
   WITH CHECK (public.can_manage_creator(id));
@@ -61,7 +61,7 @@ CREATE POLICY creators_update_manage ON public.creators
 -- ---------------------------------------------------------------------------
 -- artist_profiles
 -- ---------------------------------------------------------------------------
-CREATE POLICY artist_profiles_select_public ON public.artist_profiles
+CREATE POLICY IF NOT EXISTS artist_profiles_select_public ON public.artist_profiles
   FOR SELECT TO anon, authenticated
   USING (
     is_public = true
@@ -71,11 +71,11 @@ CREATE POLICY artist_profiles_select_public ON public.artist_profiles
     )
   );
 
-CREATE POLICY artist_profiles_select_member ON public.artist_profiles
+CREATE POLICY IF NOT EXISTS artist_profiles_select_member ON public.artist_profiles
   FOR SELECT TO authenticated
   USING (public.is_creator_member(creator_id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY artist_profiles_update_edit ON public.artist_profiles
+CREATE POLICY IF NOT EXISTS artist_profiles_update_edit ON public.artist_profiles
   FOR UPDATE TO authenticated
   USING (public.can_edit_creator(creator_id))
   WITH CHECK (public.can_edit_creator(creator_id));
@@ -83,75 +83,75 @@ CREATE POLICY artist_profiles_update_edit ON public.artist_profiles
 -- ---------------------------------------------------------------------------
 -- creator_roles (teams)
 -- ---------------------------------------------------------------------------
-CREATE POLICY creator_roles_select_member ON public.creator_roles
+CREATE POLICY IF NOT EXISTS creator_roles_select_member ON public.creator_roles
   FOR SELECT TO authenticated
   USING (public.is_creator_member(creator_id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY creator_roles_insert_manage ON public.creator_roles
+CREATE POLICY IF NOT EXISTS creator_roles_insert_manage ON public.creator_roles
   FOR INSERT TO authenticated
   WITH CHECK (public.can_manage_creator(creator_id));
 
-CREATE POLICY creator_roles_update_manage ON public.creator_roles
+CREATE POLICY IF NOT EXISTS creator_roles_update_manage ON public.creator_roles
   FOR UPDATE TO authenticated
   USING (public.can_manage_creator(creator_id))
   WITH CHECK (public.can_manage_creator(creator_id));
 
-CREATE POLICY creator_roles_delete_manage ON public.creator_roles
+CREATE POLICY IF NOT EXISTS creator_roles_delete_manage ON public.creator_roles
   FOR DELETE TO authenticated
   USING (public.can_manage_creator(creator_id) AND role <> 'owner');
 
 -- ---------------------------------------------------------------------------
 -- label_members
 -- ---------------------------------------------------------------------------
-CREATE POLICY label_members_select_member ON public.label_members
+CREATE POLICY IF NOT EXISTS label_members_select_member ON public.label_members
   FOR SELECT TO authenticated
   USING (public.is_label_member(label_id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY label_members_insert_manage ON public.label_members
+CREATE POLICY IF NOT EXISTS label_members_insert_manage ON public.label_members
   FOR INSERT TO authenticated
   WITH CHECK (public.can_manage_label(label_id));
 
-CREATE POLICY label_members_update_manage ON public.label_members
+CREATE POLICY IF NOT EXISTS label_members_update_manage ON public.label_members
   FOR UPDATE TO authenticated
   USING (public.can_manage_label(label_id))
   WITH CHECK (public.can_manage_label(label_id));
 
-CREATE POLICY label_members_delete_manage ON public.label_members
+CREATE POLICY IF NOT EXISTS label_members_delete_manage ON public.label_members
   FOR DELETE TO authenticated
   USING (public.can_manage_label(label_id) AND role <> 'owner');
 
 -- ---------------------------------------------------------------------------
 -- studios
 -- ---------------------------------------------------------------------------
-CREATE POLICY studios_select_member ON public.studios
+CREATE POLICY IF NOT EXISTS studios_select_member ON public.studios
   FOR SELECT TO authenticated
   USING (public.is_creator_member(creator_id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY studios_insert_edit ON public.studios
+CREATE POLICY IF NOT EXISTS studios_insert_edit ON public.studios
   FOR INSERT TO authenticated
   WITH CHECK (public.can_edit_creator(creator_id));
 
-CREATE POLICY studios_update_edit ON public.studios
+CREATE POLICY IF NOT EXISTS studios_update_edit ON public.studios
   FOR UPDATE TO authenticated
   USING (public.can_edit_creator(creator_id))
   WITH CHECK (public.can_edit_creator(creator_id));
 
-CREATE POLICY studios_delete_manage ON public.studios
+CREATE POLICY IF NOT EXISTS studios_delete_manage ON public.studios
   FOR DELETE TO authenticated
   USING (public.can_manage_creator(creator_id));
 
 -- ---------------------------------------------------------------------------
 -- creator_verifications
 -- ---------------------------------------------------------------------------
-CREATE POLICY creator_verifications_select_member ON public.creator_verifications
+CREATE POLICY IF NOT EXISTS creator_verifications_select_member ON public.creator_verifications
   FOR SELECT TO authenticated
   USING (public.is_creator_member(creator_id) OR public.is_admin(auth.uid()));
 
-CREATE POLICY creator_verifications_insert_edit ON public.creator_verifications
+CREATE POLICY IF NOT EXISTS creator_verifications_insert_edit ON public.creator_verifications
   FOR INSERT TO authenticated
   WITH CHECK (public.can_edit_creator(creator_id));
 
-CREATE POLICY creator_verifications_update_edit ON public.creator_verifications
+CREATE POLICY IF NOT EXISTS creator_verifications_update_edit ON public.creator_verifications
   FOR UPDATE TO authenticated
   USING (public.can_edit_creator(creator_id) OR public.is_admin(auth.uid()))
   WITH CHECK (public.can_edit_creator(creator_id) OR public.is_admin(auth.uid()));
@@ -159,28 +159,28 @@ CREATE POLICY creator_verifications_update_edit ON public.creator_verifications
 -- ---------------------------------------------------------------------------
 -- Storage creator-assets — {creator_id}/*
 -- ---------------------------------------------------------------------------
-CREATE POLICY creator_assets_select_member ON storage.objects
+CREATE POLICY IF NOT EXISTS creator_assets_select_member ON storage.objects
   FOR SELECT TO authenticated
   USING (
     bucket_id = 'creator-assets'
     AND public.is_creator_member(((storage.foldername(name))[1])::uuid)
   );
 
-CREATE POLICY creator_assets_insert_edit ON storage.objects
+CREATE POLICY IF NOT EXISTS creator_assets_insert_edit ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'creator-assets'
     AND public.can_edit_creator(((storage.foldername(name))[1])::uuid)
   );
 
-CREATE POLICY creator_assets_update_edit ON storage.objects
+CREATE POLICY IF NOT EXISTS creator_assets_update_edit ON storage.objects
   FOR UPDATE TO authenticated
   USING (
     bucket_id = 'creator-assets'
     AND public.can_edit_creator(((storage.foldername(name))[1])::uuid)
   );
 
-CREATE POLICY creator_assets_delete_manage ON storage.objects
+CREATE POLICY IF NOT EXISTS creator_assets_delete_manage ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'creator-assets'
