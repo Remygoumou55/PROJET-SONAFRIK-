@@ -22,6 +22,7 @@ const CREDIT_ROLES: TrackCreditRole[] = [
 ];
 
 interface CreditEntry {
+  uid: string;
   contributorName: string;
   role: TrackCreditRole;
   contributorProfileId: null;
@@ -50,17 +51,18 @@ function CreditsEditor({
         if (!cancelled) {
           setCredits(
             existing.length > 0
-              ? existing.map((c: TrackCredit) => ({
+              ? existing.map((c: TrackCredit, i) => ({
+                  uid: `${c.role}-${i}`,
                   contributorName: c.contributor_name,
                   role: c.role,
                   contributorProfileId: null,
                 }))
-              : [{ contributorName: stageName, role: "artiste_principal" as TrackCreditRole, contributorProfileId: null }],
+              : [{ uid: "principal-0", contributorName: stageName, role: "artiste_principal" as TrackCreditRole, contributorProfileId: null }],
           );
         }
       } catch {
         if (!cancelled) {
-          setCredits([{ contributorName: stageName, role: "artiste_principal", contributorProfileId: null }]);
+          setCredits([{ uid: "principal-0", contributorName: stageName, role: "artiste_principal", contributorProfileId: null }]);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -73,7 +75,7 @@ function CreditsEditor({
   function addCredit() {
     setCredits((prev) => [
       ...(prev ?? []),
-      { contributorName: "", role: "featuring", contributorProfileId: null },
+      { uid: Math.random().toString(36).slice(2), contributorName: "", role: "featuring", contributorProfileId: null },
     ]);
   }
 
@@ -128,7 +130,7 @@ function CreditsEditor({
       {credits.map((credit, i) => {
         const isPrincipal = credit.role === "artiste_principal";
         return (
-          <div key={i} className="flex items-center gap-2">
+          <div key={credit.uid} className="flex items-center gap-2">
             <select
               value={credit.role}
               disabled={isPrincipal}

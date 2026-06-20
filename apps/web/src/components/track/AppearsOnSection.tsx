@@ -34,7 +34,10 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
               <CoverImage
                 coverPath={item.coverUrl}
                 alt={item.trackTitle}
-                gradientSeed={item.trackId.charCodeAt(0)}
+                gradientSeed={
+                  item.trackId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
+                }
+                imgSizes="96px"
               />
               {/* Badge rôle */}
               <span

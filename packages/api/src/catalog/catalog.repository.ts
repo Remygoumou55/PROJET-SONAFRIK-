@@ -287,50 +287,49 @@ export class CatalogRepository {
   }
 
   async getTracksFeaturingCreator(creatorId: string): Promise<TrackAppearance[]> {
-    // 1. Crédits de ce créateur (hors rôle artiste_principal)
-    const { data: credits, error: creditsErr } = await this.client
+    type CreditWithTrack = {
+      role: string;
+      track_id: string;
+      tracks: {
+        id: string;
+        title: string;
+        album_id: string | null;
+        creator_id: string;
+        publication_status: string;
+      };
+    };
+
+    // Join tracks!inner : 2 round-trips (crédits+tracks → covers+noms) au lieu de 3
+    const rawResult = await this.client
       .from("track_credits")
-      .select("role, track_id")
+      .select("role, track_id, tracks!inner(id, title, album_id, creator_id, publication_status)")
       .eq("contributor_profile_id", creatorId)
-      .neq("role", "artiste_principal");
+      .neq("role", "artiste_principal")
+      .limit(20);
 
-    if (creditsErr) throw creditsErr;
-    if (!credits?.length) return [];
+    if (rawResult.error) throw rawResult.error;
 
-    const rawCredits = credits as unknown as Array<{ role: string; track_id: string }>;
-    const trackIds = rawCredits.map((c) => c.track_id);
-    const roleByTrackId = new Map(rawCredits.map((c) => [c.track_id, c.role as TrackCreditRole]));
+    const credits = (rawResult.data ?? []) as unknown as CreditWithTrack[];
+    if (!credits.length) return [];
 
-    // 2. Détails des morceaux — on exclut ceux où ce créateur est déjà l'artiste principal
-    const { data: tracks, error: tracksErr } = await this.client
-      .from("tracks")
-      .select("id, title, album_id, creator_id")
-      .in("id", trackIds)
-      .eq("publication_status", "published")
-      .neq("creator_id", creatorId);
+    // Publiés uniquement + pas l'artiste principal du morceau (évite les doublons)
+    const filtered = credits.filter(
+      (c) =>
+        c.tracks.publication_status === "published" &&
+        c.tracks.creator_id !== creatorId,
+    );
+    if (!filtered.length) return [];
 
-    if (tracksErr) throw tracksErr;
-    if (!tracks?.length) return [];
+    const albumIds = [...new Set(filtered.flatMap((c) => (c.tracks.album_id ? [c.tracks.album_id] : [])))];
+    const mainCreatorIds = [...new Set(filtered.map((c) => c.tracks.creator_id))];
 
-    const rawTracks = tracks as unknown as Array<{
-      id: string;
-      title: string;
-      album_id: string | null;
-      creator_id: string;
-    }>;
-
-    const albumIds = [...new Set(rawTracks.flatMap((t) => (t.album_id ? [t.album_id] : [])))];
-    const creatorIds = [...new Set(rawTracks.map((t) => t.creator_id))];
-
-    // 3. Covers albums + noms artistes en parallèle
     const [albumsRes, profilesRes] = await Promise.all([
       albumIds.length
         ? this.client.from("albums").select("id, cover_url").in("id", albumIds)
         : { data: [], error: null },
-      this.client
-        .from("artist_profiles")
-        .select("creator_id, stage_name")
-        .in("creator_id", creatorIds),
+      mainCreatorIds.length
+        ? this.client.from("artist_profiles").select("creator_id, stage_name").in("creator_id", mainCreatorIds)
+        : { data: [], error: null },
     ]);
 
     const coverByAlbumId = new Map(
@@ -344,14 +343,14 @@ export class CatalogRepository {
       ),
     );
 
-    return rawTracks.map((t) => ({
-      trackId: t.id,
-      trackTitle: t.title,
-      albumId: t.album_id,
-      coverUrl: t.album_id ? (coverByAlbumId.get(t.album_id) ?? null) : null,
-      mainArtistName: nameByCreatorId.get(t.creator_id) ?? "",
-      mainArtistCreatorId: t.creator_id,
-      creditRole: roleByTrackId.get(t.id) ?? "featuring",
+    return filtered.map((c) => ({
+      trackId: c.tracks.id,
+      trackTitle: c.tracks.title,
+      albumId: c.tracks.album_id,
+      coverUrl: c.tracks.album_id ? (coverByAlbumId.get(c.tracks.album_id) ?? null) : null,
+      mainArtistName: nameByCreatorId.get(c.tracks.creator_id) ?? "",
+      mainArtistCreatorId: c.tracks.creator_id,
+      creditRole: c.role as TrackCreditRole,
     }));
   }
 

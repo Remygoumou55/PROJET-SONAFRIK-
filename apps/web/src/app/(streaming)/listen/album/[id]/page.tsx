@@ -182,18 +182,15 @@ export default async function AlbumDetailPage({
         <AlbumTracksClient tracks={tracks} />
       )}
 
-      {/* Crédits par morceau (affichés si au moins un morceau a des crédits) */}
+      {/* Crédits par morceau — le composant TrackCredits affiche son propre label */}
       {tracks.some((t) => (creditsByTrack[t.id]?.length ?? 0) > 0) && (
-        <div className="mt-8 space-y-4">
-          <h2 className="text-sm font-semibold" style={{ color: "#A0A0A0" }}>
-            Crédits
-          </h2>
+        <div className="mt-8 space-y-5">
           {tracks.map((track) => {
             const trackCredits = creditsByTrack[track.id] ?? [];
             if (!trackCredits.length) return null;
             return (
-              <div key={track.id} className="space-y-1">
-                <p className="text-xs font-semibold" style={{ color: "#555555" }}>
+              <div key={track.id}>
+                <p className="text-xs font-semibold mb-1" style={{ color: "#555555" }}>
                   {track.title}
                 </p>
                 <TrackCredits credits={trackCredits} />
