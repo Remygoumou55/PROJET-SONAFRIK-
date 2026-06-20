@@ -209,6 +209,26 @@ ALTER TABLE ownership_versions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contracts         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rights_claims     ENABLE ROW LEVEL SECURITY;
 
+-- Idempotence : DROP IF EXISTS avant chaque CREATE (Supabase Preview branch depuis prod)
+DROP POLICY IF EXISTS works_select             ON works;
+DROP POLICY IF EXISTS works_insert             ON works;
+DROP POLICY IF EXISTS works_update             ON works;
+DROP POLICY IF EXISTS works_delete             ON works;
+DROP POLICY IF EXISTS contributors_select      ON contributors;
+DROP POLICY IF EXISTS contributors_insert      ON contributors;
+DROP POLICY IF EXISTS contributors_update      ON contributors;
+DROP POLICY IF EXISTS ownerships_select        ON ownerships;
+DROP POLICY IF EXISTS ownerships_insert        ON ownerships;
+DROP POLICY IF EXISTS ownerships_update        ON ownerships;
+DROP POLICY IF EXISTS ownerships_delete        ON ownerships;
+DROP POLICY IF EXISTS ownership_versions_select ON ownership_versions;
+DROP POLICY IF EXISTS ownership_versions_insert ON ownership_versions;
+DROP POLICY IF EXISTS contracts_select         ON contracts;
+DROP POLICY IF EXISTS contracts_insert         ON contracts;
+DROP POLICY IF EXISTS contracts_update         ON contracts;
+DROP POLICY IF EXISTS rights_claims_select     ON rights_claims;
+DROP POLICY IF EXISTS rights_claims_insert     ON rights_claims;
+
 -- works : le créateur voit et modifie ses œuvres
 CREATE POLICY works_select ON works FOR SELECT
   USING (
