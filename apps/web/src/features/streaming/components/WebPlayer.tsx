@@ -62,7 +62,7 @@ export const WebPlayer = memo(function WebPlayer() {
           {/* Track info */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">
-              <CoverImage coverPath={currentTrack.cover_url ?? null} alt={currentTrack.title} />
+              <CoverImage coverPath={currentTrack.cover_url ?? null} alt={currentTrack.title} imgSizes="40px" />
             </div>
             <div className="min-w-0 flex-1">
               <p

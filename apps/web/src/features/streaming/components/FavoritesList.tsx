@@ -93,7 +93,7 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
                   }}
                 >
                   <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
-                    <CoverImage coverPath={track.cover_url ?? null} alt={track.title} />
+                    <CoverImage coverPath={track.cover_url ?? null} alt={track.title} imgSizes="40px" />
                     {isActive && (
                       <div
                         className="absolute inset-0 flex items-center justify-center"
@@ -145,7 +145,7 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
                 style={{ backgroundColor: "#1F1F1F" }}
               >
                 <div className="w-full aspect-square rounded-lg mb-2 relative overflow-hidden">
-                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} />
+                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} imgSizes="50vw" />
                 </div>
                 <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>
                   {album.title}

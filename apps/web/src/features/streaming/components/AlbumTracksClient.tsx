@@ -51,7 +51,7 @@ function TrackRow({
           )}
         </div>
         <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
-          <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} />
+          <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} imgSizes="40px" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate" style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}>

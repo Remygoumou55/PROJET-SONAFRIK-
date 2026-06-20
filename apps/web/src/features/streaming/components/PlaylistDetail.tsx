@@ -51,7 +51,7 @@ function TrackRow({
       </button>
 
       <button onClick={() => onPlay(track)} className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
-        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} />
+        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} imgSizes="40px" />
       </button>
 
       <button onClick={() => onPlay(track)} className="flex-1 min-w-0 text-left">

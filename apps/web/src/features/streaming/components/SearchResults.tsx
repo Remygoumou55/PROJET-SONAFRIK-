@@ -25,7 +25,7 @@ const TrackRow = memo(function TrackRow({
       onClick={() => onPlay(track)}
     >
       <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">
-        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} />
+        <CoverImage coverPath={track.cover_url ?? null} alt={track.title} imgSizes="40px" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
@@ -160,7 +160,7 @@ export function SearchResults({ results, isSearching }: SearchResultsProps) {
                 style={{ backgroundColor: "#1F1F1F", display: "flex" }}
               >
                 <div className="aspect-square rounded-lg w-full relative overflow-hidden">
-                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} />
+                  <CoverImage coverPath={album.cover_url ?? null} alt={album.title} imgSizes="(min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw" />
                 </div>
                 <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
                   {album.title}

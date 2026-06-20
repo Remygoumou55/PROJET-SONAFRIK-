@@ -111,7 +111,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
             {/* Pochette actuelle */}
             {album.cover_path && (
               <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <CoverImage coverPath={album.cover_path} alt={album.title} />
+                <CoverImage coverPath={album.cover_path} alt={album.title} imgSizes="64px" />
               </div>
             )}
 
