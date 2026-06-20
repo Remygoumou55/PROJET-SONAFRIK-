@@ -7,12 +7,20 @@ const corsHeaders = {
 };
 
 const AUDIO_TYPES: Record<string, string> = {
-  "audio/mpeg": "mp3",
-  "audio/mp4": "aac",
-  "audio/wav": "wav",
-  "audio/x-flac": "flac",
-  "audio/flac": "flac",
+  "audio/mpeg":  "mp3",
+  "audio/mp3":   "mp3",
+  "audio/wav":   "wav",
+  "audio/x-wav": "wav",
+  "audio/mp4":   "aac",
+  "audio/m4a":   "aac",
+  "audio/x-m4a": "aac",
+  "audio/flac":  "flac",
+  "audio/x-flac":"flac",
+  "audio/ogg":   "ogg",
 };
+
+// Limite de taille du plan Supabase Free (50 MB)
+const MAX_AUDIO_SIZE_BYTES = 50 * 1024 * 1024;
 
 const VISUAL_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SIGNED_URL_TTL = 3600;
@@ -25,7 +33,7 @@ interface CatalogAssetRequest {
   albumId?: string;
   contentType?: string;
   path?: string;
-  format?: "mp3" | "aac" | "flac" | "wav";
+  format?: "mp3" | "aac" | "flac" | "wav" | "ogg";
   bitrateKbps?: number;
 }
 
@@ -76,8 +84,14 @@ Deno.serve(async (req) => {
 
     if (body.action === "upload") {
       if (!body.contentType) return json({ error: "Content-Type requis." }, 400);
-      if (body.assetType === "audio" && !AUDIO_TYPES[body.contentType]) {
-        return json({ error: "Format audio non autorisé." }, 400);
+      if (body.assetType === "audio") {
+        if (!AUDIO_TYPES[body.contentType]) {
+          return json({ error: "Format audio non autorisé. Formats acceptés : MP3, WAV, FLAC, M4A, OGG." }, 400);
+        }
+        const contentLength = req.headers.get("content-length");
+        if (contentLength && parseInt(contentLength, 10) > MAX_AUDIO_SIZE_BYTES) {
+          return json({ error: `Fichier trop volumineux. Maximum autorisé : 50 MB.` }, 413);
+        }
       }
       if (body.assetType === "cover" && !VISUAL_TYPES.includes(body.contentType)) {
         return json({ error: "Format visuel non autorisé." }, 400);
