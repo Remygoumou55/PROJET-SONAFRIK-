@@ -3,8 +3,13 @@
 import { useCallback, useRef, useState } from "react";
 import { useCatalogService } from "../hooks/useCatalog";
 
-type AudioFormat = "mp3" | "aac" | "flac" | "wav" | "ogg";
+type AudioFormat = "mp3" | "aac" | "wav";
 
+// RESTRICTION TEMPORAIRE (sprint 20260620) : FLAC et OGG retirés car aucun
+// système de transcodage n'existe encore — ces formats seraient streamés
+// tels quels aux auditeurs, annulant l'effet du mode économie de données
+// (useStreamQuality). À réactiver une fois le transcodage post-upload
+// implémenté (cf. rapport d'audit du sprint "formats audio élargis").
 const ACCEPTED_TYPES: Record<string, AudioFormat> = {
   "audio/mpeg":  "mp3",
   "audio/mp3":   "mp3",
@@ -13,11 +18,8 @@ const ACCEPTED_TYPES: Record<string, AudioFormat> = {
   "audio/m4a":   "aac",  // M4A = AAC dans container MP4
   "audio/mp4":   "aac",
   "audio/x-m4a": "aac",
-  "audio/flac":  "flac",
-  "audio/x-flac":"flac",
-  "audio/ogg":   "ogg",
 };
-const ACCEPTED_EXTENSIONS = ".mp3,.wav,.m4a,.flac,.ogg";
+const ACCEPTED_EXTENSIONS = ".mp3,.wav,.m4a";
 // 50 MB — limite du plan Supabase Storage Free (non modifiable sans upgrade de plan)
 const MAX_SIZE_BYTES = 50 * 1024 * 1024;
 const MAX_SIZE_MB = 50;
@@ -71,7 +73,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
   const validate = useCallback((file: File): string | null => {
     const format = ACCEPTED_TYPES[file.type];
     if (!format) {
-      return "Format non supporté. Formats acceptés : MP3, WAV, FLAC, M4A, OGG.";
+      return "Format non supporté. Formats acceptés actuellement : MP3, WAV, M4A. Le support FLAC et OGG sera réactivé une fois notre système de conversion audio mis en place, pour garantir une expérience optimale à tous les auditeurs quel que soit leur réseau.";
     }
     if (file.size > MAX_SIZE_BYTES) {
       const fileMB = (file.size / (1024 * 1024)).toFixed(1);
@@ -301,7 +303,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
           Glissez un fichier audio ou cliquez pour choisir
         </p>
         <p className="text-xs" style={{ color: "#555555" }}>
-          MP3 · WAV · FLAC · M4A · OGG — max {MAX_SIZE_MB} MB
+          MP3 · WAV · M4A — max {MAX_SIZE_MB} MB
         </p>
       </div>
 

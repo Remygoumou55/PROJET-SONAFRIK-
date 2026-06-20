@@ -6,6 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// RESTRICTION TEMPORAIRE (sprint 20260620) : FLAC et OGG retirés car aucun
+// système de transcodage n'existe encore — ces formats seraient streamés
+// tels quels aux auditeurs, annulant l'effet du mode économie de données
+// (useStreamQuality). À réactiver une fois le transcodage post-upload
+// implémenté (cf. rapport d'audit du sprint "formats audio élargis").
 const AUDIO_TYPES: Record<string, string> = {
   "audio/mpeg":  "mp3",
   "audio/mp3":   "mp3",
@@ -14,9 +19,6 @@ const AUDIO_TYPES: Record<string, string> = {
   "audio/mp4":   "aac",
   "audio/m4a":   "aac",
   "audio/x-m4a": "aac",
-  "audio/flac":  "flac",
-  "audio/x-flac":"flac",
-  "audio/ogg":   "ogg",
 };
 
 // Limite de taille du plan Supabase Free (50 MB)
@@ -33,7 +35,7 @@ interface CatalogAssetRequest {
   albumId?: string;
   contentType?: string;
   path?: string;
-  format?: "mp3" | "aac" | "flac" | "wav" | "ogg";
+  format?: "mp3" | "aac" | "wav";
   bitrateKbps?: number;
 }
 

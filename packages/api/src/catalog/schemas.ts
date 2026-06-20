@@ -44,7 +44,9 @@ export const catalogAssetUploadSchema = z.object({
   contentType: z.string().min(3),
   trackId: z.string().uuid().optional(),
   albumId: z.string().uuid().optional(),
-  format: z.enum(["mp3", "aac", "flac", "wav", "ogg"]).optional(),
+  // RESTRICTION TEMPORAIRE (sprint 20260620) : "flac" et "ogg" retirés de l'upload
+  // — à réactiver une fois le transcodage post-upload implémenté.
+  format: z.enum(["mp3", "aac", "wav"]).optional(),
   bitrateKbps: z.number().int().positive().optional(),
 });
 
