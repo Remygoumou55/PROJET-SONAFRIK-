@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Playlist, TrackWithMeta } from "@sonafrik/types";
 import { useStreamingService } from "../hooks/useStreaming";
@@ -10,7 +10,7 @@ import { CoverImage } from "@/components/CoverImage";
 import { PlaylistPrivacyToggle } from "@/components/playlist/PlaylistPrivacyToggle";
 import { PlaylistVisibilityBadge } from "@/components/playlist/PlaylistVisibilityBadge";
 
-function TrackRow({
+const TrackRow = memo(function TrackRow({
   track,
   index,
   isActive,
@@ -83,7 +83,7 @@ function TrackRow({
       </button>
     </div>
   );
-}
+});
 
 interface Props {
   playlist: Playlist;

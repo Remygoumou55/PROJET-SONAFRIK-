@@ -130,6 +130,7 @@ export default async function AlbumDetailPage({
             alt={album.title}
             gradientSeed={0}
             priority
+            imgSizes="144px"
           />
         </div>
         <div className="flex flex-col justify-end min-w-0">

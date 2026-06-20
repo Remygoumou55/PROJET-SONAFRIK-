@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { CoverImage } from "@/components/CoverImage";
 import { formatTime } from "@/lib/formatters";
 import { AddToPlaylistButton } from "./AddToPlaylistButton";
 
-function TrackRow({
+const TrackRow = memo(function TrackRow({
   track,
   index,
   isActive,
@@ -73,7 +73,7 @@ function TrackRow({
       <AddToPlaylistButton trackId={track.id} />
     </div>
   );
-}
+});
 
 export function AlbumTracksClient({ tracks }: { tracks: TrackWithMeta[] }) {
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();

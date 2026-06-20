@@ -141,7 +141,7 @@ export default async function ArtistPublicPage({
       {/* Banner */}
       {artist.banner_path ? (
         <div className="mt-3 h-32 w-full overflow-hidden" style={{ backgroundColor: "#1F1F1F" }}>
-          <CoverImage coverPath={artist.banner_path} alt={artist.stage_name} priority />
+          <CoverImage coverPath={artist.banner_path} alt={artist.stage_name} priority imgSizes="100vw" />
         </div>
       ) : (
         <div className="mt-3 h-24" style={{ background: "linear-gradient(135deg, #00D26A22 0%, #FFC20E11 100%)" }} />
@@ -155,7 +155,7 @@ export default async function ArtistPublicPage({
           style={{ borderColor: "#0D0D0D", backgroundColor: "#2A2A2A" }}
         >
           {artist.cover_path ? (
-            <CoverImage coverPath={artist.cover_path} alt={artist.stage_name} priority />
+            <CoverImage coverPath={artist.cover_path} alt={artist.stage_name} priority imgSizes="80px" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-2xl font-bold" style={{ color: "#00D26A" }}>
               {artist.stage_name.charAt(0).toUpperCase()}
@@ -210,7 +210,7 @@ export default async function ArtistPublicPage({
                   className="flex-shrink-0 w-28 group"
                 >
                   <div className="aspect-square rounded-xl overflow-hidden mb-2 relative" style={{ backgroundColor: "#1F1F1F" }}>
-                    <CoverImage coverPath={album.cover_url} alt={album.title} gradientSeed={album.id.charCodeAt(0)} />
+                    <CoverImage coverPath={album.cover_url} alt={album.title} gradientSeed={album.id.charCodeAt(0)} imgSizes="112px" />
                   </div>
                   <p className="text-xs font-medium truncate group-hover:underline" style={{ color: "#FFFFFF" }}>
                     {album.title}
