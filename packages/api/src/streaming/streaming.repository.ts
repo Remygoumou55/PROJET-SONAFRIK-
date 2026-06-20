@@ -1,10 +1,14 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
 import type {
+  AlbumWithMeta,
+  ArtistResult,
+  BeatSearchResult,
   Favorite,
   LibraryItem,
   PlaybackPosition,
   Playlist,
+  PlaylistSearchResult,
   PlaylistTrack,
   StreamAnalytics,
   StreamEventType,
@@ -12,6 +16,14 @@ import type {
   StreamingPlatform,
   TrackWithMeta,
 } from "@sonafrik/types";
+
+// Scoring de pertinence : 0 = exact, 1 = préfixe, 2 = contenu (tri ASC = plus pertinent en premier)
+function relevanceScore(name: string, query: string): number {
+  const n = name.toLowerCase();
+  if (n === query) return 0;
+  if (n.startsWith(query)) return 1;
+  return 2;
+}
 
 export class StreamingRepository {
   constructor(private readonly client: SonafrikSupabaseClient) {}
@@ -275,69 +287,81 @@ export class StreamingRepository {
   // Search
   // ---------------------------------------------------------------------------
 
-  async searchCatalog(query: string, limit: number): Promise<import("@sonafrik/types").SearchResult> {
-    const { data, error } = await this.client.rpc("search_catalog" as never, {
-      p_query: query,
-      p_limit: limit,
-    } as never);
-
-    if (error) throw error;
-
-    const result = data as {
-      tracks: import("@sonafrik/types").TrackWithMeta[];
-      albums: import("@sonafrik/types").AlbumWithMeta[];
-      artists: import("@sonafrik/types").ArtistResult[];
-    };
-
-    const tracks = (result?.tracks ?? []).map((t) => ({
-      ...t,
-      metadata: (t.metadata as Record<string, unknown>) ?? {},
-    }));
-    const albums = (result?.albums ?? []).map((a) => ({
-      ...a,
-      metadata: (a.metadata as Record<string, unknown>) ?? {},
-    }));
-    const artists = result?.artists ?? [];
-
-    return {
-      tracks,
-      albums,
-      artists,
-      total: tracks.length + albums.length + artists.length,
-      query,
-    };
-  }
-
   async searchTracks(query: string, limit: number): Promise<TrackWithMeta[]> {
     const { data, error } = await this.client
       .from("tracks")
       .select("*")
       .eq("publication_status", "published")
       .is("deleted_at", null)
-      .or(`title.ilike.%${query}%`)
+      .ilike("title", `%${query}%`)
       .limit(limit)
-      .order("title");
+      .order("created_at", { ascending: false });
     if (error) throw error;
-    return (data ?? []).map((row) => ({
-      ...(row as TrackWithMeta),
-      metadata: (row.metadata as Record<string, unknown>) ?? {},
-    }));
+    const rows = (data ?? []) as TrackWithMeta[];
+    const q = query.toLowerCase();
+    return rows
+      .map((row) => ({ ...row, metadata: (row.metadata as Record<string, unknown>) ?? {} }))
+      .sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
   }
 
-  async searchAlbums(query: string, limit: number): Promise<import("@sonafrik/types").AlbumWithMeta[]> {
+  async searchArtists(query: string, limit: number): Promise<ArtistResult[]> {
+    const { data, error } = await this.client
+      .from("artist_profiles")
+      .select("creator_id, stage_name, slug, bio, genres, cover_path, verified")
+      .ilike("stage_name", `%${query}%`)
+      .limit(limit)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    const rows = (data ?? []) as ArtistResult[];
+    const q = query.toLowerCase();
+    return rows.sort((a, b) => relevanceScore(a.stage_name, q) - relevanceScore(b.stage_name, q));
+  }
+
+  async searchAlbums(query: string, limit: number): Promise<AlbumWithMeta[]> {
     const { data, error } = await this.client
       .from("albums")
       .select("*")
       .eq("publication_status", "published")
       .is("deleted_at", null)
-      .or(`title.ilike.%${query}%`)
+      .ilike("title", `%${query}%`)
       .limit(limit)
-      .order("title");
+      .order("created_at", { ascending: false });
     if (error) throw error;
-    return (data ?? []).map((row) => ({
-      ...(row as import("@sonafrik/types").AlbumWithMeta),
-      metadata: (row.metadata as Record<string, unknown>) ?? {},
-    }));
+    const rows = (data ?? []) as AlbumWithMeta[];
+    const q = query.toLowerCase();
+    return rows
+      .map((row) => ({ ...row, metadata: (row.metadata as Record<string, unknown>) ?? {} }))
+      .sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
+  }
+
+  async searchPlaylists(query: string, limit: number): Promise<PlaylistSearchResult[]> {
+    const { data, error } = await this.client
+      .from("playlists")
+      .select("id, title, description, cover_path, track_count, is_public")
+      .eq("is_public", true)
+      .is("deleted_at", null)
+      .ilike("title", `%${query}%`)
+      .limit(limit)
+      .order("track_count", { ascending: false });
+    if (error) throw error;
+    const rows = (data ?? []) as PlaylistSearchResult[];
+    const q = query.toLowerCase();
+    return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
+  }
+
+  async searchBeats(query: string, limit: number): Promise<BeatSearchResult[]> {
+    const { data, error } = await this.client
+      .from("beats" as never)
+      .select("id, creator_id, title, slug, genre, cover_path, price_gnf, bpm, license_type")
+      .eq("publication_status" as never, "published")
+      .is("deleted_at" as never, null)
+      .ilike("title" as never, `%${query}%`)
+      .limit(limit)
+      .order("created_at" as never, { ascending: false });
+    if (error) throw error;
+    const rows = (data ?? []) as unknown as BeatSearchResult[];
+    const q = query.toLowerCase();
+    return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
   }
 
   // ---------------------------------------------------------------------------

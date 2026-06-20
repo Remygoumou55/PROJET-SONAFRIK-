@@ -249,7 +249,7 @@ export class StreamingService {
   }
 
   // ---------------------------------------------------------------------------
-  // Search V1
+  // Search V2 — multi-type avec scoring de pertinence
   // ---------------------------------------------------------------------------
 
   async search(input: SearchInput): Promise<SearchResult> {
@@ -258,20 +258,41 @@ export class StreamingService {
 
     await this.requireUserId();
 
+    const { query, limit, type } = parsed.data;
+
     try {
-      // Utilise search_catalog (RPC enterprise : pg_trgm + unaccent + pertinence)
-      // Fallback vers ILIKE si la RPC n'est pas disponible
-      return await this.repository.searchCatalog(parsed.data.query, parsed.data.limit);
+      const perType = Math.max(5, Math.ceil(limit / 3));
+
+      const [tracks, artists, albums, playlists, beats] = await Promise.all([
+        type === "all" || type === "tracks"
+          ? this.repository.searchTracks(query, limit)
+          : Promise.resolve([]),
+        type === "all" || type === "artists"
+          ? this.repository.searchArtists(query, type === "all" ? perType : limit)
+          : Promise.resolve([]),
+        type === "all" || type === "albums"
+          ? this.repository.searchAlbums(query, type === "all" ? perType : limit)
+          : Promise.resolve([]),
+        type === "all" || type === "playlists"
+          ? this.repository.searchPlaylists(query, type === "all" ? perType : limit)
+          : Promise.resolve([]),
+        type === "all" || type === "beats"
+          ? this.repository.searchBeats(query, type === "all" ? perType : limit)
+          : Promise.resolve([]),
+      ]);
+
+      return {
+        tracks,
+        artists,
+        albums,
+        playlists,
+        beats,
+        total: tracks.length + artists.length + albums.length + playlists.length + beats.length,
+        query,
+        type,
+      };
     } catch {
-      try {
-        const [tracks, albums] = await Promise.all([
-          this.repository.searchTracks(parsed.data.query, parsed.data.limit),
-          this.repository.searchAlbums(parsed.data.query, parsed.data.limit),
-        ]);
-        return { tracks, albums, artists: [], total: tracks.length + albums.length, query: parsed.data.query };
-      } catch {
-        throw new StreamingError("search_failed");
-      }
+      throw new StreamingError("search_failed");
     }
   }
 

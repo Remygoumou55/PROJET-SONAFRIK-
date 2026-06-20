@@ -615,12 +615,38 @@ export interface ArtistResult {
   verified: boolean;
 }
 
+export interface PlaylistSearchResult {
+  id: string;
+  title: string;
+  description: string | null;
+  cover_path: string | null;
+  track_count: number;
+  is_public: boolean;
+}
+
+export interface BeatSearchResult {
+  id: string;
+  creator_id: string;
+  title: string;
+  slug: string;
+  genre: string | null;
+  cover_path: string | null;
+  price_gnf: number;
+  bpm: number | null;
+  license_type: BeatLicenseType;
+}
+
+export type SearchType = "all" | "tracks" | "artists" | "albums" | "playlists" | "beats";
+
 export interface SearchResult {
   tracks: TrackWithMeta[];
   albums: AlbumWithMeta[];
   artists: ArtistResult[];
+  playlists: PlaylistSearchResult[];
+  beats: BeatSearchResult[];
   total: number;
   query: string;
+  type: SearchType;
 }
 
 export interface StreamAnalytics {

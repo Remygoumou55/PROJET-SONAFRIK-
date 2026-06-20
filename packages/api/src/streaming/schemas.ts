@@ -45,6 +45,7 @@ export const savePositionSchema = z.object({
 export const searchSchema = z.object({
   query: z.string().trim().min(1).max(200),
   limit: z.number().int().min(1).max(50).default(20),
+  type: z.enum(["all", "tracks", "artists", "albums", "playlists", "beats"]).optional().default("all"),
 });
 
 export const analyticsSchema = z.object({
@@ -60,5 +61,6 @@ export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackToPlaylistInput = z.infer<typeof addTrackToPlaylistSchema>;
 export type ToggleFavoriteInput = z.infer<typeof toggleFavoriteSchema>;
 export type SavePositionInput = z.infer<typeof savePositionSchema>;
-export type SearchInput = z.infer<typeof searchSchema>;
+export type SearchInput = z.input<typeof searchSchema>;
+export type SearchTypeInput = "all" | "tracks" | "artists" | "albums" | "playlists" | "beats";
 export type AnalyticsInput = z.infer<typeof analyticsSchema>;
