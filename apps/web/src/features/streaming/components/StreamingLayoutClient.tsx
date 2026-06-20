@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { PlayerProvider } from "../lib/playerContext";
 import { WebPlayer } from "./WebPlayer";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
+import type { AudioQualityPreference } from "@sonafrik/types";
 
 const NAV_ITEMS = [
   { href: "/listen",        label: "Accueil",      icon: "home" },
@@ -200,14 +202,17 @@ interface StreamingLayoutClientProps {
   children: React.ReactNode;
   userId: string;
   initialUnreadCount: number;
+  audioQualityPreference: AudioQualityPreference;
 }
 
 export function StreamingLayoutClient({
   children,
   userId,
   initialUnreadCount,
+  audioQualityPreference,
 }: StreamingLayoutClientProps) {
   return (
+    <QualityPreferenceProvider value={audioQualityPreference}>
     <PlayerProvider>
       {/*
        * Layout unique responsive — {children} rendu UNE SEULE fois.
@@ -231,5 +236,6 @@ export function StreamingLayoutClient({
 
       <WebPlayer />
     </PlayerProvider>
+    </QualityPreferenceProvider>
   );
 }

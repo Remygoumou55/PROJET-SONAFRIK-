@@ -17,6 +17,7 @@ async function StreamingGuard({ children }: { children: React.ReactNode }) {
     <StreamingLayoutClient
       userId={context.profile.id}
       initialUnreadCount={unreadCount}
+      audioQualityPreference={context.preferences.audio_quality}
     >
       {children}
     </StreamingLayoutClient>

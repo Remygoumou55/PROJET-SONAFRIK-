@@ -198,11 +198,11 @@ export const LANGUAGE_OPTIONS: { value: AppLanguage; label: string }[] = [
   { value: "en", label: "English" },
 ];
 
-export const AUDIO_QUALITY_OPTIONS: { value: AudioQualityPreference; label: string }[] = [
-  { value: "auto", label: "Automatique (réseau)" },
-  { value: "64", label: "64 kbps — Mode 2G" },
-  { value: "128", label: "128 kbps — Standard" },
-  { value: "256", label: "256 kbps — Premium" },
+export const AUDIO_QUALITY_OPTIONS: { value: AudioQualityPreference; label: string; description: string }[] = [
+  { value: "auto",  label: "Automatique (recommandé)", description: "S'adapte à votre connexion" },
+  { value: "256",   label: "Toujours haute qualité",   description: "128 kbps — maximum de données" },
+  { value: "128",   label: "Standard fixe",            description: "96 kbps — équilibré" },
+  { value: "64",    label: "Toujours économiser",       description: "64 kbps — minimum de données" },
 ];
 
 export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
@@ -508,7 +508,7 @@ export const CATALOG_ERROR_MESSAGES: Record<string, string> = {
 export type StreamingPlatform = "web" | "ios" | "android";
 export type StreamEventType = "play" | "pause" | "resume" | "seek" | "complete" | "skip" | "heartbeat";
 export type FavoriteEntityType = "track" | "album" | "artist" | "playlist";
-export type AudioQualityKbps = 64 | 128 | 256;
+export type AudioQualityKbps = 64 | 96 | 128 | 256;
 
 /** Real Listen V7.2 — seuil écoute valide */
 export const REAL_LISTEN_THRESHOLD_PERCENT = 90;

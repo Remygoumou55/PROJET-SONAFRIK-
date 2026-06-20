@@ -3,6 +3,7 @@
 import { memo, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { useTrackCredits } from "../hooks/useTrackCredits";
+import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { TipButton } from "./TipButton";
@@ -14,6 +15,7 @@ export const WebPlayer = memo(function WebPlayer() {
   const { currentTrack, currentPosition, duration, setVolume, volume, seek, audioError, clearAudioError } = usePlayer();
   const [showCredits, setShowCredits] = useState(false);
   const { credits } = useTrackCredits(showCredits ? currentTrack?.id : null);
+  const { qualityLevel } = useStreamQuality();
 
   if (!currentTrack) return null;
 
@@ -42,6 +44,20 @@ export const WebPlayer = memo(function WebPlayer() {
           <TipButton creatorId={currentTrack.creator_id} artistName={currentTrack.artist_name ?? "l'artiste"} />
         )}
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
+        {qualityLevel !== "standard" && (
+          <div className="flex justify-end mt-1">
+            <span
+              className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+              style={{
+                backgroundColor: "rgba(255,194,14,0.1)",
+                color: "#FFC20E",
+                border: "1px solid rgba(255,194,14,0.2)",
+              }}
+            >
+              {qualityLevel === "ultra_economique" ? "Ultra-économie" : "Économie de données"}
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-2 md:gap-4 mt-3">
           {/* Track info */}
           <div className="flex items-center gap-3 min-w-0 flex-1">

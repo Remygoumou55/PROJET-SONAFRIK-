@@ -93,6 +93,9 @@ export function PreferencesForm({ preferences }: PreferencesFormProps) {
               update("audio_quality", value as UserPreferences["audio_quality"])
             }
           />
+          <p className="text-xs mt-1" style={{ color: "#555555" }}>
+            {AUDIO_QUALITY_OPTIONS.find((o) => o.value === state.audio_quality)?.description ?? ""}
+          </p>
           <ToggleSetting
             label="Mode économie de données"
             description="Réduit la qualité sur réseau mobile."
