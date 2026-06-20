@@ -3,18 +3,24 @@
 import { useCallback, useRef, useState } from "react";
 import { useCatalogService } from "../hooks/useCatalog";
 
-const ACCEPTED_TYPES: Record<string, string> = {
-  "audio/mpeg": "mp3",
-  "audio/mp3":  "mp3",
-  "audio/wav":  "wav",
+type AudioFormat = "mp3" | "aac" | "flac" | "wav" | "ogg";
+
+const ACCEPTED_TYPES: Record<string, AudioFormat> = {
+  "audio/mpeg":  "mp3",
+  "audio/mp3":   "mp3",
+  "audio/wav":   "wav",
   "audio/x-wav": "wav",
-  "audio/m4a":  "m4a",
-  "audio/mp4":  "m4a",
-  "audio/x-m4a": "m4a",
+  "audio/m4a":   "aac",  // M4A = AAC dans container MP4
+  "audio/mp4":   "aac",
+  "audio/x-m4a": "aac",
+  "audio/flac":  "flac",
+  "audio/x-flac":"flac",
+  "audio/ogg":   "ogg",
 };
-const ACCEPTED_EXTENSIONS = ".mp3,.wav,.m4a";
-const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
-const MAX_SIZE_LABEL = "50 Mo";
+const ACCEPTED_EXTENSIONS = ".mp3,.wav,.m4a,.flac,.ogg";
+// 50 MB — limite du plan Supabase Storage Free (non modifiable sans upgrade de plan)
+const MAX_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_SIZE_MB = 50;
 
 interface Props {
   trackId: string;
@@ -25,8 +31,8 @@ interface Props {
 type UploadState =
   | { status: "idle" }
   | { status: "analyzing"; fileName: string }
-  | { status: "ready"; file: File; durationSeconds: number; format: string }
-  | { status: "uploading"; file: File; durationSeconds: number; format: string; progress: number }
+  | { status: "ready"; file: File; durationSeconds: number; format: AudioFormat }
+  | { status: "uploading"; file: File; durationSeconds: number; format: AudioFormat; progress: number }
   | { status: "success"; durationSeconds: number }
   | { status: "error"; message: string };
 
@@ -65,10 +71,11 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
   const validate = useCallback((file: File): string | null => {
     const format = ACCEPTED_TYPES[file.type];
     if (!format) {
-      return "Format non accepté. Utilisez MP3, WAV ou M4A.";
+      return "Format non supporté. Formats acceptés : MP3, WAV, FLAC, M4A, OGG.";
     }
     if (file.size > MAX_SIZE_BYTES) {
-      return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${MAX_SIZE_LABEL}.`;
+      const fileMB = (file.size / (1024 * 1024)).toFixed(1);
+      return `Fichier trop volumineux (${fileMB} MB). Maximum autorisé : ${MAX_SIZE_MB} MB.`;
     }
     return null;
   }, []);
@@ -80,7 +87,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
       return;
     }
 
-    const format = ACCEPTED_TYPES[file.type] ?? "mp3";
+    const format: AudioFormat = ACCEPTED_TYPES[file.type] ?? "mp3";
     setState({ status: "analyzing", fileName: file.name });
 
     try {
@@ -123,7 +130,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
         assetType: "audio",
         contentType: file.type,
         trackId,
-        format: format as "mp3" | "aac" | "flac" | "wav",
+        format,
       });
 
       await new Promise<void>((resolve, reject) => {
@@ -294,7 +301,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
           Glissez un fichier audio ou cliquez pour choisir
         </p>
         <p className="text-xs" style={{ color: "#555555" }}>
-          MP3 · WAV · M4A — max {MAX_SIZE_LABEL}
+          MP3 · WAV · FLAC · M4A · OGG — max {MAX_SIZE_MB} MB
         </p>
       </div>
 

@@ -44,7 +44,7 @@ export const catalogAssetUploadSchema = z.object({
   contentType: z.string().min(3),
   trackId: z.string().uuid().optional(),
   albumId: z.string().uuid().optional(),
-  format: z.enum(["mp3", "aac", "flac", "wav"]).optional(),
+  format: z.enum(["mp3", "aac", "flac", "wav", "ogg"]).optional(),
   bitrateKbps: z.number().int().positive().optional(),
 });
 
