@@ -43,8 +43,8 @@ export class StreamingRepository {
     const { data, error } = await this.client.rpc("start_stream_session", {
       p_track_id: trackId,
       p_platform: platform,
-      p_quality_kbps: qualityKbps ?? null,
-      p_device_id: deviceId ?? null,
+      p_quality_kbps: qualityKbps ?? undefined,
+      p_device_id: deviceId ?? undefined,
       p_total_duration_seconds: totalDurationSeconds ?? 0,
     });
     if (error) throw error;

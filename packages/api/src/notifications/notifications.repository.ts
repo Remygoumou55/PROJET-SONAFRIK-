@@ -10,8 +10,10 @@ export class NotificationsRepository {
     limit: number;
     unreadOnly: boolean;
   }): Promise<Notification[]> {
-    let query = (this.supabase
-      .from("notifications" as never) as ReturnType<typeof this.supabase.from>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sb = this.supabase as any;
+    let query = sb
+      .from("notifications")
       .select("id, user_id, type, title, body, data, read_at, created_at")
       .eq("user_id", params.userId)
       .order("created_at", { ascending: false })
@@ -27,9 +29,11 @@ export class NotificationsRepository {
   }
 
   async markRead(notificationId: string): Promise<void> {
-    const { error } = await (this.supabase
-      .from("notifications" as never) as ReturnType<typeof this.supabase.from>)
-      .update({ read_at: new Date().toISOString() } as never)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sb = this.supabase as any;
+    const { error } = await sb
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
       .eq("id", notificationId);
     if (error) throw error;
   }

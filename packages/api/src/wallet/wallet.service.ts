@@ -164,9 +164,9 @@ export class WalletService {
       p_type: parsed.type,
       p_display_name: parsed.displayName,
       p_account_holder_name: parsed.accountHolderName,
-      p_phone_number: parsed.phoneNumber ?? null,
-      p_iban: parsed.iban ?? null,
-      p_bank_name: parsed.bankName ?? null,
+      p_phone_number: parsed.phoneNumber ?? undefined,
+      p_iban: parsed.iban ?? undefined,
+      p_bank_name: parsed.bankName ?? undefined,
       p_is_default: parsed.isDefault,
     });
 
