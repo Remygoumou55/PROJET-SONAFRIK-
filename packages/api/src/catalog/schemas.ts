@@ -44,9 +44,8 @@ export const catalogAssetUploadSchema = z.object({
   contentType: z.string().min(3),
   trackId: z.string().uuid().optional(),
   albumId: z.string().uuid().optional(),
-  // RESTRICTION TEMPORAIRE (sprint 20260620) : "flac" et "ogg" retirés de l'upload
-  // — à réactiver une fois le transcodage post-upload implémenté.
-  format: z.enum(["mp3", "aac", "wav"]).optional(),
+  // WAV retiré : 30-40MB impraticables sur mobile. Pipeline WAV→MP3 prévu Phase 2.
+  format: z.enum(["mp3", "aac"]).optional(),
   bitrateKbps: z.number().int().positive().optional(),
 });
 

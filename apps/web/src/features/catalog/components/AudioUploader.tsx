@@ -3,23 +3,19 @@
 import { useCallback, useRef, useState } from "react";
 import { useCatalogService } from "../hooks/useCatalog";
 
-type AudioFormat = "mp3" | "aac" | "wav";
+type AudioFormat = "mp3" | "aac";
 
-// RESTRICTION TEMPORAIRE (sprint 20260620) : FLAC et OGG retirés car aucun
-// système de transcodage n'existe encore — ces formats seraient streamés
-// tels quels aux auditeurs, annulant l'effet du mode économie de données
-// (useStreamQuality). À réactiver une fois le transcodage post-upload
-// implémenté (cf. rapport d'audit du sprint "formats audio élargis").
+// WAV retiré : fichiers de 30-40MB impraticables sur connexion mobile (Orange/MTN Guinée).
+// Pipeline de transcodage WAV→MP3 prévu en Phase 2. En attendant, les créateurs
+// exportent directement en MP3 depuis leur DAW.
 const ACCEPTED_TYPES: Record<string, AudioFormat> = {
   "audio/mpeg":  "mp3",
   "audio/mp3":   "mp3",
-  "audio/wav":   "wav",
-  "audio/x-wav": "wav",
-  "audio/m4a":   "aac",  // M4A = AAC dans container MP4
+  "audio/m4a":   "aac",
   "audio/mp4":   "aac",
   "audio/x-m4a": "aac",
 };
-const ACCEPTED_EXTENSIONS = ".mp3,.wav,.m4a";
+const ACCEPTED_EXTENSIONS = ".mp3,.m4a";
 // 50 MB — limite du plan Supabase Storage Free (non modifiable sans upgrade de plan)
 const MAX_SIZE_BYTES = 50 * 1024 * 1024;
 const MAX_SIZE_MB = 50;

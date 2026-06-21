@@ -6,16 +6,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// RESTRICTION TEMPORAIRE (sprint 20260620) : FLAC et OGG retirés car aucun
-// système de transcodage n'existe encore — ces formats seraient streamés
-// tels quels aux auditeurs, annulant l'effet du mode économie de données
-// (useStreamQuality). À réactiver une fois le transcodage post-upload
-// implémenté (cf. rapport d'audit du sprint "formats audio élargis").
+// WAV retiré du serving : 30-40MB impraticables sur connexion mobile (Orange/MTN Guinée).
+// Pipeline WAV→MP3 prévu en Phase 2. Les uploads WAV existants en base sont bloqués
+// côté client — si un ancien WAV est demandé, l'URL signée est refusée (format rejeté).
 const AUDIO_TYPES: Record<string, string> = {
   "audio/mpeg":  "mp3",
   "audio/mp3":   "mp3",
-  "audio/wav":   "wav",
-  "audio/x-wav": "wav",
   "audio/mp4":   "aac",
   "audio/m4a":   "aac",
   "audio/x-m4a": "aac",
@@ -35,7 +31,7 @@ interface CatalogAssetRequest {
   albumId?: string;
   contentType?: string;
   path?: string;
-  format?: "mp3" | "aac" | "wav";
+  format?: "mp3" | "aac";
   bitrateKbps?: number;
 }
 
@@ -88,7 +84,7 @@ Deno.serve(async (req) => {
       if (!body.contentType) return json({ error: "Content-Type requis." }, 400);
       if (body.assetType === "audio") {
         if (!AUDIO_TYPES[body.contentType]) {
-          return json({ error: "Format audio non autorisé. Formats acceptés : MP3, WAV, FLAC, M4A, OGG." }, 400);
+          return json({ error: "Format audio non autorisé. Formats acceptés : MP3, M4A." }, 400);
         }
         const contentLength = req.headers.get("content-length");
         if (contentLength && parseInt(contentLength, 10) > MAX_AUDIO_SIZE_BYTES) {
