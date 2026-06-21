@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // Compteur mis à jour toutes les 60s — pas besoin de temps réel
 import type { LaunchProgress } from "@sonafrik/types";
 
 export const metadata: Metadata = {

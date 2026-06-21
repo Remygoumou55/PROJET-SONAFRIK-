@@ -15,8 +15,8 @@ export const SONAFRIK_BRAND: SonafrikBrand = {
 /** Real Listen V7.2 — CDC Règle : seuil écoute valide = 90% */
 export const REAL_LISTEN_THRESHOLD_PERCENT = 90;
 
-/** Intervalle heartbeat streaming (ms) */
-export const STREAM_HEARTBEAT_INTERVAL_MS = 10_000;
+/** Intervalle heartbeat streaming (ms) — 30s réduit les requêtes DB de 66% vs 10s */
+export const STREAM_HEARTBEAT_INTERVAL_MS = 30_000;
 
 /** CDC Règle #2 : 7 jours de grâce après expiration Premium */
 export const PREMIUM_GRACE_PERIOD_DAYS = 7;
