@@ -18,10 +18,12 @@ alwaysApply: true
 
 | ID | Problème | Fichier/Zone | Action |
 |---|---|---|---|
+| PAY | 4 opérateurs paiement = TODO stubs | `supabase/functions/payment-initiate/` | Intégrer au moins Wave GN |
+| DB-1 | `subscription_plans` table absente de DB | supabase/migrations/ | Créer table + RLS |
+| MOB-AUTH | Aucun guard auth sur tabs layout mobile | `apps/mobile/app/(tabs)/_layout.tsx` | Ajouter guard session |
 | E5 | AsyncStorage non chiffré mobile | `apps/mobile/lib/supabase.ts` | Migrer vers expo-secure-store |
-| DB-1 | `subscription_plans` table absente | supabase/migrations/ | Créer table + RLS |
-| DB-2 | `rate_limits` absent | supabase/migrations/ | Créer table brute force |
 | TEST | 0 tests unitaires | partout | Vitest sur modules financiers |
+| TYPES | DB types périmés (39 as never) | `packages/database/src/types/index.ts` | supabase gen types |
 
 ### 🟡 HAUTE (avant lancement)
 

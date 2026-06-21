@@ -19,11 +19,15 @@ alwaysApply: true
 | Risque | Fichier | Priorité |
 |---|---|---|
 | AsyncStorage non chiffré pour auth tokens | `apps/mobile/lib/supabase.ts` | HAUTE |
+| Aucun guard auth sur `(tabs)/_layout.tsx` mobile | `apps/mobile/app/(tabs)/_layout.tsx` | HAUTE |
+| CORS `"*"` fallback sur 11 edge functions | `supabase/functions/*/index.ts` | HAUTE |
+| 4 opérateurs paiement = TODO stubs (0 intégration réelle) | `supabase/functions/payment-initiate/index.ts` | CRITIQUE |
+| `subscription_plans` table absente de DB live | supabase/migrations/ | CRITIQUE |
+| Texte "Sprint 2 — Auth OTP SMS" en production mobile | `apps/mobile/app/index.tsx` | HAUTE |
 | 5 artistes hardcodés fictifs sur page lancement | `apps/web/src/app/lancement/page.tsx` | MOYENNE |
-| 39 fichiers avec hex hardcodés restants | `apps/web/src/` | BASSE |
-| Pas de rate_limits table DB | supabase/migrations/ | HAUTE |
 | 0 tests (aucun .test.ts ni .spec.ts) | partout | HAUTE |
-| `subscription_plans` table absente | supabase/migrations/ | CRITIQUE |
+| CSP unsafe-eval + unsafe-inline en production | `apps/web/next.config.ts` | MOYENNE |
+| URL signées audio = 7200s (2h) — trop long | `supabase/functions/stream-start/index.ts` | BASSE |
 
 ## AsyncStorage → SecureStore (À faire)
 
