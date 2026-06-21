@@ -1,5 +1,4 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -70,12 +69,14 @@ interface AdminAlert {
 
 async function fetchUnreadAlerts(): Promise<AdminAlert[]> {
   try {
-    const supabase = getSupabaseAdminClient();
-    const { data } = await (supabase as ReturnType<typeof getSupabaseAdminClient>)
-      .from("admin_notifications" as never)
+    const supabase = await getSupabaseServerClient();
+    // admin_notifications n'est pas encore dans les types auto-générés Supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from("admin_notifications")
       .select("id, type, message, created_at")
-      .eq("is_read" as never, false)
-      .order("created_at" as never, { ascending: false })
+      .eq("is_read", false)
+      .order("created_at", { ascending: false })
       .limit(10);
     return (data as AdminAlert[]) ?? [];
   } catch {

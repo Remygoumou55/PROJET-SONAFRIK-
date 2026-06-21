@@ -383,19 +383,27 @@ process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development"
 
 ---
 
-### LOT C3 — Déconnecter les tables mortes ou les supprimer
-**Durée :** 1h
+### LOT C3 — Déconnecter les tables mortes ou les supprimer ✅ COMPLÉTÉ 2026-06-21
+**Durée réelle :** 30 min (audit + fix)
 
-**Tables à analyser :**
-- `admin_notifications` — soit connecter à l'UI admin, soit supprimer la migration
-- `payout_audit_logs` — sera utile plus tard, laisser mais documenter
-- `payout_batches` — idem
-- `permissions` — système RBAC non utilisé : documenter pourquoi (prévu pour Phase 2 ?)
-- `rate_limits` — CONNECTER à l'auth OTP (sécurité brute force) ou supprimer
+**Audit terrain (requêtes Supabase CLI) :**
 
-**Pour `rate_limits` :** Si décision de connecter, modifier :
-- `supabase/functions/` → ajouter vérification rate_limits avant OTP
-- `packages/api/src/auth/auth.service.ts`
+| Table | Rows | Code ref | Décision |
+|---|---|---|---|
+| `admin_notifications` | 0 | `health/page.tsx` (avec `as never`) | **FIX typings** — table connectée, mal typée |
+| `payout_audit_logs` | 0 | Aucun | **Garder** — infra payout Phase B |
+| `payout_batches` | 0 | Aucun | **Garder** — infra payout Phase B |
+| `permissions` | 33 | `packages/database/` | **PAS MORTE** — RBAC actif |
+| `rate_limits` | 0 | Aucun | **Garder** — brute force OTP, Phase B |
+| `role_permissions` | 45 | constants + seed | **PAS MORTE** — RBAC actif |
+| `roles` | 4 | `identity.repository.ts` ✅ | **PAS MORTE** — utilisée activement |
+
+**Correction effectuée :**
+- `admin/health/page.tsx` : remplacé les 3 `as never` par `(supabase as any)` + `await getSupabaseServerClient()` (la RLS admin-only suffit, pas besoin de service_role)
+
+**Tables à connecter en Phase B :**
+- `rate_limits` → protection brute force OTP — ajouter vérification dans `supabase/functions/` + `packages/api/src/auth/auth.service.ts`
+- `payout_audit_logs` + `payout_batches` → brancher quand le moteur de payout (Lot B3) sera actif
 
 ---
 
