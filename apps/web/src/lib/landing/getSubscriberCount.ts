@@ -9,7 +9,12 @@ const _fetchSubscriberCount = async (): Promise<number> => {
   if (!url || !key) return 0;
 
   try {
-    const supabase = createClient(url, key);
+    // AbortController — évite le hang infini sur cold start Supabase free tier
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const supabase = createClient(url, key, {
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer)) },
+    });
     const { data, error } = await supabase.rpc("get_launch_progress");
     if (error || !data) return 0;
     const raw = data as { current: number; target: number };

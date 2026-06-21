@@ -54,24 +54,33 @@ export default async function LandingV5Page({
     redirect(`/auth/callback?${qs.toString()}`);
   }
 
-  // Démarrage parallèle : subscriber count (cache 5 min, client anon) + auth check
-  // Pour un visiteur anonyme, les deux fetch s'exécutent simultanément → gain ~50-100ms
-  const subscriberCountPromise = getSubscriberCount();
+  // BYPASS_AUTH=true → dev local sans vraie session.
+  // On court-circuite TOUS les appels DB pour éviter le hang sur cold start Supabase.
+  const isBypass = process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1";
 
-  const supabase = await getSupabaseServerClient();
-  const auth = createAuthService(supabase);
   let profile = null;
-  try {
-    profile = await auth.getCurrentProfile();
-  } catch {
-    // Supabase indisponible → traiter comme visiteur anonyme
+  let subscriberCount = 0;
+
+  if (isBypass) {
+    // Pas de DB en mode bypass — valeur mock pour l'affichage du compteur
+    subscriberCount = 42;
+  } else {
+    // Démarrage parallèle : subscriber count + auth check → gain ~50-100ms
+    const subscriberCountPromise = getSubscriberCount();
+
+    const supabase = await getSupabaseServerClient();
+    const auth = createAuthService(supabase);
+    try {
+      profile = await auth.getCurrentProfile();
+    } catch {
+      // Supabase indisponible → traiter comme visiteur anonyme
+    }
+
+    if (profile?.onboarding_completed) redirect("/listen");
+    if (profile && !profile.onboarding_completed) redirect("/auth/inscription");
+
+    subscriberCount = await subscriberCountPromise;
   }
-
-  if (profile?.onboarding_completed) redirect("/listen");
-  if (profile && !profile.onboarding_completed) redirect("/auth/inscription");
-
-  // subscriberCount est déjà résolu (en cache ou fetch parallèle)
-  const subscriberCount = await subscriberCountPromise;
 
   return (
     <LandingPage>

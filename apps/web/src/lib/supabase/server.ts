@@ -14,11 +14,27 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   return { url, anonKey };
 }
 
+// Fetch avec AbortController — protège chaque requête Supabase contre les hangs infinis.
+// Supabase free tier peut prendre 10-30s en cold start → sans timeout, la page ne répond jamais.
+// 8s : suffisant pour une requête normale, court-circuite un cold start.
+function fetchWithTimeout(timeoutMs: number): typeof fetch {
+  return (input, init) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(input, { ...init, signal: controller.signal }).finally(() =>
+      clearTimeout(timer),
+    );
+  };
+}
+
+const SUPABASE_FETCH_TIMEOUT_MS = 8000;
+
 // Client anon sans cookies — pour unstable_cache (données publiques, pas de session).
 export function getSupabasePublicClient(): SonafrikSupabaseClient {
   const { url, anonKey } = getSupabaseEnv();
   return createClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
   }) as unknown as SonafrikSupabaseClient;
 }
 
@@ -30,6 +46,7 @@ export function getSupabaseAdminClient(): SonafrikSupabaseClient {
   if (!url || !serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");
   return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false },
+    global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
   }) as unknown as SonafrikSupabaseClient;
 }
 
@@ -42,6 +59,7 @@ export const getSupabaseServerClient = cache(
     const { url, anonKey } = getSupabaseEnv();
 
     return createServerClient<Database>(url, anonKey, {
+      global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
       cookies: {
         getAll() {
           return cookieStore.getAll();

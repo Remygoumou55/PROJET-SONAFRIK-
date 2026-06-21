@@ -9,9 +9,14 @@ async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
   redirectIfOnboardingIncomplete(context.profile);
 
-  const supabase = await getSupabaseServerClient();
-  const notifService = createNotificationsService(supabase);
-  const unreadCount = await notifService.countUnread(context.profile.id).catch(() => 0);
+  // BYPASS_AUTH → profil mock avec unreadNotifications déjà défini, pas besoin de requêter la DB
+  const isBypass = process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1";
+  let unreadCount = context.unreadNotifications;
+  if (!isBypass) {
+    const supabase = await getSupabaseServerClient();
+    const notifService = createNotificationsService(supabase);
+    unreadCount = await notifService.countUnread(context.profile.id).catch(() => 0);
+  }
 
   return (
     <StreamingLayoutClient
