@@ -25,7 +25,7 @@ export class CatalogService {
   }
 
   private async requireUserId(): Promise<string> {
-    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-id";
+    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
     const {
       data: { user },
     } = await this.client.auth.getUser();
@@ -34,7 +34,7 @@ export class CatalogService {
   }
 
   private async requireCreatorId(): Promise<string> {
-    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-creator-id";
+    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-creator-id";
     const userId = await this.requireUserId();
     const { data } = await this.client.rpc("is_artist_account", { p_user_id: userId });
     if (!data) throw new CatalogError("not_artist_account");

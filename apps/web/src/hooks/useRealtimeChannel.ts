@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getSupabaseBrowserClient, isLocalAuditMode } from "@/lib/supabase/client";
 
 type PgEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
@@ -29,6 +29,8 @@ export function useRealtimeChannel(
 
   useEffect(() => {
     if (!enabled || !channelPrefix) return;
+    // Mode audit local : pas de connexion WebSocket Supabase — aucune session réelle.
+    if (isLocalAuditMode()) return;
 
     const supabase = getSupabaseBrowserClient();
     const channelName = `${channelPrefix}_${Date.now()}`;

@@ -32,7 +32,7 @@ export class CreatorService {
   }
 
   private async requireUserId(): Promise<string> {
-    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-id";
+    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
     const {
       data: { user },
     } = await this.client.auth.getUser();
@@ -41,7 +41,7 @@ export class CreatorService {
   }
 
   private async requireArtistAccount(userId: string): Promise<void> {
-    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return;
+    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return;
     const { data, error } = await this.client.rpc("is_artist_account", { p_user_id: userId });
     if (error || !data) throw new CreatorError("not_artist_account");
   }
