@@ -5,6 +5,10 @@ import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
 import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
+import { ComingSoon } from "@/components/ComingSoon";
+
+// Déverrouiller quand Orange Money / MTN MoMo / Wave sont intégrés
+const PAYMENTS_COMING_SOON = true;
 
 const SubscriptionModal = dynamic(
   () =>
@@ -26,6 +30,16 @@ export function WalletClient() {
   const { context, isLoading, error, reload } = useWallet();
   const [showSubscription, setShowSubscription] = useState(false);
   const [showTopup, setShowTopup]               = useState(false);
+
+  if (PAYMENTS_COMING_SOON) {
+    return (
+      <ComingSoon
+        emoji="💳"
+        title="Portefeuille & Paiements"
+        description="Orange Money, MTN MoMo et Wave arrivent bientôt sur SONAFRIK. Rechargez et gérez vos abonnements en quelques secondes."
+      />
+    );
+  }
 
   if (isLoading) {
     return (
