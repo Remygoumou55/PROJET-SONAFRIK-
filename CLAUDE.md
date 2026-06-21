@@ -2,6 +2,7 @@
 > Ce fichier est lu en premier par toute IA travaillant sur ce projet.
 > Il définit le comportement attendu, les rôles, les principes non-négociables.
 > **Toute IA doit le lire avant d'écrire une seule ligne de code.**
+> Dernière mise à jour : 2026-06-21 — Accès autonome complet accordé par Rémy Goumou.
 
 ---
 
@@ -124,17 +125,21 @@ Tous les types viennent de `packages/types/src/`. **Jamais re-définis localemen
 
 Toute logique métier passe par `packages/api/src/`. **Pas d'appels Supabase directs dans les composants.**
 
-### 4.5 Migrations SQL — Workflow avec accès CLI direct
+### 4.5 Migrations SQL — Workflow autonome complet
 
 **Accès Supabase CLI accordé par Rémy le 2026-06-21.**
 Projet lié : `cxjpburiiazzvlczzupy` (PROJET-SONAFRIK)
 
+**L'IA exécute elle-même toutes les étapes — aucune intervention manuelle de Rémy n'est nécessaire.**
+
 Workflow obligatoire :
-1. Écrire le fichier SQL dans `supabase/migrations/`
+1. Lire les migrations existantes pour comprendre l'état actuel de la DB
 2. Vérifier les contraintes existantes si besoin : `supabase db query --linked "<SELECT...>"`
-3. Exécuter : `supabase db query --linked --file supabase/migrations/<fichier>.sql`
-4. Valider en base avec une requête de confirmation
-5. Commit + push
+3. Écrire le fichier SQL dans `supabase/migrations/`
+4. Exécuter : `supabase db query --linked --file supabase/migrations/<fichier>.sql`
+5. Valider en base avec une requête de confirmation
+6. Lancer `pnpm build && pnpm lint && pnpm typecheck` — doit être 100% sans erreur
+7. Commit + push sur le bon branch
 
 **Règles sécurité absolues qui ne changent pas :**
 - ❌ JAMAIS créer une table sans RLS policy
@@ -178,7 +183,9 @@ Workflow obligatoire :
 
 ## 7. FORMAT DES LIVRABLES
 
-### Après chaque tâche terminée, mettre à jour `docs/RAPPORT_COLLECTION.md` avec :
+### Après chaque tâche terminée, l'IA doit :
+
+**A. Mettre à jour `docs/RAPPORT_COLLECTION.md` avec :**
 
 ```markdown
 ## [DATE] — [NOM DE LA TÂCHE]
@@ -202,6 +209,10 @@ Workflow obligatoire :
 ### Tests à faire
 - [ ] Test manuel : décrire le scénario
 ```
+
+**B. Exécuter l'audit post-tâche (Section 11) et produire le rapport final.**
+
+**C. Commit + push avec un message clair.**
 
 ---
 
@@ -241,5 +252,95 @@ Avant de travailler sur n'importe quelle tâche, lire :
 ❌ Faire un appel Supabase direct dans un composant React
 ❌ Déclarer une tâche "terminée" sans avoir passé la checklist Section 3
 ❌ Implémenter sans challenger si la demande est MVP-nécessaire
-❌ Créer une migration SQL sans la présenter d'abord dans le chat
+❌ Attendre la validation manuelle de Rémy pour exécuter SQL ou pousser du code
 ```
+
+---
+
+## 11. PROTOCOLE D'AUDIT POST-TÂCHE (OBLIGATOIRE)
+
+**Après chaque tâche complétée, l'IA exécute systématiquement dans cet ordre :**
+
+### Étape 1 — Validation build
+
+```bash
+pnpm build        # doit être 100% sans erreur
+pnpm lint         # 0 warning, 0 error
+pnpm typecheck    # 0 erreur TypeScript
+```
+
+Si une étape échoue → corriger AVANT de continuer.
+
+### Étape 2 — Validation Supabase (si migrations)
+
+```bash
+# Vérifier que les tables sont bien créées
+supabase db query --linked "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;"
+
+# Vérifier les RLS policies
+supabase db query --linked "SELECT tablename, policyname FROM pg_policies WHERE schemaname='public';"
+```
+
+### Étape 3 — Commit + push
+
+```bash
+git add -A
+git commit -m "feat(domaine): description claire de ce qui a été fait"
+git push origin main
+```
+
+### Étape 4 — Rapport final structuré
+
+Produire dans le chat un rapport avec ce format :
+
+```
+═══════════════════════════════════════════════
+RAPPORT — [NOM DE LA TÂCHE]
+Date : [DATE] | Sprint : [N] | IA : Claude Sonnet 4.6
+═══════════════════════════════════════════════
+
+STATUT GLOBAL : ✅ TERMINÉ / ⚠️ PARTIEL / ❌ ÉCHOUÉ
+
+─── LIVRAISONS ───────────────────────────────
+• [Ce qui a été créé / modifié]
+• [Fichiers touchés]
+• [Migrations exécutées]
+
+─── VALIDATION ───────────────────────────────
+• pnpm build     : ✅ OK / ❌ ERREUR
+• pnpm lint      : ✅ OK / ❌ ERREUR
+• pnpm typecheck : ✅ OK / ❌ ERREUR
+• Supabase DB    : ✅ OK / ❌ ERREUR (si applicable)
+• Git push       : ✅ OK / ❌ ERREUR
+
+─── DETTE TECHNIQUE ──────────────────────────
+• [Dette créée, si applicable — sinon : Aucune]
+
+─── PROCHAINE ÉTAPE RECOMMANDÉE ──────────────
+• [Ce qu'il faut faire ensuite selon PLAN_CORRECTION_360.md]
+═══════════════════════════════════════════════
+```
+
+---
+
+## 12. ACCÈS ET DROITS AUTONOMES
+
+**Accordés par Rémy Goumou le 2026-06-21 — accès complet et permanent.**
+
+| Outil | Droit | Périmètre |
+|---|---|---|
+| Supabase CLI | Lecture + Écriture | Projet `cxjpburiiazzvlczzupy` (PROJET-SONAFRIK) |
+| `supabase db query --linked` | Exécution directe | Toutes migrations et requêtes |
+| `git push` | Push | Branch `main` (jamais `--force`) |
+| `pnpm` | Build / lint / typecheck | Monorepo complet |
+| Fichiers workspace | Lecture + Écriture | Tout `e:\PROJET SONAFRIK` |
+
+**L'IA est autonome.** Elle n'attend pas de confirmation pour :
+- Exécuter une migration SQL (elle vérifie elle-même l'état DB avant et après)
+- Pousser du code sur main (après validation build/lint/typecheck 100%)
+- Lancer les validations techniques
+
+**L'IA demande confirmation uniquement pour :**
+- Supprimer des données utilisateurs réelles
+- Modifier un tarif ou une configuration financière
+- Effectuer une action irréversible non couverte par un rollback simple
