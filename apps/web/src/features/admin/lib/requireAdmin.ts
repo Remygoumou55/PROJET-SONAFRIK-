@@ -5,9 +5,9 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
     throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
   }
-  // Même logique que le middleware : bypass si BYPASS_AUTH=true OU NODE_ENV=development, jamais sur Vercel
+  // Bypass uniquement si BYPASS_AUTH=true explicite, jamais sur Vercel
   const isBypassMode =
-    (process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development") &&
+    process.env.BYPASS_AUTH === "true" &&
     process.env.VERCEL !== "1";
   if (isBypassMode) return { userId: "dev-mock-id" };
 

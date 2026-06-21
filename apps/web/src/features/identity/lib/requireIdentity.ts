@@ -73,15 +73,11 @@ const fetchIdentityContext = cache(async () => {
 });
 
 export async function requireIdentityContext(): Promise<IdentityContext> {
-  if (
-    (process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development") &&
-    process.env.VERCEL === "1"
-  ) {
+  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
     throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
   }
-  // Cohérent avec le middleware : bypass si BYPASS_AUTH=true OU NODE_ENV=development,
-  // jamais en production (VERCEL="1")
-  if (process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development") {
+  // Bypass uniquement si BYPASS_AUTH=true explicite, jamais sur Vercel
+  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") {
     return DEV_MOCK_IDENTITY;
   }
 
