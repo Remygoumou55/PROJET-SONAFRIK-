@@ -88,9 +88,9 @@ export default async function ArtistPublicPage({
       .order("published_at", { ascending: false })
       .limit(10),
     supabase
-      .from("feature_flags" as never)
+      .from("feature_flags")
       .select("enabled")
-      .eq("name" as never, "tips")
+      .eq("name", "tips")
       .maybeSingle(),
     catalog.getTracksFeaturingCreator(id),
   ]);

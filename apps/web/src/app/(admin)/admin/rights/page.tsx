@@ -23,7 +23,7 @@ export default async function AdminRightsPage() {
   const supabase = await getSupabaseServerClient();
 
   const { data } = await supabase
-    .from("rights_claims" as never)
+    .from("rights_claims")
     .select(
       "id, work_id, claimant_id, claim_type, status, description, evidence_url, created_at, works(title), profiles!claimant_id(full_name)"
     )

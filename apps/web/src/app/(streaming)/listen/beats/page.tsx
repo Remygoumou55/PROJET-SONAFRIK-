@@ -10,13 +10,10 @@ export default async function BeatStorePage() {
   await requireIdentityContext();
   const supabase = await getSupabaseServerClient();
 
-  // Vérifier le feature flag beat_store
-  // SQL requis dans Supabase Studio : voir apps/web/src/lib/sql/feature_flags.sql
-  // "as never" = table absente du schéma généré → à ajouter via supabase gen types après migration
   const { data: flagRow } = await supabase
-    .from("feature_flags" as never)
+    .from("feature_flags")
     .select("enabled")
-    .eq("name" as never, "beat_store")
+    .eq("name", "beat_store")
     .maybeSingle();
 
   const flagEnabled = (flagRow as { enabled: boolean } | null)?.enabled ?? false;

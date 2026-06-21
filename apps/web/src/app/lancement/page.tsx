@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 async function getLaunchProgress(): Promise<LaunchProgress> {
   try {
     const supabase = await getSupabaseServerClient();
-    const { data, error } = await supabase.rpc("get_launch_progress" as never);
+    const { data, error } = await supabase.rpc("get_launch_progress");
     if (error || !data) throw new Error("rpc failed");
 
     const raw = data as { current: number; target: number };

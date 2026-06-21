@@ -61,9 +61,17 @@ export class BeatsService {
     if (!parsed.success) throw new BeatsError("create_failed");
 
     const userId = await this.requireUserId();
+    // Récupérer l'ID creators (≠ auth.users.id) pour respecter la FK beats.creator_id → creators.id
+    const { data: creatorRow } = await this.client
+      .from("creators")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!creatorRow) throw new BeatsError("unauthorized");
+
     const beat = await this.repository
       .create({
-        creatorId:   userId,
+        creatorId:   creatorRow.id,
         title:       parsed.data.title,
         slug:        slugify(parsed.data.title),
         priceGnf:    parsed.data.priceGnf,

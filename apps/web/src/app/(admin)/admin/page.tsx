@@ -33,14 +33,14 @@ export default async function AdminPage() {
     c(supabase.from("albums").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null)),
     c(supabase.from("tracks").select("*", { count: "exact", head: true }).eq("publication_status", "pending_review").is("deleted_at", null)),
     c(supabase.from("stream_sessions").select("*", { count: "exact", head: true }).filter("fraud_flags", "neq", "{}")),
-    c((supabase.from("withdrawals" as never) as ReturnType<typeof supabase.from>).select("*", { count: "exact", head: true }).eq("status", "pending")),
+    c(supabase.from("withdrawals").select("*", { count: "exact", head: true }).eq("status", "pending")),
   ]);
 
   // Compteur pré-lancement (CDC Règle #7)
   let launchCurrent = 0;
   let launchTarget  = 2000;
   try {
-    const { data: launchData } = await supabase.rpc("get_launch_progress" as never);
+    const { data: launchData } = await supabase.rpc("get_launch_progress");
     const lp = launchData as { current: number; target: number } | null;
     if (lp) { launchCurrent = Number(lp.current); launchTarget = Number(lp.target); }
   } catch { /* ignore */ }
