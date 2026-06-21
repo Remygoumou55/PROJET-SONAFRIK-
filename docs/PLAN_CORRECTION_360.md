@@ -354,7 +354,19 @@ process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development"
 
 ---
 
-### LOT C2 — Fusionner les composants dupliqués
+### LOT C2 — Fusionner les composants dupliqués ✅ COMPLÉTÉ 2026-06-21
+**Durée réelle :** 45 min
+
+**TipButton** :
+- `marketplace/TipButton.tsx` → `features/shared/components/TipButton.tsx` (modal canonical)
+- `streaming/TipButton.tsx` → `streaming/TipPanel.tsx` (renommé : inline ≠ bouton)
+- `TIP_AMOUNTS` + `TipAmount` extraits dans `packages/types/src/constants.ts`
+- `tips.actions.ts` déplacé dans `features/shared/actions/`
+- Props standardisées : `creatorId` + `artistName` partout
+
+**Step5Confirm** : NON mergé — similarité ~55%, sous seuil 80%. Les types wizard (ArtistWizard vs ListenerWizard) et les champs de profil sont trop divergents.
+
+### LOT C2 ORIGINAL — Fusionner les composants dupliqués [ARCHIVÉ]
 **Durée :** 2h
 
 **Duplication 1 : TipButton.tsx**
