@@ -14,6 +14,14 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   return { url, anonKey };
 }
 
+// Client anon sans cookies — pour unstable_cache (données publiques, pas de session).
+export function getSupabasePublicClient(): SonafrikSupabaseClient {
+  const { url, anonKey } = getSupabaseEnv();
+  return createClient<Database>(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  }) as unknown as SonafrikSupabaseClient;
+}
+
 // Client service role — bypass RLS complet — réservé aux routes admin server-side.
 // JAMAIS exposé côté client. JAMAIS utilisé sur Vercel sans vérification BYPASS_AUTH.
 export function getSupabaseAdminClient(): SonafrikSupabaseClient {

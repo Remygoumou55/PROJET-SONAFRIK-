@@ -1,13 +1,12 @@
-import { Suspense, cache } from "react";
+import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
-
-export const dynamic = "force-dynamic";
 import Link from "next/link";
 import type { DiscoveryArtist, DiscoveryTrack, NewReleasesResult, TrendingTrack } from "@sonafrik/types";
 import { createRecommendationService } from "@sonafrik/api/recommendation";
 import { createDiscoveryService } from "@sonafrik/api/discovery";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { getInitials } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
 import { getDailyProverb } from "@/lib/proverbs";
@@ -24,10 +23,12 @@ const ARTIST_RING_COLORS = [
 ] as const;
 
 // ─── Fetch données homepage ────────────────────────────────────────────────────
-// cache() déduplique les appels concurrents sur le même render React tree
-const getHomepageContent = cache(async function getHomepageContent() {
+// unstable_cache : met en cache les 7 requêtes publiques entre les requêtes HTTP.
+// TTL 5 min — client anon sans cookies (données publiques, pas de session).
+const getHomepageContent = unstable_cache(
+  async function _getHomepageContent() {
   try {
-    const supabase = await getSupabaseServerClient();
+    const supabase = getSupabasePublicClient();
     const recommendation = createRecommendationService(supabase);
     const discovery = createDiscoveryService(supabase);
 
@@ -66,7 +67,10 @@ const getHomepageContent = cache(async function getHomepageContent() {
     console.error("[Homepage] getHomepageContent failed:", err);
     return { playlists: [], artists: [], genres: [], trending: [], discoveries: [], newAlbums: [], suggestedArtists: [], hadError: true };
   }
-});
+},
+  ["homepage-content"],
+  { revalidate: 300, tags: ["homepage"] },
+);
 
 type HomepageContent = Awaited<ReturnType<typeof getHomepageContent>>;
 
