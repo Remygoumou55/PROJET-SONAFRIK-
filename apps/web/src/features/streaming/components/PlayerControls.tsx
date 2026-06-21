@@ -7,20 +7,20 @@ function ShuffleIcon({ active }: { active: boolean }) {
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path
         d="M1 5h2.5a4 4 0 0 1 3.2 1.6L8 8M15 5l-3.5 3.5M15 11l-3.5-3.5"
-        stroke={active ? "#00D26A" : "#555555"}
+        stroke={active ? "var(--color-vert-energie)" : "var(--color-texte-desactive)"}
         strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M1 11h2.5a4 4 0 0 0 3.2-1.6l1.8-2.4A4 4 0 0 1 11.5 5H15"
-        stroke={active ? "#00D26A" : "#555555"}
+        stroke={active ? "var(--color-vert-energie)" : "var(--color-texte-desactive)"}
         strokeWidth="1.4"
         strokeLinecap="round"
       />
       <path
         d="M11.5 11H15"
-        stroke={active ? "#00D26A" : "#555555"}
+        stroke={active ? "var(--color-vert-energie)" : "var(--color-texte-desactive)"}
         strokeWidth="1.4"
         strokeLinecap="round"
       />
@@ -29,7 +29,7 @@ function ShuffleIcon({ active }: { active: boolean }) {
 }
 
 function RepeatIcon({ mode }: { mode: "off" | "one" | "all" }) {
-  const color = mode !== "off" ? "#00D26A" : "#555555";
+  const color = mode !== "off" ? "var(--color-vert-energie)" : "var(--color-texte-desactive)";
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path
@@ -72,7 +72,7 @@ export function PlayerControls() {
         <button
           onClick={toggleShuffle}
           className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
-          style={{ backgroundColor: shuffle ? "#00D26A22" : "transparent" }}
+          style={{ backgroundColor: shuffle ? "rgba(0,210,106,0.09)" : "transparent" }}
           aria-label={shuffle ? "Désactiver le mode aléatoire" : "Mode aléatoire"}
           title={shuffle ? "Aléatoire activé" : "Aléatoire"}
         >
@@ -99,13 +99,13 @@ export function PlayerControls() {
       {isLoading ? (
         <div
           className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
-          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
       ) : isPlaying ? (
         <button
           onClick={pauseAndSave}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          style={{ backgroundColor: "#00D26A" }}
+          style={{ backgroundColor: "var(--color-vert-energie)" }}
           aria-label="Pause"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="#0D0D0D">
@@ -117,7 +117,7 @@ export function PlayerControls() {
         <button
           onClick={resume}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          style={{ backgroundColor: "#00D26A" }}
+          style={{ backgroundColor: "var(--color-vert-energie)" }}
           aria-label="Lecture"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="#0D0D0D">
@@ -145,7 +145,7 @@ export function PlayerControls() {
       <button
         onClick={cycleRepeat}
         className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
-        style={{ backgroundColor: repeatMode !== "off" ? "#00D26A22" : "transparent" }}
+        style={{ backgroundColor: repeatMode !== "off" ? "rgba(0,210,106,0.09)" : "transparent" }}
         aria-label={
           repeatMode === "off" ? "Activer la répétition" :
           repeatMode === "all" ? "Répéter un morceau" :
@@ -164,7 +164,7 @@ export function PlayerControls() {
       <button
         onClick={stop}
         className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center transition-colors"
-        style={{ backgroundColor: "#2A2A2A" }}
+        style={{ backgroundColor: "var(--color-elevated)" }}
         aria-label="Arrêter"
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="#A0A0A0">

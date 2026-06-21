@@ -1,6 +1,7 @@
 'use client'
 
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { OnboardingRow } from '@/app/onboarding/shared/OnboardingRow'
 import type { ArtistWizard } from './types'
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -93,12 +94,12 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
           gap: '12px',
         }}
       >
-        <Row label="Nom de scène" value={data.stageName} />
-        {data.mainGenre && <Row label="Genre" value={data.mainGenre} />}
-        <Row label="Langue" value={LANGUAGE_LABELS[data.songLanguage] ?? data.songLanguage} />
-        {data.originRegion && <Row label="Région" value={data.originRegion} />}
-        <Row label="Orange Money" value={maskPhone(data.orangeMoneyNumber)} />
-        {data.mtnMoneyNumber && <Row label="MTN Money" value={maskPhone(data.mtnMoneyNumber)} />}
+        <OnboardingRow label="Nom de scène" value={data.stageName} />
+        {data.mainGenre && <OnboardingRow label="Genre" value={data.mainGenre} />}
+        <OnboardingRow label="Langue" value={LANGUAGE_LABELS[data.songLanguage] ?? data.songLanguage} />
+        {data.originRegion && <OnboardingRow label="Région" value={data.originRegion} />}
+        <OnboardingRow label="Orange Money" value={maskPhone(data.orangeMoneyNumber)} />
+        {data.mtnMoneyNumber && <OnboardingRow label="MTN Money" value={maskPhone(data.mtnMoneyNumber)} />}
       </div>
 
       {wizard.error && (
@@ -135,23 +136,3 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-      <span
-        style={{
-          fontSize: '12px',
-          color: 'rgba(255,255,255,0.4)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          flexShrink: 0,
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ fontSize: '14px', color: '#ffffff', textAlign: 'right', wordBreak: 'break-word' }}>
-        {value}
-      </span>
-    </div>
-  )
-}

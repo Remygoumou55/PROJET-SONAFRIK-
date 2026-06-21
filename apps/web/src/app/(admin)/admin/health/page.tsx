@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,28 @@ async function checkWallets(): Promise<CheckResult> {
   }
 }
 
+interface AdminAlert {
+  id:         string;
+  type:       string;
+  message:    string;
+  created_at: string;
+}
+
+async function fetchUnreadAlerts(): Promise<AdminAlert[]> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data } = await (supabase as ReturnType<typeof getSupabaseAdminClient>)
+      .from("admin_notifications" as never)
+      .select("id, type, message, created_at")
+      .eq("is_read" as never, false)
+      .order("created_at" as never, { ascending: false })
+      .limit(10);
+    return (data as AdminAlert[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
 async function checkPayments(): Promise<CheckResult> {
   const start = Date.now();
   try {
@@ -114,11 +137,12 @@ function HealthRow({ result }: { result: CheckResult }) {
 }
 
 export default async function AdminHealthPage() {
-  const [db, storage, wallets, payments] = await Promise.allSettled([
+  const [db, storage, wallets, payments, alerts] = await Promise.allSettled([
     checkDatabase(),
     checkStorage(),
     checkWallets(),
     checkPayments(),
+    fetchUnreadAlerts(),
   ]);
 
   const results: CheckResult[] = [
@@ -128,6 +152,7 @@ export default async function AdminHealthPage() {
     payments.status  === "fulfilled" ? payments.value  : { label: "Paiements",          ok: false, detail: "Timeout" },
   ];
 
+  const unreadAlerts: AdminAlert[] = alerts.status === "fulfilled" ? alerts.value : [];
   const allOk = results.every((r) => r.ok);
 
   return (
@@ -158,6 +183,45 @@ export default async function AdminHealthPage() {
       >
         <h2 className="text-sm font-semibold mb-4" style={{ color: "#A0A0A0" }}>Infrastructure</h2>
         {results.map((r) => <HealthRow key={r.label} result={r} />)}
+      </div>
+
+      {/* Alertes admin — générées par trigger check_provider_failure_rate */}
+      <div
+        className="rounded-2xl p-5"
+        style={{ backgroundColor: "#1A1A1A", border: `1px solid ${unreadAlerts.length > 0 ? "#FFC20E44" : "#2A2A2A"}` }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold" style={{ color: "#A0A0A0" }}>Alertes système</h2>
+          {unreadAlerts.length > 0 && (
+            <span
+              className="px-2 py-0.5 rounded-full text-xs font-bold"
+              style={{ backgroundColor: "#FFC20E22", color: "#FFC20E" }}
+            >
+              {unreadAlerts.length} non lue{unreadAlerts.length > 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+        {unreadAlerts.length === 0 ? (
+          <p className="text-xs" style={{ color: "#555555" }}>✅ Aucune alerte active.</p>
+        ) : (
+          <div className="space-y-2">
+            {unreadAlerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="rounded-lg px-3 py-2.5"
+                style={{ backgroundColor: "#2A2A2A", border: "1px solid #FFC20E33" }}
+              >
+                <p className="text-xs font-semibold mb-0.5" style={{ color: "#FFC20E" }}>
+                  ⚠️ {alert.type.replace(/_/g, " ")}
+                </p>
+                <p className="text-xs" style={{ color: "#A0A0A0" }}>{alert.message}</p>
+                <p className="text-xs mt-1 font-mono" style={{ color: "#555555" }}>
+                  {new Date(alert.created_at).toLocaleString("fr-GN", { timeZone: "Africa/Conakry" })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Edge Functions attendues */}

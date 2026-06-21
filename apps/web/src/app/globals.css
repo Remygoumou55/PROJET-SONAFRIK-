@@ -18,6 +18,9 @@
   --color-texte-principal: #ffffff;
   --color-texte-secondaire: #a0a0a0;
   --color-texte-desactive: #555555;
+  --color-erreur: #ff6666;
+  --color-danger: #ff4444;
+  --color-info: #3b82f6;
   --font-sans: Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;

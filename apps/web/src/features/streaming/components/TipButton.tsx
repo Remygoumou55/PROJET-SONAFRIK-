@@ -40,23 +40,23 @@ export const TipButton = memo(function TipButton({ creatorId, artistName }: Prop
   return (
     <div
       className="mx-4 mb-2 rounded-xl px-3.5 py-2.5"
-      style={{ backgroundColor: "#1F1F1F", border: "1px solid #2A2A2A" }}
+      style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-elevated)" }}
     >
-      <p className="text-xs font-semibold mb-2" style={{ color: "#A0A0A0" }}>
+      <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-texte-secondaire)" }}>
         Soutenir {artistName}
       </p>
 
       {confirmation ? (
         <div
           className="rounded-lg px-3 py-2 text-xs font-semibold"
-          style={{ backgroundColor: "#00D26A22", color: "#00D26A" }}
+          style={{ backgroundColor: "rgba(0,210,106,0.09)", color: "var(--color-vert-energie)" }}
         >
           {confirmation}
         </div>
       ) : error ? (
         <div
           className="rounded-lg px-3 py-2 text-xs"
-          style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+          style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
         >
           {error}
         </div>
@@ -68,7 +68,7 @@ export const TipButton = memo(function TipButton({ creatorId, artistName }: Prop
               disabled={loading}
               onClick={() => void handleTip(a)}
               className="flex-1 rounded-lg py-1.5 text-xs font-semibold transition-opacity disabled:opacity-50"
-              style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+              style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
             >
               {a.toLocaleString("fr-FR")} GNF
             </button>

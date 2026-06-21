@@ -83,18 +83,18 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
       {/* Panneau */}
       <div
         className="w-full max-w-md rounded-2xl p-6 space-y-5"
-        style={{ backgroundColor: "#1F1F1F", border: "1px solid #333333" }}
+        style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-bordure)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* En-tête */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold" style={{ color: "#FFFFFF" }}>
+          <h2 className="text-lg font-bold" style={{ color: "var(--color-texte-principal)" }}>
             Nouvelle playlist
           </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
+            style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}
             aria-label="Fermer"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -106,8 +106,8 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Nom */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" style={{ color: "#A0A0A0" }}>
-              Nom <span style={{ color: "#FF4444" }}>*</span>
+            <label className="text-sm font-medium" style={{ color: "var(--color-texte-secondaire)" }}>
+              Nom <span style={{ color: "var(--color-danger)" }}>*</span>
             </label>
             <input
               ref={titleRef}
@@ -118,17 +118,17 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               maxLength={FIELD_LIMITS.PLAYLIST_TITLE}
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none transition-colors"
               style={{
-                backgroundColor: "#2A2A2A",
-                border: "1px solid #333333",
-                color: "#FFFFFF",
+                backgroundColor: "var(--color-elevated)",
+                border: "1px solid var(--color-bordure)",
+                color: "var(--color-texte-principal)",
               }}
-              onFocus={(e) => { e.target.style.borderColor = "#00D26A"; }}
-              onBlur={(e) => { e.target.style.borderColor = "#333333"; }}
+              onFocus={(e) => { e.target.style.borderColor = "var(--color-vert-energie)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--color-bordure)"; }}
             />
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: title.length > FIELD_LIMITS.PLAYLIST_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: title.length > FIELD_LIMITS.PLAYLIST_TITLE * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
               >
                 {title.length}/{FIELD_LIMITS.PLAYLIST_TITLE}
               </span>
@@ -137,8 +137,8 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" style={{ color: "#A0A0A0" }}>
-              Description <span style={{ color: "#555555" }}>(optionnel)</span>
+            <label className="text-sm font-medium" style={{ color: "var(--color-texte-secondaire)" }}>
+              Description <span style={{ color: "var(--color-texte-desactive)" }}>(optionnel)</span>
             </label>
             <textarea
               value={description}
@@ -148,17 +148,17 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               maxLength={FIELD_LIMITS.PLAYLIST_DESCRIPTION}
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none resize-none transition-colors"
               style={{
-                backgroundColor: "#2A2A2A",
-                border: "1px solid #333333",
-                color: "#FFFFFF",
+                backgroundColor: "var(--color-elevated)",
+                border: "1px solid var(--color-bordure)",
+                color: "var(--color-texte-principal)",
               }}
-              onFocus={(e) => { e.target.style.borderColor = "#00D26A"; }}
-              onBlur={(e) => { e.target.style.borderColor = "#333333"; }}
+              onFocus={(e) => { e.target.style.borderColor = "var(--color-vert-energie)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--color-bordure)"; }}
             />
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: description.length > FIELD_LIMITS.PLAYLIST_DESCRIPTION * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: description.length > FIELD_LIMITS.PLAYLIST_DESCRIPTION * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
               >
                 {description.length}/{FIELD_LIMITS.PLAYLIST_DESCRIPTION}
               </span>
@@ -170,7 +170,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
 
           {/* Erreur */}
           {error && (
-            <p className="text-xs px-1" style={{ color: "#FF4444" }}>
+            <p className="text-xs px-1" style={{ color: "var(--color-danger)" }}>
               {error}
             </p>
           )}
@@ -182,7 +182,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               onClick={onClose}
               disabled={isSubmitting}
               className="flex-1 py-2.5 rounded-xl text-sm font-medium"
-              style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
+              style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}
             >
               Annuler
             </button>
@@ -191,8 +191,8 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
               disabled={isSubmitting || title.trim().length === 0}
               className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-opacity"
               style={{
-                backgroundColor: "#00D26A",
-                color: "#0D0D0D",
+                backgroundColor: "var(--color-vert-energie)",
+                color: "var(--color-noir-profond)",
                 opacity: isSubmitting || title.trim().length === 0 ? 0.5 : 1,
               }}
             >

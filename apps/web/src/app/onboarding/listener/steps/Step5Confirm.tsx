@@ -1,6 +1,7 @@
 'use client'
 
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { OnboardingRow } from '@/app/onboarding/shared/OnboardingRow'
 import type { ListenerWizard } from './types'
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -95,10 +96,10 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
           gap: '12px',
         }}
       >
-        <Row label="Nom" value={data.fullName} />
-        <Row label="Ville" value={data.city} />
-        <Row label="Langue" value={LANGUAGE_LABELS[data.preferredLanguage] ?? data.preferredLanguage} />
-        {data.backupEmail && <Row label="Email de secours" value={data.backupEmail} />}
+        <OnboardingRow label="Nom" value={data.fullName} />
+        <OnboardingRow label="Ville" value={data.city} />
+        <OnboardingRow label="Langue" value={LANGUAGE_LABELS[data.preferredLanguage] ?? data.preferredLanguage} />
+        {data.backupEmail && <OnboardingRow label="Email de secours" value={data.backupEmail} />}
       </div>
 
       {wizard.error && (
@@ -135,15 +136,3 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-      <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
-        {label}
-      </span>
-      <span style={{ fontSize: '14px', color: '#ffffff', textAlign: 'right', wordBreak: 'break-word' }}>
-        {value}
-      </span>
-    </div>
-  )
-}

@@ -25,12 +25,12 @@ export const PlayerProgressBar = memo(function PlayerProgressBar({
       {/* Piste visuelle — décorative, pointer-events ignorés */}
       <div
         className="absolute inset-x-0 h-1 rounded-full overflow-hidden pointer-events-none"
-        style={{ backgroundColor: "#333333" }}
+        style={{ backgroundColor: "var(--color-bordure)" }}
         aria-hidden="true"
       >
         <div
           className="h-full rounded-full"
-          style={{ width: `${percentage}%`, backgroundColor: "#00D26A" }}
+          style={{ width: `${percentage}%`, backgroundColor: "var(--color-vert-energie)" }}
         />
       </div>
 
@@ -44,7 +44,7 @@ export const PlayerProgressBar = memo(function PlayerProgressBar({
             height: "8px",
             top: "50%",
             transform: "translate(-50%, -50%)",
-            backgroundColor: isValidListen ? "#00D26A" : "#444444",
+            backgroundColor: isValidListen ? "var(--color-vert-energie)" : "var(--color-texte-desactive)",
             borderRadius: "1px",
             transition: "background-color 0.3s",
           }}

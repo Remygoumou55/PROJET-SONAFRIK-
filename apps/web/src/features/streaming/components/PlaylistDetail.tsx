@@ -29,24 +29,24 @@ const TrackRow = memo(function TrackRow({
     <div
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl group"
       style={{
-        backgroundColor: isActive ? "#00D26A11" : "transparent",
-        border: `1px solid ${isActive ? "#00D26A33" : "transparent"}`,
+        backgroundColor: isActive ? "rgba(0,210,106,0.07)" : "transparent",
+        border: `1px solid ${isActive ? "rgba(0,210,106,0.2)" : "transparent"}`,
       }}
     >
       <button onClick={() => onPlay(track)} className="w-8 text-center flex-shrink-0">
         {isActive ? (
           isPlaying ? (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="var(--color-vert-energie)" className="mx-auto">
               <rect x="1" y="1" width="4" height="12" rx="1" />
               <rect x="9" y="1" width="4" height="12" rx="1" />
             </svg>
           ) : (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="var(--color-vert-energie)" className="mx-auto">
               <path d="M3 1l10 6-10 6V1z" />
             </svg>
           )
         ) : (
-          <span className="text-sm" style={{ color: "#555555" }}>{index + 1}</span>
+          <span className="text-sm" style={{ color: "var(--color-texte-desactive)" }}>{index + 1}</span>
         )}
       </button>
 
@@ -55,18 +55,18 @@ const TrackRow = memo(function TrackRow({
       </button>
 
       <button onClick={() => onPlay(track)} className="flex-1 min-w-0 text-left">
-        <p className="text-sm font-medium truncate" style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}>
+        <p className="text-sm font-medium truncate" style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-principal)" }}>
           {track.title}
         </p>
         {track.artist_name && (
-          <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+          <p className="text-xs truncate" style={{ color: "var(--color-texte-secondaire)" }}>
             {track.artist_name}
           </p>
         )}
       </button>
 
       {track.duration_seconds ? (
-        <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: "#555555" }}>
+        <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: "var(--color-texte-desactive)" }}>
           {formatTime(track.duration_seconds)}
         </span>
       ) : null}
@@ -75,7 +75,7 @@ const TrackRow = memo(function TrackRow({
         onClick={() => onRemove(track.id)}
         className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg flex-shrink-0"
         aria-label="Retirer de la playlist"
-        style={{ color: "#555555" }}
+        style={{ color: "var(--color-texte-desactive)" }}
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
           <path d="M3 3l8 8M11 3l-8 8" />
@@ -190,20 +190,20 @@ export function PlaylistDetail({ playlist, initialTracks, currentUserId }: Props
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-3">
-        <Link href="/library" className="mt-1 flex-shrink-0" style={{ color: "#A0A0A0" }} aria-label="Retour">
+        <Link href="/library" className="mt-1 flex-shrink-0" style={{ color: "var(--color-texte-secondaire)" }} aria-label="Retour">
           <svg width="20" height="20" viewBox="0 0 14 14" fill="none">
             <path d="M9 2L3 7l6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl font-bold" style={{ color: "#FFFFFF" }}>{playlist.title}</h1>
+            <h1 className="text-xl font-bold" style={{ color: "var(--color-texte-principal)" }}>{playlist.title}</h1>
             <PlaylistVisibilityBadge isPublic={isPublic} />
           </div>
           {playlist.description && (
-            <p className="text-sm mt-0.5" style={{ color: "#A0A0A0" }}>{playlist.description}</p>
+            <p className="text-sm mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>{playlist.description}</p>
           )}
-          <p className="text-xs mt-1" style={{ color: "#555555" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-texte-desactive)" }}>
             {tracks.length} morceau{tracks.length !== 1 ? "x" : ""}
             {totalDuration > 0 && ` · ${formatTime(totalDuration)}`}
           </p>
@@ -219,7 +219,7 @@ export function PlaylistDetail({ playlist, initialTracks, currentUserId }: Props
         <button
           onClick={handlePlayAll}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+          style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
             <path d="M2 1l11 6-11 6V1z" />
@@ -228,17 +228,17 @@ export function PlaylistDetail({ playlist, initialTracks, currentUserId }: Props
         </button>
       )}
 
-      {playError && <p className="text-sm" role="alert" style={{ color: "#FF4D4F" }}>{playError}</p>}
-      {error && <p className="text-sm" role="alert" style={{ color: "#FF6666" }}>{error}</p>}
+      {playError && <p className="text-sm" role="alert" style={{ color: "var(--color-danger)" }}>{playError}</p>}
+      {error && <p className="text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>{error}</p>}
 
       {isLoading ? (
         <div className="flex justify-center py-10">
-          <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: "#00D26A", borderTopColor: "transparent" }} />
+          <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }} />
         </div>
       ) : tracks.length === 0 ? (
-        <div className="rounded-xl py-12 text-center" style={{ backgroundColor: "#1F1F1F" }}>
+        <div className="rounded-xl py-12 text-center" style={{ backgroundColor: "var(--color-card)" }}>
           <p className="text-2xl mb-2">🎵</p>
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
             Cette playlist est vide. Ajoutez des morceaux depuis les pages albums ou artistes.
           </p>
         </div>

@@ -60,7 +60,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
   return (
     <div className="px-6 space-y-0.5">
       {playError && (
-        <p className="text-xs mb-2" role="alert" style={{ color: "#FF4D4F" }}>
+        <p className="text-xs mb-2" role="alert" style={{ color: "var(--color-danger)" }}>
           {playError}
         </p>
       )}
@@ -81,12 +81,12 @@ export function HomepageTrendingSection({ tracks }: Props) {
               {isTop ? (
                 <span
                   className="text-sm font-black"
-                  style={{ color: i === 0 ? "#00D26A" : i === 1 ? "#FFC20E" : "#F97316" }}
+                  style={{ color: i === 0 ? "var(--color-vert-energie)" : i === 1 ? "var(--color-or-solaire)" : "#F97316" }}
                 >
                   {i + 1}
                 </span>
               ) : (
-                <span className="text-xs font-bold" style={{ color: "#444444" }}>{i + 1}</span>
+                <span className="text-xs font-bold" style={{ color: "var(--color-texte-desactive)" }}>{i + 1}</span>
               )}
             </div>
 
@@ -102,12 +102,12 @@ export function HomepageTrendingSection({ tracks }: Props) {
                   style={{ background: "rgba(0,0,0,0.45)" }}
                 >
                   {isPlaying ? (
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="#00D26A">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--color-vert-energie)">
                       <rect x="2" y="2" width="4" height="12" rx="1" />
                       <rect x="10" y="2" width="4" height="12" rx="1" />
                     </svg>
                   ) : (
-                    <svg width={10} height={12} viewBox="0 0 10 12" fill="#00D26A">
+                    <svg width={10} height={12} viewBox="0 0 10 12" fill="var(--color-vert-energie)">
                       <path d="M0 0L10 6L0 12V0Z" />
                     </svg>
                   )}
@@ -117,7 +117,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"
                 style={{ background: "rgba(0,0,0,0.6)" }}
               >
-                <svg width={10} height={12} viewBox="0 0 10 12" fill="#00D26A">
+                <svg width={10} height={12} viewBox="0 0 10 12" fill="var(--color-vert-energie)">
                   <path d="M0 0L10 6L0 12V0Z" />
                 </svg>
               </div>
@@ -125,11 +125,11 @@ export function HomepageTrendingSection({ tracks }: Props) {
 
             {/* Info */}
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate" style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}>
+              <p className="text-sm font-semibold truncate" style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-principal)" }}>
                 {track.title}
               </p>
               {track.artist_name && (
-                <p className="text-xs truncate mt-0.5" style={{ color: "#666666" }}>
+                <p className="text-xs truncate mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
                   {track.artist_name}
                 </p>
               )}
@@ -137,10 +137,10 @@ export function HomepageTrendingSection({ tracks }: Props) {
 
             {/* Streams */}
             <div className="flex-shrink-0 text-right">
-              <p className="text-xs font-bold tabular-nums" style={{ color: isTop ? "#00D26A" : "#444444" }}>
+              <p className="text-xs font-bold tabular-nums" style={{ color: isTop ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}>
                 {formatCount(track.listen_count)}
               </p>
-              <p className="text-[9px]" style={{ color: "#333333" }}>écoutes</p>
+              <p className="text-[9px]" style={{ color: "var(--color-bordure)" }}>écoutes</p>
             </div>
           </button>
         );

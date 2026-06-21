@@ -24,8 +24,8 @@ const TrackRow = memo(function TrackRow({
     <div
       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
       style={{
-        backgroundColor: isActive ? "#00D26A11" : "transparent",
-        border: `1px solid ${isActive ? "#00D26A33" : "transparent"}`,
+        backgroundColor: isActive ? "rgba(0,210,106,0.07)" : "transparent",
+        border: `1px solid ${isActive ? "rgba(0,210,106,0.2)" : "transparent"}`,
       }}
     >
       {/* Zone cliquable = lecture */}
@@ -37,28 +37,28 @@ const TrackRow = memo(function TrackRow({
         <div className="w-8 text-center flex-shrink-0">
           {isActive ? (
             isPlaying ? (
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="var(--color-vert-energie)" className="mx-auto">
                 <rect x="1" y="1" width="4" height="12" rx="1" />
                 <rect x="9" y="1" width="4" height="12" rx="1" />
               </svg>
             ) : (
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="#00D26A" className="mx-auto">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="var(--color-vert-energie)" className="mx-auto">
                 <path d="M3 1l10 6-10 6V1z" />
               </svg>
             )
           ) : (
-            <span className="text-sm" style={{ color: "#555555" }}>{index + 1}</span>
+            <span className="text-sm" style={{ color: "var(--color-texte-desactive)" }}>{index + 1}</span>
           )}
         </div>
         <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
           <CoverImage coverPath={track.cover_url ?? null} alt={track.title} gradientSeed={index} imgSizes="40px" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate" style={{ color: isActive ? "#00D26A" : "#FFFFFF" }}>
+          <p className="text-sm font-medium truncate" style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-principal)" }}>
             {track.title}
           </p>
           {track.artist_name && (
-            <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+            <p className="text-xs truncate" style={{ color: "var(--color-texte-secondaire)" }}>
               {track.artist_name}
             </p>
           )}
@@ -66,7 +66,7 @@ const TrackRow = memo(function TrackRow({
       </button>
 
       {track.duration_seconds ? (
-        <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: "#555555" }}>
+        <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: "var(--color-texte-desactive)" }}>
           {formatTime(track.duration_seconds)}
         </span>
       ) : null}
@@ -108,7 +108,7 @@ export function AlbumTracksClient({ tracks }: { tracks: TrackWithMeta[] }) {
         <button
           onClick={handlePlayAll}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+          style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
             <path d="M2 1l11 6-11 6V1z" />
@@ -118,7 +118,7 @@ export function AlbumTracksClient({ tracks }: { tracks: TrackWithMeta[] }) {
       </div>
 
       {error && (
-        <p className="text-sm px-3 mb-2" role="alert" style={{ color: "#FF4D4F" }}>
+        <p className="text-sm px-3 mb-2" role="alert" style={{ color: "var(--color-danger)" }}>
           {error}
         </p>
       )}

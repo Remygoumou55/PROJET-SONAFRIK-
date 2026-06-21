@@ -15,25 +15,25 @@ function PlaylistCard({
   return (
     <div
       className="rounded-xl p-4 flex items-center gap-4 group"
-      style={{ backgroundColor: "#1F1F1F" }}
+      style={{ backgroundColor: "var(--color-card)" }}
     >
       <Link href={`/library/playlist/${playlist.id}`} className="flex items-center gap-4 flex-1 min-w-0">
         <div
           className="w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
-          style={{ backgroundColor: "#2A2A2A" }}
+          style={{ backgroundColor: "var(--color-elevated)" }}
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="#00D26A">
-            <path d="M4 6h12M4 10h8M4 14h10" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="var(--color-vert-energie)">
+            <path d="M4 6h12M4 10h8M4 14h10" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
           </svg>
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold truncate" style={{ color: "#FFFFFF" }}>
+            <p className="font-semibold truncate" style={{ color: "var(--color-texte-principal)" }}>
               {playlist.title}
             </p>
             <PlaylistVisibilityBadge isPublic={playlist.is_public} />
           </div>
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
             {playlist.track_count ?? 0} morceau{(playlist.track_count ?? 0) !== 1 ? "x" : ""}
           </p>
         </div>
@@ -41,7 +41,7 @@ function PlaylistCard({
       <button
         onClick={() => onDelete(playlist.id)}
         className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg flex-shrink-0"
-        style={{ color: "#555555" }}
+        style={{ color: "var(--color-texte-desactive)" }}
         aria-label="Supprimer la playlist"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -60,7 +60,7 @@ export function LibraryList() {
       <div className="flex justify-center py-12">
         <div
           className="w-8 h-8 rounded-full border-2 animate-spin"
-          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
       </div>
     );
@@ -69,7 +69,7 @@ export function LibraryList() {
   if (error) {
     return (
       <div className="py-8 text-center">
-        <p style={{ color: "#A0A0A0" }}>{error}</p>
+        <p style={{ color: "var(--color-texte-secondaire)" }}>{error}</p>
       </div>
     );
   }
@@ -79,11 +79,11 @@ export function LibraryList() {
       {playlists.length === 0 ? (
         <div className="py-10 text-center">
           <p className="text-4xl mb-4">🎵</p>
-          <p className="text-lg font-semibold mb-2" style={{ color: "#FFFFFF" }}>
+          <p className="text-lg font-semibold mb-2" style={{ color: "var(--color-texte-principal)" }}>
             Vous n&apos;avez pas encore de playlists
           </p>
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
-            Utilisez le bouton <span style={{ color: "#00D26A" }}>+ Nouvelle playlist</span> ci-dessus pour commencer.
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
+            Utilisez le bouton <span style={{ color: "var(--color-vert-energie)" }}>+ Nouvelle playlist</span> ci-dessus pour commencer.
           </p>
         </div>
       ) : (

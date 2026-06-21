@@ -72,13 +72,13 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
   return (
     <div className={compact ? "flex items-baseline gap-0.5" : "flex flex-col items-start"}>
       <span className={`font-extrabold tracking-tight leading-none ${compact ? "text-xl" : "text-2xl"}`}>
-        <span style={{ color: "#FFFFFF" }}>SONA</span>
-        <span style={{ color: "#00D26A" }}>FRIK</span>
+        <span style={{ color: "var(--color-texte-principal)" }}>SONA</span>
+        <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
       </span>
       {!compact && (
         <span
           className="text-[9px] font-bold tracking-[0.2em] mt-1 block"
-          style={{ color: "#FFC20E" }}
+          style={{ color: "var(--color-or-solaire)" }}
         >
           NOTRE BIEN COMMUN
         </span>
@@ -98,7 +98,7 @@ function DesktopNav({
   return (
     <nav
       className="hidden md:flex w-64 flex-shrink-0 flex-col gap-1 p-4 h-screen sticky top-0"
-      style={{ backgroundColor: "#1A1A1A", borderRight: "1px solid #333333" }}
+      style={{ backgroundColor: "var(--color-surface)", borderRight: "1px solid var(--color-bordure)" }}
     >
       <div className="mb-8 px-3 pt-3">
         <BrandLogo />
@@ -111,8 +111,8 @@ function DesktopNav({
               key={item.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
               style={{
-                backgroundColor: isActive ? "#00D26A18" : "transparent",
-                color: isActive ? "#00D26A" : "#A0A0A0",
+                backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
+                color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)",
               }}
             >
               <NotificationBell
@@ -129,8 +129,8 @@ function DesktopNav({
             href={item.href}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
             style={{
-              backgroundColor: isActive ? "#00D26A18" : "transparent",
-              color: isActive ? "#00D26A" : "#A0A0A0",
+              backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
+              color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)",
             }}
           >
             <NavIcon icon={item.icon} />
@@ -154,8 +154,8 @@ function MobileBottomNav({
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-1 py-2"
       style={{
-        backgroundColor: "#1A1A1A",
-        borderTop: "1px solid #2A2A2A",
+        backgroundColor: "var(--color-surface)",
+        borderTop: "1px solid var(--color-elevated)",
         height: "64px",
       }}
     >
@@ -170,7 +170,7 @@ function MobileBottomNav({
               <NotificationBell initialCount={initialUnreadCount} userId={userId} />
               <span
                 className="text-[9px] font-semibold tracking-wide"
-                style={{ color: isActive ? "#00D26A" : "#555555" }}
+                style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
               >
                 Alertes
               </span>
@@ -182,12 +182,12 @@ function MobileBottomNav({
             key={item.href}
             href={item.href}
             className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors"
-            style={{ color: isActive ? "#00D26A" : "#555555" }}
+            style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
           >
             <NavIcon icon={item.icon} size={20} />
             <span
               className="text-[9px] font-semibold tracking-wide"
-              style={{ color: isActive ? "#00D26A" : "#555555" }}
+              style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
             >
               {item.label === "Bibliothèque" ? "Biblio" : item.label}
             </span>
@@ -219,7 +219,7 @@ export function StreamingLayoutClient({
        * Desktop (md+) : flex-row, sidebar fixe + main scrollable.
        * Mobile (<md)  : block, main plein-écran + bottom nav fixe.
        */}
-      <div style={{ backgroundColor: "#0D0D0D", minHeight: "100dvh" }}>
+      <div style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}>
         <div className="md:flex md:h-screen md:overflow-hidden">
           {/* Sidebar — hidden sur mobile (hidden md:flex géré dans DesktopNav) */}
           <DesktopNav userId={userId} initialUnreadCount={initialUnreadCount} />

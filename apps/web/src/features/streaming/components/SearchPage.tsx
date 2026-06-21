@@ -52,7 +52,7 @@ export function SearchPage({ initialGenre }: Props) {
 
   return (
     <div className="p-6 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>
+      <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--color-texte-principal)" }}>
         Recherche
       </h1>
 
@@ -60,9 +60,9 @@ export function SearchPage({ initialGenre }: Props) {
         <div className="flex items-center gap-2 mb-4">
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-            style={{ background: "#00D26A14", color: "#00D26A", border: "1px solid #00D26A30" }}
+            style={{ background: "rgba(0,210,106,0.08)", color: "var(--color-vert-energie)", border: "1px solid rgba(0,210,106,0.19)" }}
           >
-            <svg width={10} height={10} viewBox="0 0 24 24" fill="#00D26A">
+            <svg width={10} height={10} viewBox="0 0 24 24" fill="var(--color-vert-energie)">
               <path d="M9 18V5l12-2v13" />
               <circle cx="6" cy="18" r="3" />
               <circle cx="18" cy="16" r="3" />
@@ -73,7 +73,7 @@ export function SearchPage({ initialGenre }: Props) {
               className="ml-1 flex items-center justify-center w-3.5 h-3.5 rounded-full hover:bg-green-900/30"
               aria-label={`Retirer le filtre ${activeGenre}`}
             >
-              <svg width={8} height={8} viewBox="0 0 8 8" fill="none" stroke="#00D26A" strokeWidth={1.5} strokeLinecap="round">
+              <svg width={8} height={8} viewBox="0 0 8 8" fill="none" stroke="var(--color-vert-energie)" strokeWidth={1.5} strokeLinecap="round">
                 <path d="M1 1l6 6M7 1L1 7" />
               </svg>
             </button>
@@ -89,8 +89,8 @@ export function SearchPage({ initialGenre }: Props) {
           viewBox="0 0 18 18"
           fill="none"
         >
-          <circle cx="8" cy="8" r="5.5" stroke="#555555" strokeWidth="1.5" />
-          <path d="M12 12L16 16" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="8" cy="8" r="5.5" stroke="var(--color-texte-desactive)" strokeWidth="1.5" />
+          <path d="M12 12L16 16" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
         <input
           type="text"
@@ -99,9 +99,9 @@ export function SearchPage({ initialGenre }: Props) {
           placeholder={activeGenre ? `Chercher dans ${activeGenre}…` : "Artiste, morceau, album, beat…"}
           className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
           style={{
-            backgroundColor: "#1F1F1F",
-            color: "#FFFFFF",
-            border: "1px solid #333333",
+            backgroundColor: "var(--color-card)",
+            color: "var(--color-texte-principal)",
+            border: "1px solid var(--color-bordure)",
           }}
           autoFocus
         />
@@ -109,7 +109,7 @@ export function SearchPage({ initialGenre }: Props) {
           <button
             onClick={() => { setQuery(""); setActiveGenre(undefined); clearSearch(); }}
             className="absolute right-3 top-1/2 -translate-y-1/2"
-            style={{ color: "#555555" }}
+            style={{ color: "var(--color-texte-desactive)" }}
             aria-label="Effacer"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -128,9 +128,9 @@ export function SearchPage({ initialGenre }: Props) {
               onClick={() => handleTabChange(tab.id)}
               className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
               style={{
-                backgroundColor: activeTab === tab.id ? "#00D26A" : "#1F1F1F",
-                color: activeTab === tab.id ? "#0D0D0D" : "#A0A0A0",
-                border: `1px solid ${activeTab === tab.id ? "#00D26A" : "#333333"}`,
+                backgroundColor: activeTab === tab.id ? "var(--color-vert-energie)" : "var(--color-card)",
+                color: activeTab === tab.id ? "var(--color-noir-profond)" : "var(--color-texte-secondaire)",
+                border: `1px solid ${activeTab === tab.id ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
               }}
             >
               {tab.label}
@@ -140,7 +140,7 @@ export function SearchPage({ initialGenre }: Props) {
       )}
 
       {error && (
-        <p className="text-sm mb-4" role="alert" style={{ color: "#FF4D4F" }}>
+        <p className="text-sm mb-4" role="alert" style={{ color: "var(--color-danger)" }}>
           {error}
         </p>
       )}
@@ -157,10 +157,10 @@ export function SearchPage({ initialGenre }: Props) {
       {!query && !activeGenre && (
         <div className="text-center py-12">
           <p className="text-4xl mb-4">🎵</p>
-          <p className="font-semibold mb-1" style={{ color: "#FFFFFF" }}>
+          <p className="font-semibold mb-1" style={{ color: "var(--color-texte-principal)" }}>
             Recherchez votre musique
           </p>
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
             Morceaux, albums, artistes, playlists, beats africains
           </p>
         </div>

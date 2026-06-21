@@ -22,12 +22,12 @@ export const WebPlayer = memo(function WebPlayer() {
   return (
     <div
       className="fixed left-0 right-0 z-50 px-4 py-3 bottom-16 md:bottom-0"
-      style={{ backgroundColor: "#1A1A1A", borderTop: "1px solid #2A2A2A" }}
+      style={{ backgroundColor: "var(--color-surface)", borderTop: "1px solid var(--color-elevated)" }}
     >
       {audioError && (
         <div
           className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-lg text-xs"
-          style={{ backgroundColor: "#FF444418", border: "1px solid #FF444433", color: "#FF9999" }}
+          style={{ backgroundColor: "rgba(255,68,68,0.09)", border: "1px solid rgba(255,68,68,0.2)", color: "var(--color-erreur)" }}
         >
           <span>{audioError}</span>
           <button
@@ -50,7 +50,7 @@ export const WebPlayer = memo(function WebPlayer() {
               className="text-[10px] font-medium px-2 py-0.5 rounded-full"
               style={{
                 backgroundColor: "rgba(255,194,14,0.1)",
-                color: "#FFC20E",
+                color: "var(--color-or-solaire)",
                 border: "1px solid rgba(255,194,14,0.2)",
               }}
             >
@@ -67,12 +67,12 @@ export const WebPlayer = memo(function WebPlayer() {
             <div className="min-w-0 flex-1">
               <p
                 className="text-sm font-semibold truncate"
-                style={{ color: "#FFFFFF" }}
+                style={{ color: "var(--color-texte-principal)" }}
               >
                 {currentTrack.title}
               </p>
               {currentTrack.artist_name && (
-                <p className="text-xs truncate" style={{ color: "#A0A0A0" }}>
+                <p className="text-xs truncate" style={{ color: "var(--color-texte-secondaire)" }}>
                   {currentTrack.artist_name}
                 </p>
               )}
@@ -82,8 +82,8 @@ export const WebPlayer = memo(function WebPlayer() {
               onClick={() => setShowCredits((v) => !v)}
               className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
               style={{
-                color: showCredits ? "#00D26A" : "#A0A0A0",
-                backgroundColor: showCredits ? "#00D26A18" : "transparent",
+                color: showCredits ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)",
+                backgroundColor: showCredits ? "rgba(0,210,106,0.09)" : "transparent",
               }}
               aria-label="Afficher les crédits"
               title="Crédits"
@@ -97,7 +97,7 @@ export const WebPlayer = memo(function WebPlayer() {
 
           {/* Time + Volume */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="text-xs tabular-nums" style={{ color: "#A0A0A0" }}>
+            <span className="text-xs tabular-nums" style={{ color: "var(--color-texte-secondaire)" }}>
               {formatTime(currentPosition)} / {formatTime(duration)}
             </span>
             <div className="hidden md:flex items-center gap-2">
@@ -121,7 +121,7 @@ export const WebPlayer = memo(function WebPlayer() {
         {showCredits && credits.length > 0 && (
           <div
             className="mt-3 pt-3 px-1"
-            style={{ borderTop: "1px solid #2A2A2A" }}
+            style={{ borderTop: "1px solid var(--color-elevated)" }}
           >
             <TrackCredits credits={credits} />
           </div>
