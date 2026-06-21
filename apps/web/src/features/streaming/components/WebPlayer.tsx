@@ -6,7 +6,7 @@ import { useTrackCredits } from "../hooks/useTrackCredits";
 import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
-import { TipButton } from "./TipButton";
+import { TipPanel } from "./TipPanel";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/social/components/LikeButton";
 import { TrackCredits } from "@/components/track/TrackCredits";
@@ -41,7 +41,7 @@ export const WebPlayer = memo(function WebPlayer() {
       )}
       <div className="max-w-screen-xl mx-auto">
         {currentTrack.creator_id && (
-          <TipButton creatorId={currentTrack.creator_id} artistName={currentTrack.artist_name ?? "l'artiste"} />
+          <TipPanel creatorId={currentTrack.creator_id} artistName={currentTrack.artist_name ?? "l'artiste"} />
         )}
         <PlayerProgressBar currentPosition={currentPosition} duration={duration} onSeek={seek} />
         {qualityLevel !== "standard" && (

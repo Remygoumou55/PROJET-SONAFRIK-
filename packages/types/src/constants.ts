@@ -26,3 +26,7 @@ export const REVENUE_POOL_PERCENT = 65;
 
 /** CDC Règle #5 : commission pourboire = 5% invisible UI */
 export const TIP_COMMISSION_PERCENT = 5;
+
+/** CDC Règle #5 — Montants de pourboire disponibles (GNF) */
+export const TIP_AMOUNTS = [5000, 10000, 20000] as const;
+export type TipAmount = (typeof TIP_AMOUNTS)[number];

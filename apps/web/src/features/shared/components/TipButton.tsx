@@ -1,17 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { TIP_AMOUNTS } from "@sonafrik/types";
+import type { TipAmount } from "@sonafrik/types";
 import { sendTipAction } from "../actions/tips.actions";
 
-const AMOUNTS = [5000, 10000, 20000] as const;
-type TipAmount = (typeof AMOUNTS)[number];
-
 interface Props {
-  receiverCreatorId: string;
-  recipientName:     string;
+  creatorId:  string;
+  artistName: string;
 }
 
-export function TipButton({ receiverCreatorId, recipientName }: Props) {
+export function TipButton({ creatorId, artistName }: Props) {
   const [open, setOpen]       = useState(false);
   const [amount, setAmount]   = useState<TipAmount | null>(null);
   const [success, setSuccess] = useState(false);
@@ -29,7 +28,7 @@ export function TipButton({ receiverCreatorId, recipientName }: Props) {
     if (!amount) { setError("Choisissez un montant."); return; }
     setError(null);
     startTransition(async () => {
-      const result = await sendTipAction(receiverCreatorId, amount);
+      const result = await sendTipAction(creatorId, amount);
       if (result.error) {
         setError(result.error);
       } else {
@@ -63,7 +62,7 @@ export function TipButton({ receiverCreatorId, recipientName }: Props) {
               <div className="py-4 text-center">
                 <p className="text-2xl mb-2">🎉</p>
                 <p className="font-semibold" style={{ color: "var(--color-vert-energie)" }}>
-                  ✓ {recipientName} a reçu votre soutien !
+                  ✓ {artistName} a reçu votre soutien !
                 </p>
                 <button
                   type="button"
@@ -77,11 +76,11 @@ export function TipButton({ receiverCreatorId, recipientName }: Props) {
             ) : (
               <>
                 <h3 className="mb-4 font-semibold" style={{ color: "var(--color-texte-principal)" }}>
-                  Soutenir {recipientName}
+                  Soutenir {artistName}
                 </h3>
 
                 <div className="mb-4 flex flex-wrap gap-2">
-                  {AMOUNTS.map((a) => (
+                  {TIP_AMOUNTS.map((a) => (
                     <button
                       key={a}
                       type="button"

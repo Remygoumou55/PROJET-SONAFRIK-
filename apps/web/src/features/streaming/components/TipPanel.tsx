@@ -1,18 +1,17 @@
 "use client";
 
 import { memo, useState } from "react";
+import { TIP_AMOUNTS } from "@sonafrik/types";
+import type { TipAmount } from "@sonafrik/types";
 import { useTipService } from "../hooks/useTipService";
 import { TipsError } from "@sonafrik/api/tips";
-
-const AMOUNTS = [5000, 10000, 20000] as const;
-type TipAmount = (typeof AMOUNTS)[number];
 
 interface Props {
   creatorId:  string;
   artistName: string;
 }
 
-export const TipButton = memo(function TipButton({ creatorId, artistName }: Props) {
+export const TipPanel = memo(function TipPanel({ creatorId, artistName }: Props) {
   const tip = useTipService();
   const [loading, setLoading]           = useState(false);
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -62,7 +61,7 @@ export const TipButton = memo(function TipButton({ creatorId, artistName }: Prop
         </div>
       ) : (
         <div className="flex gap-2">
-          {AMOUNTS.map((a) => (
+          {TIP_AMOUNTS.map((a) => (
             <button
               key={a}
               disabled={loading}

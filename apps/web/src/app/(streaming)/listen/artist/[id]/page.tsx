@@ -6,7 +6,7 @@ import { CoverImage } from "@/components/CoverImage";
 import { AlbumTracksClient } from "@/features/streaming/components/AlbumTracksClient";
 import { AppearsOnSection } from "@/components/track/AppearsOnSection";
 import { FollowButton } from "@/features/social/components/FollowButton";
-import { TipButton } from "@/features/marketplace/components/TipButton";
+import { TipButton } from "@/features/shared/components/TipButton";
 import type { TrackWithMeta } from "@sonafrik/types";
 
 interface ArtistRow {
@@ -186,7 +186,7 @@ export default async function ArtistPublicPage({
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <FollowButton entityType="artist" entityId={artist.creator_id} showCount />
           {tipsEnabled ? (
-            <TipButton receiverCreatorId={artist.creator_id} recipientName={artist.stage_name} />
+            <TipButton creatorId={artist.creator_id} artistName={artist.stage_name} />
           ) : null}
         </div>
 
