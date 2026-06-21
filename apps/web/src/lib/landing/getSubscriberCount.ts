@@ -4,6 +4,9 @@ import { unstable_cache } from "next/cache";
 // Client anon public — pas de cookies, résultat identique pour tous les visiteurs
 // => safe à mettre en cache cross-request avec unstable_cache
 const _fetchSubscriberCount = async (): Promise<number> => {
+  // Mode bypass local : pas de requête DB, retourne une valeur mock instantanément
+  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return 42;
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return 0;

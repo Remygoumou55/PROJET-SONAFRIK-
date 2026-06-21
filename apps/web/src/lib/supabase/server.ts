@@ -27,6 +27,45 @@ function fetchWithTimeout(timeoutMs: number): typeof fetch {
   };
 }
 
+// Mode bypass local : toutes les requêtes Supabase renvoient des tableaux vides immédiatement.
+// Évite tout cold start, tout timeout, tout blocage de page en dev.
+// JAMAIS actif sur Vercel (BYPASS_AUTH + VERCEL !== "1").
+function fetchBypassMode(): typeof fetch {
+  return (input, _init) => {
+    const url = String(typeof input === "object" && "url" in input ? (input as Request).url : input);
+    // Requêtes REST PostgREST → tableau vide
+    if (url.includes("/rest/v1/")) {
+      return Promise.resolve(
+        new Response("[]", {
+          status: 200,
+          headers: { "Content-Type": "application/json", "Content-Range": "*/0" },
+        }),
+      );
+    }
+    // Appels RPC → null
+    if (url.includes("/functions/v1/") || url.includes("/rpc/")) {
+      return Promise.resolve(
+        new Response("null", { status: 200, headers: { "Content-Type": "application/json" } }),
+      );
+    }
+    // Auth → no session
+    if (url.includes("/auth/v1/")) {
+      return Promise.resolve(
+        new Response('{"user":null,"session":null}', {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    }
+    // Tout le reste (storage, etc.) → fetch réel avec timeout court
+    return fetchWithTimeout(3000)(input, _init);
+  };
+}
+
+function isBypassActive(): boolean {
+  return process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1";
+}
+
 const SUPABASE_FETCH_TIMEOUT_MS = 8000;
 
 // Client anon sans cookies — pour unstable_cache (données publiques, pas de session).
@@ -34,7 +73,7 @@ export function getSupabasePublicClient(): SonafrikSupabaseClient {
   const { url, anonKey } = getSupabaseEnv();
   return createClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
-    global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
+    global: { fetch: isBypassActive() ? fetchBypassMode() : fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
   }) as unknown as SonafrikSupabaseClient;
 }
 
@@ -46,7 +85,7 @@ export function getSupabaseAdminClient(): SonafrikSupabaseClient {
   if (!url || !serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");
   return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false },
-    global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
+    global: { fetch: isBypassActive() ? fetchBypassMode() : fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
   }) as unknown as SonafrikSupabaseClient;
 }
 
@@ -59,7 +98,7 @@ export const getSupabaseServerClient = cache(
     const { url, anonKey } = getSupabaseEnv();
 
     return createServerClient<Database>(url, anonKey, {
-      global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
+      global: { fetch: isBypassActive() ? fetchBypassMode() : fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
       cookies: {
         getAll() {
           return cookieStore.getAll();
