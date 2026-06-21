@@ -577,7 +577,7 @@ features/
 | D | D2 — Virtualisation listes longues | ⏰ Reporté MVP | — | Listes < 100 items — inutile avant 500+ |
 | D | D3 — Heartbeat 30s (-66% DB requests) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | D | D4 — Cache homepage (unstable_cache, TTL 5 min, 7 req → 0) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| D | D5 — Réduire Client Components | ⏳ À faire | — | — |
+| D | D5 — Réduire Client Components (108→105, -3 fichiers, ~37%) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | E | E1 — Transcodage audio | ⏳ À faire | — | — |
 | E | E2 — Meilisearch | ⏳ À faire | — | — |
 | E | E3 — Refactoring features/ | ⏳ À faire | — | — |
