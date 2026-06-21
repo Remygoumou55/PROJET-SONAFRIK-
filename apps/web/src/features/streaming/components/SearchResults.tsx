@@ -121,7 +121,7 @@ const AlbumCard = memo(function AlbumCard({ album }: { album: AlbumWithMeta }) {
 const PlaylistRow = memo(function PlaylistRow({ playlist }: { playlist: PlaylistSearchResult }) {
   return (
     <Link
-      href={`/listen/playlist/${playlist.id}`}
+      href={`/library/playlist/${playlist.id}`}
       className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors hover:bg-[var(--color-card)]"
     >
       <div
@@ -151,7 +151,7 @@ const PlaylistRow = memo(function PlaylistRow({ playlist }: { playlist: Playlist
 const BeatRow = memo(function BeatRow({ beat }: { beat: BeatSearchResult }) {
   return (
     <Link
-      href={`/beats/${beat.slug}`}
+      href="/listen/beats"
       className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors hover:bg-[var(--color-card)]"
     >
       <div className="w-10 h-10 rounded-md flex-shrink-0 relative overflow-hidden">

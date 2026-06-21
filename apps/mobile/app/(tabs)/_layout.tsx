@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Tabs } from "expo-router";
+import { Tabs, Redirect } from "expo-router";
 import { colors } from "@sonafrik/ui/tokens";
 import { PlayerProvider, usePlayerContext } from "../../features/streaming/PlayerContext";
+import { getSupabaseMobileClient } from "../../lib/supabase";
 
 function MiniPlayerBar() {
   const { currentTrack, isPlaying, pause, resume } = usePlayerContext();
@@ -56,6 +58,24 @@ function TabsInner() {
 }
 
 export default function TabsLayout() {
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
+
+  useEffect(() => {
+    const supabase = getSupabaseMobileClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setHasSession(!!data.session);
+      setSessionChecked(true);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setHasSession(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (!sessionChecked) return null;
+  if (!hasSession) return <Redirect href="/auth/connexion" />;
+
   return (
     <PlayerProvider>
       <TabsInner />

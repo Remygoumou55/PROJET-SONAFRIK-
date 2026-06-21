@@ -22,7 +22,7 @@ export default function HomeScreen() {
         <Text style={styles.link}>Se connecter</Text>
       </Pressable>
 
-      <Text style={styles.footer}>Sprint 2 — Auth OTP SMS</Text>
+      <Text style={styles.footer}>{SONAFRIK_BRAND.secondarySignature}</Text>
     </View>
   );
 }

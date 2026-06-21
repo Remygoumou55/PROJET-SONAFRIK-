@@ -183,7 +183,8 @@ export class StreamingRepository {
       .from("playlist_tracks")
       .select("*")
       .eq("playlist_id", playlistId)
-      .order("position");
+      .order("position")
+      .limit(500);
     if (error) throw error;
     return (data ?? []) as PlaylistTrack[];
   }
@@ -416,7 +417,8 @@ export class StreamingRepository {
       .select("platform, total_listened_seconds, user_id, track_id")
       .in("track_id", trackIds)
       .eq("is_valid_listen", true)
-      .gte("started_at", since);
+      .gte("started_at", since)
+      .limit(50000);
 
     if (error) throw error;
 

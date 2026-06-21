@@ -50,7 +50,8 @@ export class WalletRepository {
       .from("withdrawals" as never)
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(100);
     if (error) throw error;
     return (data as Withdrawal[]) ?? [];
   }

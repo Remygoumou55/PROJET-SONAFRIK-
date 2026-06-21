@@ -98,7 +98,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    const SIGNED_URL_EXPIRY = 7200; // 2 heures
+    const SIGNED_URL_EXPIRY = 1800; // 30 minutes — réduit l'exposition si URL divulguée
 
     const { data: signedData, error: signedError } = await supabaseAdmin.storage
       .from("catalog-audio")

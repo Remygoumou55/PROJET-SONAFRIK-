@@ -39,7 +39,8 @@ export class CatalogRepository {
       .select("*")
       .eq("creator_id", creatorId)
       .is("deleted_at", null)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(200);
 
     if (error) throw error;
     return (data ?? []).map((row) => ({
@@ -136,7 +137,7 @@ export class CatalogRepository {
 
     if (albumId) query = query.eq("album_id", albumId);
 
-    const { data, error } = await query;
+    const { data, error } = await query.limit(500);
     if (error) throw error;
     return (data ?? []).map((row) => ({
       ...(row as Track),
