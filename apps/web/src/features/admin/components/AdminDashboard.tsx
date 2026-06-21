@@ -178,7 +178,7 @@ export function AdminDashboard({ kpis }: Props) {
             <Link
               key={href}
               href={href}
-              className="rounded-xl p-4 transition-colors group block"
+              className="rounded-xl p-4 transition-opacity hover:opacity-90 block"
               style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-elevated)" }}
             >
               <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-texte-principal)" }}>
