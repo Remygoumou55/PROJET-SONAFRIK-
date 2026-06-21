@@ -16,8 +16,13 @@ async function IdentityGuard({ children }: { children: React.ReactNode }) {
 
 export default function IdentityLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<IdentityLoading />}>
-      <IdentityGuard>{children}</IdentityGuard>
-    </Suspense>
+    <>
+      {/* Avatars Google — préconnecter avant le rendu du profil */}
+      <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
+      <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
+      <Suspense fallback={<IdentityLoading />}>
+        <IdentityGuard>{children}</IdentityGuard>
+      </Suspense>
+    </>
   );
 }

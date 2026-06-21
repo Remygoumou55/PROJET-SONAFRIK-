@@ -5,7 +5,7 @@ import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-montserrat",
   display: "swap",
   preload: true,
@@ -57,7 +57,6 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href={SUPABASE_HOST} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={SUPABASE_HOST} />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <link rel="prefetch" href="/listen" as="document" />
         <link rel="prefetch" href="/auth/inscription" as="document" />
