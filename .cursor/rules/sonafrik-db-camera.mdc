@@ -1,0 +1,53 @@
+---
+description: SONAFRIK database surveillance — tables réelles, RLS, migrations, incohérences connues
+alwaysApply: true
+---
+
+# Caméra Base de Données SONAFRIK
+
+## Projet Supabase : `cxjpburiiazzvlczzupy`
+
+## Tables existantes (créées via migrations)
+
+Principales tables vérifiées en prod :
+- `profiles`, `artist_profiles`, `listener_profiles`
+- `tracks`, `albums`, `genres`, `track_credits`
+- `stream_sessions`, `playback_positions`
+- `favorites`, `playlists`, `playlist_tracks`
+- `wallet_accounts`, `wallet_ledger`, `payout_requests`
+- `audit_logs` (⚠️ PAS `audit_log`)
+- `rights_works`, `rights_holders`, `rights_distributions`
+- `feature_flags`, `system_settings`
+- `notifications`, `notification_preferences`
+- `follows`, `social_likes`
+- `team_members`, `label_artists`, `catalog_labels`
+- `admin_notifications`
+- `beats` (table créée, feature non MVP)
+
+## Incohérences connues (BUGS documentés)
+
+| Incohérence | Fichier erroné | Réalité en DB |
+|---|---|---|
+| `audit_log` | `docs/ADMIN_GUIDE.md` (l.102, 107, 112) | Table s'appelle `audit_logs` |
+| `subscription_plans` | `docs/ADMIN_GUIDE.md` (l.84, 88, 91) | Table n'existe PAS en DB |
+| `artist_profiles.user_id` | `docs/ADMIN_GUIDE.md` | Colonne = `creator_id` |
+
+## Workflow migrations SQL (OBLIGATOIRE)
+
+1. Écrire SQL dans `supabase/migrations/YYYYMMDDHHMMSS_<nom>.sql`
+2. `supabase db query --linked --file supabase/migrations/<fichier>.sql`
+3. Valider : `supabase db query --linked "SELECT tablename FROM pg_tables WHERE schemaname='public'"`
+4. Vérifier RLS : `supabase db query --linked "SELECT tablename, policyname FROM pg_policies"`
+5. Commit + push
+
+## Règles sécurité DB absolues
+
+- ❌ JAMAIS CREATE TABLE sans RLS policy immédiate
+- ❌ JAMAIS UPDATE/DELETE sur `audit_logs` et `wallet_ledger`
+- ❌ JAMAIS service_role key côté client
+- ✅ Toujours BEGIN/COMMIT pour migrations multi-étapes
+
+## Tables manquantes MVP identifiées
+
+- `subscription_plans` — NON CRÉÉE — doit être créée avant paiements
+- `rate_limits` — NON CRÉÉE — brute force non protégé côté DB

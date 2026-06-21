@@ -1,0 +1,50 @@
+---
+description: SONAFRIK plan de correction — état actuel des tâches, ce qui reste à faire avant beta
+alwaysApply: true
+---
+
+# Caméra Plan de Correction SONAFRIK
+
+> Dernière mise à jour : 2026-06-21 | Source : `docs/PLAN_CORRECTION_360.md` + Audit V2
+
+## Sprints complétés
+
+- ✅ Sprint 0–5 : Foundation, Auth, Streaming, Wallet, Rights, Catalog
+- ✅ Sprint 6 : Streaming OS (WebPlayer, Real Listen Engine, Stream Events)
+
+## Corrections prioritaires restantes
+
+### 🔴 CRITIQUE (bloquant beta)
+
+| ID | Problème | Fichier/Zone | Action |
+|---|---|---|---|
+| E5 | AsyncStorage non chiffré mobile | `apps/mobile/lib/supabase.ts` | Migrer vers expo-secure-store |
+| DB-1 | `subscription_plans` table absente | supabase/migrations/ | Créer table + RLS |
+| DB-2 | `rate_limits` absent | supabase/migrations/ | Créer table brute force |
+| TEST | 0 tests unitaires | partout | Vitest sur modules financiers |
+
+### 🟡 HAUTE (avant lancement)
+
+| ID | Problème | Fichier/Zone | Action |
+|---|---|---|---|
+| E1 | FLAC/OGG désactivés, WAV brut servi | catalog/schemas.ts, edge functions | Transcodeur HLS |
+| DEAD-1 | `LaunchCounter` non utilisé | `features/launch/components/` | Supprimer ou brancher |
+| DEAD-2 | `AuthHomeActions` non utilisé | `features/auth/components/` | Supprimer ou brancher |
+| DEAD-3 | `useEngagementStats` non utilisé | `features/social/hooks/` | Supprimer |
+| HEX | 39 fichiers hex hardcodés restants | `apps/web/src/` | Migrer vers tokens CSS |
+| LANCEMENT | 5 artistes fictifs hardcodés | `app/lancement/page.tsx` | Brancher à DB réelle |
+| ADMIN-DOC | ADMIN_GUIDE référence mauvais noms | `docs/ADMIN_GUIDE.md` | Corriger audit_log→audit_logs, subscription_plans, user_id→creator_id |
+
+### 🟢 BASSE (post-beta)
+
+| ID | Problème | Action |
+|---|---|---|
+| PERF | getStreamAnalytics sans LIMIT | Limiter à N dernières sessions |
+| DUP | toggleFavoriteSchema en double | Supprimer doublon streaming/schemas.ts |
+| DUP | toggleFavorite RPC pour likes+favoris | Créer toggle_like RPC distinct |
+| 87-CLIENT | 87 "use client" excessifs | Convertir progressivement en RSC |
+| storybook | storybook-static committé (60k lignes) | Ajouter à .gitignore + git rm |
+
+## Règle MVP-first
+
+Ne pas implémenter Beat Store, Marketplace, ML Recommandation, Multi-currency avant la beta validée.

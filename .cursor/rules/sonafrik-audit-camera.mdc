@@ -1,0 +1,70 @@
+---
+description: SONAFRIK post-task audit protocol — validation build/lint/typecheck + DB + git push
+alwaysApply: true
+---
+
+# Caméra Protocole Audit Post-Tâche SONAFRIK
+
+## Ordre d'exécution OBLIGATOIRE après chaque tâche
+
+### Étape 1 — Validation build (BLOQUANT)
+
+```powershell
+cd "e:\PROJET SONAFRIK"
+pnpm build && pnpm lint && pnpm typecheck
+```
+
+Si une commande échoue → corriger AVANT de continuer. Ne jamais déclarer terminé avec des erreurs.
+
+### Étape 2 — Validation Supabase (si migration SQL)
+
+```powershell
+# Vérifier tables créées
+supabase db query --linked "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename"
+
+# Vérifier RLS activé
+supabase db query --linked "SELECT tablename, relrowsecurity FROM pg_class c JOIN pg_namespace n ON c.relnamespace=n.oid WHERE n.nspname='public' AND c.relkind='r'"
+
+# Vérifier policies
+supabase db query --linked "SELECT tablename, policyname, cmd FROM pg_policies ORDER BY tablename"
+```
+
+### Étape 3 — Commit + push
+
+```powershell
+git add -A
+git commit -m "$(cat <<'EOF'
+feat(domain): description courte
+
+- Détail 1
+- Détail 2
+EOF
+)"
+git push origin main
+```
+
+### Étape 4 — Rapport final structuré (dans `docs/RAPPORT_COLLECTION.md`)
+
+```markdown
+## [DATE] — [NOM DE LA TÂCHE]
+
+### Fichiers touchés
+- `chemin/fichier.tsx` — description
+
+### Dette technique créée (si applicable)
+- Description
+
+### Tests à faire
+- [ ] Scénario de test manuel
+```
+
+## Checklist auto-critique avant livraison
+
+- [ ] Couleurs = tokens CSS uniquement (jamais hex hardcodé)
+- [ ] Composant dans le bon domaine
+- [ ] Pas de duplication avec existant
+- [ ] Types depuis packages/types/ uniquement
+- [ ] Pas d'import cross-feature interdit
+- [ ] Pas d'appel Supabase direct dans composant React
+- [ ] Toute table nouvelle a une RLS policy
+- [ ] pnpm build + lint + typecheck = 0 erreur

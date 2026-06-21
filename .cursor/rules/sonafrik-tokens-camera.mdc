@@ -1,0 +1,59 @@
+---
+description: SONAFRIK design system surveillance — tokens CSS obligatoires, hex interdits
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# Caméra Design Tokens SONAFRIK
+
+## Source de vérité : `apps/web/src/app/globals.css`
+
+### Tokens officiels (TOUJOURS utiliser ces variables)
+
+```css
+/* Couleurs de base */
+--color-noir-profond: #0d0d0d      /* fond principal */
+--color-surface: #1a1a1a           /* surfaces */
+--color-card: #111111              /* cartes */
+--color-elevated: #222222          /* éléments élevés */
+--color-bordure: #2a2a2a           /* bordures */
+
+/* Actions */
+--color-vert-energie: #00d26a      /* CTA, actions positives */
+--color-or-solaire: #ffc20e        /* premium, labels */
+--color-rouge-alerte: #ff4444      /* erreurs, alertes */
+
+/* Texte */
+--color-texte-principal: #f0f0f0
+--color-texte-secondaire: #aaaaaa
+--color-texte-desactive: #555555
+```
+
+### ❌ INTERDIT — jamais de hex hardcodé
+
+```tsx
+// ❌ JAMAIS
+style={{ backgroundColor: "#1A1A1A" }}
+style={{ color: "#00D26A" }}
+className="bg-[#0D0D0D]"
+
+// ✅ TOUJOURS
+style={{ backgroundColor: "var(--color-surface)" }}
+style={{ color: "var(--color-vert-energie)" }}
+className="bg-card text-vert-energie"
+```
+
+### Fichiers encore violateurs (39 fichiers — à corriger progressivement)
+
+Priorité haute :
+- `apps/web/src/app/lancement/page.tsx` — 11 hex (#111111, #1E1E1E, #444444, etc.)
+- `apps/web/src/app/(streaming)/listen/page.tsx` — 38 hex (le plus grave)
+- `apps/web/src/components/landing/LandingArtists.tsx`
+
+## Animations
+
+Max 300ms — jamais d'animation > 300ms.
+
+## Police
+
+Montserrat uniquement. Jamais Inter ou autre.

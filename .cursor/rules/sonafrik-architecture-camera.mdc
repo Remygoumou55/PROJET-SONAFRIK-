@@ -1,0 +1,43 @@
+---
+description: SONAFRIK architecture surveillance — isolations domaines, imports cross-feature, patterns obligatoires
+alwaysApply: true
+---
+
+# Caméra Architecture SONAFRIK
+
+## Structure domaines (JAMAIS violer)
+
+```
+apps/web/src/features/
+  listener/     streaming/ library/ search/
+  creator/      catalog/ analytics/ rights/
+  admin/
+  wallet/
+  identity/
+  shared/       social/ notifications/
+```
+
+**Règle absolue :** `listener/` ne peut jamais importer depuis `creator/` et vice-versa. Composant partagé → `shared/`.
+
+## Patterns obligatoires
+
+- Logique métier → `packages/api/src/<domain>/<domain>.service.ts`
+- Accès DB → `packages/api/src/<domain>/<domain>.repository.ts`
+- Types → `packages/types/src/index.ts` UNIQUEMENT
+- Composants → `apps/web/src/features/<domain>/components/`
+- Hooks → `apps/web/src/features/<domain>/hooks/use<Name>.ts`
+
+## Anti-patterns détectés (NE PAS reproduire)
+
+- `as never` dans packages/api/src — forcer le bon typage Supabase
+- `toggleFavorite` RPC utilisé pour les likes ET les favoris (social.repository.ts)
+- `toggleFavoriteSchema` défini dans DEUX fichiers (streaming/schemas.ts + social/schemas.ts)
+- 87 composants "use client" — préférer RSC quand pas d'interactivité
+- `LaunchCounter`, `AuthHomeActions`, `useEngagementStats` — composants dead non supprimés
+
+## Vérifications avant chaque PR
+
+- [ ] Aucun import cross-feature interdit
+- [ ] Aucun appel Supabase direct dans un composant React (passe par packages/api)
+- [ ] Aucun type redéfini localement s'il existe dans packages/types
+- [ ] Aucune logique métier dans un hook React (doit aller dans le service)

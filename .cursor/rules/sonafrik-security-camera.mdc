@@ -1,0 +1,51 @@
+---
+description: SONAFRIK security surveillance — BYPASS_AUTH, AsyncStorage, hex, clés API, failles connues
+alwaysApply: true
+---
+
+# Caméra Sécurité SONAFRIK
+
+## État sécurité actuel (Jun 2026)
+
+### ✅ Correct
+- `BYPASS_AUTH` bloqué sur Vercel dans middleware.ts, requireAdmin.ts, requireCreator.ts, requireIdentity.ts
+- `moment.js` supprimé (0 imports)
+- `console.log` = 0 dans apps/ (aucune fuite de données en prod)
+- `as any` = 1 occurrence isolée (admin/health/page.tsx — @ts-ignore intentionnel)
+- Error boundaries = 7 fichiers couvrant tous les route groups
+
+### ⚠️ Risques actifs à corriger
+
+| Risque | Fichier | Priorité |
+|---|---|---|
+| AsyncStorage non chiffré pour auth tokens | `apps/mobile/lib/supabase.ts` | HAUTE |
+| 5 artistes hardcodés fictifs sur page lancement | `apps/web/src/app/lancement/page.tsx` | MOYENNE |
+| 39 fichiers avec hex hardcodés restants | `apps/web/src/` | BASSE |
+| Pas de rate_limits table DB | supabase/migrations/ | HAUTE |
+| 0 tests (aucun .test.ts ni .spec.ts) | partout | HAUTE |
+| `subscription_plans` table absente | supabase/migrations/ | CRITIQUE |
+
+## AsyncStorage → SecureStore (À faire)
+
+```typescript
+// ❌ ACTUEL (apps/mobile/lib/supabase.ts)
+import AsyncStorage from "@react-native-async-storage/async-storage";
+storage: AsyncStorage, // stockage clair, non chiffré
+
+// ✅ CORRECT (à implémenter)
+import * as SecureStore from "expo-secure-store";
+const ExpoSecureStoreAdapter = {
+  getItem: (key: string) => SecureStore.getItemAsync(key),
+  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+};
+storage: ExpoSecureStoreAdapter,
+```
+
+## Règles absolues
+
+- ❌ NEVER committer .env, .env.local, secrets
+- ❌ NEVER service_role key côté client
+- ❌ NEVER BYPASS_AUTH sur Vercel (VERCEL=1)
+- ❌ NEVER git push --force sur main
+- ❌ NEVER --no-verify sur pre-commit hooks
