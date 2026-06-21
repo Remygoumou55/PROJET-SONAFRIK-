@@ -6,11 +6,11 @@ export class BeatsRepository {
 
   async listPublished(params: { limit?: number; genre?: string }): Promise<Beat[]> {
     const { data, error } = await this.client
-      .from("beats" as never)
+      .from("beats")
       .select("*")
-      .eq("publication_status" as never, "published")
-      .is("deleted_at" as never, null)
-      .order("created_at" as never, { ascending: false })
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
       .limit(params.limit ?? 60);
     if (error) throw error;
     const beats = (data ?? []) as unknown as Beat[];
@@ -19,40 +19,40 @@ export class BeatsRepository {
 
   async listByCreator(creatorId: string): Promise<Beat[]> {
     const { data, error } = await this.client
-      .from("beats" as never)
+      .from("beats")
       .select("*")
-      .eq("creator_id" as never, creatorId)
-      .is("deleted_at" as never, null)
-      .order("created_at" as never, { ascending: false });
+      .eq("creator_id", creatorId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as unknown as Beat[];
   }
 
   async create(params: {
-    creatorId:   string;
-    title:       string;
-    slug:        string;
-    priceGnf:    number;
+    creatorId:    string;
+    title:        string;
+    slug:         string;
+    priceGnf:     number;
     description?: string;
-    bpm?:        number;
-    key?:        string;
-    genre?:      string;
-    licenseType: string;
+    bpm?:         number;
+    key?:         string;
+    genre?:       string;
+    licenseType:  string;
   }): Promise<Beat> {
     const { data, error } = await this.client
-      .from("beats" as never)
+      .from("beats")
       .insert({
-        creator_id:        params.creatorId,
-        title:             params.title,
-        slug:              params.slug,
-        price_gnf:         params.priceGnf,
-        description:       params.description ?? null,
-        bpm:               params.bpm ?? null,
-        key:               params.key ?? null,
-        genre:             params.genre ?? null,
-        license_type:      params.licenseType,
-        publication_status:"draft",
-      } as never)
+        creator_id:         params.creatorId,
+        title:              params.title,
+        slug:               params.slug,
+        price_gnf:          params.priceGnf,
+        description:        params.description ?? null,
+        bpm:                params.bpm ?? null,
+        key:                params.key ?? null,
+        genre:              params.genre ?? null,
+        license_type:       params.licenseType,
+        publication_status: "draft",
+      })
       .select("*")
       .single();
     if (error) throw error;
@@ -61,27 +61,27 @@ export class BeatsRepository {
 
   async publish(beatId: string, creatorId: string): Promise<void> {
     const { error } = await this.client
-      .from("beats" as never)
-      .update({ publication_status: "published" } as never)
-      .eq("id" as never, beatId)
-      .eq("creator_id" as never, creatorId);
+      .from("beats")
+      .update({ publication_status: "published" })
+      .eq("id", beatId)
+      .eq("creator_id", creatorId);
     if (error) throw error;
   }
 
   async purchaseBeat(buyerId: string, beatId: string): Promise<string> {
-    const { data, error } = await this.client.rpc("purchase_beat" as never, {
+    const { data, error } = await this.client.rpc("purchase_beat", {
       p_buyer_id: buyerId,
       p_beat_id:  beatId,
-    } as never);
+    });
     if (error) throw error;
     return data as string;
   }
 
   async getPurchasedBeatIds(buyerId: string): Promise<string[]> {
     const { data, error } = await this.client
-      .from("beat_purchases" as never)
+      .from("beat_purchases")
       .select("beat_id")
-      .eq("buyer_id" as never, buyerId);
+      .eq("buyer_id", buyerId);
     if (error) throw error;
     return ((data ?? []) as unknown as BeatPurchase[]).map((p) => p.beat_id);
   }

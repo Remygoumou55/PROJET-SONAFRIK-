@@ -50,9 +50,10 @@ export function AdminCatalogCenter({ initialItems }: Props) {
         if (action === "published") updates.published_at = new Date().toISOString();
         if (action === "rejected" && reason) updates.rejection_reason = reason;
 
+        type ReviewUpdate = { publication_status: string; published_at?: string; rejection_reason?: string };
         const { error: dbError } = await supabase
-          .from(table as "albums")
-          .update(updates as never)
+          .from(table as "albums" | "tracks")
+          .update(updates as ReviewUpdate)
           .eq("id", id);
 
         if (dbError) throw new Error(dbError.message);

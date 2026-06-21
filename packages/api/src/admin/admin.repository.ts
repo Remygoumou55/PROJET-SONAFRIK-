@@ -1,4 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import type { Json } from "@sonafrik/database/types";
 import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
 
 export class AdminRepository {
@@ -6,7 +7,7 @@ export class AdminRepository {
 
   async listFeatureFlags(): Promise<FeatureFlag[]> {
     const { data, error } = await this.client
-      .from("feature_flags" as never)
+      .from("feature_flags")
       .select("*")
       .order("name");
     if (error) throw error;
@@ -19,9 +20,9 @@ export class AdminRepository {
     updatedBy: string | null,
   ): Promise<FeatureFlag> {
     const { data, error } = await this.client
-      .from("feature_flags" as never)
-      .update({ enabled, updated_by: updatedBy } as never)
-      .eq("name" as never, name)
+      .from("feature_flags")
+      .update({ enabled, updated_by: updatedBy })
+      .eq("name", name)
       .select("*")
       .single();
     if (error) throw error;
@@ -30,10 +31,10 @@ export class AdminRepository {
 
   async listSystemSettings(): Promise<SystemSetting[]> {
     const { data, error } = await this.client
-      .from("system_settings" as never)
+      .from("system_settings")
       .select("*")
-      .order("category" as never)
-      .order("key" as never);
+      .order("category")
+      .order("key");
     if (error) throw error;
     return (data ?? []) as unknown as SystemSetting[];
   }
@@ -44,9 +45,9 @@ export class AdminRepository {
     updatedBy: string | null,
   ): Promise<SystemSetting> {
     const { data, error } = await this.client
-      .from("system_settings" as never)
-      .update({ value, updated_by: updatedBy } as never)
-      .eq("key" as never, key)
+      .from("system_settings")
+      .update({ value: value as Json, updated_by: updatedBy })
+      .eq("key", key)
       .select("*")
       .single();
     if (error) throw error;

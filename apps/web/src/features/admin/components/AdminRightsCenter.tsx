@@ -73,15 +73,19 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       setActionState((prev) => ({ ...prev, [claimId]: true }));
       setError(null);
       try {
-        const patch: Record<string, string> = {
+        const patch: {
+          status: typeof status;
+          reviewed_at: string;
+          resolution_notes?: string;
+        } = {
           status,
           reviewed_at: new Date().toISOString(),
         };
         if (notes) patch.resolution_notes = notes;
 
-        const { error: dbError } = await (supabase as ReturnType<typeof getSupabaseBrowserClient>)
-          .from("rights_claims" as never)
-          .update(patch as never)
+        const { error: dbError } = await supabase
+          .from("rights_claims")
+          .update(patch)
           .eq("id", claimId);
 
         if (dbError) throw new Error(dbError.message);

@@ -21,7 +21,9 @@ const DEFAULT_CREATOR_STATS: CreatorEngagementStats = {
   total_engagement: 0,
 };
 
-export function useEngagementStats(entityType: string, entityId: string) {
+type EngagementEntityType = "track" | "album" | "artist" | "creator" | "playlist";
+
+export function useEngagementStats(entityType: EngagementEntityType, entityId: string) {
   const social = useSocialService();
   const [stats, setStats] = useState<EngagementStats>(DEFAULT_STATS);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ export function useEngagementStats(entityType: string, entityId: string) {
 
     setIsLoading(true);
     social
-      .getEngagementStats({ entityType: entityType as never, entityId })
+      .getEngagementStats({ entityType, entityId })
       .then((data) => { if (!cancelled) setStats(data); })
       .catch((err: unknown) => { console.error("[Social] getEngagementStats échoué", err); })
       .finally(() => { if (!cancelled) setIsLoading(false); });

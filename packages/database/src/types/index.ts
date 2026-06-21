@@ -1558,6 +1558,7 @@ export type Database = {
           description: string
           evidence_url: string | null
           id: string
+          resolution_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["rights_claim_status"]
@@ -1571,6 +1572,7 @@ export type Database = {
           description: string
           evidence_url?: string | null
           id?: string
+          resolution_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["rights_claim_status"]
@@ -1584,6 +1586,7 @@ export type Database = {
           description?: string
           evidence_url?: string | null
           id?: string
+          resolution_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["rights_claim_status"]
