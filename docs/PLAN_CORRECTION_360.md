@@ -581,7 +581,7 @@ features/
 | E | E1 — Bloquer WAV upload/serving (MP3/M4A uniquement, pipeline FFmpeg → Phase 2) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | E | E2 — Meilisearch | ⏳ À faire | — | — |
 | E | E3 — Refactoring features/ | ⏳ À faire | — | — |
-| E | E4 — Tests Playwright | ⏳ À faire | — | — |
+| E | E4 — Tests Playwright (smoke + auth + wallet, global-setup Supabase admin) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | E | E5 — SecureStore mobile (AsyncStorage → expo-secure-store, tokens chiffrés) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 
 > **Note C2 TipButton :** Les deux TipButton ont des UX fondamentalement différentes (marketplace = modale Server Action, streaming = widget inline hook). Fusionner ajouterait de la complexité sans réduire de duplication réelle. Décision : garder séparés. À revalider avec Martin si besoin.
