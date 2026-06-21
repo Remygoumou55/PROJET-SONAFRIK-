@@ -1,4 +1,4 @@
-"use client";
+import Link from "next/link";
 
 interface KpiCard {
   label: string;
@@ -26,9 +26,9 @@ function KpiTile({ label, value, sub, accent = "var(--color-texte-principal)", h
 
   if (href) {
     return (
-      <a href={href} className="block transition-opacity hover:opacity-80">
+      <Link href={href} className="block transition-opacity hover:opacity-80">
         {content}
-      </a>
+      </Link>
     );
   }
   return content;
@@ -175,20 +175,18 @@ export function AdminDashboard({ kpis }: Props) {
             { href: "/admin/finance", label: "Finances", desc: "File de retraits artistes à valider" },
             { href: "/admin/fraud", label: "Fraude", desc: "Sessions avec flags anti-fraude levés" },
           ].map(({ href, label, desc }) => (
-            <a
+            <Link
               key={href}
               href={href}
-              className="rounded-xl p-4 transition-colors group"
+              className="rounded-xl p-4 transition-colors group block"
               style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-elevated)" }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "rgba(255,194,14,0.27)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "var(--color-elevated)")}
             >
               <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-texte-principal)" }}>
                 {label}
                 <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-texte-desactive)" }}>→</span>
               </p>
               <p className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>{desc}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
