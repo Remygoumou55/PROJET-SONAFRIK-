@@ -573,10 +573,10 @@ features/
 | C | C2 — Step5Confirm (similarité 55% < seuil 80%) | ⚠️ Non mergé — décision conservée | 2026-06-21 | — |
 | C | C3 — Audit tables mortes + fix health/page.tsx | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | C | C4 — Découper types/index.ts (12 fichiers thématiques) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| D | D1 — PlayerContext split (state vs actions) | ⏳ À faire | — | — |
-| D | D2 — Virtualisation listes longues | ⏳ À faire | — | — |
+| D | D1 — PlayerContext split (position isolée, 7 consumers économisés) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| D | D2 — Virtualisation listes longues | ⏰ Reporté MVP | — | Listes < 100 items — inutile avant 500+ |
 | D | D3 — Heartbeat 30s (-66% DB requests) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| D | D4 — Redis cache homepage | ⏳ À faire | — | — |
+| D | D4 — Cache homepage (unstable_cache, TTL 5 min, 7 req → 0) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | D | D5 — Réduire Client Components | ⏳ À faire | — | — |
 | E | E1 — Transcodage audio | ⏳ À faire | — | — |
 | E | E2 — Meilisearch | ⏳ À faire | — | — |
