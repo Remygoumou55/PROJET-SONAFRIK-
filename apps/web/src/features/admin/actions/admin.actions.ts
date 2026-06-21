@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import { createAdminService } from "@sonafrik/api/admin";
 
 export async function toggleFeatureFlagAction(
@@ -10,7 +10,7 @@ export async function toggleFeatureFlagAction(
   enabled: boolean,
 ): Promise<{ error?: string }> {
   try {
-    const supabase = await getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     const service = createAdminService(supabase);
     await service.toggleFeatureFlag(name, enabled);
     revalidatePath("/admin/flags");
@@ -53,7 +53,7 @@ export async function updateSystemSettingAction(
       parsedValue = result.data;
     }
 
-    const supabase = await getSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     const service = createAdminService(supabase);
     await service.updateSystemSetting(key, parsedValue);
     revalidatePath("/admin/settings");

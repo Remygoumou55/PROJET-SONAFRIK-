@@ -16,7 +16,7 @@ export class AdminRepository {
   async toggleFeatureFlag(
     name: string,
     enabled: boolean,
-    updatedBy: string,
+    updatedBy: string | null,
   ): Promise<FeatureFlag> {
     const { data, error } = await this.client
       .from("feature_flags" as never)
@@ -41,7 +41,7 @@ export class AdminRepository {
   async updateSystemSetting(
     key: string,
     value: unknown,
-    updatedBy: string,
+    updatedBy: string | null,
   ): Promise<SystemSetting> {
     const { data, error } = await this.client
       .from("system_settings" as never)

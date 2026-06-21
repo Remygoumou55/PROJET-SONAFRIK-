@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/features/admin/lib/requireAdmin";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import { AdminFlagsCenter } from "@/features/admin/components/AdminFlagsCenter";
 import { createAdminService } from "@sonafrik/api/admin";
 
@@ -7,7 +7,7 @@ export const metadata = { title: "Feature Flags — Admin SONAFRIK" };
 
 export default async function AdminFlagsPage() {
   await requireAdmin();
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const service = createAdminService(supabase);
   const flags = await service.listFeatureFlags().catch(() => []);
 

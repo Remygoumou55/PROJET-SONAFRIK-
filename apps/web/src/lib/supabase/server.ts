@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import type { Database } from "@sonafrik/database/types";
@@ -11,6 +12,17 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   if (!url || !anonKey) throw new Error("Configuration Supabase manquante");
 
   return { url, anonKey };
+}
+
+// Client service role — bypass RLS complet — réservé aux routes admin server-side.
+// JAMAIS exposé côté client. JAMAIS utilisé sur Vercel sans vérification BYPASS_AUTH.
+export function getSupabaseAdminClient(): SonafrikSupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");
+  return createClient<Database>(url, serviceKey, {
+    auth: { persistSession: false },
+  }) as unknown as SonafrikSupabaseClient;
 }
 
 // React.cache() déduplique les appels dans le même rendu serveur :
