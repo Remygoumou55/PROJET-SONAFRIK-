@@ -34,6 +34,7 @@ export class CatalogService {
   }
 
   private async requireCreatorId(): Promise<string> {
+    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-creator-id";
     const userId = await this.requireUserId();
     const { data } = await this.client.rpc("is_artist_account", { p_user_id: userId });
     if (!data) throw new CatalogError("not_artist_account");

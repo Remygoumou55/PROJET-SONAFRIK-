@@ -38,6 +38,17 @@ export class WalletService {
   }
 
   async getWalletContext(): Promise<WalletContext> {
+    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") {
+      const now = new Date().toISOString();
+      return {
+        wallet: { id: "dev-wallet", user_id: "dev-mock-id", balance_gnf: 0, currency: "GNF", total_credited_gnf: 0, total_debited_gnf: 0, created_at: now, updated_at: now },
+        isPremium: false,
+        premiumExpiresAt: null,
+        isInGracePeriod: true,
+        recentTransactions: [],
+        pendingWithdrawals: 0,
+      };
+    }
     const userId = await this.requireUserId();
 
     const [wallet, transactions] = await Promise.all([
