@@ -568,15 +568,14 @@ features/
 | B | B4 — Admin loading.tsx (8 routes) | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
 | B | B5 — Supprimer moment.js | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
 | B | UI paiements — verrouillage ComingSoon | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
-| C | C1 — Design tokens streaming/ (16 fichiers) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| C | C1 — Design tokens autres features (513 hex restants) | 🔄 En cours | 2026-06-21 | Claude Sonnet 4.6 |
-| C | C2 — OnboardingRow extrait (Step5Confirm partagé) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| C | C2 — TipButton.tsx fusion | ⚠️ Décision architecture | 2026-06-21 | Claude Sonnet 4.6 — voir note ci-dessous |
-| C | C3 — admin_notifications connecté à /admin/health | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
-| C | C4 — Découper types/index.ts | ⏳ À faire | — | — |
-| D | D1 — PlayerContext split | ⏳ À faire | — | — |
-| D | D2 — Virtualisation listes | ⏳ À faire | — | — |
-| D | D3 — Heartbeat 30s | ⏳ À faire | — | — |
+| C | C1 — Design tokens (652→138 hex, -79%) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C2 — TipButton → shared/ + TipPanel + TipAmount | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C2 — Step5Confirm (similarité 55% < seuil 80%) | ⚠️ Non mergé — décision conservée | 2026-06-21 | — |
+| C | C3 — Audit tables mortes + fix health/page.tsx | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C4 — Découper types/index.ts (12 fichiers thématiques) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| D | D1 — PlayerContext split (state vs actions) | ⏳ À faire | — | — |
+| D | D2 — Virtualisation listes longues | ⏳ À faire | — | — |
+| D | D3 — Heartbeat 30s (-66% DB requests) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | D | D4 — Redis cache homepage | ⏳ À faire | — | — |
 | D | D5 — Réduire Client Components | ⏳ À faire | — | — |
 | E | E1 — Transcodage audio | ⏳ À faire | — | — |
