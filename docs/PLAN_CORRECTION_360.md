@@ -525,17 +525,20 @@ features/
 
 | Vague | Lot | Statut | Date | IA/Dev |
 |---|---|---|---|---|
-| A | A1 — Tables fantômes | ⏳ À faire | — | — |
-| A | A2 — NEXT_PUBLIC_BYPASS_AUTH | ⏳ À faire | — | — |
-| A | A3 — NODE_ENV bypass | ⏳ À faire | — | — |
-| B | B1 — Orange Money GN | ⏳ À faire | — | — |
-| B | B2 — MTN MoMo GN | ⏳ À faire | — | — |
-| B | B3 — Wave GN | ⏳ À faire | — | — |
-| B | B4 — Admin loading.tsx | ⏳ À faire | — | — |
-| B | B5 — Supprimer moment.js | ⏳ À faire | — | — |
-| C | C1 — Design tokens migration | ⏳ À faire | — | — |
-| C | C2 — TipButton.tsx fusion | ⏳ À faire | — | — |
-| C | C3 — Tables mortes | ⏳ À faire | — | — |
+| A | A1 — Tables fantômes (beats + admin config) | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| A | A2 — NEXT_PUBLIC_BYPASS_AUTH | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| A | A3 — NODE_ENV bypass | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| B | B1 — Orange Money GN | ❌ Bloqué | — | Attente accès sandbox Orange Guinea |
+| B | B2 — MTN MoMo GN | ❌ Bloqué | — | Attente accès sandbox MTN |
+| B | B3 — Wave GN | ❌ Bloqué | — | Attente accès sandbox Wave |
+| B | B4 — Admin loading.tsx (8 routes) | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| B | B5 — Supprimer moment.js | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| B | UI paiements — verrouillage ComingSoon | ✅ Terminé | 2026-06-20 | Claude Sonnet 4.6 |
+| C | C1 — Design tokens streaming/ (16 fichiers) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C1 — Design tokens autres features (513 hex restants) | 🔄 En cours | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C2 — OnboardingRow extrait (Step5Confirm partagé) | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
+| C | C2 — TipButton.tsx fusion | ⚠️ Décision architecture | 2026-06-21 | Claude Sonnet 4.6 — voir note ci-dessous |
+| C | C3 — admin_notifications connecté à /admin/health | ✅ Terminé | 2026-06-21 | Claude Sonnet 4.6 |
 | C | C4 — Découper types/index.ts | ⏳ À faire | — | — |
 | D | D1 — PlayerContext split | ⏳ À faire | — | — |
 | D | D2 — Virtualisation listes | ⏳ À faire | — | — |
@@ -547,6 +550,8 @@ features/
 | E | E3 — Refactoring features/ | ⏳ À faire | — | — |
 | E | E4 — Tests Playwright | ⏳ À faire | — | — |
 | E | E5 — SecureStore mobile | ⏳ À faire | — | — |
+
+> **Note C2 TipButton :** Les deux TipButton ont des UX fondamentalement différentes (marketplace = modale Server Action, streaming = widget inline hook). Fusionner ajouterait de la complexité sans réduire de duplication réelle. Décision : garder séparés. À revalider avec Martin si besoin.
 
 **Légende :** ⏳ À faire | 🔄 En cours | ✅ Terminé | ❌ Bloqué
 
