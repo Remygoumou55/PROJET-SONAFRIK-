@@ -1,68 +1,19 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import type {
-  AudioQualityKbps,
-  PlayerState,
-  StreamingPlatform,
-  TrackWithMeta,
-} from "@sonafrik/types";
+import type { TrackWithMeta } from "@sonafrik/types";
 import { REAL_LISTEN_THRESHOLD_PERCENT, STREAM_HEARTBEAT_INTERVAL_MS } from "@sonafrik/types";
+import type {
+  AudioErrorType,
+  PlayerContextValue,
+  PlayerStateCoreExtended,
+  QueueState,
+  RepeatMode,
+} from "./playerTypes";
+import { INITIAL_PLAYER_STATE, INITIAL_QUEUE_STATE } from "./playerTypes";
 
-type RepeatMode = "off" | "one" | "all";
-export type AudioErrorType = "expired" | "network" | "codec";
+export type { AudioErrorType } from "./playerTypes";
 
-interface QueueState {
-  queue: TrackWithMeta[];
-  queueIndex: number;
-  shuffle: boolean;
-  repeatMode: RepeatMode;
-}
-
-interface PlayerActions {
-  play: (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number) => void;
-  pause: () => void;
-  resume: () => void;
-  stop: () => void;
-  setVolume: (volume: number) => void;
-  seek: (positionSeconds: number) => void;
-  // Lit la position depuis un ref — ne crée pas de subscription au render cycle
-  getPosition: () => number;
-  getAccumulatedListenSeconds: () => number;
-  restartCurrentTrack: () => void;
-  onHeartbeat: (callback: (positionSeconds: number) => void) => void;
-  onComplete: (callback: () => void) => void;
-  onError: (callback: (type: AudioErrorType, positionSeconds: number) => void) => void;
-  clearAudioError: () => void;
-  // Queue management
-  setQueue: (tracks: TrackWithMeta[], startIndex?: number) => void;
-  advanceQueue: () => TrackWithMeta | null;
-  retreatQueue: () => TrackWithMeta | null;
-  toggleShuffle: () => void;
-  cycleRepeat: () => void;
-}
-
-// currentPosition retiré du state principal — il est dans PlayerPositionContext
-type PlayerStateCoreExtended = Omit<PlayerState, "currentPosition"> & {
-  audioError: string | null;
-};
-
-const initialState: PlayerStateCoreExtended = {
-  currentTrack: null,
-  sessionId: null,
-  signedUrl: null,
-  isPlaying: false,
-  isLoading: false,
-  duration: 0,
-  volume: 1,
-  platform: "web" as StreamingPlatform,
-  quality: 128 as AudioQualityKbps,
-  audioError: null,
-};
-
-interface PlayerContextValue extends PlayerStateCoreExtended, QueueState, PlayerActions {}
-
-// ── Context principal (state stable — ne change que sur événement métier) ──────
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 // ── Context position (haute fréquence — ontimeupdate toutes les 250ms) ─────────
@@ -80,13 +31,8 @@ function buildShuffledOrder(length: number, currentIndex: number): number[] {
 }
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<PlayerStateCoreExtended>(initialState);
-  const [queueState, setQueueState] = useState<QueueState>({
-    queue: [],
-    queueIndex: -1,
-    shuffle: false,
-    repeatMode: "off",
-  });
+  const [state, setState] = useState<PlayerStateCoreExtended>(INITIAL_PLAYER_STATE);
+  const [queueState, setQueueState] = useState<QueueState>(INITIAL_QUEUE_STATE);
 
   // État position séparé — seul PlayerPositionContext le consomme
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -229,7 +175,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.pause();
       audioRef.current.src = "";
     }
-    setState(initialState);
+    setState(INITIAL_PLAYER_STATE);
     positionRef.current = 0;
     setCurrentPosition(0);
   }, [clearHeartbeat]);

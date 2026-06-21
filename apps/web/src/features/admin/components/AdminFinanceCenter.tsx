@@ -6,6 +6,8 @@ import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_ME
 import { createPayoutService } from "@sonafrik/api/payout";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatGnf, formatDateTime } from "@/lib/formatters";
+import { AdminActionBtn } from "./AdminActionBtn";
+import { AdminPayoutModal } from "./AdminPayoutModal";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
@@ -18,6 +20,15 @@ const STATUS_COLORS: Record<WithdrawalStatus, { bg: string; text: string }> = {
   cancelled:  { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-desactive)" },
 };
 
+const FILTERS: { label: string; value: StatusFilter }[] = [
+  { label: "En attente",  value: "pending" },
+  { label: "Approuvés",   value: "approved" },
+  { label: "En cours",    value: "processing" },
+  { label: "Effectués",   value: "completed" },
+  { label: "Annulés",     value: "cancelled" },
+  { label: "Tout",        value: "all" },
+];
+
 interface Props {
   initialQueue: AdminPayoutEntry[];
 }
@@ -29,13 +40,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
-
-  // Modal state for reject/mark_paid
-  const [modal, setModal] = useState<{
-    type: "reject" | "mark_paid";
-    withdrawalId: string;
-    value: string;
-  } | null>(null);
+  const [modal, setModal] = useState<{ type: "reject" | "mark_paid"; withdrawalId: string; value: string } | null>(null);
 
   const fetchQueue = useCallback(async (status: StatusFilter) => {
     setLoading(true);
@@ -50,15 +55,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
     }
   }, [service]);
 
-  const handleFilterChange = (s: StatusFilter) => {
-    setStatusFilter(s);
-    void fetchQueue(s);
-  };
-
-  const runAction = async (
-    withdrawalId: string,
-    fn: () => Promise<unknown>,
-  ) => {
+  const runAction = async (withdrawalId: string, fn: () => Promise<unknown>) => {
     setActionState((prev) => ({ ...prev, [withdrawalId]: true }));
     setError(null);
     try {
@@ -66,78 +63,37 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
       await fetchQueue(statusFilter);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
-      setError(
-        PAYOUT_ENGINE_ERROR_MESSAGES[msg] ??
-          PAYOUT_ENGINE_ERROR_MESSAGES["unknown"] ??
-          "Une erreur est survenue.",
-      );
+      setError(PAYOUT_ENGINE_ERROR_MESSAGES[msg] ?? PAYOUT_ENGINE_ERROR_MESSAGES["unknown"] ?? "Une erreur est survenue.");
     } finally {
       setActionState((prev) => ({ ...prev, [withdrawalId]: false }));
     }
   };
 
-  const handleApprove = (id: string) => {
-    void runAction(id, () => service.approvePayoutRequest({ withdrawalId: id }));
-  };
-
-  const handleReject = (id: string) => {
-    setModal({ type: "reject", withdrawalId: id, value: "" });
-  };
-
-  const handleProcess = (id: string) => {
-    void runAction(id, () => service.processPayoutRequest({ withdrawalId: id }));
-  };
-
-  const handleMarkPaid = (id: string) => {
-    setModal({ type: "mark_paid", withdrawalId: id, value: "" });
-  };
-
-  const handleCancel = (id: string) => {
-    void runAction(id, () => service.cancelPayoutRequest({ withdrawalId: id }));
-  };
+  const handleFilterChange = (s: StatusFilter) => { setStatusFilter(s); void fetchQueue(s); };
+  const handleApprove = (id: string) => void runAction(id, () => service.approvePayoutRequest({ withdrawalId: id }));
+  const handleReject  = (id: string) => setModal({ type: "reject", withdrawalId: id, value: "" });
+  const handleProcess = (id: string) => void runAction(id, () => service.processPayoutRequest({ withdrawalId: id }));
+  const handleMarkPaid = (id: string) => setModal({ type: "mark_paid", withdrawalId: id, value: "" });
+  const handleCancel  = (id: string) => void runAction(id, () => service.cancelPayoutRequest({ withdrawalId: id }));
 
   const confirmModal = () => {
     if (!modal) return;
     const { type, withdrawalId, value } = modal;
     setModal(null);
     if (type === "reject") {
-      void runAction(withdrawalId, () =>
-        service.rejectPayoutRequest({ withdrawalId, reason: value }),
-      );
+      void runAction(withdrawalId, () => service.rejectPayoutRequest({ withdrawalId, reason: value }));
     } else {
-      void runAction(withdrawalId, () =>
-        service.markPayoutPaid({ withdrawalId, reference: value }),
-      );
+      void runAction(withdrawalId, () => service.markPayoutPaid({ withdrawalId, reference: value }));
     }
   };
 
-  const FILTERS: { label: string; value: StatusFilter }[] = [
-    { label: "En attente",  value: "pending" },
-    { label: "Approuvés",   value: "approved" },
-    { label: "En cours",    value: "processing" },
-    { label: "Effectués",   value: "completed" },
-    { label: "Annulés",     value: "cancelled" },
-    { label: "Tout",        value: "all" },
-  ];
-
-  const cardBg  = "var(--color-card)";
-  const border  = "var(--color-bordure)";
-  const textMain = "var(--color-texte-principal)";
-  const textSub  = "var(--color-texte-secondaire)";
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 style={{ color: textMain }} className="text-2xl font-bold">
-          Finance Center
-        </h1>
-        <p style={{ color: textSub }} className="mt-1 text-sm">
-          Gestion des demandes de retrait créateurs
-        </p>
+        <h1 style={{ color: "var(--color-texte-principal)" }} className="text-2xl font-bold">Finance Center</h1>
+        <p style={{ color: "var(--color-texte-secondaire)" }} className="mt-1 text-sm">Gestion des demandes de retrait créateurs</p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
@@ -145,9 +101,9 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
             onClick={() => handleFilterChange(f.value)}
             className="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
             style={{
-              backgroundColor: statusFilter === f.value ? "var(--color-vert-energie)" : cardBg,
-              color: statusFilter === f.value ? "var(--color-noir-profond)" : textSub,
-              border: `1px solid ${statusFilter === f.value ? "var(--color-vert-energie)" : border}`,
+              backgroundColor: statusFilter === f.value ? "var(--color-vert-energie)" : "var(--color-card)",
+              color: statusFilter === f.value ? "var(--color-noir-profond)" : "var(--color-texte-secondaire)",
+              border: `1px solid ${statusFilter === f.value ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
             }}
           >
             {f.label}
@@ -155,22 +111,16 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
         ))}
       </div>
 
-      {/* Error */}
       {error && (
         <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
 
-      {/* Queue */}
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="animate-pulse motion-reduce:animate-none rounded-xl p-5"
-              style={{ backgroundColor: cardBg, animationDelay: `${i * 80}ms` }}
-            >
+            <div key={i} className="animate-pulse motion-reduce:animate-none rounded-xl p-5" style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 80}ms` }}>
               <div className="flex justify-between">
                 <div className="space-y-2">
                   <div className="h-4 w-40 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
@@ -182,11 +132,9 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
           ))}
         </div>
       ) : queue.length === 0 ? (
-        <div className="rounded-xl py-12 text-center" style={{ backgroundColor: cardBg }}>
+        <div className="rounded-xl py-12 text-center" style={{ backgroundColor: "var(--color-card)" }}>
           <p className="text-2xl">✅</p>
-          <p className="mt-2 text-sm" style={{ color: textSub }}>
-            Aucune demande dans cette catégorie.
-          </p>
+          <p className="mt-2 text-sm" style={{ color: "var(--color-texte-secondaire)" }}>Aucune demande dans cette catégorie.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -194,109 +142,43 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
             const busy = actionState[entry.id] ?? false;
             const sc   = STATUS_COLORS[entry.status] ?? STATUS_COLORS.pending;
             return (
-              <div
-                key={entry.id}
-                className="rounded-xl p-5"
-                style={{ backgroundColor: cardBg, border: `1px solid ${border}` }}
-              >
-                {/* Top row */}
+              <div key={entry.id} className="rounded-xl p-5" style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-bordure)" }}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold" style={{ color: textMain }}>
-                        {formatGnf(entry.net_amount_gnf)}
-                      </p>
-                      <span
-                        className="rounded-full px-2 py-0.5 text-xs font-medium"
-                        style={{ backgroundColor: sc.bg, color: sc.text }}
-                      >
+                      <p className="text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>{formatGnf(entry.net_amount_gnf)}</p>
+                      <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: sc.bg, color: sc.text }}>
                         {WITHDRAWAL_STATUS_LABELS[entry.status] ?? entry.status}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs" style={{ color: textSub }}>
-                      {entry.user_email ?? entry.user_id.slice(0, 8)} ·{" "}
-                      {PAYOUT_ACCOUNT_LABELS[entry.payout_account.type]} ·{" "}
-                      {entry.payout_account.display_name}
-                      {entry.payout_account.phone_number
-                        ? ` · ${entry.payout_account.phone_number}`
-                        : ""}
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--color-texte-secondaire)" }}>
+                      {entry.user_email ?? entry.user_id.slice(0, 8)} · {PAYOUT_ACCOUNT_LABELS[entry.payout_account.type]} · {entry.payout_account.display_name}
+                      {entry.payout_account.phone_number ? ` · ${entry.payout_account.phone_number}` : ""}
                     </p>
-                    <p className="mt-0.5 text-xs" style={{ color: textSub }}>
-                      Demandé le {formatDateTime(entry.created_at)}
-                    </p>
-                    {entry.reference && (
-                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-vert-energie)" }}>
-                        Réf: {entry.reference}
-                      </p>
-                    )}
-                    {entry.rejection_reason && (
-                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-erreur)" }}>
-                        Motif: {entry.rejection_reason}
-                      </p>
-                    )}
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--color-texte-secondaire)" }}>Demandé le {formatDateTime(entry.created_at)}</p>
+                    {entry.reference && <p className="mt-0.5 text-xs" style={{ color: "var(--color-vert-energie)" }}>Réf: {entry.reference}</p>}
+                    {entry.rejection_reason && <p className="mt-0.5 text-xs" style={{ color: "var(--color-erreur)" }}>Motif: {entry.rejection_reason}</p>}
                   </div>
-
-                  {/* Actions */}
                   <div className="flex flex-wrap gap-2">
                     {entry.status === "pending" && (
                       <>
-                        <ActionBtn
-                          label="Approuver"
-                          color="var(--color-vert-energie)"
-                          textColor="var(--color-noir-profond)"
-                          disabled={busy}
-                          onClick={() => handleApprove(entry.id)}
-                        />
-                        <ActionBtn
-                          label="Rejeter"
-                          color="rgba(255,68,68,0.13)"
-                          textColor="var(--color-erreur)"
-                          disabled={busy}
-                          onClick={() => handleReject(entry.id)}
-                        />
+                        <AdminActionBtn label="Approuver" color="var(--color-vert-energie)" textColor="var(--color-noir-profond)" disabled={busy} onClick={() => handleApprove(entry.id)} />
+                        <AdminActionBtn label="Rejeter" color="rgba(255,68,68,0.13)" textColor="var(--color-erreur)" disabled={busy} onClick={() => handleReject(entry.id)} />
                       </>
                     )}
                     {entry.status === "approved" && (
                       <>
-                        <ActionBtn
-                          label="Traiter"
-                          color="rgba(59,130,246,0.13)"
-                          textColor="#60A5FA"
-                          disabled={busy}
-                          onClick={() => handleProcess(entry.id)}
-                        />
-                        <ActionBtn
-                          label="Annuler"
-                          color="rgba(85,85,85,0.13)"
-                          textColor="var(--color-texte-desactive)"
-                          disabled={busy}
-                          onClick={() => handleCancel(entry.id)}
-                        />
+                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="#60A5FA" disabled={busy} onClick={() => handleProcess(entry.id)} />
+                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
                     {entry.status === "processing" && (
                       <>
-                        <ActionBtn
-                          label="Marquer payé"
-                          color="rgba(0,210,106,0.13)"
-                          textColor="var(--color-vert-energie)"
-                          disabled={busy}
-                          onClick={() => handleMarkPaid(entry.id)}
-                        />
-                        <ActionBtn
-                          label="Annuler"
-                          color="rgba(85,85,85,0.13)"
-                          textColor="var(--color-texte-desactive)"
-                          disabled={busy}
-                          onClick={() => handleCancel(entry.id)}
-                        />
+                        <AdminActionBtn label="Marquer payé" color="rgba(0,210,106,0.13)" textColor="var(--color-vert-energie)" disabled={busy} onClick={() => handleMarkPaid(entry.id)} />
+                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
-                    {busy && (
-                      <span className="text-xs" style={{ color: textSub }}>
-                        …
-                      </span>
-                    )}
+                    {busy && <span className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>…</span>}
                   </div>
                 </div>
               </div>
@@ -305,80 +187,15 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
         </div>
       )}
 
-      {/* Modal: reject or mark_paid */}
       {modal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
-        >
-          <div
-            className="w-full max-w-md space-y-4 rounded-2xl p-6"
-            style={{ backgroundColor: "var(--color-card)", border: `1px solid ${border}` }}
-          >
-            <h3 className="text-base font-semibold" style={{ color: textMain }}>
-              {modal.type === "reject" ? "Motif de rejet" : "Référence de paiement"}
-            </h3>
-            <input
-              autoFocus
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none"
-              style={{
-                backgroundColor: "var(--color-elevated)",
-                border: `1px solid ${border}`,
-                color: textMain,
-              }}
-              placeholder={
-                modal.type === "reject"
-                  ? "Ex: Compte invalide, numéro incorrect…"
-                  : "Ex: OM-20260612-001"
-              }
-              value={modal.value}
-              onChange={(e) => setModal({ ...modal, value: e.target.value })}
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={confirmModal}
-                disabled={!modal.value.trim()}
-                className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-40"
-                style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
-              >
-                Confirmer
-              </button>
-              <button
-                onClick={() => setModal(null)}
-                className="rounded-xl px-4 text-sm"
-                style={{ backgroundColor: "var(--color-elevated)", color: textSub }}
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
+        <AdminPayoutModal
+          type={modal.type}
+          value={modal.value}
+          onChange={(v) => setModal({ ...modal, value: v })}
+          onConfirm={confirmModal}
+          onCancel={() => setModal(null)}
+        />
       )}
     </div>
-  );
-}
-
-function ActionBtn({
-  label,
-  color,
-  textColor,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  color: string;
-  textColor: string;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
-      style={{ backgroundColor: color, color: textColor }}
-    >
-      {label}
-    </button>
   );
 }
