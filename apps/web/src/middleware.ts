@@ -10,11 +10,10 @@ function getSupabaseEnv(): { url: string; anonKey: string } | null {
   return { url, anonKey };
 }
 
-// Dev bypass : BYPASS_AUTH=true OU NODE_ENV=development. Jamais sur Vercel.
+// Dev bypass : BYPASS_AUTH=true explicite uniquement. Jamais sur Vercel.
 function isBypassActive(): boolean {
   return (
-    (process.env.BYPASS_AUTH === "true" ||
-      process.env.NODE_ENV === "development") &&
+    process.env.BYPASS_AUTH === "true" &&
     process.env.VERCEL !== "1"
   );
 }
