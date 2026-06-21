@@ -21,14 +21,14 @@ function maskPhone(phone: string): string {
 interface Props {
   wizard: ArtistWizard
   router: { push: (url: string) => void }
+  bypassAuth?: boolean
 }
 
-export function Step5Confirm({ wizard, router }: Props) {
+export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
   const { data } = wizard
 
   async function handleSubmit() {
-    // Bypass dev : aucun appel Supabase
-    if (process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true') {
+    if (bypassAuth) {
       router.push('/creator')
       return
     }
