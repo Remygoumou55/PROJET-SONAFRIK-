@@ -36,6 +36,7 @@ export class SocialService {
   }
 
   private async requireUserId(): Promise<string> {
+    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-id";
     const {
       data: { user },
     } = await this.client.auth.getUser();

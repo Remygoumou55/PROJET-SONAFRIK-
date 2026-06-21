@@ -192,6 +192,9 @@ importers:
         specifier: ^3.25.36
         version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^22.19.20
+        version: 22.19.20
       eslint:
         specifier: ^9.28.0
         version: 9.39.4(jiti@2.7.0)

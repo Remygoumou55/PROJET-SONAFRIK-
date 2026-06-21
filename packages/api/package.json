@@ -95,6 +95,7 @@
     "zod": "^3.25.36"
   },
   "devDependencies": {
+    "@types/node": "^22.19.20",
     "eslint": "^9.28.0",
     "typescript": "^5.8.3"
   }

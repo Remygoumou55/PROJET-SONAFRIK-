@@ -31,6 +31,7 @@ export class WalletService {
   }
 
   private async requireUserId(): Promise<string> {
+    if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return "dev-mock-id";
     const { data: { user }, error } = await this.client.auth.getUser();
     if (error ?? !user) throw new WalletError("UNAUTHORIZED", "Non authentifié");
     return user.id;
