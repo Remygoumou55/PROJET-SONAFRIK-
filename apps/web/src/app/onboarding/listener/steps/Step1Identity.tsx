@@ -11,7 +11,7 @@ const fieldStyle: CSSProperties = {
   borderRadius: '10px',
   padding: '12px 14px',
   fontSize: '14px',
-  color: '#ffffff',
+  color: 'var(--color-texte-principal)',
   outline: 'none',
   boxSizing: 'border-box',
 }
@@ -41,7 +41,7 @@ export function Step1Identity({ wizard }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
         <div>
           <label style={labelStyle}>
-            Nom complet <span style={{ color: '#00D26A' }}>*</span>
+            Nom complet <span style={{ color: 'var(--color-vert-energie)' }}>*</span>
           </label>
           <input
             type="text"
@@ -60,8 +60,8 @@ export function Step1Identity({ wizard }: Props) {
           disabled={!canContinue}
           style={{
             width: '100%',
-            backgroundColor: canContinue ? '#00D26A' : 'rgba(0,210,106,0.25)',
-            color: '#0D0D0D',
+            backgroundColor: canContinue ? 'var(--color-vert-energie)' : 'rgba(0,210,106,0.25)',
+            color: 'var(--color-noir-profond)',
             fontWeight: 700,
             fontSize: '15px',
             padding: '14px',

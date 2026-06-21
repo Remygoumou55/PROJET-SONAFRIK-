@@ -73,7 +73,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
             key={track.track_id}
             onClick={() => void handlePlay(track)}
             className="flex items-center gap-3 py-3 rounded-xl px-3 w-full text-left group cursor-pointer transition-colors motion-reduce:transition-none"
-            style={{ borderBottom: "1px solid #141414" }}
+            style={{ borderBottom: "1px solid var(--color-noir-profond)" }}
             aria-label={`Lire ${track.title}${track.artist_name ? ` — ${track.artist_name}` : ""}`}
           >
             {/* Rank */}

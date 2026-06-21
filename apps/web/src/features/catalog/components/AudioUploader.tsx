@@ -175,13 +175,13 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
   if (state.status === "success") {
     return (
       <div className="flex items-center gap-2">
-        <span style={{ color: "#00D26A" }} className="text-sm font-medium">
+        <span style={{ color: "var(--color-vert-energie)" }} className="text-sm font-medium">
           ✓ Fichier audio envoyé
           {state.durationSeconds > 0
             ? ` (${formatDuration(state.durationSeconds)})`
             : ""}
         </span>
-        <button onClick={reset} className="text-xs underline" style={{ color: "#A0A0A0" }}>
+        <button onClick={reset} className="text-xs underline" style={{ color: "var(--color-texte-secondaire)" }}>
           Remplacer
         </button>
       </div>
@@ -193,9 +193,9 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
       <div className="flex items-center gap-2 py-2">
         <div
           className="w-4 h-4 rounded-full border-2 animate-spin"
-          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
-        <span className="text-sm" style={{ color: "#A0A0A0" }}>
+        <span className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
           Analyse de {state.fileName}…
         </span>
       </div>
@@ -208,26 +208,26 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
       <div className="space-y-3">
         <div
           className="flex items-center gap-4 rounded-xl p-4"
-          style={{ backgroundColor: "#1A1A1A", border: "1px solid #333333" }}
+          style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-bordure)" }}
         >
           {/* Icône audio */}
           <div
             className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: "#2A2A2A" }}
+            style={{ backgroundColor: "var(--color-elevated)" }}
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M8 4L8 16" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M4 7L4 13" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M12 6L12 14" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M16 8L16 12" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M8 4L8 16" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M4 7L4 13" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M12 6L12 14" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M16 8L16 12" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
+            <p className="text-sm font-medium truncate" style={{ color: "var(--color-texte-principal)" }}>
               {state.file.name}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "#A0A0A0" }}>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
               {state.format.toUpperCase()} · {formatBytes(state.file.size)}
               {state.durationSeconds > 0
                 ? ` · ${formatDuration(state.durationSeconds)}`
@@ -239,14 +239,14 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
               <div className="mt-2">
                 <div
                   className="h-1.5 rounded-full overflow-hidden"
-                  style={{ backgroundColor: "#333333" }}
+                  style={{ backgroundColor: "var(--color-bordure)" }}
                 >
                   <div
                     className="h-full rounded-full transition-all duration-200"
-                    style={{ width: `${state.progress}%`, backgroundColor: "#00D26A" }}
+                    style={{ width: `${state.progress}%`, backgroundColor: "var(--color-vert-energie)" }}
                   />
                 </div>
-                <p className="text-xs mt-1" style={{ color: "#A0A0A0" }}>
+                <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
                   {state.progress}% envoyé…
                 </p>
               </div>
@@ -259,14 +259,14 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
             <button
               onClick={() => void uploadFile()}
               className="px-4 py-2 rounded-lg text-sm font-semibold"
-              style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+              style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
             >
               Envoyer le fichier audio
             </button>
             <button
               onClick={reset}
               className="px-4 py-2 rounded-lg text-sm"
-              style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
+              style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}
             >
               Annuler
             </button>
@@ -289,27 +289,27 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
         onDrop={handleDrop}
         className="flex flex-col items-center justify-center gap-2 rounded-xl p-6 cursor-pointer transition-colors"
         style={{
-          border: `2px dashed ${isDragOver ? "#00D26A" : "#333333"}`,
-          backgroundColor: isDragOver ? "#001a0d" : "#1A1A1A",
+          border: `2px dashed ${isDragOver ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
+          backgroundColor: isDragOver ? "rgba(0,210,106,0.04)" : "var(--color-surface)",
         }}
       >
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <rect x="4" y="10" width="24" height="16" rx="3" stroke="#555555" strokeWidth="1.5" />
-          <circle cx="10" cy="18" r="2.5" stroke="#555555" strokeWidth="1.5" />
-          <path d="M13 18h9" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M16 4v8M13 7l3-3 3 3" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="4" y="10" width="24" height="16" rx="3" stroke="var(--color-texte-desactive)" strokeWidth="1.5" />
+          <circle cx="10" cy="18" r="2.5" stroke="var(--color-texte-desactive)" strokeWidth="1.5" />
+          <path d="M13 18h9" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
+        <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
           Glissez un fichier audio ou cliquez pour choisir
         </p>
-        <p className="text-xs" style={{ color: "#555555" }}>
+        <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
           MP3 · WAV · M4A — max {MAX_SIZE_MB} MB
         </p>
       </div>
 
       {/* Message d'erreur */}
       {state.status === "error" && (
-        <p className="text-xs px-1" style={{ color: "#FF4444" }}>
+        <p className="text-xs px-1" style={{ color: "var(--color-danger)" }}>
           {state.message}
         </p>
       )}

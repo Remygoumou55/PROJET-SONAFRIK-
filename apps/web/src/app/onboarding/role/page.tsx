@@ -68,7 +68,7 @@ export default function RolePage() {
           style={{
             fontSize: "22px",
             fontWeight: 700,
-            color: "#ffffff",
+            color: "var(--color-texte-principal)",
             textAlign: "center",
             marginBottom: "8px",
           }}
@@ -110,7 +110,7 @@ export default function RolePage() {
               onMouseEnter={(e) => {
                 if (loading === null) {
                   (e.currentTarget as HTMLButtonElement).style.borderColor =
-                    "#00D26A";
+                    "var(--color-vert-energie)";
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor =
                     "rgba(0,210,106,0.05)";
                 }
@@ -128,7 +128,7 @@ export default function RolePage() {
                   style={{
                     fontSize: "15px",
                     fontWeight: 600,
-                    color: "#ffffff",
+                    color: "var(--color-texte-principal)",
                     margin: "0 0 4px",
                   }}
                 >

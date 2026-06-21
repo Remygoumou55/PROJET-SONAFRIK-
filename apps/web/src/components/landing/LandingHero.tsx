@@ -16,7 +16,7 @@ export function LandingHero({ children }: LandingHeroProps) {
           gap: "6px",
           backgroundColor: "rgba(0,210,106,0.08)",
           border: "0.5px solid rgba(0,210,106,0.25)",
-          color: "#00D26A",
+          color: "var(--color-vert-energie)",
           fontSize: "12px",
           padding: "5px 14px",
           borderRadius: "20px",
@@ -29,7 +29,7 @@ export function LandingHero({ children }: LandingHeroProps) {
             width: "6px",
             height: "6px",
             borderRadius: "50%",
-            backgroundColor: "#00D26A",
+            backgroundColor: "var(--color-vert-energie)",
             flexShrink: 0,
           }}
         />
@@ -43,13 +43,13 @@ export function LandingHero({ children }: LandingHeroProps) {
           fontSize: "44px",
           fontWeight: 600,
           lineHeight: 1.2,
-          color: "#ffffff",
+          color: "var(--color-texte-principal)",
           margin: "0 0 16px",
         }}
       >
         La musique guinéenne
         <br />
-        <em style={{ color: "#00D26A", fontStyle: "normal" }}>
+        <em style={{ color: "var(--color-vert-energie)", fontStyle: "normal" }}>
           mérite sa plateforme
         </em>
       </h1>
@@ -81,8 +81,8 @@ export function LandingHero({ children }: LandingHeroProps) {
         <Link
           href="/auth/inscription?role=artist"
           style={{
-            backgroundColor: "#00D26A",
-            color: "#0D0D0D",
+            backgroundColor: "var(--color-vert-energie)",
+            color: "var(--color-noir-profond)",
             fontSize: "15px",
             fontWeight: 600,
             padding: "13px 28px",
@@ -98,7 +98,7 @@ export function LandingHero({ children }: LandingHeroProps) {
           style={{
             backgroundColor: "transparent",
             border: "0.5px solid rgba(255,255,255,0.2)",
-            color: "#ffffff",
+            color: "var(--color-texte-principal)",
             fontSize: "15px",
             fontWeight: 500,
             padding: "13px 28px",

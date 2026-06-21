@@ -14,7 +14,7 @@ export function OnboardingRow({ label, value }: { label: string; value: string }
       >
         {label}
       </span>
-      <span style={{ fontSize: '14px', color: '#ffffff', textAlign: 'right', wordBreak: 'break-word' }}>
+      <span style={{ fontSize: '14px', color: 'var(--color-texte-principal)', textAlign: 'right', wordBreak: 'break-word' }}>
         {value}
       </span>
     </div>

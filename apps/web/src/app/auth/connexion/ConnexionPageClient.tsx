@@ -105,9 +105,9 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
         <>
           <PhoneForm onSubmit={handlePhoneSubmit} submitLabel="Envoyer le code" />
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
-            <span className="text-xs" style={{ color: "#555555" }}>ou</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
+            <span className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>ou</span>
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
           </div>
           <GoogleAuthButton label="Se connecter avec Google" />
         </>
@@ -128,8 +128,8 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
           S&apos;inscrire
         </Link>
       </p>
-      <p className="text-center text-xs" style={{ color: "#A0A0A0" }}>
-        <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "#A0A0A0" }}>
+      <p className="text-center text-xs" style={{ color: "var(--color-texte-secondaire)" }}>
+        <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "var(--color-texte-secondaire)" }}>
           Problème d&apos;accès à votre compte ?
         </Link>
       </p>

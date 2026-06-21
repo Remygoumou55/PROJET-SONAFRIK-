@@ -101,9 +101,9 @@ export const WebPlayer = memo(function WebPlayer() {
               {formatTime(currentPosition)} / {formatTime(duration)}
             </span>
             <div className="hidden md:flex items-center gap-2">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="#A0A0A0">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="var(--color-texte-secondaire)">
                 <path d="M2 5h3l4-3v12L5 9H2V5z" />
-                <path d="M10 4.5a3.5 3.5 0 0 1 0 5M11.5 2.5a6 6 0 0 1 0 9" strokeWidth="1.2" stroke="#A0A0A0" fill="none" />
+                <path d="M10 4.5a3.5 3.5 0 0 1 0 5M11.5 2.5a6 6 0 0 1 0 9" strokeWidth="1.2" stroke="var(--color-texte-secondaire)" fill="none" />
               </svg>
               <input
                 type="range"

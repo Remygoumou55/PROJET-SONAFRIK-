@@ -79,26 +79,26 @@ export function ProfileHeader({ context, avatarUrl }: ProfileHeaderProps) {
       {profile.account_type === "auditeur" && (
         <div
           className="mt-6 rounded-2xl overflow-hidden"
-          style={{ border: "1px solid #FFC20E25", background: "#0D0D0D" }}
+          style={{ border: "1px solid rgba(255,194,14,0.15)", background: "var(--color-noir-profond)" }}
         >
           <div
             className="px-6 py-4 flex items-center gap-3"
             style={{
-              background: "linear-gradient(90deg, #FFC20E0D 0%, transparent 100%)",
-              borderBottom: "1px solid #1A1A1A",
+              background: "linear-gradient(90deg, rgba(255,194,14,0.05) 0%, transparent 100%)",
+              borderBottom: "1px solid var(--color-surface)",
             }}
           >
-            <svg width={18} height={18} viewBox="0 0 24 24" fill="#FFC20E">
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="var(--color-or-solaire)">
               <path d="M9 18V5l12-2v13" />
               <circle cx="6" cy="18" r="3" />
               <circle cx="18" cy="16" r="3" />
             </svg>
-            <h3 className="font-bold text-sm" style={{ color: "#FFC20E" }}>
+            <h3 className="font-bold text-sm" style={{ color: "var(--color-or-solaire)" }}>
               Devenir artiste sur SONAFRIK
             </h3>
           </div>
           <div className="px-6 py-4">
-            <p className="text-sm mb-3" style={{ color: "#CCCCCC" }}>
+            <p className="text-sm mb-3" style={{ color: "var(--color-texte-secondaire)" }}>
               Partagez votre musique africaine avec le monde. Le Creator OS vous donne accès
               à la gestion de votre catalogue, vos analytics et vos royalties.
             </p>

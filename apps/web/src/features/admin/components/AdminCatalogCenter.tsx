@@ -74,10 +74,10 @@ export function AdminCatalogCenter({ initialItems }: Props) {
     void runAction(id, type, action, reason);
   };
 
-  const cardBg = "#1F1F1F";
-  const border = "#333333";
-  const textMain = "#FFFFFF";
-  const textSub = "#A0A0A0";
+  const cardBg = "var(--color-card)";
+  const border = "var(--color-bordure)";
+  const textMain = "var(--color-texte-principal)";
+  const textSub = "var(--color-texte-secondaire)";
 
   return (
     <div className="space-y-6">
@@ -91,7 +91,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
       </div>
 
       {error && (
-        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "#FF444422", color: "#FF6666" }}>
+        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
@@ -119,8 +119,8 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                       <span
                         className="text-xs px-2 py-0.5 rounded-full font-medium"
                         style={{
-                          backgroundColor: item.type === "album" ? "#FFC20E22" : "#3B82F622",
-                          color: item.type === "album" ? "#FFC20E" : "#60A5FA",
+                          backgroundColor: item.type === "album" ? "rgba(255,194,14,0.13)" : "rgba(59,130,246,0.13)",
+                          color: item.type === "album" ? "var(--color-or-solaire)" : "#60A5FA",
                         }}
                       >
                         {item.type === "album"
@@ -137,7 +137,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                       </p>
                     )}
                     {item.submitted_at && (
-                      <p className="mt-0.5 text-xs" style={{ color: "#555555" }}>
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
                         Soumis le {formatDateTime(item.submitted_at)}
                       </p>
                     )}
@@ -148,7 +148,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                       disabled={busy}
                       onClick={() => void runAction(item.id, item.type, "published")}
                       className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                      style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+                      style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
                     >
                       {busy ? "…" : "Approuver"}
                     </button>
@@ -158,7 +158,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                         setModal({ id: item.id, type: item.type, action: "rejected", reason: "" })
                       }
                       className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                      style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+                      style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
                     >
                       Rejeter
                     </button>
@@ -178,7 +178,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
         >
           <div
             className="w-full max-w-md space-y-4 rounded-2xl p-6"
-            style={{ backgroundColor: "#1F1F1F", border: `1px solid ${border}` }}
+            style={{ backgroundColor: "var(--color-card)", border: `1px solid ${border}` }}
           >
             <h3 className="text-base font-semibold" style={{ color: textMain }}>
               Motif de rejet
@@ -186,7 +186,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
             <input
               autoFocus
               className="w-full rounded-xl px-4 py-3 text-sm outline-none"
-              style={{ backgroundColor: "#2A2A2A", border: `1px solid ${border}`, color: textMain }}
+              style={{ backgroundColor: "var(--color-elevated)", border: `1px solid ${border}`, color: textMain }}
               placeholder="Ex: Qualité audio insuffisante, métadonnées manquantes…"
               value={modal.reason}
               onChange={(e) => setModal({ ...modal, reason: e.target.value })}
@@ -196,14 +196,14 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                 onClick={confirmModal}
                 disabled={!modal.reason.trim()}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-40"
-                style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+                style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
               >
                 Confirmer le rejet
               </button>
               <button
                 onClick={() => setModal(null)}
                 className="rounded-xl px-4 text-sm"
-                style={{ backgroundColor: "#2A2A2A", color: textSub }}
+                style={{ backgroundColor: "var(--color-elevated)", color: textSub }}
               >
                 Annuler
               </button>

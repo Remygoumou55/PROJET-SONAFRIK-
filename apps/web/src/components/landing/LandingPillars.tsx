@@ -40,7 +40,7 @@ export function LandingPillars() {
           textAlign: "center",
         }}
       >
-        <p style={{ fontSize: "17px", fontWeight: 600, color: "#ffffff", margin: 0 }}>
+        <p style={{ fontSize: "17px", fontWeight: 600, color: "var(--color-texte-principal)", margin: 0 }}>
           En Guinée, des artistes talentueux créent chaque jour — et ne gagnent presque rien.
         </p>
         <p
@@ -92,7 +92,7 @@ export function LandingPillars() {
               style={{
                 fontSize: "15px",
                 fontWeight: 600,
-                color: "#ffffff",
+                color: "var(--color-texte-principal)",
                 margin: "0 0 8px",
               }}
             >

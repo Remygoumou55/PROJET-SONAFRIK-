@@ -72,7 +72,7 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
           style={{
             fontSize: '20px',
             fontWeight: 700,
-            color: '#ffffff',
+            color: 'var(--color-texte-principal)',
             margin: '0 0 6px',
           }}
         >
@@ -117,8 +117,8 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
         disabled={wizard.isSubmitting}
         style={{
           width: '100%',
-          backgroundColor: '#00D26A',
-          color: '#0D0D0D',
+          backgroundColor: 'var(--color-vert-energie)',
+          color: 'var(--color-noir-profond)',
           fontWeight: 700,
           fontSize: '15px',
           padding: '14px',

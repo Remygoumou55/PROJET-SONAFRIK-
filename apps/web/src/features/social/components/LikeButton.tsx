@@ -21,7 +21,7 @@ export function LikeButton({ trackId, showCount = false, size = "md" }: Props) {
       aria-label={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
       aria-pressed={isLiked}
       className="flex items-center gap-1.5 rounded-lg transition-opacity disabled:opacity-50"
-      style={{ color: isLiked ? "#00D26A" : "#A0A0A0" }}
+      style={{ color: isLiked ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)" }}
     >
       <svg
         width={iconSize}

@@ -24,7 +24,7 @@ const fieldStyle: CSSProperties = {
   borderRadius: '10px',
   padding: '12px 14px',
   fontSize: '14px',
-  color: '#ffffff',
+  color: 'var(--color-texte-principal)',
   outline: 'none',
   boxSizing: 'border-box',
   appearance: 'none',
@@ -59,11 +59,11 @@ export function Step2GenreLanguage({ wizard }: Props) {
             onChange={(e) => wizard.updateData({ mainGenre: e.target.value })}
             style={fieldStyle}
           >
-            <option value="" style={{ backgroundColor: '#1A1A1A' }}>
+            <option value="" style={{ backgroundColor: 'var(--color-surface)' }}>
               Sélectionner un genre…
             </option>
             {GENRE_OPTIONS.map((g) => (
-              <option key={g} value={g} style={{ backgroundColor: '#1A1A1A' }}>
+              <option key={g} value={g} style={{ backgroundColor: 'var(--color-surface)' }}>
                 {g}
               </option>
             ))}
@@ -78,7 +78,7 @@ export function Step2GenreLanguage({ wizard }: Props) {
             style={fieldStyle}
           >
             {LANGUAGE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} style={{ backgroundColor: '#1A1A1A' }}>
+              <option key={opt.value} value={opt.value} style={{ backgroundColor: 'var(--color-surface)' }}>
                 {opt.label}
               </option>
             ))}
@@ -90,8 +90,8 @@ export function Step2GenreLanguage({ wizard }: Props) {
           onClick={wizard.nextStep}
           style={{
             width: '100%',
-            backgroundColor: '#00D26A',
-            color: '#0D0D0D',
+            backgroundColor: 'var(--color-vert-energie)',
+            color: 'var(--color-noir-profond)',
             fontWeight: 700,
             fontSize: '15px',
             padding: '14px',

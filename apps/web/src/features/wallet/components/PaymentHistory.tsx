@@ -11,9 +11,9 @@ import {
 import { usePaymentHistory } from "../hooks/usePaymentHistory";
 
 function statusColor(status: PaymentIntentStatus): string {
-  if (status === "confirmed") return "#00D26A";
-  if (status === "failed" || status === "expired") return "#FF6666";
-  return "#F5A623"; // initiated / pending
+  if (status === "confirmed") return "var(--color-vert-energie)";
+  if (status === "failed" || status === "expired") return "var(--color-erreur)";
+  return "#F5A623"; // initiated / pending — no design token for this amber shade
 }
 
 function fmtDate(iso: string): string {
@@ -29,21 +29,21 @@ function IntentRow({ intent }: { intent: PaymentIntent }) {
   return (
     <div
       className="flex items-center justify-between py-3 border-b"
-      style={{ borderColor: "#2A2A2A" }}
+      style={{ borderColor: "var(--color-elevated)" }}
     >
       <div className="flex items-center gap-3">
         <span className="text-xl">{PAYMENT_PROVIDER_ICONS[intent.provider]}</span>
         <div>
-          <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
+          <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
             {PAYMENT_PROVIDER_LABELS[intent.provider]}
           </p>
-          <p className="text-xs" style={{ color: "#555555" }}>
+          <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
             {fmtDate(intent.created_at)}
           </p>
         </div>
       </div>
       <div className="text-right">
-        <p className="text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+        <p className="text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>
           {new Intl.NumberFormat("fr-GN").format(intent.amount_gnf)} GNF
         </p>
         <p className="text-xs font-medium" style={{ color: statusColor(intent.status) }}>
@@ -62,7 +62,7 @@ export const PaymentHistory = memo(function PaymentHistory() {
       <div className="py-6 flex justify-center">
         <div
           className="w-5 h-5 rounded-full border-2 animate-spin"
-          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
       </div>
     );
@@ -72,7 +72,7 @@ export const PaymentHistory = memo(function PaymentHistory() {
 
   return (
     <div className="space-y-1">
-      <h3 className="text-sm font-semibold" style={{ color: "#A0A0A0" }}>
+      <h3 className="text-sm font-semibold" style={{ color: "var(--color-texte-secondaire)" }}>
         Historique des recharges
       </h3>
       <div>

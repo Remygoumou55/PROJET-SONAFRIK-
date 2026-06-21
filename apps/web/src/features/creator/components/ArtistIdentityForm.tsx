@@ -109,7 +109,7 @@ export function ArtistIdentityForm({
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: stageName.length > FIELD_LIMITS.STAGE_NAME * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: stageName.length > FIELD_LIMITS.STAGE_NAME * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
               >
                 {stageName.length}/{FIELD_LIMITS.STAGE_NAME}
               </span>
@@ -127,7 +127,7 @@ export function ArtistIdentityForm({
             <div className="flex justify-end">
               <span
                 className="text-xs"
-                style={{ color: bio.length > FIELD_LIMITS.ARTIST_BIO * 0.85 ? "#FFC20E" : "#555555" }}
+                style={{ color: bio.length > FIELD_LIMITS.ARTIST_BIO * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
               >
                 {bio.length}/{FIELD_LIMITS.ARTIST_BIO}
               </span>

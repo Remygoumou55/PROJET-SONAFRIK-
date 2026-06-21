@@ -109,7 +109,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
             style={{
               background: "transparent",
               border: "1px solid rgba(255, 77, 79, 0.3)",
-              color: "#FF4D4F",
+              color: "var(--color-danger)",
             }}
           >
             Se déconnecter de tous les appareils

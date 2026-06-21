@@ -28,7 +28,7 @@ export function LaunchCounter({ current, target, percent, launched }: LaunchProg
   const animated = useCountUp(current, 1600);
   const barWidth  = Math.min((animated / target) * 100, 100);
 
-  const color = launched ? "#00CC44" : percent >= 50 ? "#FFC20E" : "#00CC44";
+  const color = launched ? "var(--color-vert-energie)" : percent >= 50 ? "var(--color-or-solaire)" : "var(--color-vert-energie)";
 
   return (
     <div className="w-full max-w-lg mx-auto">
@@ -41,7 +41,7 @@ export function LaunchCounter({ current, target, percent, launched }: LaunchProg
           >
             {animated.toLocaleString("fr-FR")}
           </span>
-          <span className="ml-2 text-2xl font-bold" style={{ color: "#444444" }}>
+          <span className="ml-2 text-2xl font-bold" style={{ color: "var(--color-texte-desactive)" }}>
             /{target.toLocaleString("fr-FR")}
           </span>
         </div>
@@ -53,7 +53,7 @@ export function LaunchCounter({ current, target, percent, launched }: LaunchProg
       {/* Barre de progression */}
       <div
         className="h-3 w-full overflow-hidden rounded-full"
-        style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A" }}
+        style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
       >
         <div
           className="h-full rounded-full transition-all duration-[1600ms] ease-out"
@@ -61,7 +61,7 @@ export function LaunchCounter({ current, target, percent, launched }: LaunchProg
         />
       </div>
 
-      <p className="mt-3 text-sm text-center" style={{ color: "#555555" }}>
+      <p className="mt-3 text-sm text-center" style={{ color: "var(--color-texte-desactive)" }}>
         {launched
           ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
           : `${(target - current).toLocaleString("fr-FR")} abonnés manquants pour le lancement`}

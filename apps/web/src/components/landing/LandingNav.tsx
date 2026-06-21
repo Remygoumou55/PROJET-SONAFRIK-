@@ -22,14 +22,14 @@ export function LandingNav() {
             lineHeight: 1,
           }}
         >
-          <span style={{ color: "#ffffff" }}>SON</span>
-          <span style={{ color: "#FFC20E" }}>A</span>
-          <span style={{ color: "#00D26A" }}>FRIK</span>
+          <span style={{ color: "var(--color-texte-principal)" }}>SON</span>
+          <span style={{ color: "var(--color-or-solaire)" }}>A</span>
+          <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
         </div>
         <div
           style={{
             fontSize: "10px",
-            color: "#FFC20E",
+            color: "var(--color-or-solaire)",
             letterSpacing: "2.5px",
             textTransform: "uppercase",
           }}
@@ -67,8 +67,8 @@ export function LandingNav() {
         <Link
           href="/auth/inscription"
           style={{
-            backgroundColor: "#00D26A",
-            color: "#0D0D0D",
+            backgroundColor: "var(--color-vert-energie)",
+            color: "var(--color-noir-profond)",
             fontWeight: 600,
             padding: "8px 18px",
             borderRadius: "8px",

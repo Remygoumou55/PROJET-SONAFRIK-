@@ -15,7 +15,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonafrik.vercel.app"
 const SUPABASE_HOST = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://cxjpburiiazzvlczzupy.supabase.co";
 
 export const viewport: Viewport = {
-  themeColor: "#0D0D0D",
+  themeColor: "var(--color-noir-profond)",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,

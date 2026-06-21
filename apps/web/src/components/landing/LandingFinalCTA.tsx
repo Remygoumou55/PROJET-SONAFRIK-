@@ -16,7 +16,7 @@ export function LandingFinalCTA() {
         style={{
           fontSize: "28px",
           fontWeight: 600,
-          color: "#ffffff",
+          color: "var(--color-texte-principal)",
           marginBottom: "12px",
         }}
       >
@@ -46,8 +46,8 @@ export function LandingFinalCTA() {
         <Link
           href="/auth/inscription"
           style={{
-            backgroundColor: "#00D26A",
-            color: "#0D0D0D",
+            backgroundColor: "var(--color-vert-energie)",
+            color: "var(--color-noir-profond)",
             fontSize: "15px",
             fontWeight: 600,
             padding: "13px 28px",
@@ -63,7 +63,7 @@ export function LandingFinalCTA() {
           style={{
             backgroundColor: "transparent",
             border: "0.5px solid rgba(255,255,255,0.2)",
-            color: "#ffffff",
+            color: "var(--color-texte-principal)",
             fontSize: "15px",
             fontWeight: 500,
             padding: "13px 28px",

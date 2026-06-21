@@ -144,7 +144,7 @@ function FieldCounter({ value, max }: { value: string; max: number }) {
     <div className="flex justify-end">
       <span
         className="text-xs"
-        style={{ color: value.length > max * 0.85 ? "#FFC20E" : "#555555" }}
+        style={{ color: value.length > max * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
       >
         {value.length}/{max}
       </span>

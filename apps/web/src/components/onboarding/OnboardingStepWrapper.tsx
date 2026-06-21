@@ -39,7 +39,7 @@ export function OnboardingStepWrapper({ title, subtitle, children, onBack, showB
           style={{
             fontSize: '20px',
             fontWeight: 700,
-            color: '#ffffff',
+            color: 'var(--color-texte-principal)',
             margin: '0 0 6px',
           }}
         >

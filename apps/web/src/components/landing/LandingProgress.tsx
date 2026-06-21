@@ -55,7 +55,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
               style={{
                 fontSize: "28px",
                 fontWeight: 600,
-                color: "#ffffff",
+                color: "var(--color-texte-principal)",
               }}
             >
               {subscriberCount.toLocaleString("fr-FR")}
@@ -75,7 +75,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
         <div
           style={{
             backgroundColor: "rgba(0,210,106,0.12)",
-            color: "#00D26A",
+            color: "var(--color-vert-energie)",
             fontSize: "13px",
             fontWeight: 600,
             padding: "4px 10px",
@@ -123,7 +123,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
                 style={{
                   height: "4px",
                   borderRadius: "2px",
-                  backgroundColor: reached ? "#00D26A" : "rgba(255,255,255,0.08)",
+                  backgroundColor: reached ? "var(--color-vert-energie)" : "rgba(255,255,255,0.08)",
                 }}
               />
             );
@@ -143,7 +143,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
                 key={threshold}
                 style={{
                   fontSize: "10px",
-                  color: reached ? "#00D26A" : "rgba(255,255,255,0.28)",
+                  color: reached ? "var(--color-vert-energie)" : "rgba(255,255,255,0.28)",
                   textAlign: "center",
                 }}
               >

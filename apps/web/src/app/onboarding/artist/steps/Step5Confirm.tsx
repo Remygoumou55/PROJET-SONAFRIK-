@@ -73,7 +73,7 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
       {/* Message de bienvenue */}
       <div style={{ textAlign: 'center', marginBottom: '28px' }}>
         <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎤</div>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#ffffff', margin: '0 0 6px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-texte-principal)', margin: '0 0 6px' }}>
           Bienvenue sur SONAFRIK, {data.stageName} 🎤
         </h2>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
@@ -117,8 +117,8 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
         disabled={wizard.isSubmitting}
         style={{
           width: '100%',
-          backgroundColor: '#00D26A',
-          color: '#0D0D0D',
+          backgroundColor: 'var(--color-vert-energie)',
+          color: 'var(--color-noir-profond)',
           fontWeight: 700,
           fontSize: '15px',
           padding: '14px',

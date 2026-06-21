@@ -38,16 +38,16 @@ const STATUS_FILTERS: { label: string; value: StatusFilter }[] = [
 ];
 
 const STATUS_COLORS: Record<RightsClaimStatus, { bg: string; text: string }> = {
-  pending:   { bg: "#FFC20E22", text: "#FFC20E" },
-  accepted:  { bg: "#00D26A22", text: "#00D26A" },
-  rejected:  { bg: "#FF444422", text: "#FF6666" },
-  escalated: { bg: "#A855F722", text: "#C084FC" },
+  pending:   { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
+  accepted:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
+  rejected:  { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
+  escalated: { bg: "rgba(168,85,247,0.13)",  text: "#C084FC" },
 };
 
 const TYPE_COLORS: Record<RightsClaimType, string> = {
   ownership:     "#3B82F6",
-  infringement:  "#FF6666",
-  takedown:      "#FFC20E",
+  infringement:  "var(--color-erreur)",
+  takedown:      "var(--color-or-solaire)",
 };
 
 export function AdminRightsCenter({ initialClaims }: Props) {
@@ -58,10 +58,10 @@ export function AdminRightsCenter({ initialClaims }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<{ claimId: string; reason: string } | null>(null);
 
-  const cardBg   = "#1F1F1F";
-  const border   = "#2A2A2A";
-  const textMain = "#FFFFFF";
-  const textSub  = "#A0A0A0";
+  const cardBg   = "var(--color-card)";
+  const border   = "var(--color-elevated)";
+  const textMain = "var(--color-texte-principal)";
+  const textSub  = "var(--color-texte-secondaire)";
 
   const filtered = useMemo(
     () => statusFilter === "all" ? claims : claims.filter((c) => c.status === statusFilter),
@@ -128,9 +128,9 @@ export function AdminRightsCenter({ initialClaims }: Props) {
             onClick={() => setStatusFilter(f.value)}
             className="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
             style={{
-              backgroundColor: statusFilter === f.value ? "#00D26A" : cardBg,
-              color: statusFilter === f.value ? "#0D0D0D" : textSub,
-              border: `1px solid ${statusFilter === f.value ? "#00D26A" : border}`,
+              backgroundColor: statusFilter === f.value ? "var(--color-vert-energie)" : cardBg,
+              color: statusFilter === f.value ? "var(--color-noir-profond)" : textSub,
+              border: `1px solid ${statusFilter === f.value ? "var(--color-vert-energie)" : border}`,
             }}
           >
             {f.label}
@@ -139,7 +139,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       </div>
 
       {error && (
-        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "#FF444422", color: "#FF6666" }}>
+        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
@@ -192,12 +192,12 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                     </p>
 
                     {/* Date */}
-                    <p className="text-xs mt-0.5" style={{ color: "#555555" }}>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-desactive)" }}>
                       {formatDateTime(claim.created_at)}
                     </p>
 
                     {/* Description */}
-                    <p className="text-xs mt-2 leading-relaxed" style={{ color: "#A0A0A0" }}>
+                    <p className="text-xs mt-2 leading-relaxed" style={{ color: "var(--color-texte-secondaire)" }}>
                       {claim.description}
                     </p>
 
@@ -208,7 +208,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs mt-1 inline-block hover:underline"
-                        style={{ color: "#00D26A" }}
+                        style={{ color: "var(--color-vert-energie)" }}
                       >
                         Voir la preuve →
                       </a>
@@ -222,7 +222,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         disabled={busy}
                         onClick={() => handleAccept(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                        style={{ backgroundColor: "#00D26A22", color: "#00D26A" }}
+                        style={{ backgroundColor: "rgba(0,210,106,0.13)", color: "var(--color-vert-energie)" }}
                       >
                         {busy ? "…" : "Accepter"}
                       </button>
@@ -231,7 +231,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                           disabled={busy}
                           onClick={() => handleEscalate(claim.id)}
                           className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                          style={{ backgroundColor: "#A855F722", color: "#C084FC" }}
+                          style={{ backgroundColor: "rgba(168,85,247,0.13)", color: "#C084FC" }}
                         >
                           Escalader
                         </button>
@@ -240,7 +240,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         disabled={busy}
                         onClick={() => handleReject(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                        style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+                        style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
                       >
                         Rejeter
                       </button>
@@ -261,7 +261,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
         >
           <div
             className="w-full max-w-md space-y-4 rounded-2xl p-6"
-            style={{ backgroundColor: "#1F1F1F", border: `1px solid ${border}` }}
+            style={{ backgroundColor: "var(--color-card)", border: `1px solid ${border}` }}
           >
             <h3 className="text-base font-semibold" style={{ color: textMain }}>
               Motif de rejet (optionnel)
@@ -270,7 +270,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
               autoFocus
               rows={3}
               className="w-full rounded-xl px-4 py-3 text-sm outline-none resize-none"
-              style={{ backgroundColor: "#2A2A2A", border: `1px solid ${border}`, color: textMain }}
+              style={{ backgroundColor: "var(--color-elevated)", border: `1px solid ${border}`, color: textMain }}
               placeholder="Ex: Absence de preuves suffisantes, revendication hors délai…"
               value={modal.reason}
               onChange={(e) => setModal({ ...modal, reason: e.target.value })}
@@ -279,14 +279,14 @@ export function AdminRightsCenter({ initialClaims }: Props) {
               <button
                 onClick={confirmReject}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
-                style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+                style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
               >
                 Confirmer le rejet
               </button>
               <button
                 onClick={() => setModal(null)}
                 className="rounded-xl px-4 text-sm"
-                style={{ backgroundColor: "#2A2A2A", color: textSub }}
+                style={{ backgroundColor: "var(--color-elevated)", color: textSub }}
               >
                 Annuler
               </button>

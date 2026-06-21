@@ -22,7 +22,7 @@ export function LandingSectionHeader({ label, title, subtitle }: LandingSectionH
         style={{
           fontSize: "24px",
           fontWeight: 600,
-          color: "#ffffff",
+          color: "var(--color-texte-principal)",
           marginBottom: subtitle ? "10px" : 0,
         }}
       >

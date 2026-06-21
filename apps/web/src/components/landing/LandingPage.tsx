@@ -10,7 +10,7 @@ export function LandingPage({ children }: LandingPageProps) {
       style={{
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "#0D0D0D",
+        backgroundColor: "var(--color-noir-profond)",
         minHeight: "100vh",
       }}
     >

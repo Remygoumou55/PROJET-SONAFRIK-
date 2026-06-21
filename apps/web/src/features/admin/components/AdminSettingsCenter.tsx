@@ -39,19 +39,19 @@ function SettingRow({ setting }: { setting: SystemSetting }) {
   return (
     <div
       className="grid grid-cols-[1fr_auto] items-start gap-4 rounded-lg p-4"
-      style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A" }}
+      style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
     >
       <div className="min-w-0">
-        <p className="font-mono text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+        <p className="font-mono text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>
           {setting.key}
         </p>
         {setting.description ? (
-          <p className="mt-0.5 text-xs" style={{ color: "#555555" }}>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
             {setting.description}
           </p>
         ) : null}
         {error ? (
-          <p className="mt-1 text-xs" style={{ color: "#FF6B6B" }}>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-erreur)" }}>
             {error}
           </p>
         ) : null}
@@ -72,9 +72,9 @@ function SettingRow({ setting }: { setting: SystemSetting }) {
               onBlur={save}
               className="rounded px-2 py-1 font-mono text-sm"
               style={{
-                backgroundColor: "#0D0D0D",
-                color: "#FFFFFF",
-                border: "1px solid #FFC20E",
+                backgroundColor: "var(--color-noir-profond)",
+                color: "var(--color-texte-principal)",
+                border: "1px solid var(--color-or-solaire)",
                 outline: "none",
                 width: "120px",
               }}
@@ -86,9 +86,9 @@ function SettingRow({ setting }: { setting: SystemSetting }) {
             onClick={() => setEditing(true)}
             className="rounded px-3 py-1 font-mono text-sm transition-colors"
             style={{
-              backgroundColor: "#0D0D0D",
-              color: "#FFC20E",
-              border: "1px solid #2A2A2A",
+              backgroundColor: "var(--color-noir-profond)",
+              color: "var(--color-or-solaire)",
+              border: "1px solid var(--color-elevated)",
               cursor: "pointer",
             }}
           >
@@ -111,11 +111,11 @@ export function AdminSettingsCenter({ settings }: Props) {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold" style={{ color: "#FFFFFF" }}>
+      <h1 className="mb-6 text-xl font-semibold" style={{ color: "var(--color-texte-principal)" }}>
         Paramètres système
       </h1>
 
-      <p className="mb-6 text-xs" style={{ color: "#555555" }}>
+      <p className="mb-6 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
         Cliquez sur une valeur pour la modifier. Appuyez sur Entrée ou cliquez ailleurs pour sauvegarder.
       </p>
 
@@ -126,7 +126,7 @@ export function AdminSettingsCenter({ settings }: Props) {
             <section key={cat}>
               <h2
                 className="mb-3 text-xs font-semibold uppercase tracking-widest"
-                style={{ color: "#FFC20E" }}
+                style={{ color: "var(--color-or-solaire)" }}
               >
                 {SETTING_CATEGORY_LABELS[cat]}
               </h2>
@@ -140,7 +140,7 @@ export function AdminSettingsCenter({ settings }: Props) {
       </div>
 
       {settings.length === 0 ? (
-        <p className="py-12 text-center text-sm" style={{ color: "#555555" }}>
+        <p className="py-12 text-center text-sm" style={{ color: "var(--color-texte-desactive)" }}>
           Aucun paramètre défini.
         </p>
       ) : null}

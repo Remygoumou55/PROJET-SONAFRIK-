@@ -60,7 +60,7 @@ export function LandingArtists() {
                 style={{
                   fontSize: "13px",
                   fontWeight: 600,
-                  color: "#ffffff",
+                  color: "var(--color-texte-principal)",
                   margin: 0,
                   lineHeight: 1.3,
                 }}

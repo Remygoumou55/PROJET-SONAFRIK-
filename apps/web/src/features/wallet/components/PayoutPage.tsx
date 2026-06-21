@@ -56,9 +56,9 @@ export const PayoutPage = memo(function PayoutPage() {
     width: "100%",
     padding: "10px 12px",
     borderRadius: 10,
-    border: "1px solid #333333",
-    backgroundColor: "#2A2A2A",
-    color: "#FFFFFF",
+    border: "1px solid var(--color-bordure)",
+    backgroundColor: "var(--color-elevated)",
+    color: "var(--color-texte-principal)",
     fontSize: 14,
     outline: "none",
   } as React.CSSProperties;
@@ -68,18 +68,18 @@ export const PayoutPage = memo(function PayoutPage() {
       {/* Comptes de retrait */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold" style={{ color: "#FFFFFF" }}>Comptes de retrait</h2>
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-texte-principal)" }}>Comptes de retrait</h2>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="text-sm font-medium px-3 py-1.5 rounded-lg"
-            style={{ backgroundColor: "#1F1F1F", color: "#00D26A", border: "1px solid #333333" }}
+            style={{ backgroundColor: "var(--color-card)", color: "var(--color-vert-energie)", border: "1px solid var(--color-bordure)" }}
           >
             + Ajouter
           </button>
         </div>
 
         {showAddForm && (
-          <form onSubmit={handleAddAccount} className="rounded-xl p-4 mb-4 space-y-3" style={{ backgroundColor: "#1F1F1F" }}>
+          <form onSubmit={handleAddAccount} className="rounded-xl p-4 mb-4 space-y-3" style={{ backgroundColor: "var(--color-card)" }}>
             <select
               value={accountForm.type}
               onChange={(e) => setAccountForm({ ...accountForm, type: e.target.value as AddPayoutAccountInput["type"] })}
@@ -111,17 +111,17 @@ export const PayoutPage = memo(function PayoutPage() {
                 onChange={(e) => setAccountForm({ ...accountForm, phoneNumber: e.target.value })}
               />
             )}
-            {formError && <p className="text-xs" style={{ color: "#FF6666" }}>{formError}</p>}
+            {formError && <p className="text-xs" style={{ color: "var(--color-erreur)" }}>{formError}</p>}
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
-                style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+                style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
               >
                 {isSubmitting ? "Ajout…" : "Ajouter le compte"}
               </button>
-              <button type="button" onClick={() => setShowAddForm(false)} className="px-4 rounded-xl text-sm" style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}>
+              <button type="button" onClick={() => setShowAddForm(false)} className="px-4 rounded-xl text-sm" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>
                 Annuler
               </button>
             </div>
@@ -131,38 +131,38 @@ export const PayoutPage = memo(function PayoutPage() {
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}>
-                <div className="w-10 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: "#2A2A2A" }} />
+              <div key={i} className="flex items-center gap-3 rounded-xl p-4 animate-pulse" style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 80}ms` }}>
+                <div className="w-10 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-elevated)" }} />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3.5 w-32 rounded" style={{ backgroundColor: "#2A2A2A" }} />
-                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-3.5 w-32 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
+                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
                 </div>
               </div>
             ))}
           </div>
         ) : accounts.length === 0 ? (
-          <div className="py-8 text-center rounded-xl" style={{ backgroundColor: "#1F1F1F" }}>
+          <div className="py-8 text-center rounded-xl" style={{ backgroundColor: "var(--color-card)" }}>
             <p className="text-2xl mb-2">🏦</p>
-            <p className="text-sm" style={{ color: "#A0A0A0" }}>Aucun compte de retrait.</p>
+            <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>Aucun compte de retrait.</p>
           </div>
         ) : (
           <div className="space-y-2">
             {accounts.map((acc) => (
-              <div key={acc.id} className="flex items-center justify-between rounded-xl p-4" style={{ backgroundColor: "#1F1F1F" }}>
+              <div key={acc.id} className="flex items-center justify-between rounded-xl p-4" style={{ backgroundColor: "var(--color-card)" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: "#2A2A2A", color: "#00D26A" }}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-vert-energie)" }}>
                     {acc.type === "orange_money" ? "🟠" : acc.type === "mtn_momo" ? "🟡" : acc.type === "wave" ? "🔵" : "🏦"}
                   </div>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>{acc.display_name}</p>
-                    <p className="text-xs" style={{ color: "#A0A0A0" }}>
+                    <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>{acc.display_name}</p>
+                    <p className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>
                       {PAYOUT_ACCOUNT_LABELS[acc.type as keyof typeof PAYOUT_ACCOUNT_LABELS]}
                       {acc.phone_number ? ` · ${acc.phone_number}` : ""}
                       {acc.is_default ? " · Principal" : ""}
                     </p>
                   </div>
                 </div>
-                <button onClick={() => removeAccount(acc.id)} style={{ color: "#555555" }} className="text-lg">×</button>
+                <button onClick={() => removeAccount(acc.id)} style={{ color: "var(--color-texte-desactive)" }} className="text-lg">×</button>
               </div>
             ))}
           </div>
@@ -173,18 +173,18 @@ export const PayoutPage = memo(function PayoutPage() {
       {accounts.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold" style={{ color: "#FFFFFF" }}>Demander un retrait</h2>
+            <h2 className="text-base font-semibold" style={{ color: "var(--color-texte-principal)" }}>Demander un retrait</h2>
             <button
               onClick={() => setShowWithdrawForm(!showWithdrawForm)}
               className="text-sm font-medium px-3 py-1.5 rounded-lg"
-              style={{ backgroundColor: "#1F1F1F", color: "#00D26A", border: "1px solid #333333" }}
+              style={{ backgroundColor: "var(--color-card)", color: "var(--color-vert-energie)", border: "1px solid var(--color-bordure)" }}
             >
               Retirer
             </button>
           </div>
 
           {showWithdrawForm && (
-            <form onSubmit={handleWithdraw} className="rounded-xl p-4 mb-4 space-y-3" style={{ backgroundColor: "#1F1F1F" }}>
+            <form onSubmit={handleWithdraw} className="rounded-xl p-4 mb-4 space-y-3" style={{ backgroundColor: "var(--color-card)" }}>
               <select
                 value={withdrawalForm.payoutAccountId}
                 onChange={(e) => setWithdrawalForm({ ...withdrawalForm, payoutAccountId: e.target.value })}
@@ -206,17 +206,17 @@ export const PayoutPage = memo(function PayoutPage() {
                 onChange={(e) => setWithdrawalForm({ ...withdrawalForm, amountGnf: Number(e.target.value) })}
                 required
               />
-              {formError && <p className="text-xs" style={{ color: "#FF6666" }}>{formError}</p>}
+              {formError && <p className="text-xs" style={{ color: "var(--color-erreur)" }}>{formError}</p>}
               <div className="flex gap-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
-                  style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+                  style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
                 >
                   {isSubmitting ? "Traitement…" : "Demander le retrait"}
                 </button>
-                <button type="button" onClick={() => setShowWithdrawForm(false)} className="px-4 rounded-xl text-sm" style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}>
+                <button type="button" onClick={() => setShowWithdrawForm(false)} className="px-4 rounded-xl text-sm" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>
                   Annuler
                 </button>
               </div>
@@ -227,30 +227,30 @@ export const PayoutPage = memo(function PayoutPage() {
 
       {/* Historique des retraits */}
       <section>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "#FFFFFF" }}>Historique des retraits</h2>
+        <h2 className="text-base font-semibold mb-4" style={{ color: "var(--color-texte-principal)" }}>Historique des retraits</h2>
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between rounded-xl p-4 animate-pulse" style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 70}ms` }}>
+              <div key={i} className="flex items-center justify-between rounded-xl p-4 animate-pulse" style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 70}ms` }}>
                 <div className="space-y-1.5">
-                  <div className="h-3.5 w-28 rounded" style={{ backgroundColor: "#2A2A2A" }} />
-                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-3.5 w-28 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
+                  <div className="h-3 w-20 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
                 </div>
-                <div className="h-6 w-16 rounded-full" style={{ backgroundColor: "#2A2A2A" }} />
+                <div className="h-6 w-16 rounded-full" style={{ backgroundColor: "var(--color-elevated)" }} />
               </div>
             ))}
           </div>
         ) : withdrawals.length === 0 ? (
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>Aucun retrait.</p>
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>Aucun retrait.</p>
         ) : (
           <div className="space-y-2">
             {withdrawals.map((w) => (
-              <div key={w.id} className="flex items-center justify-between rounded-xl p-4" style={{ backgroundColor: "#1F1F1F" }}>
+              <div key={w.id} className="flex items-center justify-between rounded-xl p-4" style={{ backgroundColor: "var(--color-card)" }}>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
+                  <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
                     {new Intl.NumberFormat("fr-GN").format(w.amount_gnf)} GNF
                   </p>
-                  <p className="text-xs" style={{ color: "#A0A0A0" }}>
+                  <p className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>
                     {new Date(w.created_at).toLocaleDateString("fr-FR")}
                   </p>
                 </div>
@@ -258,17 +258,17 @@ export const PayoutPage = memo(function PayoutPage() {
                   className="text-xs px-2 py-1 rounded-full font-medium"
                   style={{
                     backgroundColor:
-                      w.status === "completed"  ? "#00D26A22" :
-                      w.status === "failed"     ? "#FF444422" :
-                      w.status === "cancelled"  ? "#55555522" :
-                      w.status === "approved"   ? "#3B82F622" :
-                                                  "#FFC20E22",
+                      w.status === "completed"  ? "rgba(0,210,106,0.13)" :
+                      w.status === "failed"     ? "rgba(255,68,68,0.13)" :
+                      w.status === "cancelled"  ? "rgba(85,85,85,0.13)" :
+                      w.status === "approved"   ? "rgba(59,130,246,0.13)" :
+                                                  "rgba(255,194,14,0.13)",
                     color:
-                      w.status === "completed"  ? "#00D26A" :
-                      w.status === "failed"     ? "#FF6666" :
-                      w.status === "cancelled"  ? "#888888" :
+                      w.status === "completed"  ? "var(--color-vert-energie)" :
+                      w.status === "failed"     ? "var(--color-erreur)" :
+                      w.status === "cancelled"  ? "var(--color-texte-secondaire)" :
                       w.status === "approved"   ? "#60A5FA" :
-                                                  "#FFC20E",
+                                                  "var(--color-or-solaire)",
                   }}
                 >
                   {WITHDRAWAL_STATUS_LABELS[w.status as keyof typeof WITHDRAWAL_STATUS_LABELS] ?? w.status}

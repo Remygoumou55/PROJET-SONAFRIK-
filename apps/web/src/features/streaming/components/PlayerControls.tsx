@@ -88,7 +88,7 @@ export function PlayerControls() {
           style={{ backgroundColor: "transparent" }}
           aria-label="Morceau précédent"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#A0A0A0" aria-hidden>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-texte-secondaire)" aria-hidden>
             <rect x="2" y="2" width="2" height="12" rx="1" />
             <path d="M14 2L5 8l9 6V2z" />
           </svg>
@@ -108,7 +108,7 @@ export function PlayerControls() {
           style={{ backgroundColor: "var(--color-vert-energie)" }}
           aria-label="Pause"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#0D0D0D">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-noir-profond)">
             <rect x="3" y="2" width="3.5" height="12" rx="1" />
             <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
           </svg>
@@ -120,7 +120,7 @@ export function PlayerControls() {
           style={{ backgroundColor: "var(--color-vert-energie)" }}
           aria-label="Lecture"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#0D0D0D">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-noir-profond)">
             <path d="M4 2L14 8L4 14V2Z" />
           </svg>
         </button>
@@ -134,7 +134,7 @@ export function PlayerControls() {
           style={{ backgroundColor: "transparent" }}
           aria-label="Morceau suivant"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#A0A0A0" aria-hidden>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-texte-secondaire)" aria-hidden>
             <rect x="12" y="2" width="2" height="12" rx="1" />
             <path d="M2 2l9 6-9 6V2z" />
           </svg>
@@ -167,7 +167,7 @@ export function PlayerControls() {
         style={{ backgroundColor: "var(--color-elevated)" }}
         aria-label="Arrêter"
       >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="#A0A0A0">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--color-texte-secondaire)">
           <rect x="1" y="1" width="10" height="10" rx="1" />
         </svg>
       </button>

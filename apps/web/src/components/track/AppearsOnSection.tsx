@@ -14,7 +14,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
     <section className="mb-8">
       <h2
         className="text-sm font-semibold mb-3 uppercase tracking-wider"
-        style={{ color: "#555555" }}
+        style={{ color: "var(--color-texte-desactive)" }}
       >
         Apparaît sur
       </h2>
@@ -29,7 +29,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
             {/* Cover */}
             <div
               className="w-24 h-24 rounded-xl overflow-hidden mb-2 relative"
-              style={{ backgroundColor: "#1F1F1F" }}
+              style={{ backgroundColor: "var(--color-card)" }}
             >
               <CoverImage
                 coverPath={item.coverUrl}
@@ -44,7 +44,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
                 className="absolute bottom-1.5 right-1.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
                 style={{
                   backgroundColor: "rgba(0,210,106,0.15)",
-                  color: "#00D26A",
+                  color: "var(--color-vert-energie)",
                   backdropFilter: "blur(4px)",
                 }}
               >
@@ -55,7 +55,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
             {/* Titre */}
             <p
               className="text-xs font-medium truncate group-hover:underline"
-              style={{ color: "#FFFFFF" }}
+              style={{ color: "var(--color-texte-principal)" }}
             >
               {item.trackTitle}
             </p>

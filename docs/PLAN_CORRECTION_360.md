@@ -2,7 +2,7 @@
 > Document de référence pour toute IA ou développeur travaillant sur la correction du projet.
 > **Lire CLAUDE.md en premier.**
 > Mettre à jour ce fichier après chaque tâche complétée.
-> Dernière mise à jour : 2026-06-20
+> Dernière mise à jour : 2026-06-21
 
 ---
 
@@ -167,7 +167,16 @@ Ces imports ne sont pas interdits mais créent un couplage implicite : un bug da
 > **Durée estimée :** 1 semaine
 > **Dépendances :** Aucune — peut commencer immédiatement
 
-### LOT A1 — Migrations manquantes (tables fantômes)
+### LOT A1 — Migrations manquantes (tables fantômes) ✅ COMPLÉTÉ + BUG FIX 2026-06-21
+**Tables créées :** `beats`, `beat_purchases`, `feature_flags`, `system_settings` + RPC `purchase_beat`
+**Bug fix :** CHECK constraints corrigées via `20260621020000_fix_a1_beat_check_constraints.sql`
+- `transactions.type` : ajout de `'beat_sale'`
+- `wallet_ledger.reason` : ajout de `'beat_purchase'` et `'beat_sale'`
+**Exécuté directement via Supabase CLI** (`supabase db query --linked`) — validé en base.
+
+---
+
+### LOT A1 ORIGINAL — Migrations manquantes (tables fantômes) [ARCHIVÉ]
 **Priorité :** P0 BLOQUANT
 **Fichiers à créer :**
 - `supabase/migrations/20260621000000_beats_store.sql`
@@ -378,28 +387,33 @@ process.env.BYPASS_AUTH === "true" || process.env.NODE_ENV === "development"
 
 ---
 
-### LOT C4 — Découper `packages/types/src/index.ts`
-**Durée :** 2h
-**Attention :** Tous les imports dans web, mobile et api seront à mettre à jour.
+### LOT C1 — Design System : Migrer les tokens ✅ COMPLÉTÉ 2026-06-21
+**Durée réelle :** 2h (migration batch)
+**Résultat :** 652 hex → 138 restants (-79%), 1 195 tokens CSS en production, 0 régression.
+Les 138 restants sont des exceptions légitimes : hex+alpha, arrays JS interpolés, accents de section sans token.
 
-**Structure cible :**
+---
+
+### LOT C4 — Découper `packages/types/src/index.ts` ✅ COMPLÉTÉ 2026-06-21
+**Durée réelle :** 1h
+**Résultat :** 0 imports à changer — le barrel `index.ts` re-exporte tout, 12/12 packages TypeScript OK.
+
+**Structure livrée :**
 ```
 packages/types/src/
-├── identity.ts      (Profile, UserSession, UserPreferences...)
-├── creator.ts       (Creator, ArtistProfile, Label...)
-├── catalog.ts       (Album, Track, TrackFile, Genre...)
-├── streaming.ts     (Playlist, StreamSession, SearchResult...)
-├── wallet.ts        (Wallet, Transaction, RoyaltyCycle...)
-├── rights.ts        (Work, Contributor, Ownership...)
-├── social.ts        (Follow, EngagementStats...)
-├── admin.ts         (FeatureFlag, SystemSetting...)
-├── payments.ts      (PaymentIntent, PaymentProvider...)
-├── beats.ts         (Beat, BeatPurchase...)
-├── constants.ts     (REAL_LISTEN_THRESHOLD_PERCENT, etc.)
-└── index.ts         (re-exports uniquement)
+├── constants.ts     ✅ SonafrikBrand, CDC rules (REAL_LISTEN_THRESHOLD_PERCENT, etc.)
+├── identity.ts      ✅ Profile, UserSession, UserPreferences, Notification...
+├── creator.ts       ✅ Creator, ArtistProfile, Label, équipe, analytics (→ identity, wallet)
+├── catalog.ts       ✅ Album, Track, TrackFile, Genre, TrackCredit...
+├── streaming.ts     ✅ Playlist, StreamSession, SearchResult, Discovery, Reco... (→ catalog, beats)
+├── social.ts        ✅ Follow, EngagementStats...
+├── wallet.ts        ✅ Wallet, Transaction, RoyaltyCycle, Payout engine...
+├── rights.ts        ✅ Work, Contributor, Ownership, Contract, RightsClaim...
+├── admin.ts         ✅ FeatureFlag, SystemSetting...
+├── payments.ts      ✅ PaymentIntent, PaymentProvider...
+├── beats.ts         ✅ Beat, BeatPurchase, Tip...
+└── index.ts         ✅ re-exports uniquement — aucun import externe à changer
 ```
-
-**Fichiers impactés :** Grep `from "@sonafrik/types"` dans tout le projet pour lister tous les points d'import.
 
 ---
 

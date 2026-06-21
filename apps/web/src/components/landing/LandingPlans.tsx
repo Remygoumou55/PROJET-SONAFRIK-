@@ -88,7 +88,7 @@ const PLANS: Plan[] = [
   },
   {
     badgeBg: "rgba(0,210,106,0.12)",
-    badgeColor: "#00D26A",
+    badgeColor: "var(--color-vert-energie)",
     badgeText: "Le plus populaire",
     title: "Mensuel",
     price: "80 000 GNF",
@@ -107,7 +107,7 @@ const PLANS: Plan[] = [
   },
   {
     badgeBg: "rgba(255,194,14,0.12)",
-    badgeColor: "#FFC20E",
+    badgeColor: "var(--color-or-solaire)",
     badgeText: "Meilleure valeur",
     title: "Annuel",
     price: "700 000 GNF",
@@ -144,7 +144,7 @@ function PaymentItem({ dot, name, sub, detail }: Payment) {
             flexShrink: 0,
           }}
         />
-        <span style={{ fontSize: "12px", fontWeight: 600, color: "#ffffff" }}>{name}</span>
+        <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-texte-principal)" }}>{name}</span>
       </div>
       <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", margin: "0 0 1px 14px" }}>{sub}</p>
       <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.28)", margin: "0 0 0 14px" }}>{detail}</p>
@@ -215,17 +215,17 @@ export function LandingPlans() {
             </div>
 
             {/* Titre + prix */}
-            <p style={{ fontSize: "15px", fontWeight: 600, color: "#ffffff", margin: "0 0 4px" }}>
+            <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-texte-principal)", margin: "0 0 4px" }}>
               {plan.title}
             </p>
-            <p style={{ fontSize: "20px", fontWeight: 700, color: "#ffffff", margin: "0 0 2px" }}>
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "var(--color-texte-principal)", margin: "0 0 2px" }}>
               {plan.price}{" "}
               <span style={{ fontSize: "13px", fontWeight: 400, color: "rgba(255,255,255,0.4)" }}>
                 {plan.period}
               </span>
             </p>
             {plan.saving && (
-              <p style={{ fontSize: "11px", color: "#00D26A", margin: "0 0 8px" }}>
+              <p style={{ fontSize: "11px", color: "var(--color-vert-energie)", margin: "0 0 8px" }}>
                 {plan.saving}
               </p>
             )}
@@ -244,7 +244,7 @@ export function LandingPlans() {
                     style={{
                       fontSize: "12px",
                       fontWeight: 700,
-                      color: f.ok ? "#00D26A" : "rgba(255,255,255,0.18)",
+                      color: f.ok ? "var(--color-vert-energie)" : "rgba(255,255,255,0.18)",
                       lineHeight: "1.5",
                       flexShrink: 0,
                     }}
@@ -303,10 +303,10 @@ export function LandingPlans() {
             >
               Diaspora
             </div>
-            <p style={{ fontSize: "16px", fontWeight: 600, color: "#ffffff", margin: "0 0 6px" }}>
+            <p style={{ fontSize: "16px", fontWeight: 600, color: "var(--color-texte-principal)", margin: "0 0 6px" }}>
               Pack Diaspora
             </p>
-            <p style={{ fontSize: "20px", fontWeight: 700, color: "#00D26A", margin: "0 0 10px" }}>
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "var(--color-vert-energie)", margin: "0 0 10px" }}>
               5 EUR / mois
             </p>
             <p
@@ -333,7 +333,7 @@ export function LandingPlans() {
                 "Facturé en devise internationale",
               ].map((f) => (
                 <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "6px" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#00D26A", lineHeight: "1.5", flexShrink: 0 }}>✓</span>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-vert-energie)", lineHeight: "1.5", flexShrink: 0 }}>✓</span>
                   <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>{f}</span>
                 </div>
               ))}

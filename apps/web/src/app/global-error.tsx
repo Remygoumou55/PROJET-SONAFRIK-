@@ -15,7 +15,7 @@ export default function GlobalError({
   }, [error]);
   return (
     <html lang="fr" className="dark">
-      <body style={{ backgroundColor: "#0D0D0D", margin: 0 }}>
+      <body style={{ backgroundColor: "var(--color-noir-profond)", margin: 0 }}>
         <div
           style={{
             minHeight: "100vh",
@@ -31,17 +31,17 @@ export default function GlobalError({
             style={{
               fontSize: "1.5rem",
               fontWeight: 800,
-              color: "#FFFFFF",
+              color: "var(--color-texte-principal)",
               margin: 0,
             }}
           >
-            SONA<span style={{ color: "#00D26A" }}>FRIK</span>
+            SONA<span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
           </h1>
-          <p style={{ fontSize: "0.875rem", color: "#A0A0A0", textAlign: "center", margin: 0 }}>
+          <p style={{ fontSize: "0.875rem", color: "var(--color-texte-secondaire)", textAlign: "center", margin: 0 }}>
             Une erreur inattendue est survenue. Nos équipes en sont informées.
           </p>
           {process.env.NODE_ENV !== "production" && error.message && (
-            <p style={{ fontSize: "0.75rem", color: "#555555", textAlign: "center", margin: 0, fontFamily: "monospace" }}>
+            <p style={{ fontSize: "0.75rem", color: "var(--color-texte-desactive)", textAlign: "center", margin: 0, fontFamily: "monospace" }}>
               {error.message}
             </p>
           )}
@@ -52,8 +52,8 @@ export default function GlobalError({
               borderRadius: "0.75rem",
               fontSize: "0.875rem",
               fontWeight: 600,
-              backgroundColor: "#00D26A",
-              color: "#0D0D0D",
+              backgroundColor: "var(--color-vert-energie)",
+              color: "var(--color-noir-profond)",
               border: "none",
               cursor: "pointer",
             }}

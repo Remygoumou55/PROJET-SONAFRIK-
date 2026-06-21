@@ -35,7 +35,7 @@ export function BecomeArtistButton() {
   return (
     <>
       {error && (
-        <p className="text-xs mb-3" role="alert" style={{ color: "#FF4D4F" }}>
+        <p className="text-xs mb-3" role="alert" style={{ color: "var(--color-danger)" }}>
           {error}
         </p>
       )}

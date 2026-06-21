@@ -10,12 +10,12 @@ import { formatGnf, formatDateTime } from "@/lib/formatters";
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
 const STATUS_COLORS: Record<WithdrawalStatus, { bg: string; text: string }> = {
-  pending:    { bg: "#FFC20E22", text: "#FFC20E" },
-  approved:   { bg: "#3B82F622", text: "#60A5FA" },
-  processing: { bg: "#F59E0B22", text: "#F59E0B" },
-  completed:  { bg: "#00D26A22", text: "#00D26A" },
-  failed:     { bg: "#FF444422", text: "#FF6666" },
-  cancelled:  { bg: "#55555522", text: "#888888" },
+  pending:    { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
+  approved:   { bg: "rgba(59,130,246,0.13)",  text: "#60A5FA" },
+  processing: { bg: "rgba(245,158,11,0.13)",  text: "#F59E0B" },
+  completed:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
+  failed:     { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
+  cancelled:  { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-desactive)" },
 };
 
 interface Props {
@@ -120,10 +120,10 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
     { label: "Tout",        value: "all" },
   ];
 
-  const cardBg  = "#1F1F1F";
-  const border  = "#333333";
-  const textMain = "#FFFFFF";
-  const textSub  = "#A0A0A0";
+  const cardBg  = "var(--color-card)";
+  const border  = "var(--color-bordure)";
+  const textMain = "var(--color-texte-principal)";
+  const textSub  = "var(--color-texte-secondaire)";
 
   return (
     <div className="space-y-6">
@@ -145,9 +145,9 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
             onClick={() => handleFilterChange(f.value)}
             className="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
             style={{
-              backgroundColor: statusFilter === f.value ? "#00D26A" : cardBg,
-              color: statusFilter === f.value ? "#0D0D0D" : textSub,
-              border: `1px solid ${statusFilter === f.value ? "#00D26A" : border}`,
+              backgroundColor: statusFilter === f.value ? "var(--color-vert-energie)" : cardBg,
+              color: statusFilter === f.value ? "var(--color-noir-profond)" : textSub,
+              border: `1px solid ${statusFilter === f.value ? "var(--color-vert-energie)" : border}`,
             }}
           >
             {f.label}
@@ -157,7 +157,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
 
       {/* Error */}
       {error && (
-        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "#FF444422", color: "#FF6666" }}>
+        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
@@ -173,10 +173,10 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
             >
               <div className="flex justify-between">
                 <div className="space-y-2">
-                  <div className="h-4 w-40 rounded" style={{ backgroundColor: "#2A2A2A" }} />
-                  <div className="h-3 w-24 rounded" style={{ backgroundColor: "#2A2A2A" }} />
+                  <div className="h-4 w-40 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
+                  <div className="h-3 w-24 rounded" style={{ backgroundColor: "var(--color-elevated)" }} />
                 </div>
-                <div className="h-6 w-20 rounded-full" style={{ backgroundColor: "#2A2A2A" }} />
+                <div className="h-6 w-20 rounded-full" style={{ backgroundColor: "var(--color-elevated)" }} />
               </div>
             </div>
           ))}
@@ -225,12 +225,12 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                       Demandé le {formatDateTime(entry.created_at)}
                     </p>
                     {entry.reference && (
-                      <p className="mt-0.5 text-xs" style={{ color: "#00D26A" }}>
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-vert-energie)" }}>
                         Réf: {entry.reference}
                       </p>
                     )}
                     {entry.rejection_reason && (
-                      <p className="mt-0.5 text-xs" style={{ color: "#FF6666" }}>
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-erreur)" }}>
                         Motif: {entry.rejection_reason}
                       </p>
                     )}
@@ -242,15 +242,15 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                       <>
                         <ActionBtn
                           label="Approuver"
-                          color="#00D26A"
-                          textColor="#0D0D0D"
+                          color="var(--color-vert-energie)"
+                          textColor="var(--color-noir-profond)"
                           disabled={busy}
                           onClick={() => handleApprove(entry.id)}
                         />
                         <ActionBtn
                           label="Rejeter"
-                          color="#FF444422"
-                          textColor="#FF6666"
+                          color="rgba(255,68,68,0.13)"
+                          textColor="var(--color-erreur)"
                           disabled={busy}
                           onClick={() => handleReject(entry.id)}
                         />
@@ -260,15 +260,15 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                       <>
                         <ActionBtn
                           label="Traiter"
-                          color="#3B82F622"
+                          color="rgba(59,130,246,0.13)"
                           textColor="#60A5FA"
                           disabled={busy}
                           onClick={() => handleProcess(entry.id)}
                         />
                         <ActionBtn
                           label="Annuler"
-                          color="#55555522"
-                          textColor="#888888"
+                          color="rgba(85,85,85,0.13)"
+                          textColor="var(--color-texte-desactive)"
                           disabled={busy}
                           onClick={() => handleCancel(entry.id)}
                         />
@@ -278,15 +278,15 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                       <>
                         <ActionBtn
                           label="Marquer payé"
-                          color="#00D26A22"
-                          textColor="#00D26A"
+                          color="rgba(0,210,106,0.13)"
+                          textColor="var(--color-vert-energie)"
                           disabled={busy}
                           onClick={() => handleMarkPaid(entry.id)}
                         />
                         <ActionBtn
                           label="Annuler"
-                          color="#55555522"
-                          textColor="#888888"
+                          color="rgba(85,85,85,0.13)"
+                          textColor="var(--color-texte-desactive)"
                           disabled={busy}
                           onClick={() => handleCancel(entry.id)}
                         />
@@ -313,7 +313,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
         >
           <div
             className="w-full max-w-md space-y-4 rounded-2xl p-6"
-            style={{ backgroundColor: "#1F1F1F", border: `1px solid ${border}` }}
+            style={{ backgroundColor: "var(--color-card)", border: `1px solid ${border}` }}
           >
             <h3 className="text-base font-semibold" style={{ color: textMain }}>
               {modal.type === "reject" ? "Motif de rejet" : "Référence de paiement"}
@@ -322,7 +322,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
               autoFocus
               className="w-full rounded-xl px-4 py-3 text-sm outline-none"
               style={{
-                backgroundColor: "#2A2A2A",
+                backgroundColor: "var(--color-elevated)",
                 border: `1px solid ${border}`,
                 color: textMain,
               }}
@@ -339,14 +339,14 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                 onClick={confirmModal}
                 disabled={!modal.value.trim()}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-40"
-                style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+                style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
               >
                 Confirmer
               </button>
               <button
                 onClick={() => setModal(null)}
                 className="rounded-xl px-4 text-sm"
-                style={{ backgroundColor: "#2A2A2A", color: textSub }}
+                style={{ backgroundColor: "var(--color-elevated)", color: textSub }}
               >
                 Annuler
               </button>

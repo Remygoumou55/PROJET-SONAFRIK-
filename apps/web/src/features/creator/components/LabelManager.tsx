@@ -73,7 +73,7 @@ function LabelCard({
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: edit.name.length > FIELD_LIMITS.LABEL_NAME * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: edit.name.length > FIELD_LIMITS.LABEL_NAME * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {edit.name.length}/{FIELD_LIMITS.LABEL_NAME}
                 </span>
@@ -89,13 +89,13 @@ function LabelCard({
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: edit.description.length > FIELD_LIMITS.LABEL_DESCRIPTION * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: edit.description.length > FIELD_LIMITS.LABEL_DESCRIPTION * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {edit.description.length}/{FIELD_LIMITS.LABEL_DESCRIPTION}
                 </span>
               </div>
             </div>
-            {error && <p className="text-sm" style={{ color: "#FF4444" }}>{error}</p>}
+            {error && <p className="text-sm" style={{ color: "var(--color-danger)" }}>{error}</p>}
             <div className="flex gap-2">
               <Button size="sm" disabled={busy} onClick={handleSave}>
                 {busy ? "Enregistrement…" : "Enregistrer"}
@@ -138,7 +138,7 @@ function LabelCard({
                   variant="outline"
                   disabled={busy}
                   onClick={() => setConfirmDelete(true)}
-                  style={{ color: "#FF6666", borderColor: "#FF444433" }}
+                  style={{ color: "var(--color-erreur)", borderColor: "rgba(255,68,68,0.2)" }}
                 >
                   Supprimer
                 </Button>
@@ -207,7 +207,7 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: name.length > FIELD_LIMITS.LABEL_NAME * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: name.length > FIELD_LIMITS.LABEL_NAME * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {name.length}/{FIELD_LIMITS.LABEL_NAME}
                 </span>
@@ -223,13 +223,13 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: description.length > FIELD_LIMITS.LABEL_DESCRIPTION * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: description.length > FIELD_LIMITS.LABEL_DESCRIPTION * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {description.length}/{FIELD_LIMITS.LABEL_DESCRIPTION}
                 </span>
               </div>
             </div>
-            {createError && <p className="text-sm" style={{ color: "#FF4444" }}>{createError}</p>}
+            {createError && <p className="text-sm" style={{ color: "var(--color-danger)" }}>{createError}</p>}
             <Button type="submit" disabled={loading || name.length < 2}>
               {loading ? "Création…" : "Créer un label"}
             </Button>

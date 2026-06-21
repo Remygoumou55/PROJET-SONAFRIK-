@@ -65,7 +65,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: title.length > FIELD_LIMITS.ALBUM_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: title.length > FIELD_LIMITS.ALBUM_TITLE * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {title.length}/{FIELD_LIMITS.ALBUM_TITLE}
                 </span>
@@ -102,7 +102,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
               <Badge variant="primary">{PUBLICATION_STATUS_LABELS[album.publication_status]}</Badge>
             </div>
             {album.publication_status === "rejected" && album.rejection_reason && (
-              <p className="rounded-lg px-3 py-2 text-xs" style={{ backgroundColor: "#FF444418", color: "#FF6666" }}>
+              <p className="rounded-lg px-3 py-2 text-xs" style={{ backgroundColor: "rgba(255,68,68,0.09)", color: "var(--color-erreur)" }}>
                 <span className="font-semibold">Motif de rejet : </span>{album.rejection_reason}
               </p>
             )}
@@ -129,7 +129,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
                 <button
                   onClick={() => setExpandedCover(null)}
                   className="mt-2 text-xs"
-                  style={{ color: "#555555" }}
+                  style={{ color: "var(--color-texte-desactive)" }}
                 >
                   Fermer
                 </button>
@@ -139,7 +139,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
                 <button
                   onClick={() => setExpandedCover(album.id)}
                   className="text-sm hover:underline"
-                  style={{ color: "#00D26A" }}
+                  style={{ color: "var(--color-vert-energie)" }}
                 >
                   Ajouter / changer la pochette
                 </button>

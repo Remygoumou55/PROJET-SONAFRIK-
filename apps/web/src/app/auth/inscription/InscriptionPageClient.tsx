@@ -98,11 +98,11 @@ export function InscriptionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
     return (
       <main
         className="flex min-h-screen items-center justify-center"
-        style={{ backgroundColor: "#0D0D0D" }}
+        style={{ backgroundColor: "var(--color-noir-profond)" }}
       >
         <div
           className="w-8 h-8 rounded-full border-2 animate-spin"
-          style={{ borderColor: "#00D26A", borderTopColor: "transparent" }}
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
       </main>
     );
@@ -119,9 +119,9 @@ export function InscriptionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
         <>
           <PhoneForm onSubmit={handlePhoneSubmit} />
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
-            <span className="text-xs" style={{ color: "#555555" }}>ou</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "#333333" }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
+            <span className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>ou</span>
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
           </div>
           <GoogleAuthButton label="S'inscrire avec Google" role={roleParam ?? undefined} />
         </>

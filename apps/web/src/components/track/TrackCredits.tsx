@@ -38,7 +38,7 @@ export function TrackCredits({ credits }: TrackCreditsProps) {
               <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
                 {TRACK_CREDIT_ROLE_LABELS[role]}
               </p>
-              <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
                 {group.map((c, i) => (
                   <span key={c.id}>
                     {i > 0 && ", "}

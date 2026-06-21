@@ -7,7 +7,7 @@ export default function CreatorLoading() {
           <div
             key={i}
             className="h-24 rounded-2xl animate-pulse"
-            style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}
+            style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 80}ms` }}
           />
         ))}
       </div>
@@ -17,7 +17,7 @@ export default function CreatorLoading() {
           <div
             key={i}
             className="h-9 w-24 rounded-xl animate-pulse"
-            style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 60}ms` }}
+            style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 60}ms` }}
           />
         ))}
       </div>
@@ -26,7 +26,7 @@ export default function CreatorLoading() {
         <div
           key={i}
           className="h-16 w-full rounded-2xl animate-pulse"
-          style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}
+          style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 80}ms` }}
         />
       ))}
     </div>

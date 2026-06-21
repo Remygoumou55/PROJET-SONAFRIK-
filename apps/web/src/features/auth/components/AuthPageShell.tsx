@@ -13,10 +13,10 @@ export function AuthPageShell({ title, subtitle, children }: AuthPageShellProps)
         <header className="text-center">
           <div className="mb-4">
             <p className="text-2xl font-extrabold tracking-tight leading-none">
-              <span style={{ color: "#FFFFFF" }}>SONA</span>
-              <span style={{ color: "#00D26A" }}>FRIK</span>
+              <span style={{ color: "var(--color-texte-principal)" }}>SONA</span>
+              <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
             </p>
-            <p className="text-[9px] font-bold tracking-[0.2em] mt-1" style={{ color: "#FFC20E" }}>
+            <p className="text-[9px] font-bold tracking-[0.2em] mt-1" style={{ color: "var(--color-or-solaire)" }}>
               NOTRE BIEN COMMUN
             </p>
           </div>

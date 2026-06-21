@@ -30,10 +30,10 @@ const FLAG_LABELS: Record<string, string> = {
 };
 
 export function AdminFraudCenter({ sessions }: Props) {
-  const textMain = "#FFFFFF";
-  const textSub = "#A0A0A0";
-  const cardBg = "#1F1F1F";
-  const border = "#2A2A2A";
+  const textMain = "var(--color-texte-principal)";
+  const textSub = "var(--color-texte-secondaire)";
+  const cardBg = "var(--color-card)";
+  const border = "var(--color-elevated)";
 
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo] = useState("");
@@ -83,7 +83,7 @@ export function AdminFraudCenter({ sessions }: Props) {
           <button
             onClick={() => { setFilterFrom(""); setFilterTo(""); }}
             className="text-xs px-2 py-1 rounded-lg"
-            style={{ backgroundColor: "#2A2A2A", color: textSub }}
+            style={{ backgroundColor: "var(--color-elevated)", color: textSub }}
           >
             Réinitialiser
           </button>
@@ -112,20 +112,20 @@ export function AdminFraudCenter({ sessions }: Props) {
                       <span
                         key={flag}
                         className="text-xs px-2 py-0.5 rounded-full font-medium"
-                        style={{ backgroundColor: "#FF444422", color: "#FF6666" }}
+                        style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
                       >
                         {FLAG_LABELS[flag] ?? flag}
                       </span>
                     ))}
                   </div>
-                  <p className="text-xs font-mono" style={{ color: "#555555" }}>
+                  <p className="text-xs font-mono" style={{ color: "var(--color-texte-desactive)" }}>
                     Session {s.id.slice(0, 8)}… · Track {s.track_id.slice(0, 8)}…
                   </p>
-                  <p className="text-xs" style={{ color: "#555555" }}>
+                  <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
                     User {s.user_id.slice(0, 8)}… · {s.platform} · {s.started_at ? formatDateTime(s.started_at) : "—"}
                   </p>
                   {s.ip_address && (
-                    <p className="text-xs font-mono mt-0.5" style={{ color: "#555555" }}>
+                    <p className="text-xs font-mono mt-0.5" style={{ color: "var(--color-texte-desactive)" }}>
                       IP: {s.ip_address}
                     </p>
                   )}
@@ -133,16 +133,16 @@ export function AdminFraudCenter({ sessions }: Props) {
                 <div className="text-right">
                   <p
                     className="text-sm font-bold"
-                    style={{ color: s.is_valid_listen ? "#00D26A" : "#FF6666" }}
+                    style={{ color: s.is_valid_listen ? "var(--color-vert-energie)" : "var(--color-erreur)" }}
                   >
                     {s.listen_percentage.toFixed(0)}%
                   </p>
-                  <p className="text-xs" style={{ color: "#555555" }}>
+                  <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
                     {s.total_listened_seconds}s / {s.total_duration_seconds}s
                   </p>
                   <p
                     className="text-xs mt-0.5"
-                    style={{ color: s.is_valid_listen ? "#00D26A" : "#FF6666" }}
+                    style={{ color: s.is_valid_listen ? "var(--color-vert-energie)" : "var(--color-erreur)" }}
                   >
                     {s.is_valid_listen ? "Valide" : "Invalide"}
                   </p>

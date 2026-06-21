@@ -3,12 +3,12 @@ import { LandingSectionHeader } from "./LandingSectionHeader";
 
 const CARDS = [
   {
-    barColor: "#FFC20E",
+    barColor: "var(--color-or-solaire)",
     iconBg: "rgba(255,194,14,0.1)",
     icon: "🏆",
     badgeBg: "rgba(0,210,106,0.1)",
     badgeBorder: "rgba(0,210,106,0.22)",
-    badgeColor: "#00D26A",
+    badgeColor: "var(--color-vert-energie)",
     badgeText: "En développement",
     title: "SONAFRIK Awards",
     body: "La première cérémonie de récompenses musicales guinéennes entièrement décidée par les fans. Votez, suivez les classements en direct — les lauréats reçoivent leurs prix automatiquement.",
@@ -27,7 +27,7 @@ const CARDS = [
     pills: ["TikTokeurs", "Podcasteurs", "Vlogeurs", "Blogueurs", "Influenceurs"],
   },
   {
-    barColor: "#00D26A",
+    barColor: "var(--color-vert-energie)",
     iconBg: "rgba(0,210,106,0.1)",
     icon: "🫂",
     badgeBg: "rgba(255,255,255,0.06)",
@@ -146,7 +146,7 @@ export function LandingComingSoon() {
               style={{
                 fontSize: "15px",
                 fontWeight: 600,
-                color: "#ffffff",
+                color: "var(--color-texte-principal)",
                 margin: "0 0 8px",
                 clear: "both",
                 display: "block",
@@ -197,7 +197,7 @@ export function LandingComingSoon() {
           textAlign: "center",
         }}
       >
-        <p style={{ fontSize: "15px", fontWeight: 600, color: "#ffffff", margin: "0 0 8px" }}>
+        <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-texte-principal)", margin: "0 0 8px" }}>
           Vous êtes créateur de contenu ?
         </p>
         <p
@@ -215,8 +215,8 @@ export function LandingComingSoon() {
           href="/auth/inscription?role=creator"
           style={{
             display: "inline-block",
-            backgroundColor: "#00D26A",
-            color: "#0D0D0D",
+            backgroundColor: "var(--color-vert-energie)",
+            color: "var(--color-noir-profond)",
             fontSize: "15px",
             fontWeight: 600,
             padding: "13px 28px",

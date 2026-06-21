@@ -7,11 +7,11 @@ import { formatDateTime } from "@/lib/formatters";
 import { useNotificationsService } from "../hooks/useNotificationsService";
 
 const TYPE_STYLE: Record<NotificationType, { bg: string; text: string }> = {
-  stream_milestone:     { bg: "#3B82F622", text: "#60A5FA" },
-  royalty_paid:         { bg: "#FFC20E22", text: "#FFC20E" },
-  verification_updated: { bg: "#00D26A22", text: "#00D26A" },
-  rights_claim_updated: { bg: "#F59E0B22", text: "#F59E0B" },
-  system:               { bg: "#55555522", text: "#888888" },
+  stream_milestone:     { bg: "rgba(59,130,246,0.13)",  text: "#60A5FA" },
+  royalty_paid:         { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
+  verification_updated: { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
+  rights_claim_updated: { bg: "rgba(245,158,11,0.13)",  text: "#F59E0B" },
+  system:               { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-secondaire)" },
 };
 
 interface Props {
@@ -48,10 +48,10 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
     return (
       <div className="py-16 text-center">
         <p className="text-4xl mb-3">🔔</p>
-        <p className="font-semibold" style={{ color: "#FFFFFF" }}>
+        <p className="font-semibold" style={{ color: "var(--color-texte-principal)" }}>
           Aucune notification
         </p>
-        <p className="text-sm mt-1" style={{ color: "#A0A0A0" }}>
+        <p className="text-sm mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
           Vous serez notifié ici des activités importantes.
         </p>
       </div>
@@ -63,14 +63,14 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
       {/* Header avec "Tout marquer comme lu" */}
       {unreadCount > 0 && (
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm" style={{ color: "#A0A0A0" }}>
+          <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
             {unreadCount} non lue{unreadCount > 1 ? "s" : ""}
           </p>
           <button
             onClick={() => void markAllRead()}
             disabled={markingAll}
             className="text-xs font-medium transition-opacity disabled:opacity-40"
-            style={{ color: "#00D26A" }}
+            style={{ color: "var(--color-vert-energie)" }}
           >
             {markingAll ? "…" : "Tout marquer comme lu"}
           </button>
@@ -87,15 +87,15 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
             onClick={() => { if (isUnread) void markRead(notif.id); }}
             className="w-full text-left rounded-xl p-4 transition-opacity"
             style={{
-              backgroundColor: isUnread ? "#1F1F1F" : "#181818",
-              border: `1px solid ${isUnread ? "#2A2A2A" : "#222222"}`,
+              backgroundColor: isUnread ? "var(--color-card)" : "var(--color-surface)",
+              border: `1px solid ${isUnread ? "var(--color-elevated)" : "var(--color-surface)"}`,
               cursor: isUnread ? "pointer" : "default",
             }}
           >
             <div className="flex items-start gap-3">
               {/* Dot non-lue */}
               <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full" style={{
-                backgroundColor: isUnread ? "#00D26A" : "transparent",
+                backgroundColor: isUnread ? "var(--color-vert-energie)" : "transparent",
               }} />
 
               <div className="flex-1 min-w-0">
@@ -106,14 +106,14 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
                   >
                     {NOTIFICATION_TYPE_LABELS[notif.type]}
                   </span>
-                  <span className="text-[10px]" style={{ color: "#555555" }}>
+                  <span className="text-[10px]" style={{ color: "var(--color-texte-desactive)" }}>
                     {formatDateTime(notif.created_at)}
                   </span>
                 </div>
-                <p className="text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+                <p className="text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>
                   {notif.title}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: "#A0A0A0" }}>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
                   {notif.body}
                 </p>
               </div>

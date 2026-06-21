@@ -45,9 +45,9 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
   }
 
   const inputStyle: React.CSSProperties = {
-    backgroundColor: "#2A2A2A",
-    border: "1px solid #333333",
-    color: "#FFFFFF",
+    backgroundColor: "var(--color-elevated)",
+    border: "1px solid var(--color-bordure)",
+    color: "var(--color-texte-principal)",
     borderRadius: "0.75rem",
     padding: "0.625rem 0.875rem",
     width: "100%",
@@ -59,16 +59,16 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
     display: "block",
     fontSize: "0.75rem",
     fontWeight: 600,
-    color: "#A0A0A0",
+    color: "var(--color-texte-secondaire)",
     marginBottom: "0.375rem",
   };
 
   return (
     <div
       className="rounded-2xl p-6"
-      style={{ backgroundColor: "#1F1F1F", border: "1px solid #2A2A2A" }}
+      style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-elevated)" }}
     >
-      <h3 className="text-base font-bold mb-5" style={{ color: "#FFFFFF" }}>
+      <h3 className="text-base font-bold mb-5" style={{ color: "var(--color-texte-principal)" }}>
         Nouvelle œuvre musicale
       </h3>
 
@@ -127,7 +127,7 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
             placeholder="T-xxx.xxx.xxx-x"
             style={inputStyle}
           />
-          <p className="text-xs mt-1" style={{ color: "#555555" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-texte-desactive)" }}>
             International Standard Musical Work Code
           </p>
         </div>
@@ -147,7 +147,7 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
         {error && (
           <p
             className="text-xs px-3 py-2 rounded-lg"
-            style={{ backgroundColor: "#FF444418", color: "#FF6666" }}
+            style={{ backgroundColor: "rgba(255,68,68,0.09)", color: "var(--color-erreur)" }}
           >
             {error}
           </p>
@@ -158,7 +158,7 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
             type="submit"
             disabled={loading}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ backgroundColor: "#00D26A", color: "#000000" }}
+            style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
           >
             {loading ? "Création…" : "Créer l'œuvre"}
           </button>
@@ -166,7 +166,7 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
             type="button"
             onClick={onCancel}
             className="px-5 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
+            style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}
           >
             Annuler
           </button>

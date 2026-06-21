@@ -71,7 +71,7 @@ const getHomepageContent = cache(async function getHomepageContent() {
 type HomepageContent = Awaited<ReturnType<typeof getHomepageContent>>;
 
 // ─── Icône note de musique ─────────────────────────────────────────────────────
-function MusicNote({ size = 20, color = "#FFFFFF" }: { size?: number; color?: string }) {
+function MusicNote({ size = 20, color = "var(--color-texte-principal)" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
       <path d="M9 18V5l12-2v13" />
@@ -134,7 +134,7 @@ function MediaCard({
           </div>
         </div>
       </div>
-      <p className="text-xs font-bold truncate" style={{ color: "#FFFFFF" }}>{title}</p>
+      <p className="text-xs font-bold truncate" style={{ color: "var(--color-texte-principal)" }}>{title}</p>
       {subtitle && <p className="text-[10px] mt-0.5 truncate" style={{ color: "#777777" }}>{subtitle}</p>}
     </Link>
   );
@@ -148,14 +148,14 @@ function ContentSkeleton() {
         <div key={i} className="px-6 space-y-3">
           <div
             className="h-4 w-28 rounded-full animate-pulse"
-            style={{ backgroundColor: "#1F1F1F", animationDelay: `${i * 80}ms` }}
+            style={{ backgroundColor: "var(--color-card)", animationDelay: `${i * 80}ms` }}
           />
           <div className="flex gap-3 overflow-hidden">
             {[...Array(4)].map((_, j) => (
               <div
                 key={j}
                 className="w-32 h-32 rounded-2xl flex-shrink-0 animate-pulse"
-                style={{ backgroundColor: "#1F1F1F", animationDelay: `${(i * 4 + j) * 40}ms` }}
+                style={{ backgroundColor: "var(--color-card)", animationDelay: `${(i * 4 + j) * 40}ms` }}
               />
             ))}
           </div>
@@ -168,10 +168,10 @@ function ContentSkeleton() {
             className="flex items-center gap-3 animate-pulse"
             style={{ animationDelay: `${240 + i * 60}ms` }}
           >
-            <div className="w-10 h-10 rounded-xl flex-shrink-0" style={{ backgroundColor: "#1F1F1F" }} />
+            <div className="w-10 h-10 rounded-xl flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
             <div className="flex-1 space-y-1.5">
-              <div className="h-3 w-3/4 rounded" style={{ backgroundColor: "#1F1F1F" }} />
-              <div className="h-2.5 w-1/2 rounded" style={{ backgroundColor: "#1F1F1F" }} />
+              <div className="h-3 w-3/4 rounded" style={{ backgroundColor: "var(--color-card)" }} />
+              <div className="h-2.5 w-1/2 rounded" style={{ backgroundColor: "var(--color-card)" }} />
             </div>
           </div>
         ))}
@@ -235,12 +235,12 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
             style={{ background: "linear-gradient(135deg, #00D26A1A, #00D26A0A)", border: "1px solid #00D26A30" }}
           >
             <svg width={32} height={32} viewBox="0 0 24 24" fill="none">
-              <path d="M9 18V5l12-2v13" stroke="#00D26A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="6" cy="18" r="3" fill="#00D26A" opacity="0.7" />
-              <circle cx="18" cy="16" r="3" fill="#00D26A" opacity="0.4" />
+              <path d="M9 18V5l12-2v13" stroke="var(--color-vert-energie)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="6" cy="18" r="3" fill="var(--color-vert-energie)" opacity="0.7" />
+              <circle cx="18" cy="16" r="3" fill="var(--color-vert-energie)" opacity="0.4" />
             </svg>
           </div>
-          <p className="text-xl font-extrabold mb-2" style={{ color: "#FFFFFF" }}>
+          <p className="text-xl font-extrabold mb-2" style={{ color: "var(--color-texte-principal)" }}>
             La musique arrive bientôt
           </p>
           <p className="text-sm leading-relaxed max-w-xs" style={{ color: "#666666" }}>
@@ -249,7 +249,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
           <Link
             href="/search"
             className="mt-6 px-6 py-3 rounded-2xl text-sm font-black"
-            style={{ background: "#00D26A", color: "#000", boxShadow: "0 0 20px rgba(0,210,106,0.35)" }}
+            style={{ background: "var(--color-vert-energie)", color: "#000", boxShadow: "0 0 20px rgba(0,210,106,0.35)" }}
           >
             Explorer la musique
           </Link>
@@ -266,16 +266,16 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
                 style={{ background: "linear-gradient(135deg, #00D26A22, #00D26A11)", border: "1px solid #00D26A33" }}
               >
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="#00D26A">
-                  <path d="M22 7l-9 9-4-4-7 7" stroke="#00D26A" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                  <path d="M16 7h6v6" stroke="#00D26A" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="var(--color-vert-energie)">
+                  <path d="M22 7l-9 9-4-4-7 7" stroke="var(--color-vert-energie)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                  <path d="M16 7h6v6" stroke="var(--color-vert-energie)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🇬🇳 Tendances en Guinée</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🇬🇳 Tendances en Guinée</h2>
             </div>
             <span
               className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-              style={{ background: "#00D26A14", color: "#00D26A", border: "1px solid #00D26A22" }}
+              style={{ background: "#00D26A14", color: "var(--color-vert-energie)", border: "1px solid #00D26A22" }}
             >
               7 derniers jours
             </span>
@@ -294,14 +294,14 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
                 style={{ background: "#FFC20E1A", border: "1px solid #FFC20E33" }}
               >
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#FFC20E" strokeWidth="2">
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-or-solaire)" strokeWidth="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🎯 Recommandé pour vous</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎯 Recommandé pour vous</h2>
             </div>
             <Link href="/library" className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-              style={{ background: "#1A1A1A", color: "#00D26A", border: "1px solid #2A2A2A" }}>
+              style={{ background: "var(--color-surface)", color: "var(--color-vert-energie)", border: "1px solid var(--color-elevated)" }}>
               Voir tout →
             </Link>
           </div>
@@ -337,10 +337,10 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>⭐ Artistes populaires</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>⭐ Artistes populaires</h2>
             </div>
             <Link href="/search" className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-              style={{ background: "#1A1A1A", color: "#00D26A", border: "1px solid #2A2A2A" }}>
+              style={{ background: "var(--color-surface)", color: "var(--color-vert-energie)", border: "1px solid var(--color-elevated)" }}>
               Voir tout →
             </Link>
           </div>
@@ -373,7 +373,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <p className="text-[11px] text-center font-bold leading-tight" style={{ color: "#DDDDDD" }}>
                     {artist.stage_name}
                   </p>
-                  <p className="text-[9px] text-center" style={{ color: "#555555" }}>{genre}</p>
+                  <p className="text-[9px] text-center" style={{ color: "var(--color-texte-desactive)" }}>{genre}</p>
                 </Link>
               );
             })}
@@ -393,7 +393,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🔍 À découvrir maintenant</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🔍 À découvrir maintenant</h2>
             </div>
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#3B82F614", color: "#3B82F6", border: "1px solid #3B82F622" }}>
@@ -417,7 +417,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🎵 Dernières sorties</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎵 Dernières sorties</h2>
             </div>
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
               style={{ background: "#F973161A", color: "#F97316", border: "1px solid #F9731633" }}>
@@ -446,7 +446,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
       {suggestedArtists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
-            <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>🌟 Nouveaux talents</h2>
+            <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🌟 Nouveaux talents</h2>
           </div>
           <div className="flex gap-5 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
             {suggestedArtists.map((artist, i) => {
@@ -470,7 +470,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                     {artist.verified && (
                       <div
                         className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: "#FFC20E", border: "2px solid #0A0A0A" }}
+                        style={{ background: "var(--color-or-solaire)", border: "2px solid var(--color-noir-profond)" }}
                       >
                         <svg width={9} height={9} viewBox="0 0 10 8" fill="none">
                           <path d="M1 4L3.8 7L9 1" stroke="#000" strokeWidth="1.8" strokeLinecap="round" />
@@ -481,7 +481,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                   <p className="text-[11px] text-center font-bold leading-tight" style={{ color: "#DDDDDD" }}>
                     {artist.stage_name}
                   </p>
-                  <p className="text-[9px] text-center" style={{ color: "#555555" }}>{genre}</p>
+                  <p className="text-[9px] text-center" style={{ color: "var(--color-texte-desactive)" }}>{genre}</p>
                 </Link>
               );
             })}
@@ -500,13 +500,13 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
                 <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
               </svg>
             </div>
-            <h2 className="text-base font-extrabold" style={{ color: "#FFFFFF" }}>Genres</h2>
+            <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>Genres</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             {genres.map((genre, i) => {
               const colors = [
-                { bg: "#00D26A14", text: "#00D26A", border: "#00D26A30" },
-                { bg: "#FFC20E14", text: "#FFC20E", border: "#FFC20E30" },
+                { bg: "#00D26A14", text: "var(--color-vert-energie)", border: "#00D26A30" },
+                { bg: "#FFC20E14", text: "var(--color-or-solaire)", border: "#FFC20E30" },
                 { bg: "#A855F714", text: "#A855F7", border: "#A855F730" },
                 { bg: "#3B82F614", text: "#3B82F6", border: "#3B82F630" },
                 { bg: "#F9731614", text: "#F97316", border: "#F9731630" },
@@ -543,14 +543,14 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
           />
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "#00D26A", boxShadow: "0 0 20px rgba(0,210,106,0.4)" }}
+            style={{ background: "var(--color-vert-energie)", boxShadow: "0 0 20px rgba(0,210,106,0.4)" }}
           >
             <svg width={22} height={22} viewBox="0 0 24 24" fill="#000">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-extrabold text-sm" style={{ color: "#FFFFFF" }}>Commencer l&apos;écoute</p>
+            <p className="font-extrabold text-sm" style={{ color: "var(--color-texte-principal)" }}>Commencer l&apos;écoute</p>
             <p className="text-xs mt-0.5" style={{ color: "#666666" }}>
               Recherchez un morceau pour démarrer
             </p>
@@ -558,7 +558,7 @@ function HomepageContentSections({ content }: { content: HomepageContent }) {
           <Link
             href="/search"
             className="px-3.5 py-2 rounded-xl text-xs font-black flex-shrink-0"
-            style={{ background: "#00D26A", color: "#000", boxShadow: "0 0 12px rgba(0,210,106,0.4)" }}
+            style={{ background: "var(--color-vert-energie)", color: "#000", boxShadow: "0 0 12px rgba(0,210,106,0.4)" }}
           >
             Explorer
           </Link>
@@ -589,7 +589,7 @@ export default async function ListenPage() {
   const proverb = getDailyProverb();
 
   return (
-    <div style={{ backgroundColor: "#0A0A0A", minHeight: "100%" }}>
+    <div style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100%" }}>
 
       {/* ── HERO — rendu immédiatement après résolution de l'identité ─────── */}
       <div
@@ -600,7 +600,7 @@ export default async function ListenPage() {
             radial-gradient(ellipse 50% 80% at 0% 100%, rgba(255,194,14,0.06) 0%, transparent 50%),
             linear-gradient(to bottom, #111111, #0A0A0A)
           `,
-          borderBottom: "1px solid #1A1A1A",
+          borderBottom: "1px solid var(--color-surface)",
         }}
       >
         <div
@@ -613,17 +613,17 @@ export default async function ListenPage() {
 
         <div className="flex items-start justify-between mb-6 relative z-10">
           <div>
-            <p className="text-xs font-semibold mb-1 tracking-widest uppercase" style={{ color: "#00D26A" }}>
+            <p className="text-xs font-semibold mb-1 tracking-widest uppercase" style={{ color: "var(--color-vert-energie)" }}>
               SONAFRIK
             </p>
-            <h1 className="text-2xl font-extrabold leading-tight" style={{ color: "#FFFFFF" }}>
+            <h1 className="text-2xl font-extrabold leading-tight" style={{ color: "var(--color-texte-principal)" }}>
               {greeting},<br />
-              <span style={{ color: "#00D26A" }}>{firstName} 👋</span>
+              <span style={{ color: "var(--color-vert-energie)" }}>{firstName} 👋</span>
             </h1>
             <p className="text-sm mt-1.5" style={{ color: "#666666" }}>
               Découvrez la musique africaine
             </p>
-            <p className="text-xs mt-2 italic leading-relaxed" style={{ color: "#A0A0A0" }}>
+            <p className="text-xs mt-2 italic leading-relaxed" style={{ color: "var(--color-texte-secondaire)" }}>
               🌍 &ldquo;{proverb.text}&rdquo;
               <span className="not-italic block text-[10px] mt-0.5" style={{ color: "#666666" }}>
                 — {proverb.origin}
@@ -639,7 +639,7 @@ export default async function ListenPage() {
               {unreadNotifications > 0 && (
                 <div
                   className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center"
-                  style={{ background: "#EF4444", fontSize: 7, fontWeight: 800, color: "#fff", border: "1.5px solid #0A0A0A" }}
+                  style={{ background: "#EF4444", fontSize: 7, fontWeight: 800, color: "#fff", border: "1.5px solid var(--color-noir-profond)" }}
                 >
                   {unreadNotifications}
                 </div>
@@ -665,7 +665,7 @@ export default async function ListenPage() {
           className="flex items-center gap-3 px-4 py-3 rounded-2xl w-full relative z-10"
           style={{
             background: "#161616",
-            border: "1px solid #2A2A2A",
+            border: "1px solid var(--color-elevated)",
             boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
           }}
         >
@@ -676,7 +676,7 @@ export default async function ListenPage() {
           <span className="text-sm" style={{ color: "#444444" }}>Artiste, chanson, album…</span>
           <div
             className="ml-auto px-2.5 py-1 rounded-lg text-[10px] font-bold"
-            style={{ background: "#00D26A18", color: "#00D26A", border: "1px solid #00D26A33" }}
+            style={{ background: "#00D26A18", color: "var(--color-vert-energie)", border: "1px solid #00D26A33" }}
           >
             Chercher
           </div>

@@ -46,7 +46,7 @@ export function NotificationBell({ initialCount, userId }: Props) {
     <Link
       href="/notifications"
       className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors"
-      style={{ color: "#A0A0A0" }}
+      style={{ color: "var(--color-texte-secondaire)" }}
       aria-label={count > 0 ? `${count} notification${count > 1 ? "s" : ""} non lue${count > 1 ? "s" : ""}` : "Notifications"}
     >
       <svg
@@ -65,7 +65,7 @@ export function NotificationBell({ initialCount, userId }: Props) {
       {count > 0 && (
         <span
           className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-4 rounded-full text-[9px] font-bold px-1 leading-none"
-          style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+          style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
         >
           {count > 99 ? "99+" : count}
         </span>

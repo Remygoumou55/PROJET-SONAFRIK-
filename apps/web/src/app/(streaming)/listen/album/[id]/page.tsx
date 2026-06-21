@@ -114,7 +114,7 @@ export default async function AlbumDetailPage({
       <Link
         href="/listen"
         className="inline-flex items-center gap-1.5 text-sm mb-6"
-        style={{ color: "#A0A0A0" }}
+        style={{ color: "var(--color-texte-secondaire)" }}
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M9 2L3 7l6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -134,32 +134,32 @@ export default async function AlbumDetailPage({
           />
         </div>
         <div className="flex flex-col justify-end min-w-0">
-          <p className="text-xs font-semibold uppercase mb-1" style={{ color: "#A0A0A0" }}>
+          <p className="text-xs font-semibold uppercase mb-1" style={{ color: "var(--color-texte-secondaire)" }}>
             {releaseLabel}
           </p>
-          <h1 className="text-2xl font-bold" style={{ color: "#FFFFFF" }}>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-texte-principal)" }}>
             {album.title}
           </h1>
           {artistName && artistId && (
             <Link
               href={`/listen/artist/${artistId}`}
               className="text-sm mt-1 hover:underline"
-              style={{ color: "#A0A0A0" }}
+              style={{ color: "var(--color-texte-secondaire)" }}
             >
               {artistName}
             </Link>
           )}
           {artistName && !artistId && (
-            <p className="text-sm mt-1" style={{ color: "#A0A0A0" }}>
+            <p className="text-sm mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
               {artistName}
             </p>
           )}
           {album.release_date && (
-            <p className="text-xs mt-1" style={{ color: "#555555" }}>
+            <p className="text-xs mt-1" style={{ color: "var(--color-texte-desactive)" }}>
               {formatDate(album.release_date)}
             </p>
           )}
-          <p className="text-xs mt-1" style={{ color: "#555555" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-texte-desactive)" }}>
             {tracks.length} morceau{tracks.length !== 1 ? "x" : ""}
           </p>
         </div>
@@ -167,15 +167,15 @@ export default async function AlbumDetailPage({
 
       {/* Description */}
       {album.description && (
-        <p className="text-sm mb-6" style={{ color: "#A0A0A0" }}>
+        <p className="text-sm mb-6" style={{ color: "var(--color-texte-secondaire)" }}>
           {album.description}
         </p>
       )}
 
       {/* Liste morceaux */}
       {tracks.length === 0 ? (
-        <div className="py-10 text-center rounded-xl" style={{ backgroundColor: "#1F1F1F" }}>
-          <p className="text-sm" style={{ color: "#555555" }}>
+        <div className="py-10 text-center rounded-xl" style={{ backgroundColor: "var(--color-card)" }}>
+          <p className="text-sm" style={{ color: "var(--color-texte-desactive)" }}>
             Aucun morceau disponible pour cet album.
           </p>
         </div>
@@ -191,7 +191,7 @@ export default async function AlbumDetailPage({
             if (!trackCredits.length) return null;
             return (
               <div key={track.id}>
-                <p className="text-xs font-semibold mb-1" style={{ color: "#555555" }}>
+                <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-texte-desactive)" }}>
                   {track.title}
                 </p>
                 <TrackCredits credits={trackCredits} />

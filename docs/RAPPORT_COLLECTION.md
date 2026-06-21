@@ -270,6 +270,45 @@ Cause : BOM UTF-8 (0xEF 0xBB 0xBF) en début de chaque fichier SQL.
 
 ---
 
+## [2026-06-21] — LOT C4 : Découpe de packages/types/src/index.ts
+**IA/Dev :** Claude Code (Sonnet 4.6)
+**Vague :** C — Lot C4
+
+### Fichiers touchés
+- `packages/types/src/index.ts` — Remplacé (1 754 lignes → 11 lignes, barrel pur)
+- `packages/types/src/constants.ts` — CRÉÉ (SonafrikBrand, CDC rules)
+- `packages/types/src/identity.ts` — CRÉÉ (Profile, UserSession, Notification, auth...)
+- `packages/types/src/creator.ts` — CRÉÉ (Creator, ArtistProfile, Label, analytics — importe identity, wallet)
+- `packages/types/src/catalog.ts` — CRÉÉ (Album, Track, TrackFile, Genre, TrackCredit)
+- `packages/types/src/streaming.ts` — CRÉÉ (StreamSession, Playlist, SearchResult, Discovery, Reco — importe catalog, beats)
+- `packages/types/src/social.ts` — CRÉÉ (Follow, EngagementStats)
+- `packages/types/src/wallet.ts` — CRÉÉ (Wallet, Transaction, RoyaltyCycle, Payout, CreatorRoyaltyHistoryEntry)
+- `packages/types/src/rights.ts` — CRÉÉ (Work, Contributor, Ownership, Contract, RightsClaim)
+- `packages/types/src/admin.ts` — CRÉÉ (FeatureFlag, SystemSetting)
+- `packages/types/src/payments.ts` — CRÉÉ (PaymentIntent, PaymentProvider)
+- `packages/types/src/beats.ts` — CRÉÉ (Beat, BeatPurchase, Tip)
+
+### Changement clé
+AVANT: `packages/types/src/index.ts` — 1 754 lignes monolithique (toutes les définitions)
+APRÈS: `packages/types/src/index.ts` — 11 lignes, barrel pur
+```typescript
+export * from "./constants";
+export * from "./identity";
+export * from "./creator";
+// ... etc.
+```
+
+### Résultats
+- `turbo build --filter=@sonafrik/types` : ✅ success (3.1s)
+- `turbo typecheck` global : ✅ 12/12 packages sans erreur
+- Zéro import externe à modifier (barrel conservé)
+- Graphe de dépendances interne : streaming → catalog, beats | creator → identity, wallet (pas de cycle)
+
+### Dette créée
+Aucune. Refactoring pur sans changement comportemental.
+
+---
+
 ## PROCHAINE ENTRÉE À CRÉER
 
 Quand tu termines une tâche, copie ce template et remplis-le :

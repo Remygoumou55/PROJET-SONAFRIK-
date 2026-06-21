@@ -74,11 +74,11 @@ export function LandingHowItWorks() {
                 marginBottom: "14px",
                 flexShrink: 0,
                 ...(green
-                  ? { backgroundColor: "#00D26A", color: "#0D0D0D" }
+                  ? { backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }
                   : {
                       backgroundColor: "rgba(255,255,255,0.04)",
                       border: "0.5px solid rgba(255,255,255,0.14)",
-                      color: "#ffffff",
+                      color: "var(--color-texte-principal)",
                     }),
               }}
             >
@@ -88,7 +88,7 @@ export function LandingHowItWorks() {
               style={{
                 fontSize: "14px",
                 fontWeight: 600,
-                color: "#ffffff",
+                color: "var(--color-texte-principal)",
                 margin: "0 0 8px",
               }}
             >

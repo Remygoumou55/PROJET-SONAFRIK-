@@ -124,12 +124,23 @@ Tous les types viennent de `packages/types/src/`. **Jamais re-définis localemen
 
 Toute logique métier passe par `packages/api/src/`. **Pas d'appels Supabase directs dans les composants.**
 
-### 4.5 Migrations SQL — Workflow obligatoire
+### 4.5 Migrations SQL — Workflow avec accès CLI direct
 
-1. Écrire le SQL → le présenter dans le chat
-2. Attendre la validation de Rémy (capture d'écran Supabase)
-3. Seulement après validation → commit + push
-4. **JAMAIS commit/push d'une migration avant capture validée**
+**Accès Supabase CLI accordé par Rémy le 2026-06-21.**
+Projet lié : `cxjpburiiazzvlczzupy` (PROJET-SONAFRIK)
+
+Workflow obligatoire :
+1. Écrire le fichier SQL dans `supabase/migrations/`
+2. Vérifier les contraintes existantes si besoin : `supabase db query --linked "<SELECT...>"`
+3. Exécuter : `supabase db query --linked --file supabase/migrations/<fichier>.sql`
+4. Valider en base avec une requête de confirmation
+5. Commit + push
+
+**Règles sécurité absolues qui ne changent pas :**
+- ❌ JAMAIS créer une table sans RLS policy
+- ❌ JAMAIS utiliser service_role key côté client (code applicatif)
+- ❌ JAMAIS modifier des données utilisateurs sans confirmation explicite
+- Toujours wrapper dans `BEGIN/COMMIT` quand possible
 
 ---
 

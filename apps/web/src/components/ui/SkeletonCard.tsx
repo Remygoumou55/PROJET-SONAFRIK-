@@ -12,7 +12,7 @@ export function SkeletonCard({
       style={{
         width:            size,
         height:           size,
-        backgroundColor:  "#1F1F1F",
+        backgroundColor:  "var(--color-card)",
         animationDelay:   `${delayMs}ms`,
       }}
     />

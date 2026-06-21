@@ -88,7 +88,7 @@ export function VerificationPanel({
       {error && (
         <p
           className="rounded-lg px-4 py-3 text-sm"
-          style={{ backgroundColor: "#FF4D4F22", color: "#FF4D4F" }}
+          style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-danger)" }}
           role="alert"
         >
           {error}
@@ -151,7 +151,7 @@ export function VerificationPanel({
 
               {/* Feedback succès upload */}
               {uploadedIds.has(v.id) && (
-                <p className="text-sm font-medium" style={{ color: "#00D26A" }}>
+                <p className="text-sm font-medium" style={{ color: "var(--color-vert-energie)" }}>
                   ✓ Document joint. Vous pouvez maintenant soumettre.
                 </p>
               )}

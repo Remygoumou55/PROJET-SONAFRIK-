@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function OnboardingLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#0D0D0D" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--color-noir-profond)" }}>
       <header
         style={{
           display: "flex",
@@ -17,7 +17,7 @@ export default function OnboardingLayout({ children }: { children: ReactNode }) 
             <span style={{ fontWeight: 700, fontSize: "18px", color: "#CE1126" }}>S</span>
             <span style={{ fontWeight: 700, fontSize: "18px", color: "#FCD116" }}>O</span>
             <span style={{ fontWeight: 700, fontSize: "18px", color: "#009460" }}>N</span>
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "#ffffff" }}>AFRIK</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--color-texte-principal)" }}>AFRIK</span>
           </div>
         </Link>
       </header>

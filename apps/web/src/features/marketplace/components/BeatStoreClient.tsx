@@ -35,29 +35,29 @@ function BeatCard({
   return (
     <div
       className="flex flex-col rounded-xl p-4"
-      style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A" }}
+      style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
     >
       {/* En-tête */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate font-semibold" style={{ color: "#FFFFFF" }}>
+          <p className="truncate font-semibold" style={{ color: "var(--color-texte-principal)" }}>
             {beat.title}
           </p>
-          <p className="mt-0.5 text-xs" style={{ color: "#555555" }}>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
             {BEAT_LICENSE_LABELS[beat.license_type]}
           </p>
         </div>
         {done ? (
           <span
             className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
-            style={{ backgroundColor: "#0A3A1A", color: "#00CC44", border: "1px solid #00CC44" }}
+            style={{ backgroundColor: "rgba(0,210,106,0.07)", color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie)" }}
           >
             Acheté ✓
           </span>
         ) : (
           <span
             className="shrink-0 text-sm font-bold"
-            style={{ color: isFree ? "#00CC44" : "#FFC20E" }}
+            style={{ color: isFree ? "var(--color-vert-energie)" : "var(--color-or-solaire)" }}
           >
             {isFree ? "Gratuit" : `${beat.price_gnf.toLocaleString("fr-FR")} GNF`}
           </span>
@@ -67,30 +67,30 @@ function BeatCard({
       {/* Méta */}
       <div className="mb-3 flex flex-wrap gap-2">
         {beat.bpm ? (
-          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "#2A2A2A", color: "#AAAAAA" }}>
+          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>
             {beat.bpm} BPM
           </span>
         ) : null}
         {beat.key ? (
-          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "#2A2A2A", color: "#AAAAAA" }}>
+          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>
             {beat.key}
           </span>
         ) : null}
         {beat.genre ? (
-          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "#2A2A2A", color: "#AAAAAA" }}>
+          <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>
             {beat.genre}
           </span>
         ) : null}
       </div>
 
       {beat.description ? (
-        <p className="mb-3 text-xs leading-relaxed" style={{ color: "#777777" }}>
+        <p className="mb-3 text-xs leading-relaxed" style={{ color: "var(--color-texte-secondaire)" }}>
           {beat.description}
         </p>
       ) : null}
 
       {error ? (
-        <p className="mb-2 text-xs" style={{ color: "#FF6B6B" }}>
+        <p className="mb-2 text-xs" style={{ color: "var(--color-erreur)" }}>
           {error}
         </p>
       ) : null}
@@ -101,10 +101,10 @@ function BeatCard({
         onClick={buy}
         className="mt-auto w-full rounded-lg py-2 text-sm font-semibold transition-colors"
         style={{
-          backgroundColor: done ? "#1A1A1A" : "#FFC20E",
-          color:            done ? "#555555" : "#000000",
+          backgroundColor: done ? "var(--color-surface)" : "var(--color-or-solaire)",
+          color:            done ? "var(--color-texte-desactive)" : "var(--color-noir-profond)",
           cursor:           done || isPending ? "not-allowed" : "pointer",
-          border:           done ? "1px solid #333333" : "none",
+          border:           done ? "1px solid var(--color-bordure)" : "none",
         }}
       >
         {isPending ? "Achat…" : done ? "Déjà acquis" : isFree ? "Télécharger" : "Acheter"}
@@ -120,10 +120,10 @@ export function BeatStoreClient({ beats, purchasedIds }: Props) {
     return (
       <div className="py-16 text-center">
         <p className="text-3xl mb-3">🎹</p>
-        <p className="font-semibold" style={{ color: "#FFFFFF" }}>
+        <p className="font-semibold" style={{ color: "var(--color-texte-principal)" }}>
           Aucun beat disponible pour le moment.
         </p>
-        <p className="mt-1 text-sm" style={{ color: "#555555" }}>
+        <p className="mt-1 text-sm" style={{ color: "var(--color-texte-desactive)" }}>
           Les producteurs commencent à ajouter leurs beats.
         </p>
       </div>

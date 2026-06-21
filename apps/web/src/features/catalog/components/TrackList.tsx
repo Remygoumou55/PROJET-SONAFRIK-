@@ -115,15 +115,15 @@ function CreditsEditor({
 
   if (loading || credits === null) {
     return (
-      <div className="pt-2 text-xs" style={{ color: "#555555" }}>
+      <div className="pt-2 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
         Chargement des crédits…
       </div>
     );
   }
 
   return (
-    <div className="pt-3 space-y-2 border-t" style={{ borderColor: "#2A2A2A" }}>
-      <p className="text-xs font-semibold uppercase" style={{ color: "#A0A0A0", letterSpacing: "0.5px" }}>
+    <div className="pt-3 space-y-2 border-t" style={{ borderColor: "var(--color-elevated)" }}>
+      <p className="text-xs font-semibold uppercase" style={{ color: "var(--color-texte-secondaire)", letterSpacing: "0.5px" }}>
         Crédits
       </p>
 
@@ -137,9 +137,9 @@ function CreditsEditor({
               onChange={(e) => updateCredit(i, { role: e.target.value as TrackCreditRole })}
               className="text-xs rounded-lg px-2 py-1.5 flex-shrink-0"
               style={{
-                backgroundColor: "#1A1A1A",
-                border: "1px solid #2A2A2A",
-                color: isPrincipal ? "#555555" : "#FFFFFF",
+                backgroundColor: "var(--color-surface)",
+                border: "1px solid var(--color-elevated)",
+                color: isPrincipal ? "var(--color-texte-desactive)" : "var(--color-texte-principal)",
                 minWidth: "110px",
               }}
             >
@@ -157,16 +157,16 @@ function CreditsEditor({
               placeholder="Nom du contributeur"
               className="flex-1 text-sm rounded-lg px-2 py-1.5 min-w-0"
               style={{
-                backgroundColor: isPrincipal ? "transparent" : "#1A1A1A",
-                border: isPrincipal ? "1px solid #2A2A2A" : "1px solid #333333",
-                color: isPrincipal ? "#555555" : "#FFFFFF",
+                backgroundColor: isPrincipal ? "transparent" : "var(--color-surface)",
+                border: isPrincipal ? "1px solid var(--color-elevated)" : "1px solid var(--color-bordure)",
+                color: isPrincipal ? "var(--color-texte-desactive)" : "var(--color-texte-principal)",
               }}
             />
             {!isPrincipal && (
               <button
                 onClick={() => removeCredit(i)}
                 className="text-xs flex-shrink-0 hover:opacity-100 opacity-50 transition-opacity"
-                style={{ color: "#FF4D4F" }}
+                style={{ color: "var(--color-danger)" }}
                 aria-label="Supprimer"
               >
                 ✕
@@ -180,14 +180,14 @@ function CreditsEditor({
         <button
           onClick={addCredit}
           className="text-xs hover:underline"
-          style={{ color: "#00D26A" }}
+          style={{ color: "var(--color-vert-energie)" }}
         >
           + Ajouter un contributeur
         </button>
       </div>
 
       {error && (
-        <p className="text-xs" style={{ color: "#FF4D4F" }}>
+        <p className="text-xs" style={{ color: "var(--color-danger)" }}>
           {error}
         </p>
       )}
@@ -199,7 +199,7 @@ function CreditsEditor({
         <button
           onClick={onClose}
           className="text-xs hover:underline"
-          style={{ color: "#555555" }}
+          style={{ color: "var(--color-texte-desactive)" }}
         >
           Annuler
         </button>
@@ -262,7 +262,7 @@ export function TrackList({
               <div className="flex justify-end">
                 <span
                   className="text-xs"
-                  style={{ color: title.length > FIELD_LIMITS.TRACK_TITLE * 0.85 ? "#FFC20E" : "#555555" }}
+                  style={{ color: title.length > FIELD_LIMITS.TRACK_TITLE * 0.85 ? "var(--color-or-solaire)" : "var(--color-texte-desactive)" }}
                 >
                   {title.length}/{FIELD_LIMITS.TRACK_TITLE}
                 </span>
@@ -313,7 +313,7 @@ export function TrackList({
                 <button
                   onClick={() => setExpandedAudio(null)}
                   className="mt-2 text-xs"
-                  style={{ color: "#555555" }}
+                  style={{ color: "var(--color-texte-desactive)" }}
                 >
                   Fermer
                 </button>
@@ -323,7 +323,7 @@ export function TrackList({
                 <button
                   onClick={() => setExpandedAudio(track.id)}
                   className="text-sm hover:underline"
-                  style={{ color: "#00D26A" }}
+                  style={{ color: "var(--color-vert-energie)" }}
                 >
                   {track.duration_seconds ? "Remplacer le fichier audio" : "Ajouter le fichier audio"}
                 </button>
@@ -337,7 +337,7 @@ export function TrackList({
                     setExpandedCredits((prev) => (prev === track.id ? null : track.id))
                   }
                   className="text-sm hover:underline"
-                  style={{ color: "#A0A0A0" }}
+                  style={{ color: "var(--color-texte-secondaire)" }}
                 >
                   Crédits
                 </button>

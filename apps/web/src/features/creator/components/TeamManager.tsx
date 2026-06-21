@@ -65,7 +65,7 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
               }}
             />
             {error ? (
-              <p className="text-sm" style={{ color: "#FF4444" }} role="alert">
+              <p className="text-sm" style={{ color: "var(--color-danger)" }} role="alert">
                 {error}
               </p>
             ) : null}

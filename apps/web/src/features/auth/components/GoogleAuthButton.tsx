@@ -47,15 +47,15 @@ export function GoogleAuthButton({
         disabled={loading}
         className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60"
         style={{
-          backgroundColor: "#1F1F1F",
-          border: "1px solid #333333",
-          color: "#FFFFFF",
+          backgroundColor: "var(--color-card)",
+          border: "1px solid var(--color-bordure)",
+          color: "var(--color-texte-principal)",
         }}
       >
         {loading ? (
           <div
             className="h-5 w-5 rounded-full border-2 animate-spin"
-            style={{ borderColor: "#555555", borderTopColor: "#FFFFFF" }}
+            style={{ borderColor: "var(--color-texte-desactive)", borderTopColor: "var(--color-texte-principal)" }}
           />
         ) : (
           <GoogleIcon />
@@ -63,7 +63,7 @@ export function GoogleAuthButton({
         {loading ? "Redirection…" : label}
       </button>
       {error && (
-        <p className="text-xs text-center" style={{ color: "#FF6666" }}>
+        <p className="text-xs text-center" style={{ color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}

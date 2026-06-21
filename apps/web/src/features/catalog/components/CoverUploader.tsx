@@ -130,13 +130,13 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
   if (state.status === "success") {
     return (
       <div className="flex items-center gap-2">
-        <span style={{ color: "#00D26A" }} className="text-sm font-medium">
+        <span style={{ color: "var(--color-vert-energie)" }} className="text-sm font-medium">
           ✓ Pochette mise à jour
         </span>
         <button
           onClick={reset}
           className="text-xs underline"
-          style={{ color: "#A0A0A0" }}
+          style={{ color: "var(--color-texte-secondaire)" }}
         >
           Changer
         </button>
@@ -157,13 +157,13 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
             width={80}
             height={80}
             className="w-20 h-20 rounded-lg object-cover"
-            style={{ border: "1px solid #333333" }}
+            style={{ border: "1px solid var(--color-bordure)" }}
           />
           <div className="flex-1">
-            <p className="text-sm font-medium truncate" style={{ color: "#FFFFFF" }}>
+            <p className="text-sm font-medium truncate" style={{ color: "var(--color-texte-principal)" }}>
               {state.file.name}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "#A0A0A0" }}>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
               {formatBytes(state.file.size)}
             </p>
 
@@ -172,17 +172,17 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
               <div className="mt-2">
                 <div
                   className="h-1.5 rounded-full overflow-hidden"
-                  style={{ backgroundColor: "#333333" }}
+                  style={{ backgroundColor: "var(--color-bordure)" }}
                 >
                   <div
                     className="h-full rounded-full transition-all duration-200"
                     style={{
                       width: `${state.progress}%`,
-                      backgroundColor: "#00D26A",
+                      backgroundColor: "var(--color-vert-energie)",
                     }}
                   />
                 </div>
-                <p className="text-xs mt-1" style={{ color: "#A0A0A0" }}>
+                <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
                   {state.progress}% envoyé…
                 </p>
               </div>
@@ -195,14 +195,14 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
             <button
               onClick={uploadFile}
               className="px-4 py-2 rounded-lg text-sm font-semibold"
-              style={{ backgroundColor: "#00D26A", color: "#0D0D0D" }}
+              style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
             >
               Envoyer la pochette
             </button>
             <button
               onClick={reset}
               className="px-4 py-2 rounded-lg text-sm"
-              style={{ backgroundColor: "#2A2A2A", color: "#A0A0A0" }}
+              style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}
             >
               Annuler
             </button>
@@ -225,27 +225,27 @@ export function CoverUploader({ albumId, creatorId, onSuccess }: Props) {
         onDrop={handleDrop}
         className="flex flex-col items-center justify-center gap-2 rounded-xl p-6 cursor-pointer transition-colors"
         style={{
-          border: `2px dashed ${isDragOver ? "#00D26A" : "#333333"}`,
-          backgroundColor: isDragOver ? "#001a0d" : "#1A1A1A",
+          border: `2px dashed ${isDragOver ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
+          backgroundColor: isDragOver ? "rgba(0,210,106,0.04)" : "var(--color-surface)",
         }}
       >
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <rect x="4" y="8" width="24" height="18" rx="3" stroke="#555555" strokeWidth="1.5" />
-          <circle cx="11" cy="14" r="2" stroke="#555555" strokeWidth="1.5" />
-          <path d="M4 22l7-5 5 4 4-3 8 5" stroke="#555555" strokeWidth="1.5" strokeLinejoin="round" />
-          <path d="M16 4v8M13 7l3-3 3 3" stroke="#00D26A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="4" y="8" width="24" height="18" rx="3" stroke="var(--color-texte-desactive)" strokeWidth="1.5" />
+          <circle cx="11" cy="14" r="2" stroke="var(--color-texte-desactive)" strokeWidth="1.5" />
+          <path d="M4 22l7-5 5 4 4-3 8 5" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinejoin="round" />
+          <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <p className="text-sm font-medium" style={{ color: "#FFFFFF" }}>
+        <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
           Glissez une image ou cliquez pour choisir
         </p>
-        <p className="text-xs" style={{ color: "#555555" }}>
+        <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
           JPEG · PNG · WebP — max {MAX_SIZE_LABEL}
         </p>
       </div>
 
       {/* Message d'erreur */}
       {state.status === "error" && (
-        <p className="text-xs px-1" style={{ color: "#FF4444" }}>
+        <p className="text-xs px-1" style={{ color: "var(--color-danger)" }}>
           {state.message}
         </p>
       )}
