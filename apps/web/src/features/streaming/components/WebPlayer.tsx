@@ -2,6 +2,7 @@
 
 import { memo, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
+import { usePlayerPosition } from "../lib/playerContext";
 import { useTrackCredits } from "../hooks/useTrackCredits";
 import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
@@ -12,7 +13,8 @@ import { LikeButton } from "@/features/social/components/LikeButton";
 import { TrackCredits } from "@/components/track/TrackCredits";
 
 export const WebPlayer = memo(function WebPlayer() {
-  const { currentTrack, currentPosition, duration, setVolume, volume, seek, audioError, clearAudioError } = usePlayer();
+  const { currentTrack, duration, setVolume, volume, seek, audioError, clearAudioError } = usePlayer();
+  const currentPosition = usePlayerPosition();
   const [showCredits, setShowCredits] = useState(false);
   const { credits } = useTrackCredits(showCredits ? currentTrack?.id : null);
   const { qualityLevel } = useStreamQuality();

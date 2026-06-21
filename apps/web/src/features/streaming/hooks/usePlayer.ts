@@ -138,10 +138,11 @@ export function usePlayer() {
 
   const pauseAndSave = useCallback(async () => {
     player.pause();
-    if (player.currentTrack?.id && player.currentPosition > 0) {
+    const pos = player.getPosition();
+    if (player.currentTrack?.id && pos > 0) {
       await streaming.savePosition({
         trackId: player.currentTrack.id,
-        positionSeconds: Math.floor(player.currentPosition),
+        positionSeconds: Math.floor(pos),
       }).catch((err: unknown) => { console.error("[Player] Sauvegarde position échouée", err); });
     }
   }, [player, streaming]);

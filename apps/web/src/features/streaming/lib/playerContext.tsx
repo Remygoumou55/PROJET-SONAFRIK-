@@ -26,6 +26,8 @@ interface PlayerActions {
   stop: () => void;
   setVolume: (volume: number) => void;
   seek: (positionSeconds: number) => void;
+  // Lit la position depuis un ref — ne crée pas de subscription au render cycle
+  getPosition: () => number;
   getAccumulatedListenSeconds: () => number;
   restartCurrentTrack: () => void;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
@@ -40,17 +42,17 @@ interface PlayerActions {
   cycleRepeat: () => void;
 }
 
-interface PlayerStateExtended extends PlayerState {
+// currentPosition retiré du state principal — il est dans PlayerPositionContext
+type PlayerStateCoreExtended = Omit<PlayerState, "currentPosition"> & {
   audioError: string | null;
-}
+};
 
-const initialState: PlayerStateExtended = {
+const initialState: PlayerStateCoreExtended = {
   currentTrack: null,
   sessionId: null,
   signedUrl: null,
   isPlaying: false,
   isLoading: false,
-  currentPosition: 0,
   duration: 0,
   volume: 1,
   platform: "web" as StreamingPlatform,
@@ -58,9 +60,15 @@ const initialState: PlayerStateExtended = {
   audioError: null,
 };
 
-interface PlayerContextValue extends PlayerStateExtended, QueueState, PlayerActions {}
+interface PlayerContextValue extends PlayerStateCoreExtended, QueueState, PlayerActions {}
 
+// ── Context principal (state stable — ne change que sur événement métier) ──────
 const PlayerContext = createContext<PlayerContextValue | null>(null);
+
+// ── Context position (haute fréquence — ontimeupdate toutes les 250ms) ─────────
+// Isolé pour éviter que les re-renders de la barre de progression touchent
+// PlayerControls, SearchResults, AlbumTracksClient, etc.
+const PlayerPositionContext = createContext<number>(0);
 
 function buildShuffledOrder(length: number, currentIndex: number): number[] {
   const indices = Array.from({ length }, (_, i) => i).filter((i) => i !== currentIndex);
@@ -72,7 +80,7 @@ function buildShuffledOrder(length: number, currentIndex: number): number[] {
 }
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<PlayerStateExtended>(initialState);
+  const [state, setState] = useState<PlayerStateCoreExtended>(initialState);
   const [queueState, setQueueState] = useState<QueueState>({
     queue: [],
     queueIndex: -1,
@@ -80,14 +88,18 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     repeatMode: "off",
   });
 
+  // État position séparé — seul PlayerPositionContext le consomme
+  const [currentPosition, setCurrentPosition] = useState(0);
+  // Ref pour lire la position sans créer de subscription (utilisé par getPosition + pauseAndSave)
+  const positionRef = useRef(0);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const volumeRef = useRef<number>(1); // ref stable pour éviter la closure stale dans play()
+  const volumeRef = useRef<number>(1);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHeartbeatCallbackRef = useRef<((pos: number) => void) | null>(null);
   const onCompleteCallbackRef = useRef<(() => void) | null>(null);
   const onErrorCallbackRef = useRef<((type: AudioErrorType, positionSeconds: number) => void) | null>(null);
   const accumulatedListenSecondsRef = useRef<number>(0);
-  // Shuffled play order (indices into queue array)
   const shuffledOrderRef = useRef<number[]>([]);
 
   const clearHeartbeat = useCallback(() => {
@@ -118,8 +130,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }
       const audio = audioRef.current;
       audio.src = signedUrl;
-      audio.volume = volumeRef.current; // volumeRef évite la closure stale sur state.volume
+      audio.volume = volumeRef.current;
       audio.load();
+
+      // Reset position — ne fait partie que du context position
+      positionRef.current = 0;
+      setCurrentPosition(0);
 
       setState((prev) => ({
         ...prev,
@@ -128,7 +144,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         signedUrl,
         isPlaying: true,
         isLoading: true,
-        currentPosition: 0,
         duration,
         audioError: null,
       }));
@@ -136,10 +151,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.play().catch((err: unknown) => {
         const isAbort = (err as { name?: string })?.name === "AbortError";
         if (isAbort) {
-          // Interruption normale (nouvelle source chargée) — pas une erreur visible
           setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
         } else {
-          // Autoplay bloqué par le navigateur ou erreur inattendue
           console.error("[Player] Lecture audio échouée", err);
           const msg = "Lecture bloquée. Appuyez sur play pour démarrer.";
           setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: msg }));
@@ -161,20 +174,23 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         }));
       };
 
+      // Mise à jour haute-fréquence : uniquement le context position
       audio.ontimeupdate = () => {
-        setState((prev) => ({ ...prev, currentPosition: audio.currentTime }));
+        positionRef.current = audio.currentTime;
+        setCurrentPosition(audio.currentTime);
       };
 
       audio.onended = () => {
         clearHeartbeat();
-        setState((prev) => ({ ...prev, isPlaying: false, currentPosition: prev.duration }));
+        setState((prev) => ({ ...prev, isPlaying: false }));
+        const finalPos = audio.duration || 0;
+        positionRef.current = finalPos;
+        setCurrentPosition(finalPos);
         onCompleteCallbackRef.current?.();
       };
 
-      // URL signée expirée ou source inaccessible
       audio.onerror = () => {
         const mediaErr = audio.error;
-        // MEDIA_ERR_DECODE (3) = problème codec ; tout le reste = réseau/URL expirée
         const errorType: AudioErrorType =
           mediaErr?.code === MediaError.MEDIA_ERR_DECODE ? "codec" :
           mediaErr?.code === MediaError.MEDIA_ERR_ABORTED ? "network" :
@@ -214,11 +230,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audioRef.current.src = "";
     }
     setState(initialState);
+    positionRef.current = 0;
+    setCurrentPosition(0);
   }, [clearHeartbeat]);
 
   const setVolume = useCallback((volume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, volume));
-    volumeRef.current = clampedVolume; // maintenir le ref en sync avec l'état
+    volumeRef.current = clampedVolume;
     if (audioRef.current) audioRef.current.volume = clampedVolume;
     setState((prev) => ({ ...prev, volume: clampedVolume }));
   }, []);
@@ -227,20 +245,23 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (!audioRef.current) return;
     const clamped = Math.max(0, Math.min(positionSeconds, audioRef.current.duration || 0));
     audioRef.current.currentTime = clamped;
-    setState((prev) => ({ ...prev, currentPosition: clamped }));
+    positionRef.current = clamped;
+    setCurrentPosition(clamped);
   }, []);
+
+  // Lit la position depuis le ref — pas de subscription au re-render cycle
+  const getPosition = useCallback(() => positionRef.current, []);
 
   const getAccumulatedListenSeconds = useCallback(() => {
     return accumulatedListenSecondsRef.current;
   }, []);
 
-  // Remet la piste courante à 0 sans créer une nouvelle session streaming
-  // Utilisé par playPrev quand > 3s de lecture ont été accumulées
   const restartCurrentTrack = useCallback(() => {
     if (!audioRef.current) return;
     audioRef.current.currentTime = 0;
     accumulatedListenSecondsRef.current = 0;
-    setState((prev) => ({ ...prev, currentPosition: 0 }));
+    positionRef.current = 0;
+    setCurrentPosition(0);
   }, []);
 
   const onHeartbeat = useCallback((cb: (pos: number) => void) => {
@@ -287,7 +308,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const nextPos = pos + 1;
         if (nextPos >= shuffledOrderRef.current.length) {
           if (repeatMode === "all") {
-            // Re-shuffle and start again
             shuffledOrderRef.current = buildShuffledOrder(queue.length, shuffledOrderRef.current[0] ?? 0);
             nextIndex = shuffledOrderRef.current[0] ?? 0;
           } else {
@@ -321,7 +341,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const { queue, queueIndex, shuffle, repeatMode } = prevState;
       if (!queue.length) return prevState;
 
-      // If > 3s played, restart current track instead of going back
       if (accumulatedListenSecondsRef.current > 3) {
         prev = queue[queueIndex] ?? null;
         return prevState;
@@ -387,6 +406,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         stop,
         setVolume,
         seek,
+        getPosition,
         getAccumulatedListenSeconds,
         restartCurrentTrack,
         onHeartbeat,
@@ -400,7 +420,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         cycleRepeat,
       }}
     >
-      {children}
+      <PlayerPositionContext.Provider value={currentPosition}>
+        {children}
+      </PlayerPositionContext.Provider>
     </PlayerContext.Provider>
   );
 }
@@ -409,6 +431,13 @@ export function usePlayerContext(): PlayerContextValue {
   const ctx = useContext(PlayerContext);
   if (!ctx) throw new Error("usePlayerContext must be inside PlayerProvider");
   return ctx;
+}
+
+// Hook position haute-fréquence — à utiliser UNIQUEMENT dans les composants
+// qui affichent la progression (WebPlayer progress bar).
+// Tous les autres composants utilisent usePlayerContext() qui ne re-render pas sur position.
+export function usePlayerPosition(): number {
+  return useContext(PlayerPositionContext);
 }
 
 export { REAL_LISTEN_THRESHOLD_PERCENT };
