@@ -45,6 +45,7 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
       }
     }).catch(() => { /* Supabase indisponible — rester sur la page */ });
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router, bypassAuth]);
 
   async function handlePhoneSubmit(p: string) {
@@ -108,7 +109,7 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
         />
       )}
       {error && (
-        <p className="text-center text-sm" style={{ color: "#FF4D4F" }}>{error}</p>
+        <p className="text-center text-sm" style={{ color: "var(--color-erreur)" }}>{error}</p>
       )}
       <p className="text-center text-sm text-texte-secondaire">
         Pas encore de compte ?{" "}

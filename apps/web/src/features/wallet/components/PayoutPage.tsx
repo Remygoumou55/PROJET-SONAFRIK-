@@ -267,7 +267,7 @@ export const PayoutPage = memo(function PayoutPage() {
                       w.status === "completed"  ? "var(--color-vert-energie)" :
                       w.status === "failed"     ? "var(--color-erreur)" :
                       w.status === "cancelled"  ? "var(--color-texte-secondaire)" :
-                      w.status === "approved"   ? "#60A5FA" :
+                      w.status === "approved"   ? "var(--color-accent-bleu-clair)" :
                                                   "var(--color-or-solaire)",
                   }}
                 >

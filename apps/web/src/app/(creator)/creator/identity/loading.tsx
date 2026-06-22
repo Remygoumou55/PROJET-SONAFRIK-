@@ -2,7 +2,7 @@ export default function CreatorIdentityLoading() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       {/* Avatar + nom artiste */}
-      <div className="flex items-center gap-4 p-5 rounded-2xl" style={{ backgroundColor: "#141414" }}>
+      <div className="flex items-center gap-4 p-5 rounded-2xl" style={{ backgroundColor: "var(--color-skeleton)" }}>
         <div className="w-20 h-20 rounded-2xl animate-pulse flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
         <div className="flex-1 space-y-2">
           <div className="h-5 w-40 rounded-lg animate-pulse" style={{ backgroundColor: "var(--color-card)" }} />

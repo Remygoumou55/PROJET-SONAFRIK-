@@ -32,7 +32,7 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
         {badge && (
           <div
             className="self-start px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide z-10"
-            style={{ background: gradient.from, color: "#000" }}
+            style={{ background: gradient.from, color: "black" }}
           >
             {badge}
           </div>
@@ -56,14 +56,14 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
             className="w-9 h-9 rounded-full flex items-center justify-center"
             style={{ background: gradient.from, boxShadow: `0 0 16px ${gradient.from}88` }}
           >
-            <svg width={14} height={14} viewBox="0 0 12 14" fill="#000">
+            <svg width={14} height={14} viewBox="0 0 12 14" fill="black">
               <path d="M0 0L12 7L0 14V0Z" />
             </svg>
           </div>
         </div>
       </div>
       <p className="text-xs font-bold truncate" style={{ color: "var(--color-texte-principal)" }}>{title}</p>
-      {subtitle && <p className="text-[10px] mt-0.5 truncate" style={{ color: "#777777" }}>{subtitle}</p>}
+      {subtitle && <p className="text-[10px] mt-0.5 truncate" style={{ color: "var(--color-texte-subtil)" }}>{subtitle}</p>}
     </Link>
   );
 }

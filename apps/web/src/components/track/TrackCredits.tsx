@@ -45,7 +45,7 @@ export function TrackCredits({ credits }: TrackCreditsProps) {
                     {c.contributor_profile_id ? (
                       <Link
                         href={`/listen/artist/${c.contributor_profile_id}`}
-                        className="hover:text-[#00D26A] transition-colors"
+                        className="hover:text-vert-energie transition-colors"
                         style={{ color: "inherit" }}
                       >
                         {c.contributor_name}

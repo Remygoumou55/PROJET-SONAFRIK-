@@ -27,7 +27,7 @@ export function LandingProgressBar({ pct }: LandingProgressBarProps) {
       <div
         style={{
           height: "6px",
-          background: "linear-gradient(90deg, #00D26A, #00ff88)",
+          background: "linear-gradient(90deg, var(--color-vert-energie), var(--color-vert-profond))",
           borderRadius: "3px",
           width: `${width}%`,
           transition: "width 1.5s ease",

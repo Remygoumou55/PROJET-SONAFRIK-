@@ -45,7 +45,7 @@ const STATUS_COLORS: Record<RightsClaimStatus, { bg: string; text: string }> = {
 };
 
 const TYPE_COLORS: Record<RightsClaimType, string> = {
-  ownership:     "#3B82F6",
+  ownership:     "var(--color-info)",
   infringement:  "var(--color-erreur)",
   takedown:      "var(--color-or-solaire)",
 };

@@ -150,7 +150,7 @@ export default function RolePage() {
               marginTop: "16px",
               textAlign: "center",
               fontSize: "13px",
-              color: "#FF4D4F",
+              color: "var(--color-erreur)",
             }}
           >
             {error}

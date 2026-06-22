@@ -18,7 +18,7 @@ export default function AuthLoading() {
           ))}
         </div>
         {/* Button skeleton */}
-        <div className="w-full h-12 rounded-xl animate-pulse" style={{ backgroundColor: "#00D26A22" }} />
+        <div className="w-full h-12 rounded-xl animate-pulse" style={{ backgroundColor: "rgba(0, 210, 106, 0.13)" }} />
       </div>
     </div>
   );

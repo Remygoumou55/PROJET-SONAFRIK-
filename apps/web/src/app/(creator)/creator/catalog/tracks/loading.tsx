@@ -11,7 +11,7 @@ export default function TracksLoading() {
         <div
           key={i}
           className="flex items-center gap-3 p-3 rounded-xl animate-pulse"
-          style={{ backgroundColor: "#141414", animationDelay: `${i * 60}ms` }}
+          style={{ backgroundColor: "var(--color-skeleton)", animationDelay: `${i * 60}ms` }}
         >
           <div className="w-8 h-5 rounded flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
           <div className="w-10 h-10 rounded-lg flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />

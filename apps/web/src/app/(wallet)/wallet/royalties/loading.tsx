@@ -1,7 +1,7 @@
 export default function RoyaltiesLoading() {
   return (
     <div className="space-y-6">
-      <div className="rounded-xl p-4 animate-pulse" style={{ backgroundColor: "var(--color-card)", border: "1px solid #FFC20E33" }}>
+      <div className="rounded-xl p-4 animate-pulse" style={{ backgroundColor: "var(--color-card)", border: "1px solid rgba(255, 194, 14, 0.20)" }}>
         <div className="h-3.5 w-36 rounded mb-2" style={{ backgroundColor: "var(--color-elevated)" }} />
         <div className="h-8 w-16 rounded mb-2" style={{ backgroundColor: "var(--color-elevated)" }} />
         <div className="h-3 w-full rounded" style={{ backgroundColor: "var(--color-elevated)" }} />

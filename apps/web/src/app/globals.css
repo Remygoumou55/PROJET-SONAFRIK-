@@ -21,6 +21,17 @@
   --color-erreur: #ff4444;
   --color-danger: #ff4444;
   --color-info: #3b82f6;
+
+  /* Couleurs d'accent — catégories musicales, tags */
+  --color-accent-violet: #a855f7;
+  --color-accent-orange: #f97316;
+  --color-accent-rose: #ec4899;
+  --color-accent-bleu-clair: #60a5fa;
+
+  /* Niveaux de gris supplémentaires */
+  --color-texte-subtil: #666666;
+  --color-skeleton: #141414;
+
   --font-sans: Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;

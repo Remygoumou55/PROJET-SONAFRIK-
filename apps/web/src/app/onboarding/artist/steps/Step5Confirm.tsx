@@ -96,7 +96,7 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
 
       {wizard.error && (
         <p
-          style={{ fontSize: '13px', color: '#FF4D4F', marginBottom: '12px', textAlign: 'center' }}
+          style={{ fontSize: '13px', color: 'var(--color-erreur)', marginBottom: '12px', textAlign: 'center' }}
           role="alert"
         >
           {wizard.error}

@@ -7,7 +7,7 @@ export function SkeletonRow({
   hasThumb?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 py-3 px-3" style={{ borderBottom: "1px solid #141414" }}>
+    <div className="flex items-center gap-3 py-3 px-3" style={{ borderBottom: "1px solid var(--color-skeleton)" }}>
       {hasThumb && (
         <div
           className="w-10 h-10 rounded-xl flex-shrink-0 animate-pulse"

@@ -45,6 +45,7 @@ export function InscriptionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
       if (!cancelled) setDetecting(false);
     });
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, roleParam, bypassAuth]);
 
   async function handlePhoneSubmit(p: string) {
@@ -120,7 +121,7 @@ export function InscriptionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
         />
       )}
       {error && (
-        <p className="text-center text-sm" role="alert" style={{ color: "#FF4D4F" }}>{error}</p>
+        <p className="text-center text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>{error}</p>
       )}
       <p className="text-center text-sm text-texte-secondaire">
         Déjà un compte ?{" "}

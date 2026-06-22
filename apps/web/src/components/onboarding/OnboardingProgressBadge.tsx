@@ -27,7 +27,7 @@ export function OnboardingProgressBadge({ currentStep, totalSteps = 5 }: Props) 
             height: '48px',
             borderRadius: '50%',
             background: 'rgba(0,210,106,0.1)',
-            border: '2px solid #00D26A',
+            border: '2px solid var(--color-vert-energie)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

@@ -144,7 +144,7 @@ export default async function ArtistPublicPage({
           <CoverImage coverPath={artist.banner_path} alt={artist.stage_name} priority imgSizes="100vw" />
         </div>
       ) : (
-        <div className="mt-3 h-24" style={{ background: "linear-gradient(135deg, #00D26A22 0%, #FFC20E11 100%)" }} />
+        <div className="mt-3 h-24" style={{ background: "linear-gradient(135deg, rgba(0, 210, 106, 0.13) 0%, rgba(255, 194, 14, 0.07) 100%)" }} />
       )}
 
       {/* Header artiste */}
@@ -170,7 +170,7 @@ export default async function ArtistPublicPage({
           {artist.verified && (
             <span
               className="text-xs px-2 py-0.5 rounded-full font-semibold"
-              style={{ backgroundColor: "#FFC20E22", color: "var(--color-or-solaire)" }}
+              style={{ backgroundColor: "rgba(255, 194, 14, 0.13)", color: "var(--color-or-solaire)" }}
             >
               ✓ Vérifié
             </span>

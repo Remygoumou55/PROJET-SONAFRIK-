@@ -53,9 +53,9 @@ export const WalletDashboard = memo(function WalletDashboard({
       {/* Carte solde */}
       <div
         className="rounded-2xl p-6"
-        style={{ background: "linear-gradient(135deg, #009B3A 0%, #00D26A 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--color-vert-profond) 0%, var(--color-vert-energie) 100%)" }}
       >
-        <p className="text-sm font-medium mb-1" style={{ color: "#FFFFFF99" }}>Solde disponible</p>
+        <p className="text-sm font-medium mb-1" style={{ color: "rgba(255, 255, 255, 0.60)" }}>Solde disponible</p>
         <p className="text-3xl font-bold tracking-tight" style={{ color: "var(--color-texte-principal)" }}>
           {formatGnf(wallet.balance_gnf)}
         </p>
@@ -63,14 +63,14 @@ export const WalletDashboard = memo(function WalletDashboard({
           <button
             onClick={onTopup}
             className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={{ backgroundColor: "#FFFFFF22", color: "var(--color-texte-principal)" }}
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
           >
             Recharger
           </button>
           <Link
             href="/wallet/payout"
             className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all"
-            style={{ backgroundColor: "#FFFFFF22", color: "var(--color-texte-principal)" }}
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
           >
             Retirer
           </Link>

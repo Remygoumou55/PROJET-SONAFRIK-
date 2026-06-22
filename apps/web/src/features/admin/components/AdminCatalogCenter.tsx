@@ -109,7 +109,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
                         className="text-xs px-2 py-0.5 rounded-full font-medium"
                         style={{
                           backgroundColor: item.type === "album" ? "rgba(255,194,14,0.13)" : "rgba(59,130,246,0.13)",
-                          color: item.type === "album" ? "var(--color-or-solaire)" : "#60A5FA",
+                          color: item.type === "album" ? "var(--color-or-solaire)" : "var(--color-accent-bleu-clair)",
                         }}
                       >
                         {item.type === "album"

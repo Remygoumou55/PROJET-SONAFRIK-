@@ -166,9 +166,9 @@ export default async function AdminHealthPage() {
         <span
           className="px-3 py-1.5 rounded-lg text-xs font-bold"
           style={{
-            backgroundColor: allOk ? "#00D26A22" : "#FF666622",
-            color:           allOk ? "var(--color-vert-energie)"   : "var(--color-erreur)",
-            border:          `1px solid ${allOk ? "#00D26A44" : "#FF666644"}`,
+            backgroundColor: allOk ? "rgba(0, 210, 106, 0.13)" : "rgba(255, 102, 102, 0.13)",
+            color:           allOk ? "var(--color-vert-energie)"  : "var(--color-erreur)",
+            border:          `1px solid ${allOk ? "rgba(0, 210, 106, 0.27)" : "rgba(255, 102, 102, 0.27)"}`,
           }}
         >
           {allOk ? "TOUT OPÉRATIONNEL" : "DÉGRADÉ"}
@@ -187,14 +187,14 @@ export default async function AdminHealthPage() {
       {/* Alertes admin — générées par trigger check_provider_failure_rate */}
       <div
         className="rounded-2xl p-5"
-        style={{ backgroundColor: "var(--color-surface)", border: `1px solid ${unreadAlerts.length > 0 ? "#FFC20E44" : "var(--color-elevated)"}` }}
+        style={{ backgroundColor: "var(--color-surface)", border: `1px solid ${unreadAlerts.length > 0 ? "rgba(255, 194, 14, 0.27)" : "var(--color-elevated)"}` }}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold" style={{ color: "var(--color-texte-secondaire)" }}>Alertes système</h2>
           {unreadAlerts.length > 0 && (
             <span
               className="px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ backgroundColor: "#FFC20E22", color: "var(--color-or-solaire)" }}
+              style={{ backgroundColor: "rgba(255, 194, 14, 0.13)", color: "var(--color-or-solaire)" }}
             >
               {unreadAlerts.length} non lue{unreadAlerts.length > 1 ? "s" : ""}
             </span>
@@ -208,7 +208,7 @@ export default async function AdminHealthPage() {
               <div
                 key={alert.id}
                 className="rounded-lg px-3 py-2.5"
-                style={{ backgroundColor: "var(--color-elevated)", border: "1px solid #FFC20E33" }}
+                style={{ backgroundColor: "var(--color-elevated)", border: "1px solid rgba(255, 194, 14, 0.20)" }}
               >
                 <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--color-or-solaire)" }}>
                   ⚠️ {alert.type.replace(/_/g, " ")}

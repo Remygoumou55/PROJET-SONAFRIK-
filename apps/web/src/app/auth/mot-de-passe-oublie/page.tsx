@@ -22,7 +22,7 @@ export default function MotDePasseOubliePage() {
           <div className="flex items-start gap-3">
             <div
               className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: "#00D26A18" }}
+              style={{ backgroundColor: "rgba(0, 210, 106, 0.09)" }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth="2" strokeLinecap="round">
                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.64a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
@@ -41,7 +41,7 @@ export default function MotDePasseOubliePage() {
           <div className="flex items-start gap-3">
             <div
               className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: "#00D26A18" }}
+              style={{ backgroundColor: "rgba(0, 210, 106, 0.09)" }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth="2" strokeLinecap="round">
                 <circle cx="12" cy="12" r="10" />

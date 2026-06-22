@@ -46,7 +46,7 @@ export default async function LancementPage() {
           <span className="text-lg font-black tracking-wider" style={{ color: "var(--color-or-solaire)" }}>
             SONAFRIK
           </span>
-          <span className="ml-2 text-xs" style={{ color: "#444444" }}>
+          <span className="ml-2 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
             NOTRE BIEN COMMUN
           </span>
         </div>
@@ -70,7 +70,7 @@ export default async function LancementPage() {
             La musique guinéenne<br />
             <span style={{ color: "var(--color-vert-energie)" }}>mérite sa plateforme</span>
           </h1>
-          <p className="max-w-md mx-auto text-base leading-relaxed" style={{ color: "#777777" }}>
+          <p className="max-w-md mx-auto text-base leading-relaxed" style={{ color: "var(--color-texte-subtil)" }}>
             SONAFRIK rémunère directement les artistes. Chaque écoute compte.
             Ensemble, nous débloquons le lancement.
           </p>
@@ -79,7 +79,7 @@ export default async function LancementPage() {
         {/* Compteur */}
         <div
           className="w-full max-w-lg rounded-2xl p-8 mb-10"
-          style={{ backgroundColor: "#111111", border: "1px solid #1E1E1E" }}
+          style={{ backgroundColor: "var(--color-noir-profond)", border: "1px solid var(--color-surface)" }}
         >
           <p className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--color-texte-desactive)" }}>
             Objectif de lancement — CDC Règle #7
@@ -91,7 +91,7 @@ export default async function LancementPage() {
               <span className="text-6xl font-black tabular-nums leading-none" style={{ color: "var(--color-vert-energie)" }}>
                 {progress.current.toLocaleString("fr-FR")}
               </span>
-              <span className="ml-2 text-2xl font-bold" style={{ color: "#444444" }}>
+              <span className="ml-2 text-2xl font-bold" style={{ color: "var(--color-texte-desactive)" }}>
                 /{progress.target.toLocaleString("fr-FR")}
               </span>
             </div>
@@ -157,13 +157,13 @@ export default async function LancementPage() {
             <div
               key={rule}
               className="rounded-xl p-4"
-              style={{ backgroundColor: "#111111", border: "1px solid #1E1E1E" }}
+              style={{ backgroundColor: "var(--color-noir-profond)", border: "1px solid var(--color-surface)" }}
             >
               <p className="text-lg mb-1">{icon}</p>
               <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--color-or-solaire)" }}>
                 Règle CDC {rule}
               </p>
-              <p className="text-sm" style={{ color: "#AAAAAA" }}>{label}</p>
+              <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>{label}</p>
             </div>
           ))}
         </div>
@@ -180,20 +180,20 @@ export default async function LancementPage() {
           {/* Avatars — 5 artistes fondateurs */}
           <div className="flex flex-wrap justify-center gap-4">
             {([
-              { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",      bg: "#00D26A" },
-              { initials: "F",  name: "Faya",         genre: "R&B Africain",  bg: "#FFC20E" },
-              { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel",  bg: "#A855F7" },
-              { initials: "MF", name: "MC Fly",        genre: "Rap GN",       bg: "#3B82F6" },
-              { initials: "S",  name: "SeK",           genre: "Gospel",        bg: "#F97316" },
-            ] as const).map(({ initials, name, genre, bg }) => (
+              { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",    bg: "rgba(0, 210, 106, 0.16)",   borderColor: "rgba(0, 210, 106, 0.38)" },
+              { initials: "F",  name: "Faya",         genre: "R&B Africain",bg: "rgba(255, 194, 14, 0.16)",  borderColor: "rgba(255, 194, 14, 0.38)" },
+              { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel",bg: "rgba(168, 85, 247, 0.16)",  borderColor: "rgba(168, 85, 247, 0.38)" },
+              { initials: "MF", name: "MC Fly",       genre: "Rap GN",      bg: "rgba(59, 130, 246, 0.16)",  borderColor: "rgba(59, 130, 246, 0.38)" },
+              { initials: "S",  name: "SeK",          genre: "Gospel",       bg: "rgba(249, 115, 22, 0.16)",  borderColor: "rgba(249, 115, 22, 0.38)" },
+            ] as const).map(({ initials, name, genre, bg, borderColor }) => (
               <div key={name} className="flex flex-col items-center" style={{ width: "72px" }}>
                 <div
                   className="flex items-center justify-center rounded-full mb-2"
                   style={{
                     width: "52px",
                     height: "52px",
-                    backgroundColor: `${bg}28`,
-                    border: `2px solid ${bg}60`,
+                    backgroundColor: bg,
+                    border: `2px solid ${borderColor}`,
                     color: "var(--color-texte-principal)",
                     fontWeight: 600,
                     fontSize: "16px",

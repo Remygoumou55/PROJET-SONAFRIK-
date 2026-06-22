@@ -81,7 +81,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
               {isTop ? (
                 <span
                   className="text-sm font-black"
-                  style={{ color: i === 0 ? "var(--color-vert-energie)" : i === 1 ? "var(--color-or-solaire)" : "#F97316" }}
+                  style={{ color: i === 0 ? "var(--color-vert-energie)" : i === 1 ? "var(--color-or-solaire)" : "var(--color-accent-orange)" }}
                 >
                   {i + 1}
                 </span>

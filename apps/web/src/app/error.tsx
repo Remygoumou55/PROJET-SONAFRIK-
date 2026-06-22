@@ -25,7 +25,7 @@ export default function RootError({
         <>
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-2"
-            style={{ background: "#00D26A14", border: "1px solid #00D26A30" }}
+            style={{ background: "rgba(0, 210, 106, 0.08)", border: "1px solid rgba(0, 210, 106, 0.19)" }}
           >
             <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth={1.5}>
               <path d="M9 19V6l12-3v13" strokeLinecap="round" strokeLinejoin="round" />

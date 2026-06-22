@@ -117,12 +117,12 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                   <div className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ background: "var(--color-vert-energie)", boxShadow: "0 0 14px rgba(0,210,106,0.7)" }}>
                     {isActive && isPlaying ? (
-                      <svg width={12} height={12} viewBox="0 0 16 16" fill="#000">
+                      <svg width={12} height={12} viewBox="0 0 16 16" fill="black">
                         <rect x="2" y="1" width="4" height="14" rx="1" />
                         <rect x="10" y="1" width="4" height="14" rx="1" />
                       </svg>
                     ) : (
-                      <svg width={12} height={12} viewBox="0 0 12 14" fill="#000"><path d="M0 0L12 7L0 14V0Z" /></svg>
+                      <svg width={12} height={12} viewBox="0 0 12 14" fill="black"><path d="M0 0L12 7L0 14V0Z" /></svg>
                     )}
                   </div>
                 </div>

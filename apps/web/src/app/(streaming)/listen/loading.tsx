@@ -7,7 +7,7 @@ export default function ListenLoading() {
       {/* Hero skeleton */}
       <div
         className="px-6 pt-8 pb-10"
-        style={{ borderBottom: "1px solid var(--color-surface)", background: "linear-gradient(to bottom, #111111, var(--color-noir-profond))" }}
+        style={{ borderBottom: "1px solid var(--color-surface)", background: "linear-gradient(to bottom, var(--color-noir-profond), var(--color-noir-profond))" }}
       >
         <div className="flex items-start justify-between mb-6">
           <div className="space-y-2">

@@ -9,7 +9,7 @@ export default function TeamLoading() {
         <div
           key={i}
           className="flex items-center gap-3 p-4 rounded-2xl animate-pulse"
-          style={{ backgroundColor: "#141414", animationDelay: `${i * 70}ms` }}
+          style={{ backgroundColor: "var(--color-skeleton)", animationDelay: `${i * 70}ms` }}
         >
           <div className="w-10 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
           <div className="flex-1 space-y-1.5">

@@ -11,7 +11,7 @@ export default function ReleasesLoading() {
         <div
           key={i}
           className="flex items-center gap-4 p-4 rounded-2xl animate-pulse"
-          style={{ backgroundColor: "#141414", animationDelay: `${i * 80}ms` }}
+          style={{ backgroundColor: "var(--color-skeleton)", animationDelay: `${i * 80}ms` }}
         >
           <div className="w-16 h-16 rounded-xl flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
           <div className="flex-1 space-y-2">

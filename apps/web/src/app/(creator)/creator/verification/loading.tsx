@@ -8,7 +8,7 @@ export default function VerificationLoading() {
         <div
           key={i}
           className="flex gap-4 p-4 rounded-2xl animate-pulse"
-          style={{ backgroundColor: "#141414", animationDelay: `${i * 80}ms` }}
+          style={{ backgroundColor: "var(--color-skeleton)", animationDelay: `${i * 80}ms` }}
         >
           <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-card)" }} />
           <div className="flex-1 space-y-2">
