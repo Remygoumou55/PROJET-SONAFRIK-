@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
-import { createPayoutService } from "@sonafrik/api/payout";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { usePayoutService } from "../hooks/usePayoutService";
 import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
 import { AdminActionBtn } from "./AdminActionBtn";
@@ -35,7 +34,7 @@ interface Props {
 }
 
 export function AdminFinanceCenter({ initialQueue }: Props) {
-  const service = useMemo(() => createPayoutService(getSupabaseBrowserClient()), []);
+  const service = usePayoutService();
   const [queue, setQueue] = useState<AdminPayoutEntry[]>(initialQueue);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [loading, setLoading] = useState(false);

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@sonafrik/ui";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { createCreatorService } from "@sonafrik/api";
+import { useCreatorService } from "@/features/creator/hooks/useCreator";
 
 export function BecomeArtistButton() {
   const router = useRouter();
+  const creator = useCreatorService();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,9 +15,7 @@ export function BecomeArtistButton() {
     setLoading(true);
     setError(null);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const service = createCreatorService(supabase);
-      await service.becomeArtist();
+      await creator.becomeArtist();
       router.push("/creator/identity");
       router.refresh();
     } catch (err) {
