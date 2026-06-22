@@ -41,13 +41,13 @@ const STATUS_COLORS: Record<RightsClaimStatus, { bg: string; text: string }> = {
   pending:   { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
   accepted:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
   rejected:  { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
-  escalated: { bg: "rgba(168,85,247,0.13)",  text: "#C084FC" },
+  escalated: { bg: "rgba(168,85,247,0.13)",  text: "var(--color-accent-violet-clair)" },
 };
 
-const TYPE_COLORS: Record<RightsClaimType, string> = {
-  ownership:     "var(--color-info)",
-  infringement:  "var(--color-erreur)",
-  takedown:      "var(--color-or-solaire)",
+const TYPE_COLORS: Record<RightsClaimType, { color: string; bg: string }> = {
+  ownership:     { color: "var(--color-info)",       bg: "rgba(59, 130, 246, 0.13)" },
+  infringement:  { color: "var(--color-erreur)",     bg: "rgba(255, 68, 68, 0.13)" },
+  takedown:      { color: "var(--color-or-solaire)", bg: "rgba(255, 194, 14, 0.13)" },
 };
 
 export function AdminRightsCenter({ initialClaims }: Props) {
@@ -157,7 +157,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       <span
                         className="text-xs px-2 py-0.5 rounded-full font-medium"
-                        style={{ backgroundColor: `${tc}22`, color: tc }}
+                        style={{ backgroundColor: tc.bg, color: tc.color }}
                       >
                         {RIGHTS_CLAIM_TYPE_LABELS[claim.claim_type] ?? claim.claim_type}
                       </span>
@@ -219,7 +219,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                           disabled={busy}
                           onClick={() => handleEscalate(claim.id)}
                           className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                          style={{ backgroundColor: "rgba(168,85,247,0.13)", color: "#C084FC" }}
+                          style={{ backgroundColor: "rgba(168,85,247,0.13)", color: "var(--color-accent-violet-clair)" }}
                         >
                           Escalader
                         </button>

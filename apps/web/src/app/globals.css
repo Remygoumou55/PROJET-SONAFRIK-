@@ -32,6 +32,20 @@
   --color-texte-subtil: #666666;
   --color-skeleton: #141414;
 
+  /* Couleurs de statut supplémentaires */
+  --color-avertissement: #f59e0b;
+  --color-accent-violet-clair: #c084fc;
+
+  /* Couleurs des opérateurs de paiement (brand guidelines) */
+  --color-provider-orange: #ff6600;
+  --color-provider-mtn: #ffcc00;
+
+  /* Couleurs de feature — landing page sections */
+  --color-feature-azure: #378add;
+  --color-feature-indigo: #7f77dd;
+  --color-feature-brique: #d85a30;
+  --color-feature-navy: #185fa5;
+
   --font-sans: Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;

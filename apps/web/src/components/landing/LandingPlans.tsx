@@ -1,35 +1,35 @@
 import { LandingSectionHeader } from "./LandingSectionHeader";
 
 const PAYMENT_ORANGE = {
-  dot: "#FF6600",
+  dot: "var(--color-provider-orange)",
   name: "Orange Money",
   sub: "Instantané · Partout en Guinée",
   detail: "Depuis votre téléphone",
 };
 
 const PAYMENT_MTN = {
-  dot: "#FFCC00",
+  dot: "var(--color-provider-mtn)",
   name: "MTN Mobile Money",
   sub: "Instantané · Partout en Guinée",
   detail: "Depuis votre téléphone",
 };
 
 const PAYMENT_ORANGE_ANNUAL = {
-  dot: "#FF6600",
+  dot: "var(--color-provider-orange)",
   name: "Orange",
   sub: "Unique ou en 2 fois · Instantané",
   detail: "Paiement fractionné disponible",
 };
 
 const PAYMENT_MTN_ANNUAL = {
-  dot: "#FFCC00",
+  dot: "var(--color-provider-mtn)",
   name: "MTN",
   sub: "Unique ou en 2 fois · Instantané",
   detail: "Paiement fractionné disponible",
 };
 
 const PAYMENT_CARD = {
-  dot: "#185FA5",
+  dot: "var(--color-feature-navy)",
   name: "Carte bancaire",
   sub: "Visa, Mastercard · Sécurisé",
   detail: "Pour membres hors Guinée",
@@ -189,7 +189,7 @@ export function LandingPlans() {
             style={{
               backgroundColor: plan.featured ? "rgba(0,210,106,0.04)" : "rgba(255,255,255,0.03)",
               border: plan.featured
-                ? "1.5px solid #00D26A"
+                ? "1.5px solid var(--color-vert-energie)"
                 : "0.5px solid rgba(255,255,255,0.08)",
               borderRadius: "14px",
               padding: "18px",
@@ -293,7 +293,7 @@ export function LandingPlans() {
               style={{
                 display: "inline-flex",
                 backgroundColor: "rgba(55,138,221,0.12)",
-                color: "#378ADD",
+                color: "var(--color-feature-azure)",
                 fontSize: "10px",
                 fontWeight: 600,
                 padding: "3px 8px",
@@ -341,13 +341,13 @@ export function LandingPlans() {
             <div>
               <SectionLabel>COMMENT PAYER</SectionLabel>
               <PaymentItem
-                dot="#185FA5"
+                dot="var(--color-feature-navy)"
                 name="Carte bancaire"
                 sub="Visa, Mastercard · Sécurisé"
                 detail="Facturé en EUR depuis n'importe quel pays"
               />
               <PaymentItem
-                dot="#7F77DD"
+                dot="var(--color-feature-indigo)"
                 name="PayPal / virement"
                 sub="Délai 24 à 48h selon la banque"
                 detail="Pour ceux sans carte internationale"

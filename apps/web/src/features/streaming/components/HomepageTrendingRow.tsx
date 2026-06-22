@@ -93,7 +93,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
             {/* Art */}
             <div
               className="w-10 h-10 rounded-xl flex-shrink-0 relative overflow-hidden"
-              style={{ border: `1px solid ${grad.from}25` }}
+              style={{ border: `1px solid ${grad.borderFaded}` }}
             >
               <CoverImage coverPath={track.cover_path} alt={track.title} gradientSeed={i} priority={i < 3} imgSizes="40px" />
               {isActive && (

@@ -7,10 +7,10 @@ import { formatDateTime } from "@/lib/formatters";
 import { useNotificationsService } from "../hooks/useNotificationsService";
 
 const TYPE_STYLE: Record<NotificationType, { bg: string; text: string }> = {
-  stream_milestone:     { bg: "rgba(59,130,246,0.13)",  text: "#60A5FA" },
+  stream_milestone:     { bg: "rgba(59,130,246,0.13)",  text: "var(--color-accent-bleu-clair)" },
   royalty_paid:         { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
   verification_updated: { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
-  rights_claim_updated: { bg: "rgba(245,158,11,0.13)",  text: "#F59E0B" },
+  rights_claim_updated: { bg: "rgba(245,158,11,0.13)",  text: "var(--color-avertissement)" },
   system:               { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-secondaire)" },
 };
 

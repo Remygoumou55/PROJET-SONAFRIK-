@@ -13,7 +13,7 @@ function MusicNoteIcon({ size = 18, color }: { size?: number; color: string }) {
 interface MediaCardProps {
   title: string;
   subtitle?: string;
-  gradient: { from: string; to: string };
+  gradient: { from: string; to: string; bgFrom: string; bgTo: string; border: string; shadow: string; glow: string };
   href?: string;
   badge?: string;
 }
@@ -24,9 +24,9 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
       <div
         className="aspect-square rounded-2xl mb-2.5 flex flex-col justify-between p-3 relative overflow-hidden"
         style={{
-          background: `linear-gradient(145deg, ${gradient.from}28 0%, ${gradient.to}14 100%)`,
-          border: `1px solid ${gradient.from}30`,
-          boxShadow: `0 4px 20px ${gradient.from}14`,
+          background: `linear-gradient(145deg, ${gradient.bgFrom} 0%, ${gradient.bgTo} 100%)`,
+          border: `1px solid ${gradient.border}`,
+          boxShadow: `0 4px 20px ${gradient.shadow}`,
         }}
       >
         {badge && (
@@ -54,7 +54,7 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
         >
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: gradient.from, boxShadow: `0 0 16px ${gradient.from}88` }}
+            style={{ background: gradient.from, boxShadow: `0 0 16px ${gradient.glow}` }}
           >
             <svg width={14} height={14} viewBox="0 0 12 14" fill="black">
               <path d="M0 0L12 7L0 14V0Z" />

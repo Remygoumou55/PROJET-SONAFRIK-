@@ -29,7 +29,7 @@ function GradientPlaceholder({ seed }: { seed: number }) {
   return (
     <div
       className="w-full h-full flex items-center justify-center"
-      style={{ background: `linear-gradient(135deg, ${g.from}28, ${g.to}14)` }}
+      style={{ background: `linear-gradient(135deg, ${g.bgFrom}, ${g.bgTo})` }}
       aria-hidden="true"
     >
       <svg width={16} height={16} viewBox="0 0 24 24" fill={g.from} aria-hidden="true">

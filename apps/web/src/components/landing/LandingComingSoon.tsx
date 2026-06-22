@@ -15,7 +15,7 @@ const CARDS = [
     pills: ["Artistes", "Auditeurs", "Fans Premium"],
   },
   {
-    barColor: "#378ADD",
+    barColor: "var(--color-feature-azure)",
     iconBg: "rgba(55,138,221,0.1)",
     icon: "🎬",
     badgeBg: "rgba(255,255,255,0.06)",
@@ -39,7 +39,7 @@ const CARDS = [
     pills: ["Artistes", "Fans Premium", "Communauté"],
   },
   {
-    barColor: "#7F77DD",
+    barColor: "var(--color-feature-indigo)",
     iconBg: "rgba(127,119,221,0.1)",
     icon: "🛍️",
     badgeBg: "rgba(255,255,255,0.06)",
@@ -51,7 +51,7 @@ const CARDS = [
     pills: ["Artistes", "Beatmakers", "Producteurs", "Auditeurs"],
   },
   {
-    barColor: "#D85A30",
+    barColor: "var(--color-feature-brique)",
     iconBg: "rgba(216,90,48,0.1)",
     icon: "🎥",
     badgeBg: "rgba(255,255,255,0.06)",

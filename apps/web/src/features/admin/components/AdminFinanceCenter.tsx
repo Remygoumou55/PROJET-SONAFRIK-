@@ -13,8 +13,8 @@ type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cance
 
 const STATUS_COLORS: Record<WithdrawalStatus, { bg: string; text: string }> = {
   pending:    { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
-  approved:   { bg: "rgba(59,130,246,0.13)",  text: "#60A5FA" },
-  processing: { bg: "rgba(245,158,11,0.13)",  text: "#F59E0B" },
+  approved:   { bg: "rgba(59,130,246,0.13)",  text: "var(--color-accent-bleu-clair)" },
+  processing: { bg: "rgba(245,158,11,0.13)",  text: "var(--color-avertissement)" },
   completed:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
   failed:     { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
   cancelled:  { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-desactive)" },
@@ -168,7 +168,7 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
                     )}
                     {entry.status === "approved" && (
                       <>
-                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="#60A5FA" disabled={busy} onClick={() => handleProcess(entry.id)} />
+                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="var(--color-accent-bleu-clair)" disabled={busy} onClick={() => handleProcess(entry.id)} />
                         <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}

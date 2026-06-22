@@ -36,11 +36,11 @@ const sectionTitle: React.CSSProperties = {
   marginBottom: "0.75rem",
 };
 
-function Badge({ label, color = "var(--color-texte-desactive)" }: { label: string; color?: string }) {
+function Badge({ label, color = "var(--color-texte-desactive)", bg = "rgba(85, 85, 85, 0.13)" }: { label: string; color?: string; bg?: string }) {
   return (
     <span
       className="text-xs px-2 py-0.5 rounded-full"
-      style={{ backgroundColor: `${color}22`, color }}
+      style={{ backgroundColor: bg, color }}
     >
       {label}
     </span>
@@ -74,8 +74,8 @@ export function WorkDetail({ work, creatorId }: Props) {
                   ISWC {work.iswc}
                 </span>
               )}
-              {work.genre && <Badge label={work.genre} color="var(--color-texte-secondaire)" />}
-              <Badge label={work.language.toUpperCase()} color="var(--color-texte-desactive)" />
+              {work.genre && <Badge label={work.genre} color="var(--color-texte-secondaire)" bg="rgba(160, 160, 160, 0.13)" />}
+              <Badge label={work.language.toUpperCase()} color="var(--color-texte-desactive)" bg="rgba(85, 85, 85, 0.13)" />
             </div>
             {work.description && (
               <p className="text-sm mt-2" style={{ color: "var(--color-texte-secondaire)" }}>{work.description}</p>
@@ -141,6 +141,7 @@ export function WorkDetail({ work, creatorId }: Props) {
                         <Badge
                           label={CONTRIBUTOR_ROLE_LABELS[c.role as ContributorRole] ?? c.role}
                           color="var(--color-vert-energie)"
+                          bg="rgba(0, 210, 106, 0.13)"
                         />
                         {c.ipi && (
                           <span className="text-xs font-mono" style={{ color: "var(--color-texte-desactive)" }}>
@@ -199,8 +200,9 @@ export function WorkDetail({ work, creatorId }: Props) {
                       <Badge
                         label={CONTRACT_TYPE_LABELS[c.contract_type as ContractType] ?? c.contract_type}
                         color="var(--color-or-solaire)"
+                        bg="rgba(255, 194, 14, 0.13)"
                       />
-                      {c.signed_at && <Badge label="Signé" color="var(--color-vert-energie)" />}
+                      {c.signed_at && <Badge label="Signé" color="var(--color-vert-energie)" bg="rgba(0, 210, 106, 0.13)" />}
                     </div>
                     {c.start_date && (
                       <p className="text-xs mt-1.5" style={{ color: "var(--color-texte-desactive)" }}>
@@ -243,6 +245,10 @@ export function WorkDetail({ work, creatorId }: Props) {
                 cl.status === "accepted" ? "var(--color-vert-energie)" :
                 cl.status === "rejected" ? "var(--color-erreur)" :
                 cl.status === "escalated" ? "var(--color-or-solaire)" : "var(--color-texte-secondaire)";
+              const statusBg =
+                cl.status === "accepted"  ? "rgba(0, 210, 106, 0.13)" :
+                cl.status === "rejected"  ? "rgba(255, 68, 68, 0.13)" :
+                cl.status === "escalated" ? "rgba(255, 194, 14, 0.13)" : "rgba(160, 160, 160, 0.13)";
               return (
                 <div key={cl.id} style={cardStyle}>
                   <div className="flex items-start justify-between gap-3">
@@ -257,6 +263,7 @@ export function WorkDetail({ work, creatorId }: Props) {
                     <Badge
                       label={RIGHTS_CLAIM_STATUS_LABELS[cl.status] ?? cl.status}
                       color={statusColor}
+                      bg={statusBg}
                     />
                   </div>
                 </div>
