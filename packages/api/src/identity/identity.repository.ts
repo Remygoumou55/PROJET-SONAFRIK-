@@ -46,6 +46,30 @@ export class IdentityRepository {
     return data as Profile;
   }
 
+  async updateArtistOnboardingDetails(userId: string, data: {
+    stage_name?: string | null;
+    main_genre?: string | null;
+    song_language?: string | null;
+    origin_region?: string | null;
+    orange_money_number?: string | null;
+    mtn_money_number?: string | null;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await this.client.from("profiles").update({ ...data, updated_by: userId } as any).eq("id", userId);
+    if (error) throw error;
+  }
+
+  async updateListenerOnboardingDetails(userId: string, data: {
+    city?: string | null;
+    locale?: string | null;
+    preferred_language?: string | null;
+    backup_email?: string | null;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await this.client.from("profiles").update({ ...data, updated_by: userId } as any).eq("id", userId);
+    if (error) throw error;
+  }
+
   async softDeleteProfile(userId: string): Promise<void> {
     const { error } = await this.client
       .from("profiles")

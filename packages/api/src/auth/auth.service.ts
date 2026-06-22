@@ -1,5 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Profile } from "@sonafrik/types";
+import type { AccountType, Profile } from "@sonafrik/types";
 import { AuthRepository } from "./auth.repository";
 import { AuthError, mapSupabaseAuthError } from "./errors";
 import {
@@ -185,6 +185,12 @@ export class AuthService {
       options: { redirectTo },
     });
     if (error) throw mapSupabaseAuthError(error);
+  }
+
+  async setAccountType(accountType: AccountType): Promise<void> {
+    const userId = await this.getCurrentUserId();
+    if (!userId) throw new AuthError("session_expired");
+    await this.repository.setAccountType(userId, accountType);
   }
 }
 

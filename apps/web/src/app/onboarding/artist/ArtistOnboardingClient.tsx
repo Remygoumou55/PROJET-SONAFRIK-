@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { useAuthService } from '@/features/auth/hooks/useAuth'
 import { useOnboardingWizard } from '@/components/onboarding/useOnboardingWizard'
 import { OnboardingProgressBadge } from '@/components/onboarding/OnboardingProgressBadge'
 import { Step1StageName } from './steps/Step1StageName'
@@ -14,6 +14,7 @@ import type { ArtistOnboardingData } from './steps/types'
 
 export function ArtistOnboardingClient({ bypassAuth }: { bypassAuth: boolean }) {
   const router = useRouter()
+  const auth = useAuthService()
   const wizard = useOnboardingWizard<ArtistOnboardingData>({
     stageName: '',
     mainGenre: '',
@@ -25,25 +26,16 @@ export function ArtistOnboardingClient({ bypassAuth }: { bypassAuth: boolean }) 
 
   useEffect(() => {
     if (bypassAuth) return
-    const supabase = getSupabaseBrowserClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.replace('/'); return }
-      supabase
-        .from('profiles')
-        .select('stage_name, main_genre, origin_region, orange_money_number, mtn_money_number')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          if (!data) return
-          wizard.updateData({
-            stageName: data.stage_name ?? '',
-            mainGenre: data.main_genre ?? '',
-            originRegion: data.origin_region ?? '',
-            orangeMoneyNumber: data.orange_money_number ?? '+224',
-            mtnMoneyNumber: data.mtn_money_number ?? '',
-          })
-        })
-    })
+    void auth.getCurrentProfile().then((profile) => {
+      if (!profile) { router.replace('/'); return }
+      wizard.updateData({
+        stageName: profile.stage_name ?? '',
+        mainGenre: profile.main_genre ?? '',
+        originRegion: profile.origin_region ?? '',
+        orangeMoneyNumber: profile.orange_money_number ?? '+224',
+        mtnMoneyNumber: profile.mtn_money_number ?? '',
+      })
+    }).catch(() => { router.replace('/') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, bypassAuth])
 

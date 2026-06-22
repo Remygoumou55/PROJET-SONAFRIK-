@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { useAuthService } from '@/features/auth/hooks/useAuth'
 import { useOnboardingWizard } from '@/components/onboarding/useOnboardingWizard'
 import { OnboardingProgressBadge } from '@/components/onboarding/OnboardingProgressBadge'
 import { Step1Identity } from './steps/Step1Identity'
@@ -14,6 +14,7 @@ import type { ListenerOnboardingData } from './steps/types'
 
 export function ListenerOnboardingClient({ bypassAuth }: { bypassAuth: boolean }) {
   const router = useRouter()
+  const auth = useAuthService()
   const wizard = useOnboardingWizard<ListenerOnboardingData>({
     fullName: '',
     city: '',
@@ -23,24 +24,15 @@ export function ListenerOnboardingClient({ bypassAuth }: { bypassAuth: boolean }
 
   useEffect(() => {
     if (bypassAuth) return
-    const supabase = getSupabaseBrowserClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.replace('/'); return }
-      supabase
-        .from('profiles')
-        .select('full_name, city, preferred_language, email')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          if (!data) return
-          wizard.updateData({
-            fullName: data.full_name ?? '',
-            city: data.city ?? '',
-            preferredLanguage: data.preferred_language ?? 'fr',
-            backupEmail: data.email ?? '',
-          })
-        })
-    })
+    void auth.getCurrentProfile().then((profile) => {
+      if (!profile) { router.replace('/'); return }
+      wizard.updateData({
+        fullName: profile.full_name ?? '',
+        city: profile.city ?? '',
+        preferredLanguage: profile.preferred_language ?? 'fr',
+        backupEmail: profile.email ?? '',
+      })
+    }).catch(() => { router.replace('/') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, bypassAuth])
 

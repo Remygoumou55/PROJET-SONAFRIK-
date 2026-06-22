@@ -119,6 +119,40 @@ export class IdentityService {
     return profile;
   }
 
+  async updateArtistOnboardingDetails(data: {
+    stageName?: string;
+    mainGenre?: string | null;
+    songLanguage?: string;
+    originRegion?: string | null;
+    orangeMoneyNumber?: string;
+    mtnMoneyNumber?: string | null;
+  }): Promise<void> {
+    const userId = await this.requireUserId();
+    await this.repository.updateArtistOnboardingDetails(userId, {
+      stage_name: data.stageName,
+      main_genre: data.mainGenre,
+      song_language: data.songLanguage,
+      origin_region: data.originRegion,
+      orange_money_number: data.orangeMoneyNumber,
+      mtn_money_number: data.mtnMoneyNumber,
+    });
+  }
+
+  async updateListenerOnboardingDetails(data: {
+    city?: string;
+    locale?: string;
+    preferredLanguage?: string;
+    backupEmail?: string;
+  }): Promise<void> {
+    const userId = await this.requireUserId();
+    await this.repository.updateListenerOnboardingDetails(userId, {
+      city: data.city,
+      locale: data.locale,
+      preferred_language: data.preferredLanguage,
+      backup_email: data.backupEmail,
+    });
+  }
+
   async getPreferences(): Promise<UserPreferences> {
     const userId = await this.requireUserId();
     const preferences = await this.repository.getPreferences(userId);

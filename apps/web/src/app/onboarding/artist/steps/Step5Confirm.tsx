@@ -1,6 +1,7 @@
 'use client'
 
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { useAuthService } from '@/features/auth/hooks/useAuth'
+import { useIdentityService } from '@/features/identity/hooks/useIdentity'
 import { OnboardingRow } from '@/app/onboarding/shared/OnboardingRow'
 import type { ArtistWizard } from './types'
 
@@ -27,6 +28,8 @@ interface Props {
 
 export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
   const { data } = wizard
+  const auth = useAuthService()
+  const identity = useIdentityService()
 
   async function handleSubmit() {
     if (bypassAuth) {
@@ -38,29 +41,18 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
     wizard.setError(null)
 
     try {
-      const supabase = getSupabaseBrowserClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Non authentifié')
-
-      const { error: rpcErr } = await supabase.rpc('complete_onboarding', {
-        p_full_name: data.stageName.trim(),
-        p_account_type: 'artiste',
+      await auth.completeOnboardingForCurrentUser({
+        accountType: 'artiste',
+        fullName: data.stageName.trim(),
       })
-      if (rpcErr) throw rpcErr
-
-      const { error: updateErr } = await supabase
-        .from('profiles')
-        .update({
-          stage_name: data.stageName.trim(),
-          main_genre: data.mainGenre || null,
-          song_language: data.songLanguage,
-          origin_region: data.originRegion || null,
-          orange_money_number: data.orangeMoneyNumber.trim(),
-          ...(data.mtnMoneyNumber.trim() ? { mtn_money_number: data.mtnMoneyNumber.trim() } : {}),
-        })
-        .eq('id', user.id)
-      if (updateErr) throw updateErr
-
+      await identity.updateArtistOnboardingDetails({
+        stageName: data.stageName.trim(),
+        mainGenre: data.mainGenre || null,
+        songLanguage: data.songLanguage,
+        originRegion: data.originRegion || null,
+        orangeMoneyNumber: data.orangeMoneyNumber.trim(),
+        mtnMoneyNumber: data.mtnMoneyNumber.trim() || null,
+      })
       router.push('/creator')
     } catch (err) {
       wizard.setError(err instanceof Error ? err.message : 'Une erreur est survenue. Réessayez.')

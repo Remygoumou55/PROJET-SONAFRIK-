@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useAuthService } from "@/features/auth/hooks/useAuth";
 
 const ROLES = [
   {
@@ -25,6 +25,7 @@ const ROLES = [
 
 export default function RolePage() {
   const router = useRouter();
+  const auth = useAuthService();
   const [loading, setLoading] = useState<"listener" | "artist" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,19 +33,7 @@ export default function RolePage() {
     setLoading(role.value);
     setError(null);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/auth/connexion");
-        return;
-      }
-      const { error: updateErr } = await supabase
-        .from("profiles")
-        .update({ account_type: role.accountType })
-        .eq("id", user.id);
-      if (updateErr) throw updateErr;
+      await auth.setAccountType(role.accountType);
       router.push(role.dest);
     } catch {
       setError("Une erreur est survenue. Réessayez.");

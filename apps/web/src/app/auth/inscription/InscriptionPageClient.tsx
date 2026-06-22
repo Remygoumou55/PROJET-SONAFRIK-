@@ -8,7 +8,6 @@ import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Step = "phone" | "otp";
 
@@ -26,38 +25,25 @@ export function InscriptionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
   useEffect(() => {
     if (bypassAuth) return;
     let cancelled = false;
-    const run = async () => {
-      try {
-        const supabase = getSupabaseBrowserClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (cancelled) return;
-        if (!user) { setDetecting(false); return; }
-
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("account_type, onboarding_completed")
-          .eq("id", user.id)
-          .single();
-
-        if (cancelled) return;
-        if (profile?.onboarding_completed) {
-          const home =
-            profile.account_type === "auditeur" ? "/listen"
-            : (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") ? "/creator"
-            : "/listen";
-          router.replace(home);
-          return;
-        }
-        const dest =
-          roleParam === "artist" ? "/onboarding/artist"
-          : roleParam === "listener" ? "/onboarding/listener"
-          : "/onboarding/role";
-        router.replace(dest);
-      } catch {
-        if (!cancelled) setDetecting(false);
+    void auth.getCurrentProfile().then((profile) => {
+      if (cancelled) return;
+      if (!profile) { setDetecting(false); return; }
+      if (profile.onboarding_completed) {
+        const home =
+          profile.account_type === "auditeur" ? "/listen"
+          : (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") ? "/creator"
+          : "/listen";
+        router.replace(home);
+        return;
       }
-    };
-    void run();
+      const dest =
+        roleParam === "artist" ? "/onboarding/artist"
+        : roleParam === "listener" ? "/onboarding/listener"
+        : "/onboarding/role";
+      router.replace(dest);
+    }).catch(() => {
+      if (!cancelled) setDetecting(false);
+    });
     return () => { cancelled = true; };
   }, [router, roleParam, bypassAuth]);
 
