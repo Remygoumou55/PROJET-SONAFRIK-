@@ -1,11 +1,8 @@
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
 import { SUBSCRIPTION_PLANS, REVENUE_POOL_PERCENT, TRANSACTION_TYPE_LABELS } from "@sonafrik/types";
+import { formatGnf } from "@sonafrik/shared";
 import { useWallet } from "../../features/wallet/useWallet";
-
-function formatGnf(amount: number): string {
-  return new Intl.NumberFormat("fr-GN").format(Math.round(amount)) + " GNF";
-}
 
 export default function WalletTab() {
   const { context, isLoading, error, subscribePremium } = useWallet();
