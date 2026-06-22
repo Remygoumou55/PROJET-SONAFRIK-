@@ -106,19 +106,19 @@ const styles = StyleSheet.create({
   danger: {
     marginTop: 24,
     borderWidth: 1,
-    borderColor: "#FF4444",
+    borderColor: colors.error,
     borderRadius: 12,
     padding: 16,
     backgroundColor: colors.surface,
   },
-  dangerTitle: { color: "#FF4444", fontWeight: "700", marginBottom: 8 },
+  dangerTitle: { color: colors.error, fontWeight: "700", marginBottom: 8 },
   dangerText: { color: colors.texteSecondaire, fontSize: 13, lineHeight: 20 },
   deleteButton: {
     marginTop: 12,
-    backgroundColor: "#FF4444",
+    backgroundColor: colors.error,
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
   },
-  deleteText: { color: "#fff", fontWeight: "700" },
+  deleteText: { color: colors.textePrincipal, fontWeight: "700" },
 });

@@ -1,11 +1,11 @@
 import { LandingSectionHeader } from "./LandingSectionHeader";
 
 const ARTISTS = [
-  { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",     bg: "#0F6E56", text: "#9FE1CB" },
-  { initials: "F",  name: "Faya",         genre: "R&B Africain", bg: "#0C447C", text: "#B5D4F4" },
-  { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel", bg: "#3C3489", text: "#CECBF6" },
-  { initials: "MF", name: "MC Fly",        genre: "Rap GN",      bg: "#634400", text: "#FAC775" },
-  { initials: "S",  name: "SeK",           genre: "Gospel",       bg: "#3B2212", text: "#F5C4B3" },
+  { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",     bg: "rgba(15, 110, 86, 1)",   text: "rgba(159, 225, 203, 1)" },
+  { initials: "F",  name: "Faya",         genre: "R&B Africain", bg: "rgba(12, 68, 124, 1)",   text: "rgba(181, 212, 244, 1)" },
+  { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel", bg: "rgba(60, 52, 137, 1)",   text: "rgba(206, 203, 246, 1)" },
+  { initials: "MF", name: "MC Fly",       genre: "Rap GN",       bg: "rgba(99, 68, 0, 1)",     text: "rgba(250, 199, 117, 1)" },
+  { initials: "S",  name: "SeK",          genre: "Gospel",        bg: "rgba(59, 34, 18, 1)",    text: "rgba(245, 196, 179, 1)" },
 ] as const;
 
 export function LandingArtists() {

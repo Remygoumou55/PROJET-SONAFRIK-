@@ -127,6 +127,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: { color: colors.noirProfond, fontWeight: "700", fontSize: 16 },
-  error: { color: "#FF4444", marginTop: 12, textAlign: "center" },
+  error: { color: colors.error, marginTop: 12, textAlign: "center" },
   link: { color: colors.vertEnergie, textAlign: "center" },
 });

@@ -13,7 +13,7 @@ import { usePaymentHistory } from "../hooks/usePaymentHistory";
 function statusColor(status: PaymentIntentStatus): string {
   if (status === "confirmed") return "var(--color-vert-energie)";
   if (status === "failed" || status === "expired") return "var(--color-erreur)";
-  return "#F5A623"; // initiated / pending — no design token for this amber shade
+  return "var(--color-pending)"; // initiated / pending
 }
 
 function fmtDate(iso: string): string {

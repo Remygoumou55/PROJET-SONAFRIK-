@@ -186,6 +186,6 @@ const styles = StyleSheet.create({
   },
   menuText: { color: colors.textePrincipal, fontSize: 15 },
   menuChevron: { color: colors.texteDesactive, fontSize: 20 },
-  error: { color: "#FF4444", marginBottom: 12 },
+  error: { color: colors.error, marginBottom: 12 },
   link: { color: colors.vertEnergie },
 });

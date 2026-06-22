@@ -13,7 +13,7 @@ function MusicNoteIcon({ size = 18, color }: { size?: number; color: string }) {
 interface MediaCardProps {
   title: string;
   subtitle?: string;
-  gradient: { from: string; to: string; bgFrom: string; bgTo: string; border: string; shadow: string; glow: string };
+  gradient: { from: string; to: string; bgFrom: string; bgTo: string; border: string; shadow: string; glow: string; ringAlpha: string };
   href?: string;
   badge?: string;
 }
@@ -39,7 +39,7 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
         )}
         <div
           className="absolute top-1/2 right-2 -translate-y-1/2 w-16 h-16 rounded-full opacity-10"
-          style={{ border: `6px solid ${gradient.from}`, background: `radial-gradient(circle, ${gradient.from}40 30%, transparent 70%)` }}
+          style={{ border: `6px solid ${gradient.from}`, background: `radial-gradient(circle, ${gradient.ringAlpha} 30%, transparent 70%)` }}
         />
         <div
           className="absolute top-1/2 right-2 -translate-y-1/2 w-6 h-6 rounded-full opacity-15"

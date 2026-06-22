@@ -14,9 +14,9 @@ export default function OnboardingLayout({ children }: { children: ReactNode }) 
       >
         <Link href="/" style={{ textDecoration: "none" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "#CE1126" }}>S</span>
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "#FCD116" }}>O</span>
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "#009460" }}>N</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--color-flag-rouge)" }}>S</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--color-flag-jaune)" }}>O</span>
+            <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--color-flag-vert)" }}>N</span>
             <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--color-texte-principal)" }}>AFRIK</span>
           </div>
         </Link>

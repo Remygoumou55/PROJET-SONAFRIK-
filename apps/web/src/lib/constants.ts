@@ -8,6 +8,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(0, 210, 106, 0.19)",
     shadow: "rgba(0, 210, 106, 0.08)",
     glow: "rgba(0, 210, 106, 0.53)",
+    ringAlpha: "rgba(0, 210, 106, 0.25)",
   },
   {
     from: "var(--color-or-solaire)",
@@ -18,6 +19,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(255, 194, 14, 0.19)",
     shadow: "rgba(255, 194, 14, 0.08)",
     glow: "rgba(255, 194, 14, 0.53)",
+    ringAlpha: "rgba(255, 194, 14, 0.25)",
   },
   {
     from: "var(--color-accent-orange)",
@@ -28,6 +30,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(249, 115, 22, 0.19)",
     shadow: "rgba(249, 115, 22, 0.08)",
     glow: "rgba(249, 115, 22, 0.53)",
+    ringAlpha: "rgba(249, 115, 22, 0.25)",
   },
   {
     from: "var(--color-accent-violet)",
@@ -38,6 +41,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(168, 85, 247, 0.19)",
     shadow: "rgba(168, 85, 247, 0.08)",
     glow: "rgba(168, 85, 247, 0.53)",
+    ringAlpha: "rgba(168, 85, 247, 0.25)",
   },
   {
     from: "var(--color-info)",
@@ -48,6 +52,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(59, 130, 246, 0.19)",
     shadow: "rgba(59, 130, 246, 0.08)",
     glow: "rgba(59, 130, 246, 0.53)",
+    ringAlpha: "rgba(59, 130, 246, 0.25)",
   },
   {
     from: "var(--color-accent-rose)",
@@ -58,6 +63,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(236, 72, 153, 0.19)",
     shadow: "rgba(236, 72, 153, 0.08)",
     glow: "rgba(236, 72, 153, 0.53)",
+    ringAlpha: "rgba(236, 72, 153, 0.25)",
   },
   {
     from: "rgba(20, 184, 166, 1)",
@@ -68,6 +74,7 @@ export const CARD_GRADIENTS = [
     border: "rgba(20, 184, 166, 0.19)",
     shadow: "rgba(20, 184, 166, 0.08)",
     glow: "rgba(20, 184, 166, 0.53)",
+    ringAlpha: "rgba(20, 184, 166, 0.25)",
   },
   {
     from: "rgba(239, 68, 68, 1)",
@@ -78,5 +85,6 @@ export const CARD_GRADIENTS = [
     border: "rgba(239, 68, 68, 0.19)",
     shadow: "rgba(239, 68, 68, 0.08)",
     glow: "rgba(239, 68, 68, 0.53)",
+    ringAlpha: "rgba(239, 68, 68, 0.25)",
   },
 ] as const;

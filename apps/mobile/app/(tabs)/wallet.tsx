@@ -124,8 +124,8 @@ export default function WalletTab() {
             const isCredit = ["royalty_payout", "topup", "refund"].includes(tx.type);
             return (
               <View key={tx.id} style={styles.txRow}>
-                <View style={[styles.txIcon, { backgroundColor: isCredit ? "#00D26A22" : "#FF444422" }]}>
-                  <Text style={{ color: isCredit ? colors.vertEnergie : "#FF6666", fontSize: 12, fontWeight: "700" }}>
+                <View style={[styles.txIcon, { backgroundColor: isCredit ? "rgba(0, 210, 106, 0.13)" : "rgba(255, 68, 68, 0.13)" }]}>
+                  <Text style={{ color: isCredit ? colors.vertEnergie : "rgba(255, 102, 102, 1)", fontSize: 12, fontWeight: "700" }}>
                     {isCredit ? "+" : "−"}
                   </Text>
                 </View>
@@ -157,17 +157,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: colors.vertProfond,
   },
-  balanceLabel: { color: "#FFFFFF99", fontSize: 13 },
-  balanceAmount: { color: "#FFFFFF", fontSize: 30, fontWeight: "700", marginTop: 4 },
+  balanceLabel: { color: "rgba(255, 255, 255, 0.60)", fontSize: 13 },
+  balanceAmount: { color: colors.textePrincipal, fontSize: 30, fontWeight: "700", marginTop: 4 },
   balanceActions: { flexDirection: "row", gap: 8, marginTop: 16 },
   actionBtn: {
     flex: 1,
-    backgroundColor: "#FFFFFF22",
+    backgroundColor: "rgba(255, 255, 255, 0.13)",
     borderRadius: 12,
     paddingVertical: 10,
     alignItems: "center",
   },
-  actionBtnText: { color: "#FFFFFF", fontWeight: "600", fontSize: 14 },
+  actionBtnText: { color: colors.textePrincipal, fontWeight: "600", fontSize: 14 },
   premiumCard: {
     backgroundColor: colors.card,
     borderRadius: 14,
@@ -180,14 +180,14 @@ const styles = StyleSheet.create({
   premiumTitle: { color: colors.textePrincipal, fontSize: 14, fontWeight: "600" },
   premiumSub: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
   subscribeBtn: {
-    backgroundColor: "#FFC20E",
+    backgroundColor: colors.orSolaire,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  subscribeBtnText: { color: "#0D0D0D", fontWeight: "700", fontSize: 13 },
+  subscribeBtnText: { color: colors.noirProfond, fontWeight: "700", fontSize: 13 },
   premiumBadge: {
-    backgroundColor: "#00D26A22",
+    backgroundColor: "rgba(0, 210, 106, 0.13)",
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -212,18 +212,18 @@ const styles = StyleSheet.create({
     borderColor: colors.bordure,
   },
   planLabel: { color: colors.textePrincipal, fontWeight: "600", fontSize: 14 },
-  planPrice: { color: "#FFC20E", fontWeight: "700", fontSize: 16, marginTop: 4 },
+  planPrice: { color: colors.orSolaire, fontWeight: "700", fontSize: 16, marginTop: 4 },
   planMeta: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
   poolCard: {
-    backgroundColor: "#1F1A00",
+    backgroundColor: "rgba(31, 26, 0, 1)",
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#FFC20E33",
+    borderColor: "rgba(255, 194, 14, 0.20)",
     marginTop: 12,
     marginBottom: 4,
   },
-  poolTitle: { color: "#FFC20E", fontWeight: "600", fontSize: 14 },
+  poolTitle: { color: colors.orSolaire, fontWeight: "600", fontSize: 14 },
   poolSub: { color: colors.texteSecondaire, fontSize: 12, marginTop: 4, lineHeight: 18 },
   txRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
   txIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },

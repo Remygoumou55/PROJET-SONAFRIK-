@@ -43,6 +43,14 @@
   --color-feature-brique: #d85a30;
   --color-feature-navy: #185fa5;
 
+  /* Couleurs du drapeau guinéen — logo SONAFRIK (S O N) */
+  --color-flag-rouge: #ce1126;
+  --color-flag-jaune: #fcd116;
+  --color-flag-vert: #009460;
+
+  /* Couleurs de statut paiement */
+  --color-pending: #f5a623;
+
   --font-sans: Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;
