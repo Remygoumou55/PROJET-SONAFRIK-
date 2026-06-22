@@ -1,5 +1,5 @@
 import type { CreatorContext } from "@sonafrik/types";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
+import { Badge, buttonVariants, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import Link from "next/link";
 
 export function CreatorDashboard({ context }: { context: CreatorContext }) {
@@ -25,15 +25,15 @@ export function CreatorDashboard({ context }: { context: CreatorContext }) {
             {artistProfile.bio ?? "Complétez votre identité artiste pour activer votre espace pro."}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button asChild size="sm">
-              <Link href="/creator/identity">Modifier l&apos;identité</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/creator/verification">Vérification</Link>
-            </Button>
-            <Button asChild variant="premium" size="sm">
-              <Link href="/creator/catalog">Catalogue</Link>
-            </Button>
+            <Link href="/creator/identity" className={buttonVariants({ variant: "primary", size: "sm" })}>
+              Modifier l&apos;identité
+            </Link>
+            <Link href="/creator/verification" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Vérification
+            </Link>
+            <Link href="/creator/catalog" className={buttonVariants({ variant: "premium", size: "sm" })}>
+              Catalogue
+            </Link>
           </div>
         </CardContent>
       </Card>

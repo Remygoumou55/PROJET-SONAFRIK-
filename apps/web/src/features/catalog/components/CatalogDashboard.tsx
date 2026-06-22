@@ -1,7 +1,6 @@
 import type { CatalogContext } from "@sonafrik/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
+import { buttonVariants, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import Link from "next/link";
-import { Button } from "@sonafrik/ui";
 
 export function CatalogDashboard({ context }: { context: CatalogContext }) {
   return (
@@ -18,12 +17,12 @@ export function CatalogDashboard({ context }: { context: CatalogContext }) {
           <CardTitle>Catalog OS</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
-          <Button asChild size="sm">
-            <Link href="/creator/catalog/releases">Gérer les sorties</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/creator/catalog/tracks">Gérer les morceaux</Link>
-          </Button>
+          <Link href="/creator/catalog/releases" className={buttonVariants({ variant: "primary", size: "sm" })}>
+            Gérer les sorties
+          </Link>
+          <Link href="/creator/catalog/tracks" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            Gérer les morceaux
+          </Link>
         </CardContent>
       </Card>
 

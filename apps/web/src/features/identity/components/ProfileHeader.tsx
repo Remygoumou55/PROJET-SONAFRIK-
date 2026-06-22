@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
+import { Avatar, Badge, buttonVariants, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import type { IdentityContext } from "@sonafrik/types";
 import { ACCOUNT_TYPE_OPTIONS } from "@sonafrik/types";
 import { formatDate } from "@/lib/formatters";
@@ -55,16 +55,16 @@ export function ProfileHeader({ context, avatarUrl }: ProfileHeaderProps) {
               <p className="text-texte-desactive text-sm italic">Aucune bio pour le moment.</p>
             )}
             <div className="flex flex-wrap gap-3 pt-1">
-              <Button asChild size="sm">
-                <Link href="/profile/edit">Modifier le profil</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/settings">Paramètres</Link>
-              </Button>
+              <Link href="/profile/edit" className={buttonVariants({ variant: "primary", size: "sm" })}>
+                Modifier le profil
+              </Link>
+              <Link href="/settings" className={buttonVariants({ variant: "outline", size: "sm" })}>
+                Paramètres
+              </Link>
               {profile.account_type === "artiste" || profile.account_type === "auditeur_artiste" ? (
-                <Button asChild variant="premium" size="sm">
-                  <Link href="/creator">Espace créateur</Link>
-                </Button>
+                <Link href="/creator" className={buttonVariants({ variant: "premium", size: "sm" })}>
+                  Espace créateur
+                </Link>
               ) : null}
             </div>
           </div>
