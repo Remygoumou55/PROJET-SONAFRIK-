@@ -62,14 +62,16 @@
 | Tables `payout_audit_logs`/`payout_batches` : commentées "Réservées Vague E" | ✅ | en cours |
 | `PLAN_CORRECTION_360.md` réécrit (suppression infos périmées) | ✅ | en cours |
 
-### 🟡 VAGUE D — Optimisation (À FAIRE)
+### ✅ VAGUE D — Optimisation (TERMINÉE 2026-06-22)
 
-| Tâche | Priorité | Effort |
+| Tâche | Statut | Commit |
 |---|---|---|
-| Ajouter token `--color-error` dans `globals.css` | Moyen | 30 min |
-| Ajouter variantes alpha des tokens (`--color-or-solaire-alpha`) | Faible | 1 h |
-| Remplacer les 64 hex hardcodés restants (surtout admin/wallet/loading) | Faible | 2 h |
-| Audit `SearchResults.tsx` (411 l.) — virtualisation si liste grandit | Faible | 1 h |
+| Tokens manquants ajoutés dans `globals.css` : accent-violet, accent-orange, accent-rose, accent-bleu-clair, texte-subtil, skeleton | ✅ | `9a13cc2` |
+| 127 hex hardcodés → 0 : 35 fichiers nettoyés | ✅ | `9a13cc2` |
+| Hex alpha 8 chiffres convertis en `rgba()` standard | ✅ | `9a13cc2` |
+| `ARTIST_RING_COLORS` refactorisé en objet rgba pré-calculé | ✅ | `9a13cc2` |
+| 2 warnings ESLint pre-existants corrigés | ✅ | `9a13cc2` |
+| build + lint + typecheck : 100% verts | ✅ | `9a13cc2` |
 
 ### 🔴 VAGUE E — Paiements (BLOQUANT REVENU)
 
