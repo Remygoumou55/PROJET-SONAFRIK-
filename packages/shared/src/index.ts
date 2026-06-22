@@ -1,11 +1,7 @@
 /** Utilitaires partagés SONAFRIK */
 
 export function formatGnf(amount: number): string {
-  return new Intl.NumberFormat("fr-GN", {
-    style: "currency",
-    currency: "GNF",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return new Intl.NumberFormat("fr-FR").format(Math.round(amount)) + " GNF";
 }
 
 export function isValidListenProgress(progressPercent: number): boolean {

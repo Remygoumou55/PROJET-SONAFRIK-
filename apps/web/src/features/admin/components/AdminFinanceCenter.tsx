@@ -5,7 +5,8 @@ import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
 import { createPayoutService } from "@sonafrik/api/payout";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { formatGnf, formatDateTime } from "@/lib/formatters";
+import { formatGnf } from "@sonafrik/shared";
+import { formatDateTime } from "@/lib/formatters";
 import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
 

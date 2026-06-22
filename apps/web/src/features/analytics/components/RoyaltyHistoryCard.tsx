@@ -1,6 +1,7 @@
 import type { CreatorRoyaltyHistoryEntry } from "@sonafrik/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
-import { formatGnf, formatMonthYear } from "@/lib/formatters";
+import { formatGnf } from "@sonafrik/shared";
+import { formatMonthYear } from "@/lib/formatters";
 
 const CALC_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:  { label: "En attente",  color: "text-or-solaire" },

@@ -1,7 +1,3 @@
-export function formatGnf(amount: number): string {
-  return new Intl.NumberFormat("fr-FR").format(Math.round(amount)) + " GNF";
-}
-
 export function formatDate(iso: string | Date): string {
   return new Intl.DateTimeFormat("fr-FR", {
     day: "numeric",

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { memo } from "react";
 import type { WalletContext, Transaction } from "@sonafrik/types";
 import { TRANSACTION_TYPE_LABELS, SUBSCRIPTION_PLANS } from "@sonafrik/types";
-import { formatGnf, formatDate } from "@/lib/formatters";
+import { formatGnf } from "@sonafrik/shared";
+import { formatDate } from "@/lib/formatters";
 
 const TransactionRow = memo(function TransactionRow({ tx }: { tx: Transaction }) {
   const isCredit = tx.type === "royalty_payout" || tx.type === "topup" || tx.type === "refund";

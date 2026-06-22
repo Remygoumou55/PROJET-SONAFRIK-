@@ -1,6 +1,6 @@
 import type { CreatorRevenueStats } from "@sonafrik/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
-import { formatGnf } from "@/lib/formatters";
+import { formatGnf } from "@sonafrik/shared";
 
 function Row({
   label,
