@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/admin/rights", label: "Droits" },
   { href: "/admin/flags", label: "Flags" },
   { href: "/admin/settings", label: "Paramètres" },
+  { href: "/admin/health", label: "Santé" },
 ] as const;
 
 async function AdminGuard({ children }: { children: React.ReactNode }) {

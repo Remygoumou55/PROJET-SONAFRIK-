@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useCallback, useState } from "react";
+import { useAdminService } from "../hooks/useAdminService";
 import { formatDateTime } from "@/lib/formatters";
 
 type EntityType = "album" | "track";
@@ -28,7 +28,7 @@ const RELEASE_TYPE_LABELS: Record<string, string> = {
 };
 
 export function AdminCatalogCenter({ initialItems }: Props) {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+  const admin = useAdminService();
   const [items, setItems] = useState<PendingItem[]>(initialItems);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
@@ -45,19 +45,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
       setActionState((prev) => ({ ...prev, [id]: true }));
       setError(null);
       try {
-        const table = entityType === "album" ? "albums" : "tracks";
-        const updates: Record<string, unknown> = { publication_status: action };
-        if (action === "published") updates.published_at = new Date().toISOString();
-        if (action === "rejected" && reason) updates.rejection_reason = reason;
-
-        type ReviewUpdate = { publication_status: string; published_at?: string; rejection_reason?: string };
-        const { error: dbError } = await supabase
-          .from(table as "albums" | "tracks")
-          .update(updates as ReviewUpdate)
-          .eq("id", id);
-
-        if (dbError) throw new Error(dbError.message);
-
+        await admin.reviewCatalogItem(id, entityType, action, reason);
         setItems((prev) => prev.filter((item) => item.id !== id));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur lors de l'action.");
@@ -65,7 +53,7 @@ export function AdminCatalogCenter({ initialItems }: Props) {
         setActionState((prev) => ({ ...prev, [id]: false }));
       }
     },
-    [supabase],
+    [admin],
   );
 
   const confirmModal = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useAdminService } from "../hooks/useAdminService";
 import { formatDateTime } from "@/lib/formatters";
 import {
   RIGHTS_CLAIM_TYPE_LABELS,
@@ -51,7 +51,7 @@ const TYPE_COLORS: Record<RightsClaimType, string> = {
 };
 
 export function AdminRightsCenter({ initialClaims }: Props) {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+  const admin = useAdminService();
   const [claims, setClaims] = useState<ClaimWithContext[]>(initialClaims);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
@@ -73,23 +73,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       setActionState((prev) => ({ ...prev, [claimId]: true }));
       setError(null);
       try {
-        const patch: {
-          status: typeof status;
-          reviewed_at: string;
-          resolution_notes?: string;
-        } = {
-          status,
-          reviewed_at: new Date().toISOString(),
-        };
-        if (notes) patch.resolution_notes = notes;
-
-        const { error: dbError } = await supabase
-          .from("rights_claims")
-          .update(patch)
-          .eq("id", claimId);
-
-        if (dbError) throw new Error(dbError.message);
-
+        await admin.updateRightsClaim(claimId, status, notes);
         setClaims((prev) =>
           prev.map((c) => (c.id === claimId ? { ...c, status } : c)),
         );
@@ -99,7 +83,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
         setActionState((prev) => ({ ...prev, [claimId]: false }));
       }
     },
-    [supabase],
+    [admin],
   );
 
   const handleAccept = (id: string) => void runUpdate(id, "accepted");

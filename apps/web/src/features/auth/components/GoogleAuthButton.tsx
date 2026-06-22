@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useAuthService } from "../hooks/useAuth";
 
 interface GoogleAuthButtonProps {
   label?: string;
@@ -14,29 +14,22 @@ export function GoogleAuthButton({
 }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const auth = useAuthService();
 
   async function handleGoogleAuth() {
     setLoading(true);
     setError(null);
-    const supabase = getSupabaseBrowserClient();
-
     // NEXT_PUBLIC_APP_URL fixe l'URL stable (prod Vercel) pour éviter que les
     // URLs de preview changeantes soient rejetées par Supabase Redirect URLs
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
     const roleParam = role ? `?role=${role}` : "";
-
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${appUrl}/auth/callback${roleParam}`,
-      },
-    });
-
-    if (oauthError) {
+    try {
+      await auth.signInWithGoogle(`${appUrl}/auth/callback${roleParam}`);
+      // Si pas d'erreur, le navigateur est redirigé vers Google — pas besoin de setLoading(false)
+    } catch {
       setError("Erreur de connexion Google. Réessayez.");
       setLoading(false);
     }
-    // Si pas d'erreur, le navigateur est redirigé vers Google — pas besoin de setLoading(false)
   }
 
   return (

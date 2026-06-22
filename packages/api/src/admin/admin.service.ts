@@ -45,6 +45,31 @@ export class AdminService {
       .catch(() => { throw new AdminError("update_failed"); });
     return setting;
   }
+
+  async reviewCatalogItem(
+    id: string,
+    entityType: "album" | "track",
+    action: "published" | "rejected",
+    reason?: string,
+  ): Promise<void> {
+    const table = entityType === "album" ? "albums" : "tracks";
+    const updates: { publication_status: string; published_at?: string; rejection_reason?: string } = {
+      publication_status: action,
+    };
+    if (action === "published") updates.published_at = new Date().toISOString();
+    if (action === "rejected" && reason) updates.rejection_reason = reason;
+    await this.repository.reviewCatalogItem(id, table, updates)
+      .catch(() => { throw new AdminError("update_failed"); });
+  }
+
+  async updateRightsClaim(
+    id: string,
+    status: "accepted" | "rejected" | "escalated" | "pending",
+    notes?: string,
+  ): Promise<void> {
+    await this.repository.updateRightsClaim(id, status, notes)
+      .catch(() => { throw new AdminError("update_failed"); });
+  }
 }
 
 export function createAdminService(client: SonafrikSupabaseClient): AdminService {

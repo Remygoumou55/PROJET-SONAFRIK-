@@ -169,6 +169,23 @@ export class AuthService {
     await this.repository.revokeSession(userId, sessionId);
     await this.repository.logAudit("auth.session.revoked", "user_sessions", sessionId);
   }
+
+  async signOutEverywhere(): Promise<void> {
+    const { data: { user } } = await this.client.auth.getUser();
+    if (user) {
+      await this.repository.logAudit("auth.signout.global", "profiles", user.id);
+    }
+    const { error } = await this.client.auth.signOut({ scope: "global" });
+    if (error) throw mapSupabaseAuthError(error);
+  }
+
+  async signInWithGoogle(redirectTo: string): Promise<void> {
+    const { error } = await this.client.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo },
+    });
+    if (error) throw mapSupabaseAuthError(error);
+  }
 }
 
 export function createAuthService(client: SonafrikSupabaseClient): AuthService {

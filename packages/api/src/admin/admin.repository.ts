@@ -53,4 +53,29 @@ export class AdminRepository {
     if (error) throw error;
     return data as unknown as SystemSetting;
   }
+
+  async reviewCatalogItem(
+    id: string,
+    table: "albums" | "tracks",
+    updates: { publication_status: string; published_at?: string; rejection_reason?: string },
+  ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await this.client.from(table).update(updates as any).eq("id", id);
+    if (error) throw error;
+  }
+
+  async updateRightsClaim(
+    id: string,
+    status: string,
+    notes?: string,
+  ): Promise<void> {
+    const patch: { status: string; reviewed_at: string; resolution_notes?: string } = {
+      status,
+      reviewed_at: new Date().toISOString(),
+    };
+    if (notes) patch.resolution_notes = notes;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await this.client.from("rights_claims").update(patch as any).eq("id", id);
+    if (error) throw error;
+  }
 }

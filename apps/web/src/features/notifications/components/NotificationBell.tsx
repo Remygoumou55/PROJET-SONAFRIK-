@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useNotificationsService } from "../hooks/useNotificationsService";
 import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 
 export function NotificationBell({ initialCount, userId }: Props) {
   const [count, setCount] = useState(initialCount);
-  const supabase = getSupabaseBrowserClient();
+  const notifications = useNotificationsService();
 
   useRealtimeChannel(
     `notif_bell_${userId}`,
@@ -28,14 +28,7 @@ export function NotificationBell({ initialCount, userId }: Props) {
         table: "notifications",
         filter: `user_id=eq.${userId}`,
         onEvent: () => {
-          void supabase
-            .from("notifications")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId)
-            .is("read_at", null)
-            .then(({ count: c }) => {
-              if (c !== null) setCount(c);
-            });
+          void notifications.countUnread(userId).then((c) => setCount(c));
         },
       },
     ],

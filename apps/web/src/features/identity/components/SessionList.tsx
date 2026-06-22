@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Badge, Button, Card, CardContent, Modal } from "@sonafrik/ui";
 import type { UserSession } from "@sonafrik/types";
 import { useIdentityService } from "../hooks/useIdentity";
+import { useAuthService } from "@/features/auth/hooks/useAuth";
 import { formatDateWithTime } from "@/lib/formatters";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface SessionListProps {
   sessions: UserSession[];
@@ -21,6 +21,7 @@ const PLATFORM_LABELS: Record<string, string> = {
 export function SessionList({ sessions: initial }: SessionListProps) {
   const router = useRouter();
   const identity = useIdentityService();
+  const auth = useAuthService();
   const [sessions, setSessions] = useState(initial);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [signOutAllOpen, setSignOutAllOpen] = useState(false);
@@ -42,15 +43,10 @@ export function SessionList({ sessions: initial }: SessionListProps) {
     setSigningOutAll(true);
     setSignOutAllError(null);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signOut({ scope: "global" });
-      if (error) {
-        setSignOutAllError(error.message);
-        return;
-      }
+      await auth.signOutEverywhere();
       router.push("/");
-    } catch {
-      setSignOutAllError("Erreur lors de la déconnexion globale.");
+    } catch (err) {
+      setSignOutAllError(err instanceof Error ? err.message : "Erreur lors de la déconnexion globale.");
     } finally {
       setSigningOutAll(false);
     }
