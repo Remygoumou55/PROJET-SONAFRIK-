@@ -132,8 +132,9 @@ Deno.serve(async (req) => {
     }
 
     return json({ error: "Action invalide." }, 400);
-  } catch {
-    return json({ error: "Erreur interne du serveur." }, 500);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erreur interne du serveur.";
+    return json({ error: message }, 500);
   }
 });
 
@@ -155,17 +156,18 @@ async function persistAsset(
   userId: string,
 ) {
   if (body.assetType === "cover" && body.albumId) {
-    await client
+    const { error } = await client
       .from("albums")
       .update({ cover_path: path, updated_by: userId })
       .eq("id", body.albumId);
+    if (error) throw new Error(error.message);
     return;
   }
 
   if (body.assetType === "audio" && body.trackId) {
     const format = body.format ?? (body.contentType ? AUDIO_TYPES[body.contentType] : "mp3");
     await client.from("track_files").update({ is_primary: false }).eq("track_id", body.trackId);
-    await client.from("track_files").insert({
+    const { error } = await client.from("track_files").insert({
       track_id: body.trackId,
       format,
       file_path: path,
@@ -174,6 +176,7 @@ async function persistAsset(
       created_by: userId,
       updated_by: userId,
     });
+    if (error) throw new Error(error.message);
   }
 }
 

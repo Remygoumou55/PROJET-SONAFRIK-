@@ -56,11 +56,25 @@ export class AdminRepository {
 
   async reviewCatalogItem(
     id: string,
-    table: "albums" | "tracks",
-    updates: { publication_status: string; published_at?: string; rejection_reason?: string },
+    entityType: "album" | "track",
+    action: "published" | "rejected",
+    reason?: string,
   ): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await this.client.from(table).update(updates as any).eq("id", id);
+    if (entityType === "album") {
+      const { error } = await this.client.rpc("review_album_publication", {
+        p_album_id: id,
+        p_status: action,
+        ...(action === "rejected" && reason ? { p_rejection_reason: reason } : {}),
+      });
+      if (error) throw error;
+      return;
+    }
+
+    const { error } = await this.client.rpc("review_track_publication", {
+      p_track_id: id,
+      p_status: action,
+      ...(action === "rejected" && reason ? { p_rejection_reason: reason } : {}),
+    });
     if (error) throw error;
   }
 

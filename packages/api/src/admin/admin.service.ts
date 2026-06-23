@@ -52,13 +52,7 @@ export class AdminService {
     action: "published" | "rejected",
     reason?: string,
   ): Promise<void> {
-    const table = entityType === "album" ? "albums" : "tracks";
-    const updates: { publication_status: string; published_at?: string; rejection_reason?: string } = {
-      publication_status: action,
-    };
-    if (action === "published") updates.published_at = new Date().toISOString();
-    if (action === "rejected" && reason) updates.rejection_reason = reason;
-    await this.repository.reviewCatalogItem(id, table, updates)
+    await this.repository.reviewCatalogItem(id, entityType, action, reason)
       .catch(() => { throw new AdminError("update_failed"); });
   }
 

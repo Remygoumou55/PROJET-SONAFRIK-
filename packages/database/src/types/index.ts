@@ -3023,6 +3023,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      review_track_publication: {
+        Args: {
+          p_track_id: string
+          p_rejection_reason?: string
+          p_status: string
+        }
+        Returns: undefined
+      }
+      bootstrap_admin_if_none: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      assign_admin_role: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       review_creator_verification: {
         Args: {
           p_rejection_reason?: string
