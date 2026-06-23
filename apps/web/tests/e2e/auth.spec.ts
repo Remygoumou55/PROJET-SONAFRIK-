@@ -37,7 +37,9 @@ test.describe("Utilisateur authentifié", () => {
     await expect(page).toHaveTitle(/Recherche|SONAFRIK/i, { timeout: 10_000 });
 
     // Un champ de recherche doit être présent
-    const searchInput = page.locator("input[type='search'], input[placeholder*='Chercher'], input[placeholder*='Rechercher']").first();
+    const searchInput = page.locator(
+      "input[type='search'], input[placeholder*='Chercher'], input[placeholder*='Rechercher'], input[placeholder*='Artiste']",
+    ).first();
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
   });
 

@@ -1,18 +1,21 @@
 import { chromium, type FullConfig } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { createStreamingService } from "@sonafrik/api/streaming";
 
-const TEST_EMAIL = process.env.PLAYWRIGHT_TEST_EMAIL ?? "e2e-test@sonafrik.test";
-const TEST_PASSWORD = process.env.PLAYWRIGHT_TEST_PASSWORD ?? "PlaywrightTest2026!";
+const TEST_EMAIL = process.env.PLAYWRIGHT_TEST_EMAIL ?? "s13b-playwright-listener@sonafrik.test";
+const TEST_PASSWORD = process.env.PLAYWRIGHT_TEST_PASSWORD ?? "S13BCert2026!";
+export const CERTIFIED_TRACK_ID = "411f4e81-b684-4691-983d-234eb127c82b";
 export const AUTH_STATE_PATH = "./tests/e2e/.auth-state.json";
 
 export async function globalSetup(_config: FullConfig) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !serviceKey) {
+  if (!supabaseUrl || !serviceKey || !anonKey) {
     console.warn(
-      "[E2E] NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY absent — " +
-      "les tests authentifiés seront ignorés.",
+      "[E2E] Variables Supabase absentes — les tests authentifiés seront ignorés.",
     );
     return;
   }
@@ -21,7 +24,6 @@ export async function globalSetup(_config: FullConfig) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  // Créer le test user ou récupérer son ID s'il existe déjà
   let userId: string | undefined;
 
   const { data: existingUsers } = await admin.auth.admin.listUsers();
@@ -35,66 +37,114 @@ export async function globalSetup(_config: FullConfig) {
       password: TEST_PASSWORD,
       email_confirm: true,
     });
-    if (error || !created.user) {
+    if (created.user) {
+      userId = created.user.id;
+    } else if (error?.message?.includes("already been registered")) {
+      const probe = createClient(supabaseUrl, anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const { data: signInProbe, error: probeErr } = await probe.auth.signInWithPassword({
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
+      });
+      if (probeErr || !signInProbe.user) {
+        throw new Error(`[E2E] Test user introuvable après conflit email : ${probeErr?.message}`);
+      }
+      userId = signInProbe.user.id;
+    } else {
       throw new Error(`[E2E] Impossible de créer le test user : ${error?.message}`);
     }
-    userId = created.user.id;
   }
 
-  // S'assurer que le profil existe et que l'onboarding est marqué complet
-  // (le trigger handle_new_user crée le profil, mais parfois avec délai)
   await admin.from("profiles").upsert({
     id: userId,
-    full_name: "Test E2E",
+    full_name: "S13B Playwright Listener",
+    phone: "+224620000099",
+    country_code: "GN",
     account_type: "auditeur",
+    role: "listener",
     onboarding_completed: true,
   }, { onConflict: "id" });
 
-  // Signer le test user et capturer la session dans storageState
-  const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  // Injecter la session Supabase via le storage (localStorage + cookie)
-  const { data: sessionData, error: sessionError } = await admin.auth.admin.getUserById(userId);
-  if (sessionError || !sessionData.user) {
-    throw new Error(`[E2E] Impossible de récupérer le test user : ${sessionError?.message}`);
-  }
-
-  // Créer une session de test via signInWithPassword
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const userClient = createClient(supabaseUrl, anonKey, {
+  const probeClient = createClient(supabaseUrl, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-
-  const { data: signInData, error: signInError } = await userClient.auth.signInWithPassword({
+  const { data: probeSignIn, error: probeSignInErr } = await probeClient.auth.signInWithPassword({
     email: TEST_EMAIL,
     password: TEST_PASSWORD,
   });
-
-  if (signInError || !signInData.session) {
-    throw new Error(`[E2E] Connexion test user échouée : ${signInError?.message}`);
+  if (probeSignInErr || !probeSignIn.session) {
+    throw new Error(`[E2E] Probe stream-start : connexion échouée — ${probeSignInErr?.message}`);
+  }
+  const probeStream = createStreamingService(probeClient);
+  let probeOk = false;
+  let probeDetail = "";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const start = await probeStream.startStream({
+        trackId: CERTIFIED_TRACK_ID,
+        platform: "web",
+        qualityKbps: 96,
+      });
+      if (!start.sessionId || !start.signedUrl) {
+        throw new Error("sessionId ou signedUrl manquant");
+      }
+      probeOk = true;
+      break;
+    } catch (probeErr) {
+      probeDetail = probeErr instanceof Error ? probeErr.message : String(probeErr);
+      await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+    }
+  }
+  if (!probeOk) {
+    throw new Error(`[E2E] Probe stream-start échoué (qualityKbps=96) : ${probeDetail}`);
   }
 
-  const { access_token, refresh_token } = signInData.session;
-  const storageKey = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`;
-
-  await page.goto(baseURL);
-  await page.evaluate(
-    ({ key, value }) => { localStorage.setItem(key, JSON.stringify(value)); },
-    {
-      key: storageKey,
-      value: {
-        access_token,
-        refresh_token,
-        token_type: "bearer",
-        expires_in: 3600,
-        expires_at: Math.floor(Date.now() / 1000) + 3600,
-        user: signInData.user,
+  const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+  const baseHost = new URL(baseURL).hostname;
+  const authCookies: { name: string; value: string }[] = [];
+  const ssrClient = createServerClient(supabaseUrl, anonKey, {
+    cookies: {
+      getAll() {
+        return authCookies;
+      },
+      setAll(cookiesToSet: { name: string; value: string }[]) {
+        for (const { name, value } of cookiesToSet) {
+          const idx = authCookies.findIndex((c) => c.name === name);
+          if (!value) {
+            if (idx >= 0) authCookies.splice(idx, 1);
+          } else if (idx >= 0) {
+            authCookies[idx] = { name, value };
+          } else {
+            authCookies.push({ name, value });
+          }
+        }
       },
     },
+  });
+  const { error: cookieSignInErr } = await ssrClient.auth.setSession({
+    access_token: probeSignIn.session.access_token,
+    refresh_token: probeSignIn.session.refresh_token,
+  });
+  if (cookieSignInErr || authCookies.length === 0) {
+    throw new Error(`[E2E] Injection cookies SSR échouée : ${cookieSignInErr?.message ?? "aucun cookie"}`);
+  }
+
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  await context.addCookies(
+    authCookies.map(({ name, value }) => ({
+      name,
+      value,
+      domain: baseHost,
+      path: "/",
+      httpOnly: false,
+      secure: baseURL.startsWith("https"),
+      sameSite: "Lax" as const,
+    })),
   );
+  const page = await context.newPage();
+  await page.goto(baseURL);
 
   await context.storageState({ path: AUTH_STATE_PATH });
   await browser.close();

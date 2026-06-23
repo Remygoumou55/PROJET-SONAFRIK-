@@ -1,4 +1,16 @@
 import { defineConfig, devices } from "@playwright/test";
+import { readFileSync, existsSync } from "fs";
+import { resolve } from "path";
+
+const envLocal = resolve(__dirname, ".env.local");
+if (existsSync(envLocal)) {
+  for (const line of readFileSync(envLocal, "utf8").split("\n")) {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m && !process.env[m[1]!.trim()]) {
+      process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
+    }
+  }
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -16,13 +28,20 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: ["--autoplay-policy=no-user-gesture-required"],
+        },
+      },
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
+    ? undefined
+    : {
+        command: "pnpm dev",
+        url: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
 });

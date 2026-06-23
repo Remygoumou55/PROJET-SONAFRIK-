@@ -295,8 +295,8 @@ export class StreamingRepository {
       .eq("publication_status", "published")
       .is("deleted_at", null)
       .ilike("title", `%${query}%`)
-      .limit(limit)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(limit);
     if (error) throw error;
     const rows = (data ?? []) as TrackWithMeta[];
     const q = query.toLowerCase();
@@ -310,8 +310,8 @@ export class StreamingRepository {
       .from("artist_profiles")
       .select("creator_id, stage_name, slug, bio, genres, cover_path, verified")
       .ilike("stage_name", `%${query}%`)
-      .limit(limit)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(limit);
     if (error) throw error;
     const rows = (data ?? []) as ArtistResult[];
     const q = query.toLowerCase();
@@ -325,8 +325,8 @@ export class StreamingRepository {
       .eq("publication_status", "published")
       .is("deleted_at", null)
       .ilike("title", `%${query}%`)
-      .limit(limit)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(limit);
     if (error) throw error;
     const rows = (data ?? []) as AlbumWithMeta[];
     const q = query.toLowerCase();
@@ -342,8 +342,8 @@ export class StreamingRepository {
       .eq("is_public", true)
       .is("deleted_at", null)
       .ilike("title", `%${query}%`)
-      .limit(limit)
-      .order("track_count", { ascending: false });
+      .order("track_count", { ascending: false })
+      .limit(limit);
     if (error) throw error;
     const rows = (data ?? []) as PlaylistSearchResult[];
     const q = query.toLowerCase();
@@ -351,18 +351,22 @@ export class StreamingRepository {
   }
 
   async searchBeats(query: string, limit: number): Promise<BeatSearchResult[]> {
-    const { data, error } = await this.client
-      .from("beats" as never)
-      .select("id, creator_id, title, slug, genre, cover_path, price_gnf, bpm, license_type")
-      .eq("publication_status" as never, "published")
-      .is("deleted_at" as never, null)
-      .ilike("title" as never, `%${query}%`)
-      .limit(limit)
-      .order("created_at" as never, { ascending: false });
-    if (error) throw error;
-    const rows = (data ?? []) as unknown as BeatSearchResult[];
-    const q = query.toLowerCase();
-    return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
+    try {
+      const { data, error } = await this.client
+        .from("beats" as never)
+        .select("id, creator_id, title, slug, genre, cover_path, price_gnf, bpm, license_type")
+        .eq("publication_status" as never, "published")
+        .is("deleted_at" as never, null)
+        .ilike("title" as never, `%${query}%`)
+        .order("created_at" as never, { ascending: false })
+        .limit(limit);
+      if (error) return [];
+      const rows = (data ?? []) as unknown as BeatSearchResult[];
+      const q = query.toLowerCase();
+      return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
+    } catch {
+      return [];
+    }
   }
 
   // ---------------------------------------------------------------------------

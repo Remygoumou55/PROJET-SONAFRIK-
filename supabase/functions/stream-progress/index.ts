@@ -81,10 +81,28 @@ Deno.serve(async (req: Request) => {
     }
 
     // Mettre à jour le heartbeat
-    await supabase.rpc("update_stream_heartbeat", {
+    const { error: heartbeatError } = await supabase.rpc("update_stream_heartbeat", {
       p_session_id: sessionId,
       p_position_seconds: Math.max(0, positionSeconds),
     });
+
+    if (heartbeatError) {
+      return new Response(JSON.stringify({ error: "session_not_found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Persister les fraud_flags sur la session (analytics fraude)
+    if (fraudFlags.length > 0) {
+      const { error: fraudError } = await supabase.rpc("append_stream_session_fraud_flags", {
+        p_session_id: sessionId,
+        p_flags: fraudFlags,
+      });
+      if (fraudError) {
+        console.warn("[stream-progress] fraud_flags skipped:", fraudError.message);
+      }
+    }
 
     // Enregistrer l'événement heartbeat (track_id rempli par trigger fill_stream_event_track_id)
     await supabase.from("stream_events").insert({

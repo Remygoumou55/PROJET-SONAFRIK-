@@ -11,6 +11,7 @@ import type {
   StreamStartResult,
 } from "@sonafrik/types";
 import { StreamingError } from "./errors";
+import { mapFunctionInvokeError } from "./invoke-errors";
 import { StreamingRepository } from "./streaming.repository";
 import {
   addTrackToPlaylistSchema,
@@ -43,7 +44,13 @@ export class StreamingService {
   }
 
   private async requireUserId(): Promise<string> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
+    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") {
+      const {
+        data: { user },
+      } = await this.client.auth.getUser();
+      if (user) return user.id;
+      return "dev-mock-id";
+    }
     const {
       data: { user },
     } = await this.client.auth.getUser();
@@ -70,7 +77,9 @@ export class StreamingService {
       },
     });
 
-    if (error || !data?.sessionId) throw new StreamingError("stream_start_failed");
+    if (error || !data?.sessionId) {
+      throw new StreamingError(mapFunctionInvokeError("start", error));
+    }
 
     try {
       await this.repository.logAudit("streaming.session.started", "tracks", parsed.data.trackId);
@@ -83,7 +92,7 @@ export class StreamingService {
 
   async sendHeartbeat(input: StreamHeartbeatInput): Promise<void> {
     const parsed = streamHeartbeatSchema.safeParse(input);
-    if (!parsed.success) throw new StreamingError("session_not_found");
+    if (!parsed.success) throw new StreamingError("invalid_session");
 
     await this.requireUserId();
 
@@ -102,7 +111,7 @@ export class StreamingService {
         signal: controller.signal,
       });
 
-      if (error) throw new StreamingError("session_not_found");
+      if (error) throw new StreamingError(mapFunctionInvokeError("progress", error));
     } finally {
       clearTimeout(timer);
     }
@@ -111,7 +120,7 @@ export class StreamingService {
   /** Real Listen V7.2 — retourne true si l'écoute est valide (≥90%) */
   async completeStream(input: CompleteStreamInput): Promise<boolean> {
     const parsed = completeStreamSchema.safeParse(input);
-    if (!parsed.success) throw new StreamingError("session_not_found");
+    if (!parsed.success) throw new StreamingError("invalid_session");
 
     await this.requireUserId();
 
@@ -123,8 +132,16 @@ export class StreamingService {
       },
     });
 
-    if (error) throw new StreamingError("session_not_found");
-    return (data?.isValidListen as boolean) ?? false;
+    if (!error && data != null) {
+      return (data.isValidListen as boolean) ?? false;
+    }
+
+    const session = await this.repository.getSession(parsed.data.sessionId).catch(() => null);
+    if (session?.completed_at != null) {
+      return session.is_valid_listen;
+    }
+
+    throw new StreamingError(mapFunctionInvokeError("complete", error));
   }
 
   async getSession(sessionId: string): Promise<StreamSession> {
@@ -261,24 +278,35 @@ export class StreamingService {
 
     const { query, limit, type } = parsed.data;
 
+    const safe = async <T>(run: () => Promise<T>, fallback: T): Promise<T> => {
+      try {
+        return await run();
+      } catch (err) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[streaming.search]", err);
+        }
+        return fallback;
+      }
+    };
+
     try {
       const perType = Math.max(5, Math.ceil(limit / 3));
 
       const [tracks, artists, albums, playlists, beats] = await Promise.all([
         type === "all" || type === "tracks"
-          ? this.repository.searchTracks(query, limit)
+          ? safe(() => this.repository.searchTracks(query, limit), [])
           : Promise.resolve([]),
         type === "all" || type === "artists"
-          ? this.repository.searchArtists(query, type === "all" ? perType : limit)
+          ? safe(() => this.repository.searchArtists(query, type === "all" ? perType : limit), [])
           : Promise.resolve([]),
         type === "all" || type === "albums"
-          ? this.repository.searchAlbums(query, type === "all" ? perType : limit)
+          ? safe(() => this.repository.searchAlbums(query, type === "all" ? perType : limit), [])
           : Promise.resolve([]),
         type === "all" || type === "playlists"
-          ? this.repository.searchPlaylists(query, type === "all" ? perType : limit)
+          ? safe(() => this.repository.searchPlaylists(query, type === "all" ? perType : limit), [])
           : Promise.resolve([]),
         type === "all" || type === "beats"
-          ? this.repository.searchBeats(query, type === "all" ? perType : limit)
+          ? safe(() => this.repository.searchBeats(query, type === "all" ? perType : limit), [])
           : Promise.resolve([]),
       ]);
 

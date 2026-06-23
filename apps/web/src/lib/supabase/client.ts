@@ -39,19 +39,19 @@ export function getSupabaseBrowserClient(): SonafrikSupabaseClient {
   const { url, anonKey } = getSupabaseEnv();
   client = createBrowserClient<Database>(url, anonKey) as unknown as SonafrikSupabaseClient;
 
-  // En mode audit local, on court-circuite auth.getUser() et auth.getSession()
-  // pour que TOUS les services obtiennent un user mock sans appeler Supabase Auth.
-  // JAMAIS actif sur Vercel (NEXT_PUBLIC_LOCAL_AUDIT_MODE n'est pas dans le bundle prod).
+  // En mode audit local : mock getUser() seulement sans session réelle.
+  // Ne pas remplacer l'objet auth (casse _useSession) — getSession reste intact pour stream-start.
   if (process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") {
-    const originalAuth = (client as unknown as { auth: Record<string, unknown> }).auth;
-    (client as unknown as { auth: Record<string, unknown> }).auth = {
-      ...originalAuth,
-      getUser: async () => ({
+    const auth = client.auth;
+    auth.getUser = async () => {
+      const { data: { session } } = await auth.getSession();
+      if (session?.user) {
+        return { data: { user: session.user }, error: null };
+      }
+      return {
         data: { user: DEV_MOCK_USER as unknown as import("@supabase/supabase-js").User },
         error: null,
-      }),
-      getSession: async () => ({ data: { session: null }, error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      };
     };
   }
 

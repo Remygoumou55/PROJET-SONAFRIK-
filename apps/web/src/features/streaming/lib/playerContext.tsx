@@ -75,6 +75,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         audioRef.current = new Audio();
       }
       const audio = audioRef.current;
+      audio.crossOrigin = "anonymous";
+      audio.preload = "auto";
       audio.src = signedUrl;
       audio.volume = volumeRef.current;
       audio.load();
@@ -88,23 +90,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         currentTrack: track,
         sessionId,
         signedUrl,
-        isPlaying: true,
+        isPlaying: false,
         isLoading: true,
         duration,
         audioError: null,
       }));
-
-      audio.play().catch((err: unknown) => {
-        const isAbort = (err as { name?: string })?.name === "AbortError";
-        if (isAbort) {
-          setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
-        } else {
-          console.error("[Player] Lecture audio échouée", err);
-          const msg = "Lecture bloquée. Appuyez sur play pour démarrer.";
-          setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: msg }));
-          onErrorCallbackRef.current?.("network", 0);
-        }
-      });
 
       audio.onloadedmetadata = () => {
         if (audio.duration > 0 && isFinite(audio.duration)) {
@@ -138,7 +128,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.onerror = () => {
         const mediaErr = audio.error;
         const errorType: AudioErrorType =
-          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ? "codec" :
+          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ||
+          mediaErr?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED ? "codec" :
+          mediaErr?.code === MediaError.MEDIA_ERR_NETWORK ? "network" :
           mediaErr?.code === MediaError.MEDIA_ERR_ABORTED ? "network" :
           "expired";
         const errorMsg =
@@ -151,9 +143,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onErrorCallbackRef.current?.(errorType, audio.currentTime);
       };
 
-      startHeartbeat();
+      // Lecture démarrée via resume() — conserve le geste utilisateur après stream-start async.
     },
-    [clearHeartbeat, startHeartbeat],
+    [clearHeartbeat],
   );
 
   const pause = useCallback(() => {
@@ -164,9 +156,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const resume = useCallback(() => {
     if (!audioRef.current) return;
-    audioRef.current.play().catch((err: unknown) => { console.error("[Player] Reprise audio échouée", err); });
-    setState((prev) => ({ ...prev, isPlaying: true }));
-    startHeartbeat();
+    const audio = audioRef.current;
+    setState((prev) => ({ ...prev, isPlaying: true, isLoading: false, audioError: null }));
+
+    const startPlayback = () => {
+      audio.play().catch((err: unknown) => { console.error("[Player] Reprise audio échouée", err); });
+      startHeartbeat();
+    };
+
+    if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      startPlayback();
+    } else {
+      audio.addEventListener("canplay", startPlayback, { once: true });
+    }
   }, [startHeartbeat]);
 
   const stop = useCallback(() => {

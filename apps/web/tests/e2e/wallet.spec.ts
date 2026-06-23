@@ -13,16 +13,19 @@ test.describe("Wallet", () => {
     test.skip(!hasAuthState(), "Auth state absent — SUPABASE_SERVICE_ROLE_KEY manquant");
   });
 
-  test("/wallet — page accessible et affiche le solde", async ({ page }) => {
+  test("/wallet — page accessible (bêta = ComingSoon ou solde GNF)", async ({ page }) => {
     await page.goto("/wallet");
 
     // Ne doit pas rediriger vers /auth
     await expect(page).not.toHaveURL(/\/auth\//);
     await expect(page).toHaveTitle(/Wallet|Portefeuille|SONAFRIK/i, { timeout: 10_000 });
 
-    // Le solde GNF doit être affiché (contient "GNF" ou "0")
+    // En bêta PAYMENTS_COMING_SOON=true → écran « Bientôt » ; sinon solde GNF
+    const comingSoon = page.locator("text=/Bientôt|Portefeuille & Paiements/i").first();
     const balance = page.locator("text=/GNF|0 GNF|Solde/i").first();
-    await expect(balance).toBeVisible({ timeout: 10_000 });
+    const hasComingSoon = await comingSoon.isVisible().catch(() => false);
+    const hasBalance = await balance.isVisible().catch(() => false);
+    expect(hasComingSoon || hasBalance).toBeTruthy();
   });
 
   test("/wallet — bouton recharge visible (paiements verrouillés en bêta = ComingSoon)", async ({ page }) => {

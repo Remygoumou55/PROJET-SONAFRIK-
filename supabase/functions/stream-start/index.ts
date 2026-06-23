@@ -83,7 +83,19 @@ Deno.serve(async (req: Request) => {
         .limit(1);
     }
 
-    const { data: trackFile } = await fileQuery.maybeSingle();
+    let { data: trackFile } = await fileQuery.maybeSingle();
+
+    // Repli : si aucun fichier ne correspond au débit demandé, utiliser le primaire
+    if (!trackFile?.file_path && qualityKbps) {
+      const { data: primaryFile } = await supabase
+        .from("track_files")
+        .select("id, file_path, bitrate_kbps, format")
+        .eq("track_id", trackId)
+        .eq("is_primary", true)
+        .limit(1)
+        .maybeSingle();
+      trackFile = primaryFile;
+    }
 
     if (!trackFile?.file_path) {
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {

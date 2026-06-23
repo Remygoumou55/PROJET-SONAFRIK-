@@ -51,17 +51,49 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    // Idempotent : session déjà complétée → 200 (évite double-complete / invoke error)
+    const { data: existingSession } = await supabase
+      .from("stream_sessions")
+      .select("is_valid_listen, listen_percentage, completed_at")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingSession?.completed_at) {
+      return new Response(
+        JSON.stringify({
+          isValidListen: existingSession.is_valid_listen,
+          listenPercentage: Math.round(Number(existingSession.listen_percentage ?? 0)),
+          threshold: Math.round(VALID_LISTEN_THRESHOLD * 100),
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     // Calculer si l'écoute est valide (Real Listen V7.2 — côté serveur)
     const effectiveDuration = Math.max(totalDurationSeconds, 1);
     const listenPercentage = Math.min(positionSeconds / effectiveDuration, 1.0);
     const isValidListen = listenPercentage >= VALID_LISTEN_THRESHOLD;
 
     // Persister via RPC
-    const { data: serverValidation } = await supabase.rpc("complete_stream_session", {
-      p_session_id: sessionId,
-      p_position_seconds: positionSeconds,
-      p_total_duration_seconds: totalDurationSeconds,
-    });
+    const { data: serverValidation, error: completeError } = await supabase.rpc(
+      "complete_stream_session",
+      {
+        p_session_id: sessionId,
+        p_position_seconds: positionSeconds,
+        p_total_duration_seconds: totalDurationSeconds,
+      },
+    );
+
+    if (completeError) {
+      return new Response(JSON.stringify({ error: "session_not_found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const finalIsValid = (serverValidation as boolean) ?? isValidListen;
 
@@ -87,14 +119,17 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Audit si écoute valide
+    // Audit si écoute valide — non bloquant (PostgrestBuilder n'expose pas .catch())
     if (finalIsValid && session?.track_id) {
-      await supabase.rpc("log_audit_event_authenticated", {
+      const { error: auditError } = await supabase.rpc("log_audit_event_authenticated", {
         p_action: "streaming.listen.validated",
         p_entity_type: "tracks",
         p_entity_id: session.track_id,
         p_metadata: { session_id: sessionId, listen_percentage: listenPercentage },
-      }).catch(() => {});
+      });
+      if (auditError) {
+        console.warn("[stream-complete] audit skipped:", auditError.message);
+      }
     }
 
     return new Response(

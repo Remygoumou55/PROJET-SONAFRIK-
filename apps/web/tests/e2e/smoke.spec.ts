@@ -3,6 +3,9 @@ import { test, expect } from "@playwright/test";
 // Tests publics — aucune authentification requise.
 // Vérifient que les pages clés se chargent sans erreur JS et ont le bon titre.
 
+// BYPASS_AUTH=true (défaut .env.local) désactive les redirections middleware.
+const bypassAuth = process.env.BYPASS_AUTH === "true";
+
 test.describe("Pages publiques", () => {
   test("page auth/connexion — se charge et affiche le formulaire téléphone", async ({ page }) => {
     await page.goto("/auth/connexion");
@@ -22,6 +25,8 @@ test.describe("Pages publiques", () => {
   });
 
   test("/listen sans session — redirige vers /auth/connexion", async ({ page }) => {
+    test.skip(bypassAuth, "BYPASS_AUTH=true — middleware ne redirige pas");
+
     await page.goto("/listen");
 
     // Middleware protège /listen — doit rediriger
@@ -30,22 +35,22 @@ test.describe("Pages publiques", () => {
   });
 
   test("/wallet sans session — redirige vers /auth/connexion", async ({ page }) => {
+    test.skip(bypassAuth, "BYPASS_AUTH=true — middleware ne redirige pas");
+
     await page.goto("/wallet");
 
     await page.waitForURL(/\/auth\/connexion/, { timeout: 10_000 });
     await expect(page.url()).toContain("/auth/connexion");
   });
 
-  test("validation formulaire connexion — numéro vide affiche une erreur", async ({ page }) => {
+  test("validation formulaire connexion — numéro invalide affiche une erreur", async ({ page }) => {
     await page.goto("/auth/connexion");
 
-    // Soumettre sans remplir le champ
+    const phoneInput = page.getByLabel(/téléphone/i);
+    await phoneInput.fill("+224");
     const submitBtn = page.locator("button[type='submit']").first();
     await submitBtn.click();
 
-    // Un message d'erreur ou le bouton reste désactivé
-    const hasError = await page.locator("[role='alert'], .text-red, [class*='error'], [class*='erreur']").isVisible().catch(() => false);
-    const btnDisabled = await submitBtn.isDisabled().catch(() => false);
-    expect(hasError || btnDisabled).toBeTruthy();
+    await expect(page.getByText(/Numéro invalide|Format attendu/i)).toBeVisible();
   });
 });

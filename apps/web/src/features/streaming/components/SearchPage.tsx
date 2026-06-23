@@ -1,9 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import type { SearchType } from "@sonafrik/types";
 import { useSearch } from "../hooks/useSearch";
-import { SearchResults } from "./SearchResults";
+
+const SearchResults = dynamic(
+  () => import("./SearchResults").then((m) => ({ default: m.SearchResults })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="py-12 flex justify-center">
+        <div
+          className="w-6 h-6 rounded-full border-2 animate-spin"
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
+        />
+      </div>
+    ),
+  },
+);
 
 const TABS: { id: SearchType; label: string }[] = [
   { id: "all", label: "Tout" },
@@ -16,19 +31,21 @@ const TABS: { id: SearchType; label: string }[] = [
 
 interface Props {
   initialGenre?: string;
+  initialQuery?: string;
 }
 
-export function SearchPage({ initialGenre }: Props) {
-  const [query, setQuery] = useState(initialGenre ?? "");
+export function SearchPage({ initialGenre, initialQuery }: Props) {
+  const seed = initialQuery ?? initialGenre ?? "";
+  const [query, setQuery] = useState(seed);
   const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const [activeTab, setActiveTab] = useState<SearchType>("all");
   const { results, isSearching, error, search, clearSearch } = useSearch();
 
   useEffect(() => {
-    if (initialGenre) {
-      search(initialGenre, activeTab);
+    if (seed.trim().length >= 2) {
+      search(seed, activeTab);
     }
-  }, [initialGenre, search, activeTab]);
+  }, [seed, search, activeTab]);
 
   const handleChange = (value: string) => {
     setQuery(value);

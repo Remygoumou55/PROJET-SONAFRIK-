@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { memo } from "react";
 import { usePathname } from "next/navigation";
 import { PlayerProvider } from "../lib/playerContext";
-import { WebPlayer } from "./WebPlayer";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
 import type { AudioQualityPreference } from "@sonafrik/types";
+
+const WebPlayer = dynamic(
+  () => import("./WebPlayer").then((m) => ({ default: m.WebPlayer })),
+  { ssr: false },
+);
 
 const NAV_ITEMS = [
   { href: "/listen",        label: "Accueil",      icon: "home" },
@@ -127,6 +132,7 @@ function DesktopNav({
           <Link
             key={item.href}
             href={item.href}
+            prefetch
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
             style={{
               backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
@@ -181,6 +187,7 @@ function MobileBottomNav({
           <Link
             key={item.href}
             href={item.href}
+            prefetch
             className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors"
             style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
           >

@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 export default async function Search({
   searchParams,
 }: {
-  searchParams: Promise<{ genre?: string }>;
+  searchParams: Promise<{ genre?: string; q?: string }>;
 }) {
-  const { genre } = await searchParams;
-  return <SearchPage initialGenre={genre} />;
+  const { genre, q } = await searchParams;
+  return <SearchPage initialGenre={genre} initialQuery={q} />;
 }
