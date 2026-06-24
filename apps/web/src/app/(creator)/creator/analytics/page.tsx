@@ -2,7 +2,7 @@ import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createAnalyticsService } from "@sonafrik/api/analytics";
 import { createRoyaltyService } from "@sonafrik/api/royalties";
-import { CreatorAnalyticsDashboard } from "@/features/analytics/components/CreatorAnalyticsDashboard";
+import { CreatorAnalyticsDashboard } from "@/features/creator/analytics/components/CreatorAnalyticsDashboard";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
 
 const EMPTY_STREAM_STATS = {

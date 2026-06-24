@@ -80,6 +80,10 @@
     "./payments": {
       "types": "./dist/payments/index.d.ts",
       "default": "./dist/payments/index.js"
+    },
+    "./listener": {
+      "types": "./dist/listener/index.d.ts",
+      "default": "./dist/listener/index.js"
     }
   },
   "scripts": {

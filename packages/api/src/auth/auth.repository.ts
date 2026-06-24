@@ -118,9 +118,10 @@ export class AuthRepository {
   }
 
   async setAccountType(userId: string, accountType: AccountType): Promise<void> {
-    const patch = { account_type: accountType, updated_by: userId };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await this.client.from("profiles").update(patch as any).eq("id", userId);
+    const { error } = await this.client
+      .from("profiles")
+      .update({ account_type: accountType, updated_by: userId })
+      .eq("id", userId);
     if (error) throw error;
   }
 }

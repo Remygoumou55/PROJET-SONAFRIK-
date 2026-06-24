@@ -10,6 +10,7 @@ import type {
   StreamSession,
   StreamStartResult,
 } from "@sonafrik/types";
+import { createSocialService } from "../social/social.service";
 import { StreamingError } from "./errors";
 import { mapFunctionInvokeError } from "./invoke-errors";
 import { StreamingRepository } from "./streaming.repository";
@@ -22,7 +23,6 @@ import {
   searchSchema,
   startStreamSchema,
   streamHeartbeatSchema,
-  toggleFavoriteSchema,
   updatePlaylistSchema,
   type AddTrackToPlaylistInput,
   type AnalyticsInput,
@@ -38,9 +38,11 @@ import {
 
 export class StreamingService {
   private readonly repository: StreamingRepository;
+  private readonly social: ReturnType<typeof createSocialService>;
 
   constructor(private readonly client: SonafrikSupabaseClient) {
     this.repository = new StreamingRepository(client);
+    this.social = createSocialService(client);
   }
 
   private async requireUserId(): Promise<string> {
@@ -117,31 +119,36 @@ export class StreamingService {
     }
   }
 
-  /** Real Listen V7.2 — retourne true si l'écoute est valide (≥90%) */
+  /** Real Listen V7.2 — retourne true si l'écoute est valide (≥90%). Ne throw jamais (idempotent). */
   async completeStream(input: CompleteStreamInput): Promise<boolean> {
     const parsed = completeStreamSchema.safeParse(input);
-    if (!parsed.success) throw new StreamingError("invalid_session");
+    if (!parsed.success) return false;
 
-    await this.requireUserId();
+    try {
+      await this.requireUserId();
+    } catch {
+      return false;
+    }
 
     const { data, error } = await this.client.functions.invoke("stream-complete", {
       body: {
         sessionId: parsed.data.sessionId,
-        positionSeconds: parsed.data.positionSeconds,
-        totalDurationSeconds: parsed.data.totalDurationSeconds,
+        positionSeconds: Math.round(parsed.data.positionSeconds),
+        totalDurationSeconds: Math.round(parsed.data.totalDurationSeconds),
       },
     });
 
     if (!error && data != null) {
-      return (data.isValidListen as boolean) ?? false;
+      const payload = typeof data === "string" ? (JSON.parse(data) as Record<string, unknown>) : data;
+      return Boolean(payload.isValidListen ?? payload.is_valid_listen ?? false);
     }
 
     const session = await this.repository.getSession(parsed.data.sessionId).catch(() => null);
     if (session?.completed_at != null) {
-      return session.is_valid_listen;
+      return session.is_valid_listen ?? false;
     }
 
-    throw new StreamingError(mapFunctionInvokeError("complete", error));
+    return false;
   }
 
   async getSession(sessionId: string): Promise<StreamSession> {
@@ -223,26 +230,23 @@ export class StreamingService {
   // Favorites
   // ---------------------------------------------------------------------------
 
-  async toggleFavorite(input: ToggleFavoriteInput): Promise<boolean> {
-    const parsed = toggleFavoriteSchema.safeParse(input);
-    if (!parsed.success) throw new StreamingError("favorite_toggle_failed");
+  // Favorites — délégués au domaine social (source unique)
+  // ---------------------------------------------------------------------------
 
-    const userId = await this.requireUserId();
+  async toggleFavorite(input: ToggleFavoriteInput): Promise<boolean> {
     try {
-      return await this.repository.toggleFavorite(userId, parsed.data.entityType, parsed.data.entityId);
+      return await this.social.toggleFavorite(input);
     } catch {
       throw new StreamingError("favorite_toggle_failed");
     }
   }
 
   async isFavorited(entityType: Favorite["entity_type"], entityId: string): Promise<boolean> {
-    await this.requireUserId();
-    return this.repository.isFavorited(entityType, entityId);
+    return this.social.isFavorited({ entityType, entityId });
   }
 
   async getUserFavorites(): Promise<Favorite[]> {
-    const userId = await this.requireUserId();
-    return this.repository.getUserFavorites(userId);
+    return this.social.getUserFavorites();
   }
 
   // ---------------------------------------------------------------------------
@@ -330,8 +334,12 @@ export class StreamingService {
   // ---------------------------------------------------------------------------
 
   async getLibrary(): Promise<LibraryItem[]> {
-    const userId = await this.requireUserId();
-    return this.repository.getUserLibrary(userId);
+    const favorites = await this.social.getUserFavorites();
+    return favorites.map((fav) => ({
+      entity_type: fav.entity_type,
+      entity_id: fav.entity_id,
+      created_at: fav.created_at,
+    }));
   }
 
   // ---------------------------------------------------------------------------

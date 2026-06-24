@@ -22,3 +22,25 @@ export async function requireAdmin(): Promise<{ userId: string }> {
 
   return { userId: user.id };
 }
+
+/** Pour server actions — retourne une erreur au lieu de redirect. */
+export async function verifyAdminForAction(): Promise<
+  { ok: true; userId: string } | { ok: false; error: string }
+> {
+  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
+    return { ok: false, error: "Configuration invalide." };
+  }
+  const isBypassMode =
+    process.env.BYPASS_AUTH === "true" &&
+    process.env.VERCEL !== "1";
+  if (isBypassMode) return { ok: true, userId: "dev-mock-id" };
+
+  const supabase = await getSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Connexion requise." };
+
+  const { data: isAdmin } = await supabase.rpc("is_admin", { p_user_id: user.id });
+  if (!isAdmin) return { ok: false, error: "Accès administrateur requis." };
+
+  return { ok: true, userId: user.id };
+}

@@ -51,6 +51,7 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
   const [isLoading, setIsLoading]   = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [instructions, setInstructions] = useState("");
+  const [isSandbox, setIsSandbox]       = useState(false);
   const [intentId, setIntentId]     = useState<string | null>(null);
   const [intentStatus, setIntentStatus] = useState<PaymentIntentStatus | null>(null);
   const [pollSeconds, setPollSeconds]   = useState(0);
@@ -85,6 +86,10 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
       });
       setIntentId(result.intentId);
       setInstructions(result.instructions);
+      setIsSandbox(result.sandbox ?? false);
+      if (result.checkoutUrl) {
+        window.open(result.checkoutUrl, "_blank", "noopener,noreferrer");
+      }
       setStep("polling");
       setPollSeconds(0);
     } catch (err) {
@@ -278,7 +283,9 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
               className="rounded-xl p-4 text-sm space-y-1"
               style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-principal)" }}
             >
-              <p className="font-semibold" style={{ color: "var(--color-vert-energie)" }}>Action requise</p>
+              <p className="font-semibold" style={{ color: "var(--color-vert-energie)" }}>
+                {isSandbox ? "Mode sandbox" : "Action requise"}
+              </p>
               <p>{instructions}</p>
             </div>
 

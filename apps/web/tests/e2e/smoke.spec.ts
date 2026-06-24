@@ -53,4 +53,10 @@ test.describe("Pages publiques", () => {
 
     await expect(page.getByText(/Numéro invalide|Format attendu/i)).toBeVisible();
   });
+
+  test("/explorer redirige vers /search", async ({ page }) => {
+    await page.goto("/explorer");
+    await page.waitForURL(/\/search/, { timeout: 10_000 });
+    expect(page.url()).toContain("/search");
+  });
 });

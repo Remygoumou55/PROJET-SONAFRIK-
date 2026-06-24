@@ -146,7 +146,9 @@ async function journey(artist: Awaited<ReturnType<typeof createArtist>>, adminCl
   await fetch(audio.signedUrl as string, {
     method: "PUT",
     headers: { "Content-Type": "audio/mpeg" },
-    body: new Uint8Array([0xff, 0xfb, 0x90, 0x00]),
+    body: Buffer.from(
+      await fetch("https://download.samplelib.com/mp3/sample-3s.mp3").then((r) => r.arrayBuffer()),
+    ),
   });
 
   const { error: subErr } = await client.rpc("submit_track_for_review", { p_track_id: track.id });

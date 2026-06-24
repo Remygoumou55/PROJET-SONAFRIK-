@@ -33,14 +33,14 @@ export class CatalogRepository {
     return (data ?? []) as Genre[];
   }
 
-  async listAlbums(creatorId: string): Promise<Album[]> {
+  async listAlbums(creatorId: string, limit = 50, offset = 0): Promise<Album[]> {
     const { data, error } = await this.client
       .from("albums")
       .select("*")
       .eq("creator_id", creatorId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .range(offset, offset + limit - 1);
 
     if (error) throw error;
     return (data ?? []).map((row) => ({
@@ -127,17 +127,18 @@ export class CatalogRepository {
     );
   }
 
-  async listTracks(creatorId: string, albumId?: string): Promise<Track[]> {
+  async listTracks(creatorId: string, albumId?: string, limit = 100, offset = 0): Promise<Track[]> {
     let query = this.client
       .from("tracks")
       .select("*")
       .eq("creator_id", creatorId)
       .is("deleted_at", null)
-      .order("track_number");
+      .order("track_number")
+      .range(offset, offset + limit - 1);
 
     if (albumId) query = query.eq("album_id", albumId);
 
-    const { data, error } = await query.limit(500);
+    const { data, error } = await query;
     if (error) throw error;
     return (data ?? []).map((row) => ({
       ...(row as Track),

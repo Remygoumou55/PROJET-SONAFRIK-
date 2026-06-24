@@ -89,6 +89,27 @@ Deno.serve(async (req: Request) => {
     );
 
     if (completeError) {
+      const { data: closedSession } = await supabase
+        .from("stream_sessions")
+        .select("is_valid_listen, listen_percentage, completed_at")
+        .eq("id", sessionId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (closedSession?.completed_at) {
+        return new Response(
+          JSON.stringify({
+            isValidListen: closedSession.is_valid_listen,
+            listenPercentage: Math.round(Number(closedSession.listen_percentage ?? 0)),
+            threshold: Math.round(VALID_LISTEN_THRESHOLD * 100),
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
       return new Response(JSON.stringify({ error: "session_not_found" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

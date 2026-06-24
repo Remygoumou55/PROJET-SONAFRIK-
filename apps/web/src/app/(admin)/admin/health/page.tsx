@@ -1,4 +1,4 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 
 export const dynamic = "force-dynamic";
 
@@ -13,102 +13,15 @@ const EXPECTED_FUNCTIONS = [
   "payment-soutra-callback",
 ];
 
-interface CheckResult {
-  label:     string;
-  ok:        boolean;
-  latencyMs?: number;
-  detail?:   string;
-}
-
-async function checkDatabase(): Promise<CheckResult> {
-  const start = Date.now();
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { count, error } = await supabase
-      .from("tracks")
-      .select("*", { count: "exact", head: true });
-    if (error) return { label: "Base de données", ok: false, latencyMs: Date.now() - start, detail: error.message };
-    return { label: "Base de données", ok: true, latencyMs: Date.now() - start, detail: `${count ?? 0} morceaux indexés` };
-  } catch (err) {
-    return { label: "Base de données", ok: false, latencyMs: Date.now() - start, detail: String(err) };
-  }
-}
-
-async function checkStorage(): Promise<CheckResult> {
-  const start = Date.now();
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { data, error } = await supabase.storage.from("covers").list("", { limit: 1 });
-    if (error) return { label: "Supabase Storage", ok: false, latencyMs: Date.now() - start, detail: error.message };
-    return { label: "Supabase Storage", ok: true, latencyMs: Date.now() - start, detail: `${data?.length ?? 0} fichier(s) trouvé(s) dans covers/` };
-  } catch (err) {
-    return { label: "Supabase Storage", ok: false, latencyMs: Date.now() - start, detail: String(err) };
-  }
-}
-
-async function checkWallets(): Promise<CheckResult> {
-  const start = Date.now();
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { count, error } = await supabase
-      .from("wallets")
-      .select("*", { count: "exact", head: true });
-    if (error) return { label: "Wallets", ok: false, latencyMs: Date.now() - start, detail: error.message };
-    return { label: "Wallets", ok: true, latencyMs: Date.now() - start, detail: `${count ?? 0} wallets actifs` };
-  } catch (err) {
-    return { label: "Wallets", ok: false, latencyMs: Date.now() - start, detail: String(err) };
-  }
-}
-
-interface AdminAlert {
-  id:         string;
-  type:       string;
-  message:    string;
-  created_at: string;
-}
-
-async function fetchUnreadAlerts(): Promise<AdminAlert[]> {
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { data } = await supabase
-      .from("admin_notifications")
-      .select("id, type, message, created_at")
-      .eq("is_read", false)
-      .order("created_at", { ascending: false })
-      .limit(10);
-    return (data as AdminAlert[]) ?? [];
-  } catch {
-    return [];
-  }
-}
-
-async function checkPayments(): Promise<CheckResult> {
-  const start = Date.now();
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { count, error } = await supabase
-      .from("payment_intents")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "confirmed");
-    if (error) return { label: "Paiements confirmés", ok: false, latencyMs: Date.now() - start, detail: error.message };
-    return { label: "Paiements confirmés", ok: true, latencyMs: Date.now() - start, detail: `${count ?? 0} total` };
-  } catch (err) {
-    return { label: "Paiements confirmés", ok: false, latencyMs: Date.now() - start, detail: String(err) };
-  }
-}
-
 function StatusBadge({ ok }: { ok: boolean }) {
   return (
-    <span
-      className="text-base"
-      title={ok ? "Opérationnel" : "Dégradé / Indisponible"}
-    >
+    <span className="text-base" title={ok ? "Opérationnel" : "Dégradé / Indisponible"}>
       {ok ? "✅" : "❌"}
     </span>
   );
 }
 
-function HealthRow({ result }: { result: CheckResult }) {
+function HealthRow({ result }: { result: { label: string; ok: boolean; latencyMs?: number; detail?: string } }) {
   return (
     <div
       className="flex items-center justify-between py-3 border-b"
@@ -126,7 +39,14 @@ function HealthRow({ result }: { result: CheckResult }) {
       {result.latencyMs !== undefined && (
         <span
           className="text-xs font-mono tabular-nums"
-          style={{ color: result.latencyMs < 200 ? "var(--color-vert-energie)" : result.latencyMs < 800 ? "var(--color-or-solaire)" : "var(--color-erreur)" }}
+          style={{
+            color:
+              result.latencyMs < 200
+                ? "var(--color-vert-energie)"
+                : result.latencyMs < 800
+                  ? "var(--color-or-solaire)"
+                  : "var(--color-erreur)",
+          }}
         >
           {result.latencyMs} ms
         </span>
@@ -136,23 +56,9 @@ function HealthRow({ result }: { result: CheckResult }) {
 }
 
 export default async function AdminHealthPage() {
-  const [db, storage, wallets, payments, alerts] = await Promise.allSettled([
-    checkDatabase(),
-    checkStorage(),
-    checkWallets(),
-    checkPayments(),
-    fetchUnreadAlerts(),
-  ]);
-
-  const results: CheckResult[] = [
-    db.status        === "fulfilled" ? db.value        : { label: "Base de données",   ok: false, detail: "Timeout" },
-    storage.status   === "fulfilled" ? storage.value   : { label: "Supabase Storage",  ok: false, detail: "Timeout" },
-    wallets.status   === "fulfilled" ? wallets.value   : { label: "Wallets",            ok: false, detail: "Timeout" },
-    payments.status  === "fulfilled" ? payments.value  : { label: "Paiements",          ok: false, detail: "Timeout" },
-  ];
-
-  const unreadAlerts: AdminAlert[] = alerts.status === "fulfilled" ? alerts.value : [];
-  const allOk = results.every((r) => r.ok);
+  const admin = await getAdminServiceForSession();
+  const { checks, alerts: unreadAlerts } = await admin.getHealthSnapshot();
+  const allOk = checks.every((r) => r.ok);
 
   return (
     <div className="space-y-6">
@@ -167,27 +73,28 @@ export default async function AdminHealthPage() {
           className="px-3 py-1.5 rounded-lg text-xs font-bold"
           style={{
             backgroundColor: allOk ? "rgba(0, 210, 106, 0.13)" : "rgba(255, 102, 102, 0.13)",
-            color:           allOk ? "var(--color-vert-energie)"  : "var(--color-erreur)",
-            border:          `1px solid ${allOk ? "rgba(0, 210, 106, 0.27)" : "rgba(255, 102, 102, 0.27)"}`,
+            color: allOk ? "var(--color-vert-energie)" : "var(--color-erreur)",
+            border: `1px solid ${allOk ? "rgba(0, 210, 106, 0.27)" : "rgba(255, 102, 102, 0.27)"}`,
           }}
         >
           {allOk ? "TOUT OPÉRATIONNEL" : "DÉGRADÉ"}
         </span>
       </div>
 
-      {/* Composants infrastructure */}
       <div
         className="rounded-2xl p-5"
         style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
       >
         <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--color-texte-secondaire)" }}>Infrastructure</h2>
-        {results.map((r) => <HealthRow key={r.label} result={r} />)}
+        {checks.map((r) => <HealthRow key={r.label} result={r} />)}
       </div>
 
-      {/* Alertes admin — générées par trigger check_provider_failure_rate */}
       <div
         className="rounded-2xl p-5"
-        style={{ backgroundColor: "var(--color-surface)", border: `1px solid ${unreadAlerts.length > 0 ? "rgba(255, 194, 14, 0.27)" : "var(--color-elevated)"}` }}
+        style={{
+          backgroundColor: "var(--color-surface)",
+          border: `1px solid ${unreadAlerts.length > 0 ? "rgba(255, 194, 14, 0.27)" : "var(--color-elevated)"}`,
+        }}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold" style={{ color: "var(--color-texte-secondaire)" }}>Alertes système</h2>
@@ -223,14 +130,15 @@ export default async function AdminHealthPage() {
         )}
       </div>
 
-      {/* Edge Functions attendues */}
       <div
         className="rounded-2xl p-5"
         style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
       >
-        <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--color-texte-secondaire)" }}>Edge Functions (à vérifier manuellement)</h2>
+        <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--color-texte-secondaire)" }}>
+          Edge Functions (à vérifier manuellement)
+        </h2>
         <p className="text-xs mb-3" style={{ color: "var(--color-texte-desactive)" }}>
-          L&apos;état des Edge Functions n&apos;est pas vérifiable depuis le serveur Next.js.<br />
+          L&apos;état des Edge Functions n&apos;est pas vérifiable depuis le serveur Next.js.
           Vérifiez dans Supabase Dashboard → Edge Functions.
         </p>
         <div className="space-y-2">

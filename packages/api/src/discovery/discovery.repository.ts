@@ -1,5 +1,6 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type {
+  DiscoveryAlbum,
   DiscoveryArtist,
   DiscoveryTrack,
   NewReleasesResult,
@@ -9,21 +10,21 @@ export class DiscoveryRepository {
   constructor(private readonly client: SonafrikSupabaseClient) {}
 
   async getDiscoveryFeed(limit: number): Promise<DiscoveryTrack[]> {
-    const { data, error } = await this.client.rpc("get_discovery_feed" as never, {
+    const { data, error } = await this.client.rpc("get_discovery_feed", {
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
-    return (data as DiscoveryTrack[]) ?? [];
+    return (data as unknown as DiscoveryTrack[]) ?? [];
   }
 
   async getNewReleases(type: string, days: number, limit: number): Promise<NewReleasesResult> {
-    const { data, error } = await this.client.rpc("get_new_releases" as never, {
+    const { data, error } = await this.client.rpc("get_new_releases", {
       p_type: type,
       p_days: days,
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
-    const result = data as NewReleasesResult;
+    const result = data as unknown as NewReleasesResult;
     return {
       tracks: result?.tracks ?? [],
       albums: result?.albums ?? [],
@@ -32,18 +33,18 @@ export class DiscoveryRepository {
   }
 
   async getSuggestedArtists(limit: number): Promise<DiscoveryArtist[]> {
-    const { data, error } = await this.client.rpc("get_suggested_artists" as never, {
+    const { data, error } = await this.client.rpc("get_suggested_artists", {
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
-    return (data as DiscoveryArtist[]) ?? [];
+    return (data as unknown as DiscoveryArtist[]) ?? [];
   }
 
-  async getSuggestedAlbums(limit: number): Promise<import("@sonafrik/types").DiscoveryAlbum[]> {
-    const { data, error } = await this.client.rpc("get_suggested_albums" as never, {
+  async getSuggestedAlbums(limit: number): Promise<DiscoveryAlbum[]> {
+    const { data, error } = await this.client.rpc("get_suggested_albums", {
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
-    return (data as import("@sonafrik/types").DiscoveryAlbum[]) ?? [];
+    return (data as unknown as DiscoveryAlbum[]) ?? [];
   }
 }

@@ -16,64 +16,55 @@ export class RoyaltyRepository {
     totalRevenueGnf: number,
     revenuePoolPercent: number,
   ): Promise<string> {
-    const { data, error } = await this.client.rpc(
-      "open_royalty_cycle" as never,
-      {
-        p_period_start:         periodStart,
-        p_period_end:           periodEnd,
-        p_total_revenue_gnf:    totalRevenueGnf,
-        p_revenue_pool_percent: revenuePoolPercent,
-      } as never,
-    );
+    const { data, error } = await this.client.rpc("open_royalty_cycle", {
+      p_period_start:         periodStart,
+      p_period_end:           periodEnd,
+      p_total_revenue_gnf:    totalRevenueGnf,
+      p_revenue_pool_percent: revenuePoolPercent,
+    });
     if (error) throw error;
     return data as string;
   }
 
   async calculateRoyalties(cycleId: string): Promise<RoyaltyCalculationResult> {
-    const { data, error } = await this.client.rpc(
-      "calculate_royalties" as never,
-      { p_cycle_id: cycleId } as never,
-    );
+    const { data, error } = await this.client.rpc("calculate_royalties", {
+      p_cycle_id: cycleId,
+    });
     if (error) throw error;
-    return data as RoyaltyCalculationResult;
+    return data as unknown as RoyaltyCalculationResult;
   }
 
   async distributeRoyalties(cycleId: string): Promise<RoyaltyDistributionResult> {
-    const { data, error } = await this.client.rpc(
-      "distribute_royalties" as never,
-      { p_cycle_id: cycleId } as never,
-    );
+    const { data, error } = await this.client.rpc("distribute_royalties", {
+      p_cycle_id: cycleId,
+    });
     if (error) throw error;
-    return data as RoyaltyDistributionResult;
+    return data as unknown as RoyaltyDistributionResult;
   }
 
   async getRoyaltyCycleSummary(cycleId: string): Promise<RoyaltyCycleSummary | null> {
-    const { data, error } = await this.client.rpc(
-      "get_royalty_cycle_summary" as never,
-      { p_cycle_id: cycleId } as never,
-    );
+    const { data, error } = await this.client.rpc("get_royalty_cycle_summary", {
+      p_cycle_id: cycleId,
+    });
     if (error) throw error;
-    return data as RoyaltyCycleSummary | null;
+    return data as unknown as RoyaltyCycleSummary | null;
   }
 
   async getCreatorRoyaltyHistory(
     creatorId: string,
     limit: number,
   ): Promise<CreatorRoyaltyHistoryEntry[]> {
-    const { data, error } = await this.client.rpc(
-      "get_creator_royalty_history" as never,
-      { p_creator_id: creatorId, p_limit: limit } as never,
-    );
+    const { data, error } = await this.client.rpc("get_creator_royalty_history", {
+      p_creator_id: creatorId,
+      p_limit: limit,
+    });
     if (error) throw error;
-    return (data as CreatorRoyaltyHistoryEntry[]) ?? [];
+    return (data as unknown as CreatorRoyaltyHistoryEntry[]) ?? [];
   }
 
   async getActiveRoyaltyCycle(): Promise<ActiveRoyaltyCycle | null> {
-    const { data, error } = await this.client.rpc(
-      "get_active_royalty_cycle" as never,
-      {} as never,
-    );
+    const { data, error } = await this.client.rpc("get_active_royalty_cycle");
     if (error) throw error;
-    return data as ActiveRoyaltyCycle | null;
+    return data as unknown as ActiveRoyaltyCycle | null;
   }
 }

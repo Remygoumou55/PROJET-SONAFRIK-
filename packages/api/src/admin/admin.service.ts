@@ -3,6 +3,13 @@ import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
 import { AdminError } from "./errors";
 import { AdminRepository } from "./admin.repository";
 import { toggleFeatureFlagSchema, updateSystemSettingSchema } from "./schemas";
+import type {
+  AdminDashboardKpis,
+  AdminFraudSession,
+  AdminHealthSnapshot,
+  AdminRightsClaim,
+  PendingCatalogItem,
+} from "./types";
 
 export class AdminService {
   private readonly repository: AdminRepository;
@@ -64,8 +71,36 @@ export class AdminService {
     await this.repository.updateRightsClaim(id, status, notes)
       .catch(() => { throw new AdminError("update_failed"); });
   }
+
+  async listPendingCatalogItems(limit = 200): Promise<PendingCatalogItem[]> {
+    return this.repository.listPendingCatalogItems(limit);
+  }
+
+  async listRightsClaims(limit = 100): Promise<AdminRightsClaim[]> {
+    return this.repository.listRightsClaims(limit);
+  }
+
+  async listFraudSessions(limit = 50): Promise<AdminFraudSession[]> {
+    return this.repository.listFraudSessions(limit);
+  }
+
+  async getDashboardKpis(): Promise<AdminDashboardKpis> {
+    return this.repository.getDashboardKpis();
+  }
+
+  async getHealthSnapshot(): Promise<AdminHealthSnapshot> {
+    return this.repository.getHealthSnapshot();
+  }
 }
 
 export function createAdminService(client: SonafrikSupabaseClient): AdminService {
   return new AdminService(client);
 }
+
+export type {
+  AdminDashboardKpis,
+  AdminFraudSession,
+  AdminHealthSnapshot,
+  AdminRightsClaim,
+  PendingCatalogItem,
+} from "./types";

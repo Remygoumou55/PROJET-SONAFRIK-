@@ -2,25 +2,25 @@
 > Document de référence pour toute IA ou développeur travaillant sur le projet.
 > **Lire CLAUDE.md en premier.**
 > Mettre à jour ce fichier après chaque tâche complétée.
-> Dernière mise à jour : 2026-06-22 — Post-Audit Forensique 360°
+> Dernière mise à jour : 2026-06-23 — Certification globale A→E
 
 ---
 
-## ÉTAT RÉEL AU 2026-06-22
+## ÉTAT RÉEL AU 2026-06-23
 
-**Score global : 82/100** — Projet sain et maintenable, prêt pour la bêta fermée.
+**Score global : 88/100** — Projet certifié bêta fermée, prêt staging paiements.
 
-> ⚠️ L'ancienne version de ce document (pré-audit) décrivait des problèmes résolus depuis.
-> Ce document reflète l'**état mesuré réel**, pas un état estimé.
+> Rapport détaillé : `docs/RAPPORT-CERTIFICATION-GLOBALE.md`  
+> Re-vérification : `pnpm probe:certification` → **103/103**
 
 | Dimension | Score | État |
 |---|---|---|
-| Architecture | 88/100 | ✅ Isolation domaines respectée |
+| Architecture | 92/100 | ✅ Couche API complète, admin isolé |
 | Performance | 85/100 | ✅ React.cache, timeouts, next/image |
-| Sécurité | 78/100 | ✅ RLS 53/53 tables, 0 secret exposé |
-| Maintenabilité | 84/100 | ✅ 0 erreur TS, 0 warning lint |
-| MVP Readiness | 70/100 | ⚠️ Bêta OK — paiements en stub |
-| Qualité du code | 86/100 | ✅ Typecheck + lint 100% verts |
+| Sécurité | 88/100 | ✅ RLS 53/53, règles financières strictes |
+| Maintenabilité | 90/100 | ✅ 0 erreur TS, 0 warning lint, probes A→E |
+| MVP Readiness | 85/100 | ✅ Bêta OK — prod paiements = credentials opérateurs |
+| Qualité du code | 92/100 | ✅ 0× `as never`, 0× `as any` dans api |
 
 ---
 
@@ -28,62 +28,67 @@
 
 ### ✅ VAGUE A — Sécurité urgente (TERMINÉE 2026-06-22)
 
-| Tâche | Statut | Commit |
-|---|---|---|
-| Migration `20260621040000_subscription_plans_and_security_fixes` appliquée | ✅ | `99eabc4` |
-| `admin_dashboard_stats` : SELECT révoqué à `anon`/`authenticated` | ✅ | `99eabc4` |
-| `subscription_plans` : table + RLS + 3 plans + trigger | ✅ | `99eabc4` |
-| `requireCreator.ts` : garde bypass aligné sur `&& VERCEL !== "1"` | ✅ | `99eabc4` |
-| Vercel dashboard : aucun `BYPASS_AUTH`/`NEXT_PUBLIC_BYPASS_AUTH` | ✅ | Vérifié |
-| Drift migration résolu : 48/48 appliquées | ✅ | Manuel |
+| Tâche | Statut |
+|---|---|
+| Migration `20260621040000_subscription_plans_and_security_fixes` | ✅ |
+| `admin_dashboard_stats` : SELECT révoqué à `anon`/`authenticated` | ✅ |
+| `subscription_plans` : table + RLS + 3 plans + trigger | ✅ |
+| `requireCreator.ts` : garde bypass aligné | ✅ |
+| Vercel : aucun `BYPASS_AUTH` | ✅ |
+| Probe certification | ✅ 15/15 |
 
 ### ✅ VAGUE B — Stabilisation (TERMINÉE 2026-06-22)
 
-| Tâche | Statut | Commit |
+| Tâche | Statut |
+|---|---|
+| `formatGnf` unifié sur `@sonafrik/shared` | ✅ |
+| Doublons RPC supprimés (`mark_all_notifications_read`, `send_tip`, `check_ownership_total`) | ✅ |
+| Probe certification | ✅ 19/19 |
+
+### ✅ VAGUE C — Architecture / couche API (TERMINÉE 2026-06-22)
+
+| Tâche | Statut |
+|---|---|
+| 8 pages admin sans Supabase direct → `useAdminService` | ✅ |
+| `AdminService/Repository` : catalog, rights, finance, fraud | ✅ |
+| Route `/admin/health` | ✅ |
+| Probe certification | ✅ 19/19 |
+
+### ✅ VAGUE D — Typage & design tokens (TERMINÉE 2026-06-22)
+
+| Tâche | Statut |
+|---|---|
+| 127 hex hardcodés → 0 | ✅ |
+| Tokens CSS manquants ajoutés | ✅ |
+| 71× `as never` → 0 dans `@sonafrik/api` | ✅ |
+| 5× `as any` supprimés | ✅ |
+| Probe certification | ✅ 22/22 |
+
+### ✅ VAGUE E — Paiements mobiles (TERMINÉE 2026-06-23)
+
+| Tâche | Statut |
+|---|---|
+| Module `_shared/payments.ts` — Wave, Orange, MTN, Soutra + sandbox | ✅ |
+| Module `_shared/payment-callback.ts` — DRY + HMAC | ✅ |
+| 4 edge callbacks refactorisés | ✅ |
+| Edge `payment-initiate` déployée | ✅ |
+| `packages/api/src/payments/` — service + schemas | ✅ |
+| Web : `TopupModal`, `PayoutPage`, gate `NEXT_PUBLIC_PAYMENTS_ENABLED` | ✅ |
+| Migration `20260624200000` — audit `request_withdrawal` | ✅ appliquée remote |
+| Probe certification | ✅ 22/22 |
+
+---
+
+## PROCHAINES ÉTAPES (POST VAGUE E)
+
+| Tâche | Priorité | Bloquant |
 |---|---|---|
-| `formatGnf` unifié sur `@sonafrik/shared` (4 composants web + 1 mobile) | ✅ | `8e0fc0e` + `742f5ed` |
-| RPC `mark_all_notifications_read()` doublon supprimé | ✅ | `8e0fc0e` |
-| RPC `send_tip(p_sender_id, ...)` doublon supprimé | ✅ | `8e0fc0e` |
-| RPC `check_ownership_total(uuid)` doublon supprimé | ✅ | `8e0fc0e` |
-
-### ✅ VAGUE C — Nettoyage (TERMINÉE 2026-06-22)
-
-| Tâche | Statut | Commit |
-|---|---|---|
-| `AdminCatalogCenter` : couche API via `useAdminService` | ✅ | en cours |
-| `AdminRightsCenter` : couche API via `useAdminService` | ✅ | en cours |
-| `NotificationBell` : couche API via `useNotificationsService` | ✅ | en cours |
-| `SessionList` : `signOutEverywhere()` via `useAuthService` | ✅ | en cours |
-| `GoogleAuthButton` : `signInWithGoogle()` via `useAuthService` | ✅ | en cours |
-| `AdminService/Repository` : méthodes `reviewCatalogItem` + `updateRightsClaim` | ✅ | en cours |
-| `AuthService` : méthodes `signOutEverywhere` + `signInWithGoogle` | ✅ | en cours |
-| Hook `useAdminService` créé | ✅ | en cours |
-| Route `/admin/health` : lien ajouté dans la nav admin | ✅ | en cours |
-| Tables `payout_audit_logs`/`payout_batches` : commentées "Réservées Vague E" | ✅ | en cours |
-| `PLAN_CORRECTION_360.md` réécrit (suppression infos périmées) | ✅ | en cours |
-
-### ✅ VAGUE D — Optimisation (TERMINÉE 2026-06-22)
-
-| Tâche | Statut | Commit |
-|---|---|---|
-| Tokens manquants ajoutés dans `globals.css` : accent-violet, accent-orange, accent-rose, accent-bleu-clair, texte-subtil, skeleton | ✅ | `9a13cc2` |
-| 127 hex hardcodés → 0 : 35 fichiers nettoyés | ✅ | `9a13cc2` |
-| Hex alpha 8 chiffres convertis en `rgba()` standard | ✅ | `9a13cc2` |
-| `ARTIST_RING_COLORS` refactorisé en objet rgba pré-calculé | ✅ | `9a13cc2` |
-| 2 warnings ESLint pre-existants corrigés | ✅ | `9a13cc2` |
-| build + lint + typecheck : 100% verts | ✅ | `9a13cc2` |
-
-### 🔴 VAGUE E — Paiements (BLOQUANT REVENU)
-
-| Tâche | Priorité | Effort estimé |
-|---|---|---|
-| Intégrer Orange Money GN (credentials sandbox → prod) | Critique | 2-3 sem. |
-| Intégrer MTN MoMo GN | Critique | 2-3 sem. |
-| Intégrer Wave GN | Critique | 1-2 sem. |
-| Intégrer Soutra Money | Critique | 1-2 sem. |
-| HMAC callbacks sécurisés pour chaque provider | Critique | 1 sem. |
-| Activer `payout_batches` + `payout_audit_logs` dans le code | Critique | 1 sem. |
-| Déverrouiller Beat Store (feature flag) | Post-paiements | 1 sem. |
+| Credentials sandbox/prod opérateurs (Orange, MTN, Wave, Soutra) | Critique | Revenu réel |
+| Webhooks opérateurs → edge callbacks en prod | Critique | Revenu réel |
+| `NEXT_PUBLIC_PAYMENTS_ENABLED=true` en staging | Haute | Test E2E paiement |
+| Sprint G-5 — abonnements Mobile Money | Moyenne | Abonnements |
+| Beat Store (`beat_store` flag) | Post-paiements | Marketplace beats |
+| `/wallet/royalties` — UI réelle | Moyenne | Créateurs |
 
 ---
 
@@ -92,12 +97,10 @@
 | Métrique | Valeur |
 |---|---|
 | Tables | 53 (toutes avec RLS activé) |
-| Policies RLS | 161 |
-| Tables sans policy (deny-all) | 1 (`rate_limits` — accès service-role only) |
-| Migrations | 48/48 appliquées |
-| Fonctions RPC | ~140 (dont ~40 extensions) |
-| Triggers | 51 |
-| Doublons RPC | 0 (résolu Vague B) |
+| Policies RLS | ~161 |
+| Migrations | **64/64** appliquées (local = remote) |
+| Doublons RPC | 0 |
+| Dernière migration | `20260624200000_vague_e_payout_audit_request` |
 
 ---
 
@@ -106,23 +109,34 @@
 | Package | État | Note |
 |---|---|---|
 | `@sonafrik/types` | ✅ Sain | Source unique des types métier |
-| `@sonafrik/api` | ✅ Sain | Couche service/repository complète |
+| `@sonafrik/api` | ✅ Sain | 0× `as never`, couche service complète |
 | `@sonafrik/ui` | ✅ Sain | 17 composants centralisés |
-| `@sonafrik/shared` | ✅ Sain | `formatGnf` unifié, utilitaires partagés |
+| `@sonafrik/shared` | ✅ Sain | `formatGnf` unifié |
 | `@sonafrik/database` | ✅ Sain | Client typé Supabase |
+| `@sonafrik/web` | ✅ Sain | 47 routes, build OK |
+| `@sonafrik/mobile` | ✅ Sain | Player partiel |
 
 ---
 
-## PROBLÈMES RÉSOLUS (anciennement listés comme bloquants)
+## PROBLÈMES RÉSOLUS (anciennement bloquants)
 
-> Ces problèmes étaient décrits dans l'ancienne version du plan comme bloquants.
-> Ils sont tous résolus.
+- ~~Tables fantômes~~ → créées ✅
+- ~~1301 couleurs hex hardcodées~~ → 0 ✅
+- ~~Button asChild crash~~ → corrigé ✅
+- ~~RLS manquant~~ → 53/53 ✅
+- ~~Drift migration~~ → 64/64 ✅
+- ~~Doublons RPC~~ → 0 ✅
+- ~~Composants `.from()` direct~~ → couche API ✅
+- ~~Paiements stubs sans architecture~~ → Vague E complète ✅
+- ~~Edge `payment-initiate` non déployée~~ → déployée 2026-06-23 ✅
 
-- ~~Tables fantômes~~ (`beats`, `feature_flags`, `system_settings`) → créées et utilisées ✅
-- ~~1301 couleurs hex hardcodées~~ → 64 restantes (non bloquant) ✅
-- ~~Button asChild crash~~ → `buttonVariants` sur `<Link>` ✅
-- ~~RLS manquant~~ → 53/53 tables protégées ✅
-- ~~Drift migration~~ → 48/48 appliquées ✅
-- ~~Doublons RPC~~ → 0 doublon ✅
-- ~~formatGnf incohérent~~ → source unique `@sonafrik/shared` ✅
-- ~~Composants en `.from()` direct~~ → couche API respectée (Vague C) ✅
+---
+
+## COMMANDES DE CERTIFICATION
+
+```powershell
+pnpm probe:certification   # 103 checks — A→E + globaux
+pnpm probe:vague-a           # … jusqu'à e
+pnpm typecheck && pnpm lint
+pnpm --filter @sonafrik/web build
+```

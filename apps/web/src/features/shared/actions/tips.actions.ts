@@ -10,6 +10,9 @@ export async function sendTipAction(
 ): Promise<{ error?: string; receiverName?: string }> {
   try {
     const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Connexion requise." };
+
     const service = createTipsService(supabase);
     const result = await service.sendTip({ receiverCreatorId: creatorId, amountGnf });
     return { receiverName: result.receiverName };

@@ -10,7 +10,17 @@
     "build-storybook": "turbo run build-storybook --filter=@sonafrik/ui",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,mjs}\"",
     "smoke": "npx tsx scripts/smoke-test.ts",
-    "check-env": "npx tsx scripts/check-env.ts"
+    "check-env": "npx tsx scripts/check-env.ts",
+    "gen:types": "npx tsx scripts/gen-types.ts",
+    "probe:vague-a": "npx tsx scripts/probe-vague-a.ts",
+    "probe:vague-b": "npx tsx scripts/probe-vague-b.ts",
+    "probe:vague-c": "npx tsx scripts/probe-vague-c.ts",
+    "probe:vague-d": "npx tsx scripts/probe-vague-d.ts",
+    "probe:vague-e": "npx tsx scripts/probe-vague-e.ts",
+    "probe:vague-f": "npx tsx scripts/probe-vague-f.ts",
+    "probe:hex-colors": "npx tsx scripts/probe-hex-colors.ts",
+    "probe:vague-f-audit": "npx tsx scripts/probe-vague-f-audit.ts",
+    "probe:certification": "npx tsx scripts/probe-certification-globale.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

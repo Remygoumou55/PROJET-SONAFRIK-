@@ -15,11 +15,27 @@ export type { PaymentProvider };
 
 export interface InitiatePaymentResult {
   intentId: string;
-  /** Instructions d'action affichées à l'utilisateur (ex: "Confirmez sur votre téléphone") */
+  /** Instructions USSD / app opérateur */
   instructions: string;
+  /** Mode sandbox — confirmation manuelle ou webhook test */
+  sandbox?: boolean;
+  /** Wave Checkout — ouvrir dans le navigateur */
+  checkoutUrl?: string;
+  /** Push USSD (Orange, MTN, Soutra) vs redirect (Wave) */
+  ussdPush?: boolean;
 }
 
-function resolveInstructions(provider: PaymentProvider, phone: string): string {
+function resolveInstructions(
+  provider: PaymentProvider,
+  phone: string,
+  opts?: { sandbox?: boolean; checkoutUrl?: string },
+): string {
+  if (opts?.sandbox) {
+    return "Mode sandbox : le paiement est en attente. En dev, confirmez via webhook test ou SQL confirm_payment_intent.";
+  }
+  if (opts?.checkoutUrl && provider === "wave_gn") {
+    return "Une page Wave s'est ouverte. Validez le paiement dans l'application Wave, puis revenez ici.";
+  }
   switch (provider) {
     case "orange_money_gn":
       return `Composez #144# sur le ${phone} et confirmez le paiement SONAFRIK.`;
@@ -47,17 +63,44 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
       });
 
       if (error) {
-        const msg = (error as { message?: string }).message ?? "";
-        if (msg.includes("invalid_provider"))    throw new PaymentError("invalid_provider");
-        if (msg.includes("invalid_amount"))      throw new PaymentError("invalid_amount");
-        if (msg.includes("unauthorized"))        throw new PaymentError("unauthorized");
+        let msg = (error as { message?: string }).message ?? "";
+        const ctx = (error as { context?: Response }).context;
+        if (ctx) {
+          try {
+            const body = await ctx.json() as { error?: string; message?: string };
+            msg = [body.error, body.message, msg].filter(Boolean).join(" ");
+          } catch {
+            /* ignore */
+          }
+        }
+        if (msg.includes("invalid_provider")) throw new PaymentError("invalid_provider");
+        if (msg.includes("invalid_amount"))   throw new PaymentError("invalid_amount");
+        if (msg.includes("unauthorized"))     throw new PaymentError("unauthorized");
+        if (msg.includes("wallet_not_found")) throw new PaymentError("provider_error", "Portefeuille introuvable.");
         throw new PaymentError("provider_error", msg);
       }
 
-      const result = data as { intentId: string };
+      const result = data as {
+        intentId?: string;
+        error?: string;
+        message?: string;
+        sandbox?: boolean;
+        checkoutUrl?: string;
+        ussdPush?: boolean;
+      };
+
+      if (!result?.intentId) {
+        throw new PaymentError("provider_error", result?.message ?? result?.error ?? "initiation_failed");
+      }
       return {
         intentId:     result.intentId,
-        instructions: resolveInstructions(parsed.data.provider, parsed.data.phone),
+        sandbox:      result.sandbox,
+        checkoutUrl:  result.checkoutUrl,
+        ussdPush:     result.ussdPush,
+        instructions: resolveInstructions(parsed.data.provider, parsed.data.phone, {
+          sandbox: result.sandbox,
+          checkoutUrl: result.checkoutUrl,
+        }),
       };
     },
 

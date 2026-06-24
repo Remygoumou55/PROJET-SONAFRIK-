@@ -3,21 +3,10 @@
 import { useCallback, useState } from "react";
 import { useAdminService } from "../hooks/useAdminService";
 import { formatDateTime } from "@/lib/formatters";
-
-type EntityType = "album" | "track";
-type ReviewStatus = "published" | "rejected";
-
-interface PendingItem {
-  id: string;
-  type: EntityType;
-  title: string;
-  creator_name: string | null;
-  submitted_at: string | null;
-  release_type?: string;
-}
+import type { PendingCatalogItem } from "@sonafrik/api/admin";
 
 interface Props {
-  initialItems: PendingItem[];
+  initialItems: PendingCatalogItem[];
 }
 
 const RELEASE_TYPE_LABELS: Record<string, string> = {
@@ -29,19 +18,24 @@ const RELEASE_TYPE_LABELS: Record<string, string> = {
 
 export function AdminCatalogCenter({ initialItems }: Props) {
   const admin = useAdminService();
-  const [items, setItems] = useState<PendingItem[]>(initialItems);
+  const [items, setItems] = useState<PendingCatalogItem[]>(initialItems);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
   const [modal, setModal] = useState<{
     id: string;
-    type: EntityType;
-    action: ReviewStatus;
+    type: PendingCatalogItem["type"];
+    action: "published" | "rejected";
     reason: string;
   } | null>(null);
 
   const runAction = useCallback(
-    async (id: string, entityType: EntityType, action: ReviewStatus, reason?: string) => {
+    async (
+      id: string,
+      entityType: PendingCatalogItem["type"],
+      action: "published" | "rejected",
+      reason?: string,
+    ) => {
       setActionState((prev) => ({ ...prev, [id]: true }));
       setError(null);
       try {

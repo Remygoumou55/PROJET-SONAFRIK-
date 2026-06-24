@@ -5,10 +5,8 @@ import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
 import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
+import { isPaymentsEnabled } from "@/features/wallet/lib/paymentsEnabled";
 import { ComingSoon } from "@/components/ComingSoon";
-
-// Déverrouiller quand Orange Money / MTN MoMo / Wave sont intégrés
-const PAYMENTS_COMING_SOON = true;
 
 const SubscriptionModal = dynamic(
   () =>
@@ -31,7 +29,7 @@ export function WalletClient() {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showTopup, setShowTopup]               = useState(false);
 
-  if (PAYMENTS_COMING_SOON) {
+  if (!isPaymentsEnabled()) {
     return (
       <ComingSoon
         emoji="💳"

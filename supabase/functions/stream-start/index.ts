@@ -65,12 +65,15 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Sélectionner le fichier audio selon la qualité demandée
+    // Formats lisibles par tous les navigateurs (CDC : pas de FLAC/OGG côté web)
+    const WEB_AUDIO_FORMATS = ["mp3", "m4a", "aac"];
+
     let fileQuery = supabase
       .from("track_files")
       .select("id, file_path, bitrate_kbps, format")
       .eq("track_id", trackId)
       .eq("is_primary", true)
+      .in("format", WEB_AUDIO_FORMATS)
       .limit(1);
 
     if (qualityKbps) {
@@ -78,6 +81,7 @@ Deno.serve(async (req: Request) => {
         .from("track_files")
         .select("id, file_path, bitrate_kbps, format")
         .eq("track_id", trackId)
+        .in("format", WEB_AUDIO_FORMATS)
         .lte("bitrate_kbps", qualityKbps)
         .order("bitrate_kbps", { ascending: false })
         .limit(1);
@@ -85,16 +89,27 @@ Deno.serve(async (req: Request) => {
 
     let { data: trackFile } = await fileQuery.maybeSingle();
 
-    // Repli : si aucun fichier ne correspond au débit demandé, utiliser le primaire
+    // Repli : fichier primaire web-safe, puis tout primaire
     if (!trackFile?.file_path && qualityKbps) {
       const { data: primaryFile } = await supabase
         .from("track_files")
         .select("id, file_path, bitrate_kbps, format")
         .eq("track_id", trackId)
         .eq("is_primary", true)
+        .in("format", WEB_AUDIO_FORMATS)
         .limit(1)
         .maybeSingle();
       trackFile = primaryFile;
+    }
+    if (!trackFile?.file_path) {
+      const { data: anyPrimary } = await supabase
+        .from("track_files")
+        .select("id, file_path, bitrate_kbps, format")
+        .eq("track_id", trackId)
+        .eq("is_primary", true)
+        .limit(1)
+        .maybeSingle();
+      trackFile = anyPrimary;
     }
 
     if (!trackFile?.file_path) {
@@ -104,11 +119,26 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Générer URL pré-signée (Règle #10 CDC — URLs audio côté serveur uniquement)
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
+
+    const { data: blobList } = await supabaseAdmin.storage
+      .from("catalog-audio")
+      .list(trackFile.file_path.split("/").slice(0, -1).join("/") || "", {
+        search: trackFile.file_path.split("/").pop(),
+        limit: 1,
+      });
+    const metaSize = blobList?.[0]?.metadata?.size as number | undefined;
+    if (metaSize !== undefined && metaSize < 64) {
+      return new Response(JSON.stringify({ error: "stream_start_failed" }), {
+        status: 422,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Générer URL pré-signée (Règle #10 CDC — URLs audio côté serveur uniquement)
 
     const SIGNED_URL_EXPIRY = 1800; // 30 minutes — réduit l'exposition si URL divulguée
 

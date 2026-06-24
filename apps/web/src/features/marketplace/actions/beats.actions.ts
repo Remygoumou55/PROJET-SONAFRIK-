@@ -9,6 +9,9 @@ export async function purchaseBeatAction(
 ): Promise<{ error?: string }> {
   try {
     const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Connexion requise." };
+
     const service = createBeatsService(supabase);
     await service.purchaseBeat(beatId);
     revalidatePath("/listen/beats");
@@ -29,6 +32,9 @@ export async function createBeatAction(params: {
 }): Promise<{ error?: string }> {
   try {
     const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Connexion requise." };
+
     const service = createBeatsService(supabase);
     await service.createBeat(params);
     revalidatePath("/listen/beats");

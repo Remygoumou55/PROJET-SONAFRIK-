@@ -4,13 +4,17 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import { createAdminService } from "@sonafrik/api/admin";
+import { verifyAdminForAction } from "@/features/admin/lib/requireAdmin";
 
 export async function toggleFeatureFlagAction(
   name: string,
   enabled: boolean,
 ): Promise<{ error?: string }> {
+  const auth = await verifyAdminForAction();
+  if (!auth.ok) return { error: auth.error };
+
   try {
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseAdminClient({ adminVerified: true });
     const service = createAdminService(supabase);
     await service.toggleFeatureFlag(name, enabled);
     revalidatePath("/admin/flags");
@@ -35,6 +39,9 @@ export async function updateSystemSettingAction(
   key: string,
   value: string,
 ): Promise<{ error?: string }> {
+  const auth = await verifyAdminForAction();
+  if (!auth.ok) return { error: auth.error };
+
   try {
     // Les valeurs sont stockées en JSONB — on tente le parse JSON, sinon string brute
     let parsedValue: unknown = value;
@@ -53,7 +60,7 @@ export async function updateSystemSettingAction(
       parsedValue = result.data;
     }
 
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseAdminClient({ adminVerified: true });
     const service = createAdminService(supabase);
     await service.updateSystemSetting(key, parsedValue);
     revalidatePath("/admin/settings");

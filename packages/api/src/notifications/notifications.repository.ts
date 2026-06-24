@@ -10,9 +10,7 @@ export class NotificationsRepository {
     limit: number;
     unreadOnly: boolean;
   }): Promise<Notification[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sb = this.supabase as any;
-    let query = sb
+    let query = this.supabase
       .from("notifications")
       .select("id, user_id, type, title, body, data, read_at, created_at")
       .eq("user_id", params.userId)
@@ -29,25 +27,21 @@ export class NotificationsRepository {
   }
 
   async markRead(notificationId: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sb = this.supabase as any;
-    const { error } = await sb
+    const { error } = await this.supabase
       .from("notifications")
       .update({ read_at: new Date().toISOString() })
       .eq("id", notificationId);
     if (error) throw error;
   }
 
-  async markAllRead(userId: string): Promise<void> {
-    const { error } = await this.supabase
-      .rpc("mark_all_notifications_read" as never, { p_user_id: userId } as never);
+  async markAllRead(_userId: string): Promise<void> {
+    const { error } = await this.supabase.rpc("mark_all_notifications_read");
     if (error) throw error;
   }
 
-  async countUnread(userId: string): Promise<number> {
-    const { data, error } = await this.supabase
-      .rpc("count_unread_notifications" as never, { p_user_id: userId } as never);
+  async countUnread(_userId: string): Promise<number> {
+    const { data, error } = await this.supabase.rpc("count_unread_notifications");
     if (error) throw error;
-    return (data as unknown as number) ?? 0;
+    return (data as number) ?? 0;
   }
 }

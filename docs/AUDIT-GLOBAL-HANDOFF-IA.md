@@ -3,8 +3,8 @@
 > **Projet :** SONAFRIK — Music Operating System Africain
 > **Workspace :** `E:\PROJET SONAFRIK`
 > **Supabase :** `cxjpburiiazzvlczzupy`
-> **Dernière mise à jour :** 2026-06-22
-> **Statut global :** Bêta fermée possible — **paiements réels = bloquant revenu**
+> **Dernière mise à jour :** 2026-06-23
+> **Statut global :** Bêta fermée certifiée — **103/103 probes** — prod paiements = credentials opérateurs
 
 ---
 
@@ -12,14 +12,15 @@
 
 SONAFRIK est un monorepo Turborepo (Next.js 15 web + Expo mobile + Supabase) pour le streaming musical guinéen. Depuis le premier prompt (CDC V9.0), le projet est passé de **zéro à un MVP technique quasi-complet** : auth, identity, creator, catalog, streaming (Real Listen V7.2), wallet, royalties, rights, admin, mobile player.
 
-**3 audits forensiques** (V1 → V2 → V3) + **4 vagues de correction** (A→D) ont été exécutées. Score actuel **82/100** — prêt bêta fermée, **pas prêt monétisation** (4 opérateurs paiement = stubs).
+**3 audits forensiques** (V1 → V2 → V3) + **5 vagues de correction** (A→E) ont été exécutées. Score actuel **88/100** — prêt bêta fermée, **staging paiements prêt** (credentials opérateurs requis pour prod).
 
 **Toute IA doit lire dans cet ordre :**
 1. `CLAUDE.md`
 2. `docs/CDC-v9.0.md`
 3. `docs/PLAN_CORRECTION_360.md`
-4. `docs/RAPPORT_COLLECTION.md` (5 dernières entrées)
-5. `.cursor/rules/*.mdc` (6 caméras de surveillance)
+4. `docs/RAPPORT-CERTIFICATION-GLOBALE.md`
+5. `docs/RAPPORT_COLLECTION.md` (5 dernières entrées)
+6. `.cursor/rules/*.mdc` (6 caméras de surveillance)
 
 ---
 

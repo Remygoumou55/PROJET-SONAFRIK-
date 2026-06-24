@@ -1,7 +1,7 @@
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createRightsService } from "@sonafrik/api/rights";
-import { WorksPageClient } from "@/features/rights/components/WorksPageClient";
+import { WorksPageClient } from "@/features/creator/rights/components/WorksPageClient";
 
 export const metadata = { title: "Droits & Contrats — Creator OS SONAFRIK" };
 

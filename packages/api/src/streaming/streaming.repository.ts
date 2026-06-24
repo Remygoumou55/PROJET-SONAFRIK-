@@ -4,8 +4,6 @@ import type {
   AlbumWithMeta,
   ArtistResult,
   BeatSearchResult,
-  Favorite,
-  LibraryItem,
   PlaybackPosition,
   Playlist,
   PlaylistSearchResult,
@@ -178,13 +176,13 @@ export class StreamingRepository {
     if (error) throw error;
   }
 
-  async getPlaylistTracks(playlistId: string): Promise<PlaylistTrack[]> {
+  async getPlaylistTracks(playlistId: string, limit = 100, offset = 0): Promise<PlaylistTrack[]> {
     const { data, error } = await this.client
       .from("playlist_tracks")
       .select("*")
       .eq("playlist_id", playlistId)
       .order("position")
-      .limit(500);
+      .range(offset, offset + limit - 1);
     if (error) throw error;
     return (data ?? []) as PlaylistTrack[];
   }
@@ -216,42 +214,6 @@ export class StreamingRepository {
       .eq("playlist_id", playlistId)
       .eq("track_id", trackId);
     if (error) throw error;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Favorites
-  // ---------------------------------------------------------------------------
-
-  async toggleFavorite(
-    userId: string,
-    entityType: Favorite["entity_type"],
-    entityId: string,
-  ): Promise<boolean> {
-    const { data, error } = await this.client.rpc("toggle_favorite", {
-      p_entity_type: entityType,
-      p_entity_id: entityId,
-    });
-    if (error) throw error;
-    return data as boolean;
-  }
-
-  async isFavorited(entityType: Favorite["entity_type"], entityId: string): Promise<boolean> {
-    const { data, error } = await this.client.rpc("is_favorited", {
-      p_entity_type: entityType,
-      p_entity_id: entityId,
-    });
-    if (error) throw error;
-    return data as boolean;
-  }
-
-  async getUserFavorites(userId: string): Promise<Favorite[]> {
-    const { data, error } = await this.client
-      .from("favorites")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as Favorite[];
   }
 
   // ---------------------------------------------------------------------------
@@ -351,35 +313,18 @@ export class StreamingRepository {
   }
 
   async searchBeats(query: string, limit: number): Promise<BeatSearchResult[]> {
-    try {
-      const { data, error } = await this.client
-        .from("beats" as never)
-        .select("id, creator_id, title, slug, genre, cover_path, price_gnf, bpm, license_type")
-        .eq("publication_status" as never, "published")
-        .is("deleted_at" as never, null)
-        .ilike("title" as never, `%${query}%`)
-        .order("created_at" as never, { ascending: false })
-        .limit(limit);
-      if (error) return [];
-      const rows = (data ?? []) as unknown as BeatSearchResult[];
-      const q = query.toLowerCase();
-      return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
-    } catch {
-      return [];
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Library
-  // ---------------------------------------------------------------------------
-
-  async getUserLibrary(userId: string): Promise<LibraryItem[]> {
-    const favorites = await this.getUserFavorites(userId);
-    return favorites.map((fav) => ({
-      entity_type: fav.entity_type,
-      entity_id: fav.entity_id,
-      created_at: fav.created_at,
-    }));
+    const { data, error } = await this.client
+      .from("beats")
+      .select("id, creator_id, title, slug, genre, cover_path, price_gnf, bpm, license_type")
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .ilike("title", `%${query}%`)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) return [];
+    const rows = (data ?? []) as BeatSearchResult[];
+    const q = query.toLowerCase();
+    return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
   }
 
   // ---------------------------------------------------------------------------
@@ -422,7 +367,7 @@ export class StreamingRepository {
       .in("track_id", trackIds)
       .eq("is_valid_listen", true)
       .gte("started_at", since)
-      .limit(50000);
+      .limit(10_000);
 
     if (error) throw error;
 

@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useAdminService } from "../hooks/useAdminService";
 import { formatDateTime } from "@/lib/formatters";
+import type { AdminRightsClaim } from "@sonafrik/api/admin";
 import {
   RIGHTS_CLAIM_TYPE_LABELS,
   RIGHTS_CLAIM_STATUS_LABELS,
@@ -10,21 +11,10 @@ import {
   type RightsClaimStatus,
 } from "@sonafrik/types";
 
-export interface ClaimWithContext {
-  id: string;
-  work_id: string;
-  work_title: string;
-  claimant_id: string;
-  claimant_name: string | null;
-  claim_type: RightsClaimType;
-  status: RightsClaimStatus;
-  description: string;
-  evidence_url: string | null;
-  created_at: string;
-}
+export type ClaimWithContext = AdminRightsClaim;
 
 interface Props {
-  initialClaims: ClaimWithContext[];
+  initialClaims: AdminRightsClaim[];
 }
 
 type StatusFilter = RightsClaimStatus | "all";
@@ -52,7 +42,7 @@ const TYPE_COLORS: Record<RightsClaimType, { color: string; bg: string }> = {
 
 export function AdminRightsCenter({ initialClaims }: Props) {
   const admin = useAdminService();
-  const [claims, setClaims] = useState<ClaimWithContext[]>(initialClaims);
+  const [claims, setClaims] = useState<AdminRightsClaim[]>(initialClaims);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);

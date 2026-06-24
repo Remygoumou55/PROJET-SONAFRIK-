@@ -54,8 +54,10 @@ export class IdentityRepository {
     orange_money_number?: string | null;
     mtn_money_number?: string | null;
   }): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await this.client.from("profiles").update({ ...data, updated_by: userId } as any).eq("id", userId);
+    const { error } = await this.client
+      .from("profiles")
+      .update({ ...data, updated_by: userId })
+      .eq("id", userId);
     if (error) throw error;
   }
 
@@ -65,8 +67,16 @@ export class IdentityRepository {
     preferred_language?: string | null;
     backup_email?: string | null;
   }): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await this.client.from("profiles").update({ ...data, updated_by: userId } as any).eq("id", userId);
+    const { error } = await this.client
+      .from("profiles")
+      .update({
+        city: data.city,
+        locale: data.locale ?? undefined,
+        preferred_language: data.preferred_language,
+        backup_email: data.backup_email,
+        updated_by: userId,
+      })
+      .eq("id", userId);
     if (error) throw error;
   }
 
@@ -130,15 +140,10 @@ export class IdentityRepository {
     return (data ?? []) as unknown as Notification[];
   }
 
-  async getUnreadCount(userId: string): Promise<number> {
-    const { count, error } = await this.client
-      .from("notifications")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .is("read_at", null);
-
+  async getUnreadCount(_userId: string): Promise<number> {
+    const { data, error } = await this.client.rpc("count_unread_notifications");
     if (error) throw error;
-    return count ?? 0;
+    return (data as number) ?? 0;
   }
 
   async markNotificationRead(notificationId: string): Promise<void> {
@@ -149,10 +154,8 @@ export class IdentityRepository {
     if (error) throw error;
   }
 
-  async markAllNotificationsRead(userId: string): Promise<void> {
-    const { error } = await this.client.rpc("mark_all_notifications_read" as never, {
-      p_user_id: userId,
-    } as never);
+  async markAllNotificationsRead(_userId: string): Promise<void> {
+    const { error } = await this.client.rpc("mark_all_notifications_read");
     if (error) throw error;
   }
 
@@ -217,6 +220,11 @@ export class IdentityRepository {
       p_entity_id: entityId,
       p_metadata: (metadata ?? {}) as Json,
     });
+    if (error) throw error;
+  }
+
+  async becomeArtist(): Promise<void> {
+    const { error } = await this.client.rpc("become_artist_for_current_user");
     if (error) throw error;
   }
 }

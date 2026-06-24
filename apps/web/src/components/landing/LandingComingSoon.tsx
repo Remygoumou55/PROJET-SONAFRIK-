@@ -212,7 +212,7 @@ export function LandingComingSoon() {
           accès prioritaire et des conditions exclusives au lancement.
         </p>
         <Link
-          href="/auth/inscription?role=creator"
+          href="/auth/inscription?role=artist"
           style={{
             display: "inline-block",
             backgroundColor: "var(--color-vert-energie)",

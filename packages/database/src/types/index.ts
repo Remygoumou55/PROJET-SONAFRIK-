@@ -1976,6 +1976,42 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price_gnf: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price_gnf: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_gnf?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           category: Database["public"]["Enums"]["setting_category"]
@@ -2764,10 +2800,15 @@ export type Database = {
         }
         Returns: string
       }
+      append_stream_session_fraud_flags: {
+        Args: { p_flags: string[]; p_session_id: string }
+        Returns: undefined
+      }
       approve_payout_request: {
         Args: { p_withdrawal_id: string }
         Returns: Json
       }
+      assign_admin_role: { Args: { p_user_id: string }; Returns: undefined }
       assign_role_for_account_type: {
         Args: {
           p_account_type: string
@@ -2777,6 +2818,10 @@ export type Database = {
         Returns: undefined
       }
       become_artist_for_current_user: { Args: never; Returns: Json }
+      bootstrap_admin_if_none: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       calculate_royalties: { Args: { p_cycle_id: string }; Returns: Json }
       can_edit_creator: {
         Args: { p_creator_id: string; p_user_id?: string }
@@ -2793,10 +2838,6 @@ export type Database = {
       cancel_payout_request: {
         Args: { p_reason?: string; p_withdrawal_id: string }
         Returns: Json
-      }
-      check_ownership_total: {
-        Args: { p_version_id: string }
-        Returns: boolean
       }
       check_rate_limit: {
         Args: {
@@ -2823,10 +2864,7 @@ export type Database = {
         Args: { p_intent_id: string; p_provider_ref: string }
         Returns: Json
       }
-      count_unread_notifications: {
-        Args: { p_user_id?: string }
-        Returns: number
-      }
+      count_unread_notifications: { Args: never; Returns: number }
       create_notification: {
         Args: {
           p_body: string
@@ -2840,6 +2878,10 @@ export type Database = {
       create_payout_batch: {
         Args: { p_name: string; p_notes?: string }
         Returns: string
+      }
+      creator_is_active_public: {
+        Args: { p_creator_id: string }
+        Returns: boolean
       }
       distribute_royalties: { Args: { p_cycle_id: string }; Returns: Json }
       ensure_creator_for_current_user: { Args: never; Returns: string }
@@ -2935,6 +2977,10 @@ export type Database = {
         Args: { p_permission_code: string; p_user_id: string }
         Returns: boolean
       }
+      has_public_artist_profile: {
+        Args: { p_creator_id: string }
+        Returns: boolean
+      }
       has_streaming_permission: {
         Args: { p_user_id?: string }
         Returns: boolean
@@ -2979,9 +3025,7 @@ export type Database = {
         }
         Returns: string
       }
-      mark_all_notifications_read:
-        | { Args: never; Returns: number }
-        | { Args: { p_user_id?: string }; Returns: undefined }
+      mark_all_notifications_read: { Args: never; Returns: number }
       mark_notification_read: {
         Args: { p_notification_id: string }
         Returns: undefined
@@ -3023,27 +3067,19 @@ export type Database = {
         }
         Returns: undefined
       }
-      review_track_publication: {
-        Args: {
-          p_track_id: string
-          p_rejection_reason?: string
-          p_status: string
-        }
-        Returns: undefined
-      }
-      bootstrap_admin_if_none: {
-        Args: { p_user_id: string }
-        Returns: undefined
-      }
-      assign_admin_role: {
-        Args: { p_user_id: string }
-        Returns: undefined
-      }
       review_creator_verification: {
         Args: {
           p_rejection_reason?: string
           p_status: string
           p_verification_id: string
+        }
+        Returns: undefined
+      }
+      review_track_publication: {
+        Args: {
+          p_rejection_reason?: string
+          p_status: string
+          p_track_id: string
         }
         Returns: undefined
       }
@@ -3055,20 +3091,10 @@ export type Database = {
         Args: { p_limit?: number; p_query: string }
         Returns: Json
       }
-      send_tip:
-        | {
-            Args: { p_amount_gnf: number; p_receiver_creator_id: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_amount_gnf: number
-              p_message?: string
-              p_recipient_id: string
-              p_sender_id: string
-            }
-            Returns: string
-          }
+      send_tip: {
+        Args: { p_amount_gnf: number; p_receiver_creator_id: string }
+        Returns: Json
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       start_stream_session: {

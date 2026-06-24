@@ -52,6 +52,12 @@ const nextConfig: NextConfig = {
         destination: "/auth/mot-de-passe-oublie",
         permanent: true,
       },
+      // Libellé UI « Explorer » → route réelle /search
+      {
+        source: "/explorer",
+        destination: "/search",
+        permanent: false,
+      },
     ];
   },
   async headers() {

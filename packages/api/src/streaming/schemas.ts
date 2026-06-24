@@ -32,10 +32,8 @@ export const addTrackToPlaylistSchema = z.object({
   trackId: z.string().uuid(),
 });
 
-export const toggleFavoriteSchema = z.object({
-  entityType: z.enum(["track", "album", "artist", "playlist"]),
-  entityId: z.string().uuid(),
-});
+export { toggleFavoriteSchema } from "../social/schemas";
+export type { ToggleSocialFavoriteInput as ToggleFavoriteInput } from "../social/schemas";
 
 export const savePositionSchema = z.object({
   trackId: z.string().uuid(),
@@ -59,7 +57,6 @@ export type CompleteStreamInput = z.infer<typeof completeStreamSchema>;
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackToPlaylistInput = z.infer<typeof addTrackToPlaylistSchema>;
-export type ToggleFavoriteInput = z.infer<typeof toggleFavoriteSchema>;
 export type SavePositionInput = z.infer<typeof savePositionSchema>;
 export type SearchInput = z.input<typeof searchSchema>;
 export type SearchTypeInput = "all" | "tracks" | "artists" | "albums" | "playlists" | "beats";

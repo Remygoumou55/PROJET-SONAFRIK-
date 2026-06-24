@@ -270,6 +270,13 @@ export class IdentityService {
     const userId = await this.requireUserId();
     return this.repository.getUserRoles(userId);
   }
+
+  /** Pont identity → creator : activation compte artiste sans importer @sonafrik/api/creator côté web. */
+  async becomeArtist(): Promise<void> {
+    await this.requireUserId();
+    await this.repository.becomeArtist();
+    await this.repository.logAudit("identity.account.become_artist", "profiles");
+  }
 }
 
 export function createIdentityService(client: SonafrikSupabaseClient): IdentityService {

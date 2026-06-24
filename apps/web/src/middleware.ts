@@ -100,6 +100,21 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // Routes admin : session requise + rôle admin (complète le layout SSR)
+  if (isAdminRoute) {
+    const isAdmin = await withTimeout(
+      Promise.resolve(
+        supabase.rpc("is_admin", { p_user_id: user.id }).then((r) => r.data === true),
+      ),
+      4000,
+      false,
+    );
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/listen", request.url));
+    }
+    return response;
+  }
+
   // Session active : fetch profil uniquement pour les routes nécessitant
   // une décision de routing (pages auth + onboarding).
   if (

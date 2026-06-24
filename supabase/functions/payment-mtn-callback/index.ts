@@ -1,14 +1,13 @@
 /**
  * SONAFRIK — Edge Function : payment-mtn-callback
- * Webhook MTN MoMo Guinée → confirme le payment_intent côté SONAFRIK.
- *
- * MTN MoMo envoie une notification POST vers l'URL de callback enregistrée
- * lors de la création de la RequestToPay.
- *
- * RÈGLE ABSOLUE : toujours retourner 200 à l'opérateur pour éviter les retries.
+ * Webhook MTN MoMo GN → confirm_payment_intent (Vague E++).
  */
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  confirmPaymentIntent,
+  createServiceClient,
+  markPaymentIntentFailed,
+} from "../_shared/payment-callback.ts";
 
 function ok(): Response {
   return new Response("OK", { status: 200 });
@@ -20,7 +19,6 @@ Deno.serve(async (req: Request) => {
   try {
     const rawBody = await req.text();
 
-    // 1. Vérification de la clé de callback MTN
     const secret = Deno.env.get("MTN_MOMO_CALLBACK_API_KEY");
     if (secret) {
       const apiKey = req.headers.get("X-Callback-Api-Key") ?? "";
@@ -30,66 +28,33 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // 2. Parser le payload MTN MoMo
-    // Format MTN MoMo v1 (RequestToPay notification) :
-    // {
-    //   referenceId: string,           // = notre intentId (X-Reference-Id envoyé lors de l'initiation)
-    //   status: "SUCCESSFUL"|"FAILED",
-    //   reason?: { code, message },
-    //   financialTransactionId?: string
-    // }
     const payload = JSON.parse(rawBody) as {
-      referenceId?: string;            // = notre intentId
-      financialTransactionId?: string; // référence MTN
-      status?: string;                 // "SUCCESSFUL" | "FAILED" | "PENDING"
+      referenceId?: string;
+      financialTransactionId?: string;
+      status?: string;
       reason?: { code?: string; message?: string };
-      [key: string]: unknown;
     };
 
-    const intentId    = payload.referenceId;
+    const intentId = payload.referenceId;
     const providerRef = payload.financialTransactionId;
-    const status      = (payload.status ?? "").toUpperCase();
+    const status = (payload.status ?? "").toUpperCase();
 
     if (!intentId) {
       console.error("[mtn-callback] referenceId manquant :", payload);
       return ok();
     }
 
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const serviceClient = createServiceClient();
 
-    // 3. Succès → confirmer
     if (status === "SUCCESSFUL" && providerRef) {
-      const { data, error } = await serviceClient.rpc("confirm_payment_intent", {
-        p_intent_id:    intentId,
-        p_provider_ref: providerRef,
-      });
-
-      if (error) {
-        console.error("[mtn-callback] confirm_payment_intent error :", error.message);
-      } else {
-        console.log("[mtn-callback] paiement confirmé :", data);
-      }
+      await confirmPaymentIntent(serviceClient, intentId, providerRef, "mtn-callback");
       return ok();
     }
 
-    // 4. Échec → marquer comme failed
     if (status === "FAILED") {
-      console.warn("[mtn-callback] paiement MTN échoué, raison :", payload.reason);
-      await serviceClient
-        .from("payment_intents")
-        .update({
-          status:    "failed",
-          failed_at: new Date().toISOString(),
-          metadata:  { mtn_reason: payload.reason },
-        })
-        .eq("id", intentId)
-        .in("status", ["initiated", "pending"]);
+      await markPaymentIntentFailed(serviceClient, intentId, { mtn_reason: payload.reason });
     }
 
-    // 5. PENDING : ne rien faire, attendre la prochaine notification
     return ok();
   } catch (err) {
     console.error("[mtn-callback] erreur non gérée :", err);

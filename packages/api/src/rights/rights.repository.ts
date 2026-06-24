@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@sonafrik/database";
+import type { Json } from "@sonafrik/database/types";
 import type {
   Work,
   Contributor,
@@ -7,6 +8,10 @@ import type {
   Contract,
   RightsClaim,
   WorkWithDetails,
+  ContributorRole,
+  OwnershipType,
+  ContractType,
+  RightsClaimType,
 } from "@sonafrik/types";
 
 export class RightsRepository {
@@ -18,7 +23,7 @@ export class RightsRepository {
     offset: number,
   ): Promise<Work[]> {
     const { data, error } = await this.client
-      .from("works" as never)
+      .from("works")
       .select("*")
       .eq("creator_id", creatorId)
       .is("deleted_at", null)
@@ -31,21 +36,21 @@ export class RightsRepository {
   async getWorkWithDetails(workId: string): Promise<WorkWithDetails | null> {
     const [workRes, contribRes, contractRes, claimRes] = await Promise.all([
       this.client
-        .from("works" as never)
+        .from("works")
         .select("*")
         .eq("id", workId)
         .is("deleted_at", null),
       this.client
-        .from("contributors" as never)
+        .from("contributors")
         .select("*, ownerships(*)")
         .eq("work_id", workId),
       this.client
-        .from("contracts" as never)
+        .from("contracts")
         .select("*")
         .eq("work_id", workId)
         .is("deleted_at", null),
       this.client
-        .from("rights_claims" as never)
+        .from("rights_claims")
         .select("*")
         .eq("work_id", workId),
     ]);
@@ -73,7 +78,7 @@ export class RightsRepository {
     description: string | undefined,
   ): Promise<Work> {
     const { data, error } = await this.client
-      .from("works" as never)
+      .from("works")
       .insert({
         creator_id:  creatorId,
         title,
@@ -81,7 +86,7 @@ export class RightsRepository {
         genre:       genre ?? null,
         language,
         description: description ?? null,
-      } as never)
+      })
       .select()
       .single();
     if (error) throw error;
@@ -93,8 +98,8 @@ export class RightsRepository {
     patch: Partial<Pick<Work, "title" | "iswc" | "genre" | "language" | "description">>,
   ): Promise<Work> {
     const { data, error } = await this.client
-      .from("works" as never)
-      .update({ ...patch, updated_at: new Date().toISOString() } as never)
+      .from("works")
+      .update({ ...patch, updated_at: new Date().toISOString() })
       .eq("id", workId)
       .select()
       .single();
@@ -104,8 +109,8 @@ export class RightsRepository {
 
   async softDeleteWork(workId: string): Promise<void> {
     const { error } = await this.client
-      .from("works" as never)
-      .update({ deleted_at: new Date().toISOString() } as never)
+      .from("works")
+      .update({ deleted_at: new Date().toISOString() })
       .eq("id", workId);
     if (error) throw error;
   }
@@ -113,19 +118,19 @@ export class RightsRepository {
   async addContributor(
     workId: string,
     displayName: string,
-    role: string,
+    role: ContributorRole,
     profileId?: string,
     ipi?: string,
   ): Promise<Contributor> {
     const { data, error } = await this.client
-      .from("contributors" as never)
+      .from("contributors")
       .insert({
         work_id:      workId,
         display_name: displayName,
         role,
         profile_id:   profileId ?? null,
         ipi:          ipi ?? null,
-      } as never)
+      })
       .select()
       .single();
     if (error) throw error;
@@ -136,11 +141,11 @@ export class RightsRepository {
     workId: string,
     contributorId: string,
     sharePercent: number,
-    ownershipType: string,
+    ownershipType: OwnershipType,
     territory: string,
   ): Promise<Ownership> {
     const { data, error } = await this.client
-      .from("ownerships" as never)
+      .from("ownerships")
       .upsert(
         {
           work_id:        workId,
@@ -149,7 +154,7 @@ export class RightsRepository {
           ownership_type: ownershipType,
           territory,
           updated_at:     new Date().toISOString(),
-        } as never,
+        },
         { onConflict: "work_id,contributor_id,ownership_type,territory" },
       )
       .select()
@@ -160,7 +165,7 @@ export class RightsRepository {
 
   async deleteOwnership(ownershipId: string): Promise<void> {
     const { error } = await this.client
-      .from("ownerships" as never)
+      .from("ownerships")
       .delete()
       .eq("id", ownershipId);
     if (error) throw error;
@@ -169,11 +174,11 @@ export class RightsRepository {
   async snapshotOwnership(workId: string, userId: string): Promise<void> {
     const [ownRes, versionRes] = await Promise.all([
       this.client
-        .from("ownerships" as never)
+        .from("ownerships")
         .select("*")
         .eq("work_id", workId),
       this.client
-        .from("ownership_versions" as never)
+        .from("ownership_versions")
         .select("version_number")
         .eq("work_id", workId),
     ]);
@@ -183,20 +188,20 @@ export class RightsRepository {
     const maxVersion = versions.reduce((max, v) => Math.max(max, v.version_number), 0);
 
     await this.client
-      .from("ownership_versions" as never)
+      .from("ownership_versions")
       .insert({
         work_id:        workId,
         version_number: maxVersion + 1,
-        snapshot:       { ownerships },
+        snapshot:       { ownerships } as unknown as Json,
         created_by:     userId,
-      } as never);
+      });
   }
 
   async createContract(
     workId: string,
     creatorId: string,
     counterpartyName: string,
-    contractType: string,
+    contractType: ContractType,
     startDate?: string,
     endDate?: string,
     revenueSharePercent?: number,
@@ -204,7 +209,7 @@ export class RightsRepository {
     signedAt?: string,
   ): Promise<Contract> {
     const { data, error } = await this.client
-      .from("contracts" as never)
+      .from("contracts")
       .insert({
         work_id:               workId,
         creator_id:            creatorId,
@@ -215,7 +220,7 @@ export class RightsRepository {
         revenue_share_percent: revenueSharePercent ?? null,
         terms:                 terms ?? null,
         signed_at:             signedAt ?? null,
-      } as never)
+      })
       .select()
       .single();
     if (error) throw error;
@@ -225,19 +230,19 @@ export class RightsRepository {
   async createClaim(
     workId: string,
     claimantId: string,
-    claimType: string,
+    claimType: RightsClaimType,
     description: string,
     evidenceUrl?: string,
   ): Promise<RightsClaim> {
     const { data, error } = await this.client
-      .from("rights_claims" as never)
+      .from("rights_claims")
       .insert({
         work_id:      workId,
         claimant_id:  claimantId,
         claim_type:   claimType,
         description,
         evidence_url: evidenceUrl ?? null,
-      } as never)
+      })
       .select()
       .single();
     if (error) throw error;

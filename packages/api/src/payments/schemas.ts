@@ -12,7 +12,7 @@ export const PAYMENT_PURPOSES  = [
 export const initiatePaymentSchema = z.object({
   provider:    z.enum(PAYMENT_PROVIDERS),
   purpose:     z.enum(PAYMENT_PURPOSES),
-  amountGnf:   z.number().positive(),
+  amountGnf:   z.number().int().min(1000),
   phone:       z.string().min(8).max(20),
 });
 

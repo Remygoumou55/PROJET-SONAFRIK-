@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createRightsService } from "@sonafrik/api/rights";
-import { WorkDetail } from "@/features/rights/components/WorkDetail";
+import { WorkDetail } from "@/features/creator/rights/components/WorkDetail";
 
 export const metadata = { title: "Détail œuvre — Creator OS SONAFRIK" };
 

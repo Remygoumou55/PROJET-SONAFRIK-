@@ -1,25 +1,35 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import type { Beat } from "@sonafrik/types";
 import { BEAT_LICENSE_LABELS } from "@sonafrik/types";
 import { purchaseBeatAction } from "../actions/beats.actions";
 
 interface Props {
-  beats:        Beat[];
+  beats: Beat[];
   purchasedIds: string[];
+  highlightBeatId?: string | null;
 }
 
 function BeatCard({
   beat,
   purchased,
+  highlighted,
 }: {
   beat: Beat;
   purchased: boolean;
+  highlighted?: boolean;
 }) {
-  const [done, setDone]         = useState(purchased);
-  const [error, setError]       = useState<string | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [done, setDone] = useState(purchased);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (highlighted && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [highlighted]);
 
   function buy() {
     setError(null);
@@ -34,8 +44,16 @@ function BeatCard({
 
   return (
     <div
+      ref={cardRef}
+      id={`beat-${beat.id}`}
       className="flex flex-col rounded-xl p-4"
-      style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
+      style={{
+        backgroundColor: "var(--color-surface)",
+        border: highlighted
+          ? "2px solid var(--color-or-solaire)"
+          : "1px solid var(--color-elevated)",
+        boxShadow: highlighted ? "0 0 16px rgba(255,194,14,0.25)" : undefined,
+      }}
     >
       {/* En-tête */}
       <div className="mb-3 flex items-start justify-between gap-2">
@@ -102,9 +120,9 @@ function BeatCard({
         className="mt-auto w-full rounded-lg py-2 text-sm font-semibold transition-colors"
         style={{
           backgroundColor: done ? "var(--color-surface)" : "var(--color-or-solaire)",
-          color:            done ? "var(--color-texte-desactive)" : "var(--color-noir-profond)",
-          cursor:           done || isPending ? "not-allowed" : "pointer",
-          border:           done ? "1px solid var(--color-bordure)" : "none",
+          color: done ? "var(--color-texte-desactive)" : "var(--color-noir-profond)",
+          cursor: done || isPending ? "not-allowed" : "pointer",
+          border: done ? "1px solid var(--color-bordure)" : "none",
         }}
       >
         {isPending ? "Achat…" : done ? "Déjà acquis" : isFree ? "Télécharger" : "Acheter"}
@@ -113,7 +131,7 @@ function BeatCard({
   );
 }
 
-export function BeatStoreClient({ beats, purchasedIds }: Props) {
+export function BeatStoreClient({ beats, purchasedIds, highlightBeatId }: Props) {
   const purchasedSet = new Set(purchasedIds);
 
   if (beats.length === 0) {
@@ -133,7 +151,12 @@ export function BeatStoreClient({ beats, purchasedIds }: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {beats.map((beat) => (
-        <BeatCard key={beat.id} beat={beat} purchased={purchasedSet.has(beat.id)} />
+        <BeatCard
+          key={beat.id}
+          beat={beat}
+          purchased={purchasedSet.has(beat.id)}
+          highlighted={highlightBeatId === beat.id}
+        />
       ))}
     </div>
   );

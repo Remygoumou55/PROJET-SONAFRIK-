@@ -1,95 +1,82 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Json } from "@sonafrik/database/types";
 import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
+import { AdminConfigRepository } from "./admin.config.repository";
+import { AdminDashboardRepository } from "./admin.dashboard.repository";
+import { AdminModerationRepository } from "./admin.moderation.repository";
+import type {
+  AdminAlert,
+  AdminDashboardKpis,
+  AdminFraudSession,
+  AdminHealthSnapshot,
+  AdminRightsClaim,
+  PendingCatalogItem,
+} from "./types";
 
 export class AdminRepository {
-  constructor(private readonly client: SonafrikSupabaseClient) {}
+  private readonly config: AdminConfigRepository;
+  private readonly moderation: AdminModerationRepository;
+  private readonly dashboard: AdminDashboardRepository;
 
-  async listFeatureFlags(): Promise<FeatureFlag[]> {
-    const { data, error } = await this.client
-      .from("feature_flags")
-      .select("*")
-      .order("name");
-    if (error) throw error;
-    return (data ?? []) as unknown as FeatureFlag[];
+  constructor(client: SonafrikSupabaseClient) {
+    this.config = new AdminConfigRepository(client);
+    this.moderation = new AdminModerationRepository(client);
+    this.dashboard = new AdminDashboardRepository(client);
   }
 
-  async toggleFeatureFlag(
-    name: string,
-    enabled: boolean,
-    updatedBy: string | null,
-  ): Promise<FeatureFlag> {
-    const { data, error } = await this.client
-      .from("feature_flags")
-      .update({ enabled, updated_by: updatedBy })
-      .eq("name", name)
-      .select("*")
-      .single();
-    if (error) throw error;
-    return data as unknown as FeatureFlag;
+  listFeatureFlags(): Promise<FeatureFlag[]> {
+    return this.config.listFeatureFlags();
   }
 
-  async listSystemSettings(): Promise<SystemSetting[]> {
-    const { data, error } = await this.client
-      .from("system_settings")
-      .select("*")
-      .order("category")
-      .order("key");
-    if (error) throw error;
-    return (data ?? []) as unknown as SystemSetting[];
+  toggleFeatureFlag(name: string, enabled: boolean, updatedBy: string | null): Promise<FeatureFlag> {
+    return this.config.toggleFeatureFlag(name, enabled, updatedBy);
   }
 
-  async updateSystemSetting(
-    key: string,
-    value: unknown,
-    updatedBy: string | null,
-  ): Promise<SystemSetting> {
-    const { data, error } = await this.client
-      .from("system_settings")
-      .update({ value: value as Json, updated_by: updatedBy })
-      .eq("key", key)
-      .select("*")
-      .single();
-    if (error) throw error;
-    return data as unknown as SystemSetting;
+  listSystemSettings(): Promise<SystemSetting[]> {
+    return this.config.listSystemSettings();
   }
 
-  async reviewCatalogItem(
+  updateSystemSetting(key: string, value: unknown, updatedBy: string | null): Promise<SystemSetting> {
+    return this.config.updateSystemSetting(key, value, updatedBy);
+  }
+
+  isFeatureEnabled(name: string): Promise<boolean> {
+    return this.config.isFeatureEnabled(name);
+  }
+
+  reviewCatalogItem(
     id: string,
     entityType: "album" | "track",
     action: "published" | "rejected",
     reason?: string,
   ): Promise<void> {
-    if (entityType === "album") {
-      const { error } = await this.client.rpc("review_album_publication", {
-        p_album_id: id,
-        p_status: action,
-        ...(action === "rejected" && reason ? { p_rejection_reason: reason } : {}),
-      });
-      if (error) throw error;
-      return;
-    }
-
-    const { error } = await this.client.rpc("review_track_publication", {
-      p_track_id: id,
-      p_status: action,
-      ...(action === "rejected" && reason ? { p_rejection_reason: reason } : {}),
-    });
-    if (error) throw error;
+    return this.moderation.reviewCatalogItem(id, entityType, action, reason);
   }
 
-  async updateRightsClaim(
-    id: string,
-    status: string,
-    notes?: string,
-  ): Promise<void> {
-    const patch: { status: string; reviewed_at: string; resolution_notes?: string } = {
-      status,
-      reviewed_at: new Date().toISOString(),
-    };
-    if (notes) patch.resolution_notes = notes;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await this.client.from("rights_claims").update(patch as any).eq("id", id);
-    if (error) throw error;
+  updateRightsClaim(id: string, status: AdminRightsClaim["status"], notes?: string): Promise<void> {
+    return this.moderation.updateRightsClaim(id, status, notes);
+  }
+
+  listPendingCatalogItems(limit = 200): Promise<PendingCatalogItem[]> {
+    return this.moderation.listPendingCatalogItems(limit);
+  }
+
+  listRightsClaims(limit = 100): Promise<AdminRightsClaim[]> {
+    return this.moderation.listRightsClaims(limit);
+  }
+
+  listFraudSessions(limit = 50): Promise<AdminFraudSession[]> {
+    return this.moderation.listFraudSessions(limit);
+  }
+
+  getDashboardKpis(): Promise<AdminDashboardKpis> {
+    return this.dashboard.getDashboardKpis();
+  }
+
+  listUnreadAdminAlerts(limit = 10): Promise<AdminAlert[]> {
+    return this.dashboard.listUnreadAdminAlerts(limit);
+  }
+
+  getHealthSnapshot(): Promise<AdminHealthSnapshot> {
+    return this.dashboard.getHealthSnapshot();
   }
 }

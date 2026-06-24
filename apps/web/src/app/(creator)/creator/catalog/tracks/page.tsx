@@ -1,5 +1,5 @@
 import { createCatalogService } from "@sonafrik/api/catalog";
-import { TrackList } from "@/features/catalog/components/TrackList";
+import { TrackList } from "@/features/creator/catalog/components/TrackList";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 

@@ -15,7 +15,7 @@ export class WalletRepository {
 
   async getWallet(userId: string): Promise<Wallet | null> {
     const { data, error } = await this.client
-      .from("wallets" as never)
+      .from("wallets")
       .select("*")
       .eq("user_id", userId)
       .single();
@@ -25,7 +25,7 @@ export class WalletRepository {
 
   async getLedger(userId: string, limit = 20, offset = 0): Promise<WalletLedgerEntry[]> {
     const { data, error } = await this.client
-      .from("wallet_ledger" as never)
+      .from("wallet_ledger")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
@@ -36,7 +36,7 @@ export class WalletRepository {
 
   async getTransactions(userId: string, limit = 20, offset = 0): Promise<Transaction[]> {
     const { data, error } = await this.client
-      .from("transactions" as never)
+      .from("transactions")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
@@ -45,20 +45,20 @@ export class WalletRepository {
     return (data as Transaction[]) ?? [];
   }
 
-  async getWithdrawals(userId: string): Promise<Withdrawal[]> {
+  async getWithdrawals(userId: string, limit = 50, offset = 0): Promise<Withdrawal[]> {
     const { data, error } = await this.client
-      .from("withdrawals" as never)
+      .from("withdrawals")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(100);
+      .range(offset, offset + limit - 1);
     if (error) throw error;
     return (data as Withdrawal[]) ?? [];
   }
 
   async getPayoutAccounts(userId: string): Promise<PayoutAccount[]> {
     const { data, error } = await this.client
-      .from("payout_accounts" as never)
+      .from("payout_accounts")
       .select("*")
       .eq("user_id", userId)
       .is("deleted_at", null)
@@ -69,27 +69,29 @@ export class WalletRepository {
 
   async getRoyaltyCycles(): Promise<RoyaltyCycle[]> {
     const { data, error } = await this.client
-      .from("royalty_cycles" as never)
+      .from("royalty_cycles")
       .select("*")
-      .order("period_start", { ascending: false });
+      .order("period_start", { ascending: false })
+      .limit(24);
     if (error) throw error;
     return (data as RoyaltyCycle[]) ?? [];
   }
 
-  async getMyRoyaltyCalculations(userId: string): Promise<RoyaltyCalculation[]> {
+  async getMyRoyaltyCalculations(userId: string, limit = 50, offset = 0): Promise<RoyaltyCalculation[]> {
     const { data, error } = await this.client
-      .from("royalty_calculations" as never)
+      .from("royalty_calculations")
       .select("*")
       .eq("artist_id", userId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
     if (error) throw error;
     return (data as RoyaltyCalculation[]) ?? [];
   }
 
   async softDeletePayoutAccount(accountId: string): Promise<void> {
     const { error } = await this.client
-      .from("payout_accounts" as never)
-      .update({ deleted_at: new Date().toISOString() } as never)
+      .from("payout_accounts")
+      .update({ deleted_at: new Date().toISOString() })
       .eq("id", accountId);
     if (error) throw error;
   }

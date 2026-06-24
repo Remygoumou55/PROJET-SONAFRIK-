@@ -78,8 +78,11 @@ export function getSupabasePublicClient(): SonafrikSupabaseClient {
 }
 
 // Client service role — bypass RLS complet — réservé aux routes admin server-side.
-// JAMAIS exposé côté client. JAMAIS utilisé sur Vercel sans vérification BYPASS_AUTH.
-export function getSupabaseAdminClient(): SonafrikSupabaseClient {
+// Passer { adminVerified: true } uniquement après verifyAdminForAction() / requireAdmin().
+export function getSupabaseAdminClient(options?: { adminVerified?: boolean }): SonafrikSupabaseClient {
+  if (process.env.VERCEL === "1" && !options?.adminVerified) {
+    throw new Error("getSupabaseAdminClient: adminVerified requis en production.");
+  }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");

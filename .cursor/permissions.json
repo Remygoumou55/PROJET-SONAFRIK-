@@ -1,0 +1,91 @@
+{
+  // SONAFRIK — Allowlist durcie (préfixes larges interdits)
+  // Docs: https://cursor.com/docs/reference/permissions
+  // Jamais "git", "pnpm", "npm", "supabase" ou "node" seuls — matching par préfixe
+
+  "approvalMode": "allowlist",
+
+  "terminalAllowlist": [
+    "pnpm install",
+    "pnpm build",
+    "pnpm lint",
+    "pnpm typecheck",
+    "pnpm dev",
+    "npm install",
+    "npm run",
+    "npm test",
+    "npx tsc",
+
+    "supabase db query",
+    "supabase status",
+    "supabase migration list",
+
+    "git status",
+    "git diff",
+    "git log",
+    "git show",
+
+    "cd",
+    "pwd",
+    "ls",
+    "cat",
+    "head",
+    "tail",
+    "dirname",
+    "basename",
+    "which",
+    "file",
+    "stat",
+    "du",
+    "df",
+    "grep",
+    "wc",
+    "sort",
+    "uniq",
+    "cut",
+    "rg",
+    "echo",
+    "printf",
+    "date",
+    "sleep",
+    "whoami",
+    "id",
+    "uname",
+    "printenv",
+
+    "docker ps",
+    "docker images",
+    "docker logs",
+    "docker inspect",
+    "docker compose ps",
+    "docker compose logs",
+    "docker compose config",
+
+    "Get-ChildItem",
+    "Get-Content",
+    "Select-String",
+    "Test-Path",
+    "Measure-Object",
+    "dir"
+  ],
+
+  "autoRun": {
+    "allow_instructions": [
+      "Allow pnpm build, lint, typecheck, and dev only inside the SONAFRIK monorepo root.",
+      "Allow supabase db query --linked for read-only SQL validation on project cxjpburiiazzvlczzupy.",
+      "Allow read-only git status, diff, log, and show.",
+      "Allow read-only docker inspection commands."
+    ],
+    "block_instructions": [
+      "Always block git push, pull, merge, rebase, reset, clean, checkout -f, branch -D, commit, and add.",
+      "Always block rm, rm -rf, rmdir, mv, del, Remove-Item, and any deletion or move.",
+      "Always block sudo, chmod, chown, and privilege escalation.",
+      "Block supabase db push, db reset, link, and any destructive or write SQL without explicit approval.",
+      "Block npm publish, pnpm publish, and package registry publish.",
+      "Block bare node execution, npx without a fixed tool, and curl or wget piped to shell.",
+      "Block modifications to .env, .env.local, credentials, or wallet/financial config.",
+      "Block docker compose down, docker rm, docker rmi, and destructive docker commands.",
+      "Block any deploy, publish, or production data mutation."
+    ]
+  }
+}

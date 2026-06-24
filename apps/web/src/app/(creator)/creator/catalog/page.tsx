@@ -1,5 +1,5 @@
 import { createCatalogService } from "@sonafrik/api/catalog";
-import { CatalogDashboard } from "@/features/catalog/components/CatalogDashboard";
+import { CatalogDashboard } from "@/features/creator/catalog/components/CatalogDashboard";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 

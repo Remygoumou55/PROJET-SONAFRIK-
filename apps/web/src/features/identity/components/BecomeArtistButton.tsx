@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@sonafrik/ui";
-import { useCreatorService } from "@/features/creator/hooks/useCreator";
+import { useIdentityService } from "@/features/identity/hooks/useIdentity";
 
 export function BecomeArtistButton() {
   const router = useRouter();
-  const creator = useCreatorService();
+  const identity = useIdentityService();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +15,7 @@ export function BecomeArtistButton() {
     setLoading(true);
     setError(null);
     try {
-      await creator.becomeArtist();
+      await identity.becomeArtist();
       router.push("/creator/identity");
       router.refresh();
     } catch (err) {

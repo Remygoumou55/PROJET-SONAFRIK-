@@ -1,24 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { AdminFraudSession } from "@sonafrik/api/admin";
 import { formatDateTime } from "@/lib/formatters";
 
-interface FraudSession {
-  id: string;
-  user_id: string;
-  track_id: string;
-  platform: string;
-  started_at: string;
-  total_listened_seconds: number;
-  total_duration_seconds: number;
-  listen_percentage: number;
-  fraud_flags: string[];
-  is_valid_listen: boolean;
-  ip_address: string | null;
-}
-
 interface Props {
-  sessions: FraudSession[];
+  sessions: AdminFraudSession[];
 }
 
 const FLAG_LABELS: Record<string, string> = {
