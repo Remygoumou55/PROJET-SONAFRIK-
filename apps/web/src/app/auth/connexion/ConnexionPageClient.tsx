@@ -2,53 +2,111 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
+import { LegalConsentCheckbox } from "@/features/auth/components/LegalConsentCheckbox";
 import { OtpForm } from "@/features/auth/components/OtpForm";
 import { PhoneForm } from "@/features/auth/components/PhoneForm";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
 
 type Step = "phone" | "otp";
+type RoleParam = "artist" | "listener" | null;
 
-export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
+const AUTH_SUBTITLE = "Écoute · Participe · Prospère";
+
+const BACK_LINK = (
+  <Link
+    href="/"
+    className="inline-flex text-sm transition-colors hover:underline"
+    style={{ color: "var(--color-texte-secondaire)" }}
+  >
+    ← Retour à l&apos;accueil
+  </Link>
+);
+
+function homeForProfile(accountType: string | null | undefined): string {
+  if (accountType === "auditeur") return "/listen";
+  if (accountType === "artiste" || accountType === "auditeur_artiste") return "/creator";
+  return "/listen";
+}
+
+function onboardingForRole(role: RoleParam, accountType?: string | null): string {
+  if (accountType === "artiste" || accountType === "auditeur_artiste") return "/onboarding/artist";
+  if (accountType === "auditeur") return "/onboarding/listener";
+  if (role === "artist") return "/onboarding/artist";
+  if (role === "listener") return "/onboarding/listener";
+  return "/onboarding/role";
+}
+
+interface ConnexionPageClientProps {
+  bypassAuth: boolean;
+  initialRole?: RoleParam;
+}
+
+/** Page unique OTP — connexion ET inscription (Supabase signInWithOtp). */
+export function ConnexionPageClient({ bypassAuth, initialRole = null }: ConnexionPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const auth = useAuthService();
   const [step, setStep] = useState<Step>("phone");
+  const [detecting, setDetecting] = useState(!bypassAuth);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
+  const [roleParam, setRoleParam] = useState<RoleParam>(initialRole);
+
+  useEffect(() => {
+    const r = searchParams.get("role");
+    if (r === "artist" || r === "listener") setRoleParam(r);
+  }, [searchParams]);
 
   useEffect(() => {
     if (searchParams.get("error") === "oauth") {
       setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
+      setDetecting(false);
       return;
     }
-    if (bypassAuth) return;
+    if (bypassAuth) {
+      setDetecting(false);
+      return;
+    }
     let cancelled = false;
     void auth.getCurrentProfile().then((profile) => {
-      if (cancelled || !profile) return;
-      if (!profile.onboarding_completed) {
-        const dest =
-          profile.account_type === "artiste" || profile.account_type === "auditeur_artiste"
-            ? "/onboarding/artist"
-            : profile.account_type === "auditeur" ? "/onboarding/listener"
-            : "/onboarding/role";
-        router.replace(dest);
-      } else {
-        const home =
-          profile.account_type === "auditeur" ? "/listen"
-          : (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") ? "/creator"
-          : "/listen";
-        const next = searchParams.get("next");
-        router.replace(next && next.startsWith("/") && !next.startsWith("/auth") ? next : home);
+      if (cancelled) return;
+      if (!profile) {
+        setDetecting(false);
+        return;
       }
-    }).catch(() => { /* Supabase indisponible — rester sur la page */ });
+      if (!profile.onboarding_completed) {
+        router.replace(onboardingForRole(roleParam, profile.account_type));
+        return;
+      }
+      const next = searchParams.get("next");
+      const dest =
+        next && next.startsWith("/") && !next.startsWith("/auth")
+          ? next
+          : homeForProfile(profile.account_type);
+      router.replace(dest);
+    }).catch(() => {
+      if (!cancelled) setDetecting(false);
+    });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, router, bypassAuth]);
+  }, [searchParams, router, roleParam, bypassAuth]);
+
+  function requireConsent(): boolean {
+    if (acceptedTerms) {
+      setConsentError(null);
+      return true;
+    }
+    setConsentError("Veuillez accepter les conditions pour continuer");
+    return false;
+  }
 
   async function handlePhoneSubmit(p: string) {
+    if (!requireConsent()) return;
     setError(null);
     try {
       setPhone(p);
@@ -64,41 +122,75 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
     try {
       const { profile } = await auth.verifyOtp({ phone, token });
       if (!profile?.onboarding_completed) {
-        const dest =
-          profile?.account_type === "artiste" || profile?.account_type === "auditeur_artiste"
-            ? "/onboarding/artist"
-            : profile?.account_type === "auditeur"
-              ? "/onboarding/listener"
-              : "/onboarding/role";
-        router.push(dest);
+        router.push(onboardingForRole(roleParam, profile?.account_type));
         return;
       }
       auth.registerCurrentSession({
         platform: "web",
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       }).catch(() => {});
-      const home =
-        profile.account_type === "auditeur" ? "/listen"
-        : profile.account_type === "artiste" || profile.account_type === "auditeur_artiste" ? "/creator"
-        : "/listen";
       const next = searchParams.get("next");
-      router.push(next && next.startsWith("/") && !next.startsWith("/auth") ? next : home);
+      const dest =
+        next && next.startsWith("/") && !next.startsWith("/auth")
+          ? next
+          : homeForProfile(profile.account_type);
+      router.push(dest);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Code invalide. Réessayez.");
     }
   }
 
+  if (detecting) {
+    return (
+      <main
+        className="flex min-h-screen items-center justify-center"
+        style={{ backgroundColor: "var(--color-noir-profond)" }}
+      >
+        <div
+          className="w-8 h-8 rounded-full border-2 animate-spin"
+          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
+        />
+      </main>
+    );
+  }
+
   return (
-    <AuthPageShell title="Connexion" subtitle="Entrez votre numéro pour recevoir un code SMS">
+    <AuthPageShell
+      title="Créer votre compte"
+      subtitle={AUTH_SUBTITLE}
+      leading={BACK_LINK}
+    >
+      <p className="text-center text-xs" style={{ color: "var(--color-texte-desactive)" }}>
+        Nouveau ou déjà inscrit — votre numéro suffit
+      </p>
       {step === "phone" && (
         <>
-          <PhoneForm onSubmit={handlePhoneSubmit} submitLabel="Envoyer le code" />
+          <LegalConsentCheckbox
+            checked={acceptedTerms}
+            error={consentError}
+            onChange={(checked) => {
+              setAcceptedTerms(checked);
+              if (checked) setConsentError(null);
+            }}
+          />
+          <PhoneForm
+            onSubmit={handlePhoneSubmit}
+            submitDisabled={!acceptedTerms}
+            onBlockedSubmit={() =>
+              setConsentError("Veuillez accepter les conditions pour continuer")
+            }
+          />
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
             <span className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>ou</span>
             <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
           </div>
-          <GoogleAuthButton label="Se connecter avec Google" />
+          <GoogleAuthButton
+            label="Continuer avec Google"
+            role={roleParam ?? undefined}
+            disabled={!acceptedTerms}
+            onDisabledClick={requireConsent}
+          />
         </>
       )}
       {step === "otp" && (
@@ -106,19 +198,24 @@ export function ConnexionPageClient({ bypassAuth }: { bypassAuth: boolean }) {
           phone={phone}
           onSubmit={handleOtpSubmit}
           onResend={() => auth.requestOtp({ phone })}
+          onChangePhone={() => {
+            setStep("phone");
+            setError(null);
+          }}
         />
       )}
-      {error && (
-        <p className="text-center text-sm" style={{ color: "var(--color-erreur)" }}>{error}</p>
+      {step === "phone" && error && (
+        <p className="text-center text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>{error}</p>
       )}
-      <p className="text-center text-sm text-texte-secondaire">
-        Pas encore de compte ?{" "}
-        <Link href="/auth/inscription" className="text-vert-energie hover:underline">
-          S&apos;inscrire
-        </Link>
-      </p>
-      <p className="text-center text-xs" style={{ color: "var(--color-texte-secondaire)" }}>
-        <Link href="/auth/mot-de-passe-oublie" className="hover:underline" style={{ color: "var(--color-texte-secondaire)" }}>
+      <p className="text-center text-xs">
+        <Link
+          href="/auth/mot-de-passe-oublie"
+          className="inline-flex items-center gap-1.5 transition-colors hover:underline"
+          style={{ color: "var(--color-vert-energie)" }}
+        >
+          <span aria-hidden="true" className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style={{ border: "1.5px solid var(--color-vert-energie)" }}>
+            ?
+          </span>
           Problème d&apos;accès à votre compte ?
         </Link>
       </p>
