@@ -78,9 +78,10 @@ Compléter la Vague F : découpage fichiers 350–400L, audit hex Global SCS, mi
 - [x] build — 47 routes
 - [x] `pnpm probe:vague-f` — 26/26
 - [x] `pnpm probe:certification` — 129/129
+- [x] git commit `c822fc8` + push `origin/main`
 
 ### Résultat
-**Succès** — Vague F complète (F3, F5, F6.2–F6.3, F7.2–F7.3).
+**Succès** — Vague F complète, poussée sur `main`. Perf : suppression requête notifications dupliquée dans layout listener.
 
 ---
 
