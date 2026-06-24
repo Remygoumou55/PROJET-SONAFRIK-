@@ -1,21 +1,21 @@
 import { LandingProgressBar } from "./LandingProgressBar";
+import { SUBSCRIBER_TARGET } from "@/lib/landing/constants";
 
 interface LandingProgressProps {
   subscriberCount: number;
 }
 
-const TARGET = 2000;
 const MILESTONES = [
   { threshold: 500, label: "500 ✓ Bêta" },
   { threshold: 1000, label: "1 000" },
   { threshold: 1500, label: "1 500" },
-  { threshold: 2000, label: "2 000 🚀" },
+  { threshold: SUBSCRIBER_TARGET, label: "2 000 🚀" },
 ] as const;
 
 export function LandingProgress({ subscriberCount }: LandingProgressProps) {
-  const pct = Math.min((subscriberCount / TARGET) * 100, 100);
-  const remaining = Math.max(TARGET - subscriberCount, 0);
-  const pctDisplay = pct.toFixed(1);
+  const pct = Math.min((subscriberCount / SUBSCRIBER_TARGET) * 100, 100);
+  const remaining = Math.max(SUBSCRIBER_TARGET - subscriberCount, 0);
+  const pctDisplay = Math.round(pct);
 
   return (
     <div
@@ -68,7 +68,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
                 marginLeft: "4px",
               }}
             >
-              / 2 000 abonnés
+              / {SUBSCRIBER_TARGET.toLocaleString("fr-FR")} abonnés
             </span>
           </div>
         </div>
@@ -102,7 +102,7 @@ export function LandingProgress({ subscriberCount }: LandingProgressProps) {
         <strong style={{ color: "rgba(255,255,255,0.8)" }}>
           {remaining.toLocaleString("fr-FR")}
         </strong>{" "}
-        abonnés pour le lancement officiel
+        personnes pour le lancement officiel
       </p>
 
       {/* Jalons */}

@@ -1,8 +1,9 @@
 import type { LaunchProgress } from "@sonafrik/types";
+import { SUBSCRIBER_TARGET } from "./constants";
 
 const FALLBACK: LaunchProgress = {
   current: 0,
-  target: 2000,
+  target: SUBSCRIBER_TARGET,
   percent: 0,
   launched: false,
 };
@@ -13,7 +14,7 @@ export function parseLaunchProgress(data: unknown): LaunchProgress {
 
   const raw = data as Record<string, unknown>;
   const current = Number(raw.current ?? raw.subscribers ?? raw.count ?? raw.total ?? 0);
-  const target = Math.max(Number(raw.target ?? raw.goal ?? raw.max ?? 2000), 1);
+  const target = SUBSCRIBER_TARGET;
 
   if (!Number.isFinite(current) || !Number.isFinite(target)) return FALLBACK;
 
