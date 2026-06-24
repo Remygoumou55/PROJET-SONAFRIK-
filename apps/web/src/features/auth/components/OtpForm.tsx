@@ -3,21 +3,23 @@
 import { useEffect, useState } from "react";
 import { Button, Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
+import { maskGuineanPhone } from "@sonafrik/shared";
 
-const OTP_RESEND_COOLDOWN_S = 60;
+const OTP_RESEND_COOLDOWN_S = 30;
 
 interface OtpFormProps {
   phone: string;
   onSubmit: (token: string) => Promise<void>;
   onResend: () => Promise<void>;
+  onChangePhone?: () => void;
 }
 
-export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
+export function OtpForm({ phone, onSubmit, onResend, onChangePhone }: OtpFormProps) {
   const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
+  const [cooldown, setCooldown] = useState(OTP_RESEND_COOLDOWN_S);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -52,10 +54,16 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
     }
   }
 
+  const maskedPhone = maskGuineanPhone(phone);
+
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col gap-4">
-      <p className="text-center text-sm text-texte-secondaire">
-        Code envoyé au <span className="text-texte-principal">{phone}</span>
+      <p
+        className="text-center"
+        style={{ fontSize: "14px", color: "var(--color-vert-energie)" }}
+        role="status"
+      >
+        ✓ Code envoyé au {maskedPhone}
       </p>
       <Input
         label="Code de vérification"
@@ -76,16 +84,34 @@ export function OtpForm({ phone, onSubmit, onResend }: OtpFormProps) {
       <Button type="submit" fullWidth isLoading={loading}>
         Vérifier
       </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        fullWidth
-        isLoading={resending}
-        disabled={cooldown > 0 || resending}
-        onClick={handleResend}
-      >
-        {cooldown > 0 ? `Renvoyer dans ${cooldown}s` : "Renvoyer le code"}
-      </Button>
+      <p className="text-center text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
+        Pas reçu ?{" "}
+        <button
+          type="button"
+          disabled={cooldown > 0 || resending}
+          onClick={handleResend}
+          className="transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline"
+          style={{
+            color: cooldown > 0 ? "var(--color-texte-desactive)" : "var(--color-vert-energie)",
+          }}
+        >
+          {resending
+            ? "Envoi…"
+            : cooldown > 0
+              ? `Renvoyer dans ${cooldown}s`
+              : "Renvoyer le code"}
+        </button>
+      </p>
+      {onChangePhone ? (
+        <button
+          type="button"
+          onClick={onChangePhone}
+          className="text-sm text-center transition-colors hover:underline"
+          style={{ color: "var(--color-texte-secondaire)" }}
+        >
+          Changer de numéro
+        </button>
+      ) : null}
     </form>
   );
 }
