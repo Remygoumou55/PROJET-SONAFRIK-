@@ -49,3 +49,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .vercel
+
+# Scripts temporaires (probes audio locaux)
+scripts/.tmp-test.mp3
