@@ -1,9 +1,10 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-
-export const revalidate = 60; // Compteur mis à jour toutes les 60s — pas besoin de temps réel
+import Link from "next/link";
 import type { LaunchProgress } from "@sonafrik/types";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { parseLaunchProgress } from "@/lib/landing/parseLaunchProgress";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "SONAFRIK — Notre Bien Commun",
@@ -21,14 +22,9 @@ async function getLaunchProgress(): Promise<LaunchProgress> {
     const supabase = await getSupabaseServerClient();
     const { data, error } = await supabase.rpc("get_launch_progress");
     if (error || !data) throw new Error("rpc failed");
-
-    const raw = data as { current: number; target: number };
-    const current = Number(raw.current);
-    const target  = Math.max(Number(raw.target), 1);
-    const percent = Math.min((current / target) * 100, 100);
-    return { current, target, percent, launched: current >= target };
+    return parseLaunchProgress(data);
   } catch {
-    return { current: 0, target: 2000, percent: 0, launched: false };
+    return parseLaunchProgress(null);
   }
 }
 

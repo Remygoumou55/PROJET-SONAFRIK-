@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 
-/* Scan explicite de tous les fichiers sources qui utilisent des classes Tailwind */
+/* Scan explicite — évite les échecs silencieux de détection auto (gitignore parent, monorepo). */
 @source "../**/*.{ts,tsx}";
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../../packages/shared/src/**/*.{ts,tsx}";
@@ -22,39 +22,32 @@
   --color-danger: #ff4444;
   --color-info: #3b82f6;
 
-  /* Couleurs d'accent — catégories musicales, tags */
   --color-accent-violet: #a855f7;
   --color-accent-orange: #f97316;
   --color-accent-rose: #ec4899;
   --color-accent-bleu-clair: #60a5fa;
 
-  /* Niveaux de gris supplémentaires */
   --color-texte-subtil: #666666;
   --color-skeleton: #141414;
 
-  /* Couleurs de statut supplémentaires */
   --color-avertissement: #f59e0b;
   --color-accent-violet-clair: #c084fc;
 
-  /* Couleurs des opérateurs de paiement (brand guidelines) */
   --color-provider-orange: #ff6600;
   --color-provider-mtn: #ffcc00;
 
-  /* Couleurs de feature — landing page sections */
   --color-feature-azure: #378add;
   --color-feature-indigo: #7f77dd;
   --color-feature-brique: #d85a30;
   --color-feature-navy: #185fa5;
 
-  /* Couleurs du drapeau guinéen — logo SONAFRIK (S O N) */
   --color-flag-rouge: #ce1126;
   --color-flag-jaune: #fcd116;
   --color-flag-vert: #009460;
 
-  /* Couleurs de statut paiement */
   --color-pending: #f5a623;
 
-  --font-sans: Montserrat, system-ui, sans-serif;
+  --font-sans: var(--font-montserrat), Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -103,7 +96,6 @@ body {
   animation: landing-pulse 2s ease-in-out infinite;
 }
 
-/* Landing responsive — ≤700px */
 @media (max-width: 700px) {
   .landing-plans-grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -116,7 +108,6 @@ body {
   }
 }
 
-/* Landing responsive — ≤480px */
 @media (max-width: 480px) {
   .landing-plans-grid {
     grid-template-columns: 1fr !important;

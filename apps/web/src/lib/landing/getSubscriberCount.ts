@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
+import { parseLaunchProgress } from "./parseLaunchProgress";
 
 // Client anon public — pas de cookies, résultat identique pour tous les visiteurs
 // => safe à mettre en cache cross-request avec unstable_cache
@@ -20,8 +21,7 @@ const _fetchSubscriberCount = async (): Promise<number> => {
     });
     const { data, error } = await supabase.rpc("get_launch_progress");
     if (error || !data) return 0;
-    const raw = data as { current: number; target: number };
-    return Number(raw.current);
+    return parseLaunchProgress(data).current;
   } catch {
     return 0;
   }

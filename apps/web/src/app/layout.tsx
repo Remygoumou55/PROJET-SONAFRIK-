@@ -58,6 +58,8 @@ export default function RootLayout({
         <link rel="preconnect" href={SUPABASE_HOST} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={SUPABASE_HOST} />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+        <link rel="preconnect" href="https://accounts.google.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="prefetch" href="/listen" as="document" />
         <link rel="prefetch" href="/auth/inscription" as="document" />
       </head>
