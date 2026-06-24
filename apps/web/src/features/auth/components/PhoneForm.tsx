@@ -1,31 +1,77 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input } from "@sonafrik/ui";
+import { Input } from "@sonafrik/ui";
 import { AuthError } from "@sonafrik/api/auth";
-import { isValidGuineanPhone, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
+import {
+  GUINEAN_PHONE_FORMAT_HINT,
+  guineanNationalDigitCount,
+  isValidGuineanPhone,
+} from "@sonafrik/shared";
 
 interface PhoneFormProps {
   onSubmit: (phone: string) => Promise<void>;
   submitLabel?: string;
   defaultPhone?: string;
+  submitDisabled?: boolean;
+  onBlockedSubmit?: () => void;
+}
+
+/** Force le préfixe +224 et ne garde que les chiffres guinéens. */
+function formatGuineanPhoneInput(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+
+  if (!digits.length) return "+224";
+
+  if (digits.startsWith("224")) {
+    return `+${digits.slice(0, 12)}`;
+  }
+
+  if (digits.startsWith("0")) {
+    return `+224${digits.slice(1, 10)}`;
+  }
+
+  return `+224${digits.slice(0, 9)}`;
+}
+
+function phoneInputVariant(
+  phone: string,
+  showInvalid: boolean,
+): "default" | "success" | "error" {
+  if (showInvalid && !isValidGuineanPhone(phone)) return "error";
+  const digitCount = guineanNationalDigitCount(phone);
+  if (digitCount >= 8 && isValidGuineanPhone(phone)) return "success";
+  return "default";
 }
 
 export function PhoneForm({
   onSubmit,
   submitLabel = "Recevoir le code SMS",
   defaultPhone = "+224",
+  submitDisabled = false,
+  onBlockedSubmit,
 }: PhoneFormProps) {
   const [phone, setPhone] = useState(defaultPhone);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const inputVariant = phoneInputVariant(phone, submitAttempted);
+  const showValidIcon = inputVariant === "success";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitAttempted(true);
+
+    if (submitDisabled) {
+      onBlockedSubmit?.();
+      return;
+    }
+
     setError(null);
 
     if (!isValidGuineanPhone(phone)) {
-      setError(GUINEAN_PHONE_ERROR);
+      setError(GUINEAN_PHONE_FORMAT_HINT);
       return;
     }
 
@@ -49,21 +95,56 @@ export function PhoneForm({
         placeholder="+224620000000"
         maxLength={13}
         value={phone}
+        variant={inputVariant}
         onChange={(e) => {
-          setPhone(e.target.value);
+          setPhone(formatGuineanPhoneInput(e.target.value));
           if (error) setError(null);
         }}
+        onFocus={() => {
+          if (phone === "") setPhone("+224");
+        }}
         hint="Format international — Guinée : +224XXXXXXXXX"
+        error={error ?? undefined}
+        readOnly={loading}
         required
+        suffix={
+          showValidIcon ? (
+            <span
+              className="text-sm font-semibold"
+              style={{ color: "var(--color-vert-energie)" }}
+              aria-hidden="true"
+            >
+              ✓
+            </span>
+          ) : undefined
+        }
       />
-      {error ? (
-        <p className="text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>
-          {error}
-        </p>
-      ) : null}
-      <Button type="submit" fullWidth isLoading={loading}>
-        {submitLabel}
-      </Button>
+      <button
+        type="submit"
+        disabled={loading}
+        aria-disabled={submitDisabled || loading}
+        className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg text-sm transition-all duration-300 sm:text-base"
+        style={{
+          background: submitDisabled
+            ? "rgba(0, 210, 106, 0.3)"
+            : "var(--color-vert-energie)",
+          cursor: submitDisabled ? "not-allowed" : "pointer",
+          color: submitDisabled ? "rgba(255, 255, 255, 0.4)" : "var(--color-noir-profond)",
+          fontWeight: submitDisabled ? 600 : 700,
+        }}
+      >
+        {loading ? (
+          <>
+            <span
+              className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+              aria-hidden="true"
+            />
+            Envoi en cours…
+          </>
+        ) : (
+          submitLabel
+        )}
+      </button>
     </form>
   );
 }

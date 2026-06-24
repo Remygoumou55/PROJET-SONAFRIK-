@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 const inputVariants = cva(
@@ -16,6 +16,7 @@ const inputVariants = cva(
       variant: {
         default: "border-bordure focus:border-vert-energie",
         error: "border-red-500 focus:border-red-500 focus-visible:outline-red-500",
+        success: "border-vert-energie focus:border-vert-energie",
       },
       inputSize: {
         sm: "min-h-[36px] px-3 py-1.5 text-sm",
@@ -36,6 +37,7 @@ export interface InputProps
   label?: string;
   error?: string;
   hint?: string;
+  suffix?: ReactNode;
 }
 
 export function Input({
@@ -45,6 +47,7 @@ export function Input({
   label,
   error,
   hint,
+  suffix,
   id,
   required,
   ...props
@@ -61,15 +64,26 @@ export function Input({
           {required ? <span className="text-vert-energie ml-0.5">*</span> : null}
         </label>
       ) : null}
-      <input
-        id={inputId}
-        className={cn(inputVariants({ variant: error ? "error" : variant, inputSize }), className)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={[errorId, hintId].filter(Boolean).join(" ") || undefined}
-        aria-required={required}
-        required={required}
-        {...props}
-      />
+      <div className="relative">
+        <input
+          id={inputId}
+          className={cn(
+            inputVariants({ variant: error ? "error" : variant, inputSize }),
+            suffix ? "pr-10" : undefined,
+            className,
+          )}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={[errorId, hintId].filter(Boolean).join(" ") || undefined}
+          aria-required={required}
+          required={required}
+          {...props}
+        />
+        {suffix ? (
+          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            {suffix}
+          </div>
+        ) : null}
+      </div>
       {error ? (
         <p id={errorId} className="text-sm text-red-500" role="alert">
           {error}
