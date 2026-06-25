@@ -110,7 +110,7 @@ function staticChecks() {
   const topup = read("apps/web/src/features/wallet/components/TopupModal.tsx");
   log(
     "E8 web wallet UI",
-    walletClient.includes("isPaymentsEnabled") &&
+    walletClient.includes("isTopupEnabled") &&
       topup.includes("checkoutUrl") &&
       topup.includes("isSandbox"),
     "gate env + wave + sandbox",
@@ -119,7 +119,7 @@ function staticChecks() {
   const payoutPage = read("apps/web/src/app/(wallet)/wallet/payout/page.tsx");
   log(
     "E9 payout page",
-    payoutPage.includes("PayoutPage") && payoutPage.includes("isPaymentsEnabled"),
+    payoutPage.includes("PayoutPage") && payoutPage.includes("isWithdrawalEnabled"),
     "retraits créateur",
   );
 
