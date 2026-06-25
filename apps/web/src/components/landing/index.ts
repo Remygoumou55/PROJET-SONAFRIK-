@@ -1,5 +1,4 @@
 export { LandingPage } from "./LandingPage";
-export { LandingNav } from "./LandingNav";
 export { LandingHero } from "./LandingHero";
 export { LandingSearchBar } from "./LandingSearchBar";
 export { LandingProgress } from "./LandingProgress";

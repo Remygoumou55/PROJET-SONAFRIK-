@@ -18,10 +18,13 @@ import {
   Testimonials,
   LandingFinalCTA,
   LandingFooter,
+  LandingFAQ,
 } from "@/components/landing";
-import { LandingNav } from "@/components/landing/LandingNav";
-import { LandingFAQ } from "@/components/landing/LandingFAQ";
 import { LiveStatsSkeleton } from "@/components/landing/LiveStatsSkeleton";
+
+const LandingNav = dynamic(
+  () => import("@/components/landing/LandingNav").then((m) => m.LandingNav),
+);
 
 const LiveStats = dynamic(
   () => import("@/components/landing/LiveStats").then((m) => m.LiveStats),
