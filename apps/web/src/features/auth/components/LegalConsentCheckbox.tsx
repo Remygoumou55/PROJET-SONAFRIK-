@@ -54,7 +54,7 @@ export function LegalConsentCheckbox({
         </span>
       </label>
       {error ? (
-        <p role="alert" style={{ fontSize: "12px", color: "#FF4D4F" }}>
+        <p role="alert" style={{ fontSize: "12px", color: "var(--color-erreur)" }}>
           {error}
         </p>
       ) : null}
