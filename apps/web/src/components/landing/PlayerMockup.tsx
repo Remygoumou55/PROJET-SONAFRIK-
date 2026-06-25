@@ -1,147 +1,55 @@
+import type { LandingArtistsSection } from "@sonafrik/types";
+
+interface PlayerMockupProps {
+  featuredTrack?: LandingArtistsSection["featuredTrack"];
+}
+
 /** Mockup player mobile — visuel statique, aucune logique audio. */
-export function PlayerMockup() {
+export function PlayerMockup({ featuredTrack }: PlayerMockupProps) {
+  const title = featuredTrack?.title ?? "Mouna";
+  const artistName = featuredTrack?.artistName ?? "Artiste SONAFRIK";
+  const initials = featuredTrack?.initials ?? "SA";
+
   return (
-    <div
-      className="landing-player-mockup mx-auto w-full"
-      style={{
-        maxWidth: "380px",
-        backgroundColor: "var(--color-surface)",
-        borderRadius: "24px",
-        border: "1px solid rgba(255,255,255,0.08)",
-        padding: "24px",
-        boxShadow:
-          "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,210,106,0.1)",
-      }}
-    >
-      <p
-        style={{
-          fontSize: "10px",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          color: "var(--color-vert-energie)",
-          margin: "0 0 16px",
-          fontWeight: 600,
-        }}
-      >
+    <div className="landing-player-mockup mx-auto w-full max-w-[380px] rounded-3xl border border-white/10 bg-surface p-6 shadow-[0_40px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,210,106,0.1)]">
+      <p className="mb-4 text-[10px] font-semibold uppercase tracking-[2px] text-vert-energie">
         En cours de lecture
       </p>
 
-      <div
-        style={{
-          width: "100%",
-          aspectRatio: "1",
-          maxWidth: "280px",
-          margin: "0 auto 20px",
-          borderRadius: "16px",
-          background:
-            "linear-gradient(145deg, rgba(0,210,106,0.35) 0%, var(--color-noir-profond) 55%, rgba(255,194,14,0.2) 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "48px",
-            fontWeight: 700,
-            color: "var(--color-texte-principal)",
-            opacity: 0.9,
-          }}
-        >
-          AD
-        </span>
+      <div className="mx-auto mb-5 flex aspect-square w-full max-w-[280px] items-center justify-center rounded-2xl bg-gradient-to-br from-vert-energie/35 via-noir-profond to-or-solaire/20">
+        <span className="text-5xl font-bold text-texte-principal/90">{initials}</span>
       </div>
 
-      <h3
-        style={{
-          fontSize: "22px",
-          fontWeight: 700,
-          color: "var(--color-texte-principal)",
-          margin: "0 0 4px",
-          textAlign: "center",
-        }}
-      >
-        Mouna
-      </h3>
-      <p
-        style={{
-          fontSize: "16px",
-          color: "rgba(255,255,255,0.6)",
-          margin: "0 0 20px",
-          textAlign: "center",
-        }}
-      >
-        Alpha Diallo
-      </p>
+      <h3 className="mb-1 text-center text-[22px] font-bold text-texte-principal">{title}</h3>
+      <p className="mb-5 text-center text-base text-white/60">{artistName}</p>
 
-      <div style={{ marginBottom: "8px" }}>
-        <div
-          className="landing-player-progress-track"
-          style={{
-            height: "4px",
-            borderRadius: "2px",
-            backgroundColor: "rgba(255,255,255,0.1)",
-            overflow: "hidden",
-          }}
-        >
+      <div className="mb-2">
+        <div className="landing-player-progress-track h-1 overflow-hidden rounded-sm bg-white/10">
           <div className="landing-player-progress-fill" />
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: "6px",
-            fontSize: "12px",
-            color: "rgba(255,255,255,0.4)",
-          }}
-        >
+        <div className="mt-1.5 flex justify-between text-xs text-white/40">
           <span>2:14</span>
           <span>3:42</span>
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "24px",
-          margin: "20px 0",
-        }}
-      >
-        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "20px" }} aria-hidden="true">
+      <div className="my-5 flex items-center justify-center gap-6">
+        <span className="text-xl text-white/50" aria-hidden="true">
           ⏮
         </span>
         <div
-          style={{
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            backgroundColor: "var(--color-vert-energie)",
-            color: "var(--color-noir-profond)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "22px",
-          }}
+          className="flex size-14 items-center justify-center rounded-full bg-vert-energie text-[22px] text-noir-profond"
           aria-hidden="true"
         >
           ▶
         </div>
-        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "20px" }} aria-hidden="true">
+        <span className="text-xl text-white/50" aria-hidden="true">
           ⏭
         </span>
       </div>
 
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "28px",
-          color: "rgba(255,255,255,0.4)",
-          fontSize: "18px",
-          marginBottom: "16px",
-        }}
+        className="mb-4 flex justify-center gap-7 text-lg text-white/40"
         aria-hidden="true"
       >
         <span>♥</span>
@@ -149,17 +57,8 @@ export function PlayerMockup() {
         <span>⬇</span>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <span
-          style={{
-            fontSize: "11px",
-            color: "var(--color-or-solaire)",
-            backgroundColor: "rgba(255,194,14,0.12)",
-            border: "1px solid rgba(255,194,14,0.25)",
-            borderRadius: "8px",
-            padding: "4px 10px",
-          }}
-        >
+      <div className="flex justify-end">
+        <span className="rounded-lg border border-or-solaire/25 bg-or-solaire/15 px-2.5 py-1 text-[11px] text-or-solaire">
           📶 Économie de données activée
         </span>
       </div>

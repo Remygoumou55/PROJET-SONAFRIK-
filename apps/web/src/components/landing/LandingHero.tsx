@@ -8,105 +8,33 @@ interface LandingHeroProps {
 
 export function LandingHero({ children }: LandingHeroProps) {
   return (
-    <section style={{ textAlign: "center", paddingBottom: "64px" }}>
-      {/* Pill animée */}
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          backgroundColor: "rgba(0,210,106,0.08)",
-          border: "0.5px solid rgba(0,210,106,0.25)",
-          color: "var(--color-vert-energie)",
-          fontSize: "12px",
-          padding: "5px 14px",
-          borderRadius: "20px",
-          marginBottom: "28px",
-        }}
-      >
-        <span
-          className="landing-pulse-dot"
-          style={{
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            backgroundColor: "var(--color-vert-energie)",
-            flexShrink: 0,
-          }}
-        />
+    <section className="pb-16 text-center">
+      <div className="mb-7 inline-flex items-center gap-1.5 rounded-full border border-vert-energie/25 bg-vert-energie/10 px-3.5 py-1.5 text-xs text-vert-energie">
+        <span className="landing-pulse-dot size-1.5 shrink-0 rounded-full bg-vert-energie" />
         Lancement en cours — Guinée Conakry
       </div>
 
-      {/* Titre H1 */}
-      <h1
-        className="landing-hero-h1"
-        style={{
-          fontSize: "44px",
-          fontWeight: 600,
-          lineHeight: 1.2,
-          color: "var(--color-texte-principal)",
-          margin: "0 0 16px",
-        }}
-      >
+      <h1 className="landing-hero-h1 mb-4 text-[44px] font-semibold leading-tight text-texte-principal">
         La musique guinéenne
         <br />
-        <em style={{ color: "var(--color-vert-energie)", fontStyle: "normal" }}>
-          mérite sa plateforme
-        </em>
+        <em className="font-normal not-italic text-vert-energie">mérite sa plateforme</em>
       </h1>
 
-      {/* Sous-titre */}
-      <p
-        style={{
-          fontSize: "16px",
-          color: "rgba(255,255,255,0.5)",
-          maxWidth: "500px",
-          margin: "16px auto 36px",
-          lineHeight: 1.6,
-        }}
-      >
+      <p className="mx-auto mb-9 max-w-[500px] text-base leading-relaxed text-white/50">
         SONAFRIK rémunère directement les artistes. Chaque écoute compte.
         Rejoignez la communauté qui débloque le lancement.
       </p>
 
-      {/* Boutons CTA */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "12px",
-          marginBottom: "8px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="mb-2 flex flex-wrap justify-center gap-3">
         <Link
           href="/auth/connexion"
-          style={{
-            backgroundColor: "var(--color-vert-energie)",
-            color: "var(--color-noir-profond)",
-            fontSize: "15px",
-            fontWeight: 600,
-            padding: "13px 28px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
+          className="inline-block rounded-lg bg-vert-energie px-7 py-3.5 text-[15px] font-semibold text-noir-profond no-underline"
         >
           Commencer maintenant
         </Link>
         <Link
           href="#comment-ca-marche"
-          style={{
-            backgroundColor: "transparent",
-            border: "0.5px solid rgba(255,255,255,0.2)",
-            color: "var(--color-texte-principal)",
-            fontSize: "15px",
-            fontWeight: 500,
-            padding: "13px 28px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
+          className="inline-block rounded-lg border border-white/20 bg-transparent px-7 py-3.5 text-[15px] font-medium text-texte-principal no-underline"
         >
           En savoir plus
         </Link>
@@ -114,18 +42,8 @@ export function LandingHero({ children }: LandingHeroProps) {
 
       <LandingSearchBar />
 
-      {/* Hint */}
-      <p
-        style={{
-          fontSize: "12px",
-          color: "rgba(255,255,255,0.28)",
-          margin: "12px 0 0",
-        }}
-      >
-        Gratuit · Aucune carte requise · 2 minutes
-      </p>
+      <p className="mt-3 text-xs text-white/30">Gratuit · Aucune carte requise · 2 minutes</p>
 
-      {/* Carte de progression (injectée par LandingProgress) */}
       {children}
     </section>
   );

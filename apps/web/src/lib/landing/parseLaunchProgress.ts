@@ -14,9 +14,9 @@ export function parseLaunchProgress(data: unknown): LaunchProgress {
 
   const raw = data as Record<string, unknown>;
   const current = Number(raw.current ?? raw.subscribers ?? raw.count ?? raw.total ?? 0);
-  const target = SUBSCRIBER_TARGET;
+  const target = Number(raw.target ?? SUBSCRIBER_TARGET);
 
-  if (!Number.isFinite(current) || !Number.isFinite(target)) return FALLBACK;
+  if (!Number.isFinite(current) || !Number.isFinite(target) || target < 1) return FALLBACK;
 
   const percent = Math.min((current / target) * 100, 100);
   return {

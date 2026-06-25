@@ -15,23 +15,10 @@ export function LandingProgressBar({ pct }: LandingProgressBarProps) {
   }, [pct]);
 
   return (
-    <div
-      style={{
-        height: "6px",
-        backgroundColor: "rgba(255,255,255,0.08)",
-        borderRadius: "3px",
-        overflow: "hidden",
-        margin: "12px 0",
-      }}
-    >
+    <div className="my-3 h-1.5 overflow-hidden rounded-sm bg-white/10">
       <div
-        style={{
-          height: "6px",
-          background: "linear-gradient(90deg, var(--color-vert-energie), var(--color-vert-profond))",
-          borderRadius: "3px",
-          width: `${width}%`,
-          transition: "width 1.5s ease",
-        }}
+        className="h-1.5 rounded-sm bg-gradient-to-r from-vert-energie to-vert-profond transition-[width] duration-[1500ms] ease-out"
+        style={{ width: `${width}%` }}
       />
     </div>
   );

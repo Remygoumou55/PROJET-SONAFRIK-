@@ -7,27 +7,9 @@ interface LandingPageProps {
 
 export function LandingPage({ children }: LandingPageProps) {
   return (
-    <div
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: "var(--color-noir-profond)",
-        minHeight: "100vh",
-      }}
-    >
+    <div className="relative min-h-screen overflow-hidden bg-noir-profond">
       <AmbientBackgroundGlow />
-
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          maxWidth: "960px",
-          margin: "0 auto",
-          padding: "0 24px 64px",
-        }}
-      >
-        {children}
-      </div>
+      <div className="relative z-[1] mx-auto max-w-[960px] px-6 pb-16">{children}</div>
     </div>
   );
 }

@@ -5,8 +5,8 @@ const COLUMNS = [
     key: "now",
     icon: "✅",
     title: "DISPONIBLE MAINTENANT",
-    borderColor: "var(--color-vert-energie)",
-    itemColor: "var(--color-vert-energie)",
+    borderClass: "border-l-vert-energie",
+    textClass: "text-vert-energie",
     items: [
       "Streaming musical",
       "Espace artiste complet",
@@ -19,70 +19,41 @@ const COLUMNS = [
     key: "soon",
     icon: "🔜",
     title: "PROCHAINEMENT",
-    borderColor: "var(--color-or-solaire)",
-    itemColor: "var(--color-or-solaire)",
+    borderClass: "border-l-or-solaire",
+    textClass: "text-or-solaire",
     items: ["Fan Tribu (commentaires, réactions)", "Marketplace musicale", "Lyrics synchronisées"],
   },
   {
     key: "vision",
     icon: "🔮",
     title: "VISION 2027",
-    borderColor: "rgba(255,255,255,0.2)",
-    itemColor: "rgba(255,255,255,0.45)",
+    borderClass: "border-l-white/20",
+    textClass: "text-white/45",
     items: ["Distribution internationale", "IA musicale SONAFRIK", "Lives & Événements"],
   },
 ] as const;
 
 export function Roadmap() {
   return (
-    <section style={{ marginBottom: "56px" }}>
+    <section className="mb-14">
       <LandingSectionHeader
         label="ROADMAP"
         title="Ce que nous construisons ensemble"
         subtitle="SONAFRIK grandit avec vous"
       />
 
-      <div
-        className="landing-roadmap-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "14px",
-        }}
-      >
-        {COLUMNS.map(({ key, icon, title, borderColor, itemColor, items }) => (
+      <div className="landing-roadmap-grid grid grid-cols-3 gap-3.5">
+        {COLUMNS.map(({ key, icon, title, borderClass, textClass, items }) => (
           <div
             key={key}
-            style={{
-              backgroundColor: "rgba(255,255,255,0.03)",
-              border: "0.5px solid rgba(255,255,255,0.08)",
-              borderLeft: `3px solid ${borderColor}`,
-              borderRadius: "14px",
-              padding: "20px",
-            }}
+            className={`rounded-[14px] border border-white/10 border-l-[3px] bg-white/[0.03] p-5 ${borderClass}`}
           >
-            <p
-              style={{
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.5px",
-                color: itemColor,
-                margin: "0 0 14px",
-              }}
-            >
+            <p className={`mb-3.5 text-[11px] font-bold tracking-wide ${textClass}`}>
               {icon} {title}
             </p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <ul className="m-0 list-none p-0">
               {items.map((item) => (
-                <li
-                  key={item}
-                  style={{
-                    fontSize: "13px",
-                    color: itemColor,
-                    marginBottom: "8px",
-                    lineHeight: 1.5,
-                  }}
-                >
+                <li key={item} className={`mb-2 text-[13px] leading-snug ${textClass}`}>
                   {item}
                 </li>
               ))}

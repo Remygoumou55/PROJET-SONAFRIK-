@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SonafrikLogo } from "./SonafrikLogo";
 
 const COLUMNS = [
   {
@@ -29,36 +30,13 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer
-      style={{
-        borderTop: "1px solid var(--color-bordure)",
-        paddingTop: "40px",
-        marginTop: "8px",
-      }}
-    >
-      <div
-        className="landing-footer-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1.2fr repeat(3, 1fr)",
-          gap: "32px",
-          marginBottom: "32px",
-        }}
-      >
+    <footer className="mt-2 border-t border-bordure pt-10">
+      <div className="landing-footer-grid mb-8 grid grid-cols-[1.2fr_repeat(3,1fr)] gap-8">
         <div>
-          <p
-            style={{
-              fontSize: "18px",
-              fontWeight: 600,
-              letterSpacing: "3px",
-              margin: "0 0 8px",
-            }}
-          >
-            <span style={{ color: "var(--color-texte-principal)" }}>SON</span>
-            <span style={{ color: "var(--color-or-solaire)" }}>A</span>
-            <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
+          <p className="mb-2">
+            <SonafrikLogo size="footer" />
           </p>
-          <p style={{ fontSize: "13px", color: "var(--color-texte-secondaire)", lineHeight: 1.6, margin: 0 }}>
+          <p className="m-0 text-[13px] leading-relaxed text-texte-secondaire">
             La musique guinéenne mérite sa plateforme.
             <br />
             Notre Bien Commun.
@@ -67,29 +45,15 @@ export function LandingFooter() {
 
         {COLUMNS.map(({ title, links }) => (
           <div key={title}>
-            <p
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                color: "var(--color-texte-secondaire)",
-                margin: "0 0 12px",
-              }}
-            >
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-texte-secondaire">
               {title}
             </p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <ul className="m-0 list-none p-0">
               {links.map(({ label, href }) => (
-                <li key={label} style={{ marginBottom: "8px" }}>
+                <li key={label} className="mb-2">
                   <Link
                     href={href}
-                    style={{
-                      fontSize: "13px",
-                      color: "rgba(255,255,255,0.55)",
-                      textDecoration: "none",
-                    }}
-                    className="landing-footer-link"
+                    className="landing-footer-link text-[13px] text-white/55 no-underline"
                   >
                     {label}
                   </Link>
@@ -100,15 +64,7 @@ export function LandingFooter() {
         ))}
       </div>
 
-      <p
-        style={{
-          fontSize: "12px",
-          color: "var(--color-texte-desactive)",
-          textAlign: "center",
-          margin: 0,
-          paddingBottom: "24px",
-        }}
-      >
+      <p className="m-0 pb-6 text-center text-xs text-texte-desactive">
         © {new Date().getFullYear()} SONAFRIK — Guinée Conakry. Tous droits réservés.
       </p>
     </footer>

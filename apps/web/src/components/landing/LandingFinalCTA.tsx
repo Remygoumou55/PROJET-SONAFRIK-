@@ -2,75 +2,23 @@ import Link from "next/link";
 
 export function LandingFinalCTA() {
   return (
-    <div
-      style={{
-        backgroundColor: "rgba(255,255,255,0.03)",
-        border: "0.5px solid rgba(255,255,255,0.08)",
-        borderRadius: "14px",
-        padding: "48px",
-        textAlign: "center",
-        marginBottom: "48px",
-      }}
-    >
-      <h2
-        style={{
-          fontSize: "28px",
-          fontWeight: 600,
-          color: "var(--color-texte-principal)",
-          marginBottom: "12px",
-        }}
-      >
-        Votre place est ici.
-      </h2>
-      <p
-        style={{
-          fontSize: "15px",
-          color: "rgba(255,255,255,0.45)",
-          maxWidth: "500px",
-          margin: "0 auto 28px",
-          lineHeight: 1.65,
-        }}
-      >
+    <div className="mb-12 rounded-[14px] border border-white/10 bg-white/[0.03] p-12 text-center">
+      <h2 className="mb-3 text-[28px] font-semibold text-texte-principal">Votre place est ici.</h2>
+      <p className="mx-auto mb-7 max-w-[500px] text-[15px] leading-relaxed text-white/45">
         Chaque abonné fait avancer le compteur. Ensemble, on débloque le lancement et on change
         comment la musique guinéenne est valorisée.
       </p>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "12px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="flex flex-wrap justify-center gap-3">
         <Link
           href="/auth/connexion"
-          style={{
-            backgroundColor: "var(--color-vert-energie)",
-            color: "var(--color-noir-profond)",
-            fontSize: "15px",
-            fontWeight: 600,
-            padding: "13px 28px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
+          className="inline-block rounded-lg bg-vert-energie px-7 py-3.5 text-[15px] font-semibold text-noir-profond no-underline"
         >
           Rejoindre maintenant →
         </Link>
         <Link
           href="/lancement"
-          style={{
-            backgroundColor: "transparent",
-            border: "0.5px solid rgba(255,255,255,0.2)",
-            color: "var(--color-texte-principal)",
-            fontSize: "15px",
-            fontWeight: 500,
-            padding: "13px 28px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
+          className="inline-block rounded-lg border border-white/20 bg-transparent px-7 py-3.5 text-[15px] font-medium text-texte-principal no-underline"
         >
           En savoir plus
         </Link>

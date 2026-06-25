@@ -1,100 +1,48 @@
+import type { LandingArtistsSection } from "@sonafrik/types";
+import Link from "next/link";
+import { getAvatarPalette } from "@/lib/landing/artistDisplay";
 import { LandingSectionHeader } from "./LandingSectionHeader";
 
-const ARTISTS = [
-  { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",     bg: "rgba(15, 110, 86, 1)",   text: "rgba(159, 225, 203, 1)" },
-  { initials: "F",  name: "Faya",         genre: "R&B Africain", bg: "rgba(12, 68, 124, 1)",   text: "rgba(181, 212, 244, 1)" },
-  { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel", bg: "rgba(60, 52, 137, 1)",   text: "rgba(206, 203, 246, 1)" },
-  { initials: "MF", name: "MC Fly",       genre: "Rap GN",       bg: "rgba(99, 68, 0, 1)",     text: "rgba(250, 199, 117, 1)" },
-  { initials: "S",  name: "SeK",          genre: "Gospel",        bg: "rgba(59, 34, 18, 1)",    text: "rgba(245, 196, 179, 1)" },
-] as const;
+interface LandingArtistsProps {
+  section: LandingArtistsSection;
+}
 
-export function LandingArtists() {
+export function LandingArtists({ section }: LandingArtistsProps) {
+  const { artists, trackCount } = section;
+  if (artists.length === 0) return null;
+
   return (
-    <section id="artistes" style={{ marginBottom: "56px", textAlign: "center", scrollMarginTop: "88px" }}>
+    <section id="artistes" className="mb-14 scroll-mt-[88px] text-center">
       <LandingSectionHeader label="DÉJÀ SUR SONAFRIK" title="Les artistes fondateurs" />
 
-      {/* Cartes artistes */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: "10px",
-          marginBottom: "20px",
-        }}
-      >
-        {ARTISTS.map(({ initials, name, genre, bg, text }) => (
-          <div
-            key={name}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              backgroundColor: "rgba(255,255,255,0.04)",
-              border: "0.5px solid rgba(255,255,255,0.08)",
-              borderRadius: "14px",
-              padding: "12px 16px",
-              minWidth: "160px",
-            }}
-          >
-            {/* Avatar */}
-            <div
-              style={{
-                width: "38px",
-                height: "38px",
-                borderRadius: "50%",
-                backgroundColor: bg,
-                color: text,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "13px",
-                fontWeight: 600,
-                flexShrink: 0,
-              }}
+      <div className="mb-5 flex flex-wrap justify-center gap-2.5">
+        {artists.map((artist) => {
+          const palette = getAvatarPalette(artist.paletteIndex);
+          return (
+            <Link
+              key={artist.creatorId}
+              href={`/listen/artist/${artist.creatorId}`}
+              className="flex min-w-[160px] items-center gap-2.5 rounded-[14px] border border-white/10 bg-white/5 px-4 py-3 no-underline transition-colors hover:bg-white/[0.07]"
             >
-              {initials}
-            </div>
-            <div style={{ textAlign: "left" }}>
-              <p
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "var(--color-texte-principal)",
-                  margin: 0,
-                  lineHeight: 1.3,
-                }}
+              <div
+                className={`flex size-[38px] shrink-0 items-center justify-center rounded-full border text-[13px] font-semibold ${palette.bg} ${palette.text} ${palette.border}`}
               >
-                {name}
-              </p>
-              <p
-                style={{
-                  fontSize: "11px",
-                  color: "rgba(255,255,255,0.4)",
-                  margin: 0,
-                  lineHeight: 1.3,
-                }}
-              >
-                {genre}
-              </p>
-            </div>
-          </div>
-        ))}
+                {artist.initials}
+              </div>
+              <div className="text-left">
+                <p className="m-0 text-[13px] font-semibold leading-snug text-texte-principal">
+                  {artist.stageName}
+                </p>
+                <p className="m-0 text-[11px] leading-snug text-white/40">{artist.genre}</p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Pill de stats */}
-      <div
-        style={{
-          display: "inline-block",
-          backgroundColor: "rgba(255,255,255,0.04)",
-          border: "0.5px solid rgba(255,255,255,0.08)",
-          padding: "7px 16px",
-          borderRadius: "20px",
-          fontSize: "12px",
-          color: "rgba(255,255,255,0.5)",
-        }}
-      >
-        🎵 5 artistes · 30 morceaux · Guinée Conakry
+      <div className="inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-white/50">
+        🎵 {artists.length} artiste{artists.length > 1 ? "s" : ""} · {trackCount.toLocaleString("fr-FR")}{" "}
+        morceau{trackCount > 1 ? "x" : ""} · Guinée Conakry
       </div>
     </section>
   );

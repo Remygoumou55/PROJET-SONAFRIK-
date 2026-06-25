@@ -25,53 +25,20 @@ const FAQ_ITEMS = [
 
 export function LandingFAQ() {
   return (
-    <section id="faq" style={{ marginBottom: "56px", scrollMarginTop: "88px" }}>
+    <section id="faq" className="mb-14 scroll-mt-[88px]">
       <LandingSectionHeader label="FAQ" title="Questions fréquentes" />
 
-      <div
-        className="landing-faq-list"
-        style={{ maxWidth: "720px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "8px" }}
-      >
+      <div className="landing-faq-list mx-auto flex max-w-[720px] flex-col gap-2">
         {FAQ_ITEMS.map(({ q, a }, index) => (
           <details
             key={q}
-            className="landing-faq-item"
+            className="landing-faq-item overflow-hidden rounded-xl border border-bordure bg-white/[0.02]"
             open={index === 0}
-            style={{
-              borderRadius: "12px",
-              border: "1px solid var(--color-bordure)",
-              backgroundColor: "rgba(255,255,255,0.02)",
-              overflow: "hidden",
-            }}
           >
-            <summary
-              className="landing-faq-summary"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "12px",
-                padding: "16px 18px",
-                cursor: "pointer",
-                listStyle: "none",
-                color: "var(--color-texte-principal)",
-                fontSize: "15px",
-                fontWeight: 600,
-              }}
-            >
+            <summary className="landing-faq-summary flex cursor-pointer list-none items-center justify-between gap-3 px-[18px] py-4 text-[15px] font-semibold text-texte-principal">
               {q}
             </summary>
-            <p
-              style={{
-                margin: 0,
-                padding: "0 18px 16px",
-                fontSize: "14px",
-                color: "var(--color-texte-secondaire)",
-                lineHeight: 1.65,
-              }}
-            >
-              {a}
-            </p>
+            <p className="m-0 px-[18px] pb-4 text-sm leading-relaxed text-texte-secondaire">{a}</p>
           </details>
         ))}
       </div>

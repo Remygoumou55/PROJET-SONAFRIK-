@@ -104,7 +104,7 @@ body {
 .live-dot {
   width: 8px;
   height: 8px;
-  background: #ff4d4f;
+  background: var(--color-erreur);
   border-radius: 50%;
   animation: pulse-red 1.5s ease-in-out infinite;
   flex-shrink: 0;

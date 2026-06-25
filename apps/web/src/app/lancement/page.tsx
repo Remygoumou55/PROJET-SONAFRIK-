@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { LaunchProgress } from "@sonafrik/types";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { parseLaunchProgress } from "@/lib/landing/parseLaunchProgress";
+import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
+import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
+import { getAvatarPalette } from "@/lib/landing/artistDisplay";
+import { SonafrikLogo } from "@/components/landing/SonafrikLogo";
 
 export const revalidate = 60;
 
@@ -17,134 +18,92 @@ export const metadata: Metadata = {
   },
 };
 
-async function getLaunchProgress(): Promise<LaunchProgress> {
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { data, error } = await supabase.rpc("get_launch_progress");
-    if (error || !data) throw new Error("rpc failed");
-    return parseLaunchProgress(data);
-  } catch {
-    return parseLaunchProgress(null);
-  }
-}
-
 export default async function LancementPage() {
-  const progress = await getLaunchProgress();
+  const [progress, artistsSection] = await Promise.all([
+    getLaunchProgress(),
+    getLandingArtistsSection(),
+  ]);
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ backgroundColor: "var(--color-noir-profond)", color: "var(--color-texte-principal)" }}
-    >
-      {/* Header */}
+    <div className="flex min-h-screen flex-col bg-noir-profond text-texte-principal">
       <header className="flex items-center justify-between px-6 py-5">
         <div>
-          <span className="text-lg font-black tracking-wider" style={{ color: "var(--color-or-solaire)" }}>
-            SONAFRIK
-          </span>
-          <span className="ml-2 text-xs" style={{ color: "var(--color-texte-desactive)" }}>
-            NOTRE BIEN COMMUN
-          </span>
+          <SonafrikLogo size="footer" />
+          <span className="ml-2 text-xs text-texte-desactive">NOTRE BIEN COMMUN</span>
         </div>
         <Link
           href="/auth/connexion"
-          className="rounded-full px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-80"
-          style={{ backgroundColor: "var(--color-surface)", color: "var(--color-texte-principal)", border: "1px solid var(--color-elevated)" }}
+          className="rounded-full border border-elevated bg-surface px-4 py-1.5 text-sm font-medium text-texte-principal transition-opacity hover:opacity-80"
         >
           Se connecter
         </Link>
       </header>
 
-      {/* Hero */}
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-        {/* Slogan */}
         <div className="mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] mb-4" style={{ color: "var(--color-or-solaire)" }}>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-or-solaire">
             Écoute · Participe · Prospère
           </p>
-          <h1 className="text-4xl sm:text-5xl font-black leading-tight mb-4">
-            La musique guinéenne<br />
-            <span style={{ color: "var(--color-vert-energie)" }}>mérite sa plateforme</span>
+          <h1 className="mb-4 text-4xl font-black leading-tight sm:text-5xl">
+            La musique guinéenne
+            <br />
+            <span className="text-vert-energie">mérite sa plateforme</span>
           </h1>
-          <p className="max-w-md mx-auto text-base leading-relaxed" style={{ color: "var(--color-texte-subtil)" }}>
+          <p className="mx-auto max-w-md text-base leading-relaxed text-texte-subtil">
             SONAFRIK rémunère directement les artistes. Chaque écoute compte.
             Ensemble, nous débloquons le lancement.
           </p>
         </div>
 
-        {/* Compteur */}
-        <div
-          className="w-full max-w-lg rounded-2xl p-8 mb-10"
-          style={{ backgroundColor: "var(--color-noir-profond)", border: "1px solid var(--color-surface)" }}
-        >
-          <p className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "var(--color-texte-desactive)" }}>
+        <div className="mb-10 w-full max-w-lg rounded-2xl border border-surface bg-noir-profond p-8">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-texte-desactive">
             Objectif de lancement — CDC Règle #7
           </p>
 
-          {/* Chiffres */}
           <div className="mb-4 flex items-end justify-between">
             <div>
-              <span className="text-6xl font-black tabular-nums leading-none" style={{ color: "var(--color-vert-energie)" }}>
+              <span className="text-6xl font-black tabular-nums leading-none text-vert-energie">
                 {progress.current.toLocaleString("fr-FR")}
               </span>
-              <span className="ml-2 text-2xl font-bold" style={{ color: "var(--color-texte-desactive)" }}>
+              <span className="ml-2 text-2xl font-bold text-texte-desactive">
                 /{progress.target.toLocaleString("fr-FR")}
               </span>
             </div>
-            <span className="text-lg font-semibold" style={{ color: "var(--color-vert-energie)" }}>
+            <span className="text-lg font-semibold text-vert-energie">
               {progress.percent.toFixed(1)} %
             </span>
           </div>
 
-          {/* Barre de progression */}
-          <div
-            style={{
-              height: "8px",
-              width: "100%",
-              backgroundColor: "var(--color-card)",
-              border: "1px solid var(--color-elevated)",
-              borderRadius: "4px",
-              overflow: "hidden",
-            }}
-          >
+          <div className="h-2 w-full overflow-hidden rounded border border-elevated bg-card">
             <div
-              style={{
-                height: "100%",
-                width: `${progress.percent}%`,
-                backgroundColor: "var(--color-vert-energie)",
-                borderRadius: "4px",
-                transition: "width 0.6s ease",
-              }}
+              className="h-full rounded bg-vert-energie transition-[width] duration-500 ease-out"
+              style={{ width: `${progress.percent}%` }}
             />
           </div>
 
-          <p className="mt-3 text-sm text-center" style={{ color: "var(--color-texte-desactive)" }}>
+          <p className="mt-3 text-center text-sm text-texte-desactive">
             {progress.launched
               ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
               : `${(progress.target - progress.current).toLocaleString("fr-FR")} abonnés manquants pour le lancement`}
           </p>
         </div>
 
-        {/* CTA */}
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div className="flex flex-wrap justify-center gap-3">
           <Link
             href="/auth/connexion"
-            className="rounded-full px-8 py-3 text-sm font-bold transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
+            className="rounded-full bg-vert-energie px-8 py-3 text-sm font-bold text-noir-profond transition-opacity hover:opacity-90"
           >
             Rejoindre SONAFRIK
           </Link>
           <Link
             href="/auth/connexion?role=listener"
-            className="rounded-full px-8 py-3 text-sm font-medium transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "var(--color-surface)", color: "var(--color-texte-principal)", border: "1px solid var(--color-elevated)" }}
+            className="rounded-full border border-elevated bg-surface px-8 py-3 text-sm font-medium text-texte-principal transition-opacity hover:opacity-80"
           >
             Rejoindre comme auditeur
           </Link>
         </div>
 
-        {/* Règles CDC */}
-        <div className="mt-16 grid gap-4 sm:grid-cols-3 max-w-2xl w-full text-left">
+        <div className="mt-16 grid w-full max-w-2xl gap-4 text-left sm:grid-cols-3">
           {[
             { rule: "#3", label: "65% reversés aux artistes", icon: "🎵" },
             { rule: "#4", label: "Beat Store à 0% de commission", icon: "🎹" },
@@ -152,85 +111,59 @@ export default async function LancementPage() {
           ].map(({ rule, label, icon }) => (
             <div
               key={rule}
-              className="rounded-xl p-4"
-              style={{ backgroundColor: "var(--color-noir-profond)", border: "1px solid var(--color-surface)" }}
+              className="rounded-xl border border-surface bg-noir-profond p-4"
             >
-              <p className="text-lg mb-1">{icon}</p>
-              <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--color-or-solaire)" }}>
-                Règle CDC {rule}
-              </p>
-              <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>{label}</p>
+              <p className="mb-1 text-lg">{icon}</p>
+              <p className="mb-0.5 text-xs font-semibold text-or-solaire">Règle CDC {rule}</p>
+              <p className="text-sm text-texte-secondaire">{label}</p>
             </div>
           ))}
         </div>
 
-        {/* Preuve sociale — artistes fondateurs */}
-        <div className="mt-12 mb-8 w-full max-w-2xl text-center">
-          <p className="text-base font-bold mb-1" style={{ color: "var(--color-texte-principal)" }}>
-            Déjà sur SONAFRIK
-          </p>
-          <p className="mb-6" style={{ color: "var(--color-texte-secondaire)", fontSize: "14px" }}>
-            Les premiers artistes qui font confiance à la plateforme
-          </p>
+        {artistsSection.artists.length > 0 ? (
+          <div className="mb-8 mt-12 w-full max-w-2xl text-center">
+            <p className="mb-1 text-base font-bold text-texte-principal">Déjà sur SONAFRIK</p>
+            <p className="mb-6 text-sm text-texte-secondaire">
+              Les premiers artistes qui font confiance à la plateforme
+            </p>
 
-          {/* Avatars — 5 artistes fondateurs */}
-          <div className="flex flex-wrap justify-center gap-4">
-            {([
-              { initials: "AD", name: "Alpha Diallo", genre: "Afrobeat",    bg: "rgba(0, 210, 106, 0.16)",   borderColor: "rgba(0, 210, 106, 0.38)" },
-              { initials: "F",  name: "Faya",         genre: "R&B Africain",bg: "rgba(255, 194, 14, 0.16)",  borderColor: "rgba(255, 194, 14, 0.38)" },
-              { initials: "DS", name: "Djeli Sow",    genre: "Traditionnel",bg: "rgba(168, 85, 247, 0.16)",  borderColor: "rgba(168, 85, 247, 0.38)" },
-              { initials: "MF", name: "MC Fly",       genre: "Rap GN",      bg: "rgba(59, 130, 246, 0.16)",  borderColor: "rgba(59, 130, 246, 0.38)" },
-              { initials: "S",  name: "SeK",          genre: "Gospel",       bg: "rgba(249, 115, 22, 0.16)",  borderColor: "rgba(249, 115, 22, 0.38)" },
-            ] as const).map(({ initials, name, genre, bg, borderColor }) => (
-              <div key={name} className="flex flex-col items-center" style={{ width: "72px" }}>
-                <div
-                  className="flex items-center justify-center rounded-full mb-2"
-                  style={{
-                    width: "52px",
-                    height: "52px",
-                    backgroundColor: bg,
-                    border: `2px solid ${borderColor}`,
-                    color: "var(--color-texte-principal)",
-                    fontWeight: 600,
-                    fontSize: "16px",
-                  }}
-                >
-                  {initials}
-                </div>
-                <p style={{ fontSize: "12px", color: "var(--color-texte-principal)", fontWeight: 500, lineHeight: "1.3" }}>
-                  {name}
-                </p>
-                <p style={{ fontSize: "11px", color: "var(--color-texte-secondaire)", lineHeight: "1.3" }}>
-                  {genre}
-                </p>
-              </div>
-            ))}
-          </div>
+            <div className="flex flex-wrap justify-center gap-4">
+              {artistsSection.artists.map((artist) => {
+                const palette = getAvatarPalette(artist.paletteIndex);
+                return (
+                  <Link
+                    key={artist.creatorId}
+                    href={`/listen/artist/${artist.creatorId}`}
+                    className="flex w-[72px] flex-col items-center no-underline"
+                  >
+                    <div
+                      className={`mb-2 flex size-[52px] items-center justify-center rounded-full border-2 text-base font-semibold ${palette.bg} ${palette.text} ${palette.border}`}
+                    >
+                      {artist.initials}
+                    </div>
+                    <p className="text-xs font-medium leading-snug text-texte-principal">
+                      {artist.stageName}
+                    </p>
+                    <p className="text-[11px] leading-snug text-texte-secondaire">{artist.genre}</p>
+                  </Link>
+                );
+              })}
+            </div>
 
-          {/* Badge stats */}
-          <div className="mt-5 inline-block">
-            <span
-              style={{
-                display: "inline-block",
-                backgroundColor: "var(--color-card)",
-                border: "1px solid var(--color-elevated)",
-                borderRadius: "20px",
-                padding: "6px 16px",
-                fontSize: "12px",
-                color: "var(--color-texte-secondaire)",
-              }}
-            >
-              🎵 5 artistes · 30 morceaux · Guinée Conakry
-            </span>
+            <div className="mt-5 inline-block">
+              <span className="inline-block rounded-full border border-elevated bg-card px-4 py-1.5 text-xs text-texte-secondaire">
+                🎵 {artistsSection.artists.length} artiste
+                {artistsSection.artists.length > 1 ? "s" : ""} ·{" "}
+                {artistsSection.trackCount.toLocaleString("fr-FR")} morceau
+                {artistsSection.trackCount > 1 ? "x" : ""} · Guinée Conakry
+              </span>
+            </div>
           </div>
-        </div>
+        ) : null}
       </main>
 
-      {/* Footer */}
       <footer className="px-6 py-6 text-center">
-        <p className="text-xs" style={{ color: "var(--color-bordure)" }}>
-          © 2026 SONAFRIK — Notre Bien Commun
-        </p>
+        <p className="text-xs text-bordure">© 2026 SONAFRIK — Notre Bien Commun</p>
       </footer>
     </div>
   );

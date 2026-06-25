@@ -1,82 +1,25 @@
 const PARTNERS = [
-  {
-    name: "Orange Money",
-    dot: "var(--color-provider-orange)",
-    sub: "Paiement mobile Guinée",
-  },
-  {
-    name: "MTN MoMo",
-    dot: "var(--color-provider-mtn)",
-    sub: "Paiement mobile Guinée",
-  },
-  {
-    name: "Wave",
-    dot: "var(--color-vert-energie)",
-    sub: "Bientôt disponible",
-  },
+  { name: "Orange Money", dotClass: "bg-provider-orange", sub: "Paiement mobile Guinée" },
+  { name: "MTN MoMo", dotClass: "bg-provider-mtn", sub: "Paiement mobile Guinée" },
+  { name: "Wave", dotClass: "bg-vert-energie", sub: "Bientôt disponible" },
 ] as const;
 
 export function LandingPartners() {
   return (
-    <section style={{ marginBottom: "56px", textAlign: "center" }}>
-      <p
-        style={{
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.28)",
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          marginBottom: "20px",
-        }}
-      >
+    <section className="mb-14 text-center">
+      <p className="mb-5 text-[11px] uppercase tracking-[1.5px] text-white/30">
         Paiements & partenaires
       </p>
-      <div
-        className="landing-partners-row"
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: "12px",
-        }}
-      >
-        {PARTNERS.map(({ name, dot, sub }) => (
+      <div className="landing-partners-row flex flex-wrap justify-center gap-3">
+        {PARTNERS.map(({ name, dotClass, sub }) => (
           <div
             key={name}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "12px 18px",
-              borderRadius: "12px",
-              border: "1px solid var(--color-bordure)",
-              backgroundColor: "var(--color-surface)",
-              minWidth: "160px",
-            }}
+            className="flex min-w-[160px] items-center gap-2.5 rounded-xl border border-bordure bg-surface px-[18px] py-3"
           >
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                backgroundColor: dot,
-                flexShrink: 0,
-              }}
-              aria-hidden="true"
-            />
-            <div style={{ textAlign: "left" }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "var(--color-texte-principal)",
-                }}
-              >
-                {name}
-              </p>
-              <p style={{ margin: 0, fontSize: "11px", color: "var(--color-texte-secondaire)" }}>
-                {sub}
-              </p>
+            <span className={`size-2.5 shrink-0 rounded-full ${dotClass}`} aria-hidden="true" />
+            <div className="text-left">
+              <p className="m-0 text-[13px] font-semibold text-texte-principal">{name}</p>
+              <p className="m-0 text-[11px] text-texte-secondaire">{sub}</p>
             </div>
           </div>
         ))}

@@ -1,151 +1,81 @@
 import { LandingProgressBar } from "./LandingProgressBar";
-import { SUBSCRIBER_TARGET } from "@/lib/landing/constants";
 
 interface LandingProgressProps {
   subscriberCount: number;
+  subscriberTarget: number;
 }
 
-const MILESTONES = [
-  { threshold: 500, label: "500 ✓ Bêta" },
-  { threshold: 1000, label: "1 000" },
-  { threshold: 1500, label: "1 500" },
-  { threshold: SUBSCRIBER_TARGET, label: "2 000 🚀" },
-] as const;
+function buildMilestones(target: number) {
+  const steps = [
+    Math.round(target * 0.25),
+    Math.round(target * 0.5),
+    Math.round(target * 0.75),
+    target,
+  ];
+  return steps.map((threshold, i) => ({
+    threshold,
+    label:
+      i === 0
+        ? `${steps[0]!.toLocaleString("fr-FR")} ✓ Bêta`
+        : i === 3
+          ? `${target.toLocaleString("fr-FR")} 🚀`
+          : steps[i]!.toLocaleString("fr-FR"),
+  }));
+}
 
-export function LandingProgress({ subscriberCount }: LandingProgressProps) {
-  const pct = Math.min((subscriberCount / SUBSCRIBER_TARGET) * 100, 100);
-  const remaining = Math.max(SUBSCRIBER_TARGET - subscriberCount, 0);
+export function LandingProgress({ subscriberCount, subscriberTarget }: LandingProgressProps) {
+  const pct = Math.min((subscriberCount / subscriberTarget) * 100, 100);
+  const remaining = Math.max(subscriberTarget - subscriberCount, 0);
   const pctDisplay = Math.round(pct);
+  const milestones = buildMilestones(subscriberTarget);
 
   return (
-    <div
-      style={{
-        backgroundColor: "rgba(255,255,255,0.04)",
-        border: "0.5px solid rgba(255,255,255,0.1)",
-        borderRadius: "14px",
-        padding: "24px 28px",
-        maxWidth: "520px",
-        margin: "36px auto 0",
-        textAlign: "left",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "4px",
-        }}
-      >
+    <div className="mx-auto mt-9 max-w-[520px] rounded-[14px] border border-white/10 bg-white/5 px-7 py-6 text-left">
+      <div className="mb-1 flex items-start justify-between">
         <div>
-          <div
-            style={{
-              fontSize: "11px",
-              color: "rgba(255,255,255,0.3)",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginBottom: "6px",
-            }}
-          >
+          <div className="mb-1.5 text-[11px] uppercase tracking-wide text-white/30">
             OBJECTIF DE LANCEMENT
           </div>
-          <div style={{ lineHeight: 1 }}>
-            <span
-              style={{
-                fontSize: "28px",
-                fontWeight: 600,
-                color: "var(--color-texte-principal)",
-              }}
-            >
+          <div className="leading-none">
+            <span className="text-[28px] font-semibold text-texte-principal">
               {subscriberCount.toLocaleString("fr-FR")}
             </span>
-            <span
-              style={{
-                fontSize: "16px",
-                color: "rgba(255,255,255,0.35)",
-                fontWeight: 400,
-                marginLeft: "4px",
-              }}
-            >
-              / {SUBSCRIBER_TARGET.toLocaleString("fr-FR")} abonnés
+            <span className="ml-1 text-base font-normal text-white/35">
+              / {subscriberTarget.toLocaleString("fr-FR")} abonnés
             </span>
           </div>
         </div>
-        <div
-          style={{
-            backgroundColor: "rgba(0,210,106,0.12)",
-            color: "var(--color-vert-energie)",
-            fontSize: "13px",
-            fontWeight: 600,
-            padding: "4px 10px",
-            borderRadius: "8px",
-            whiteSpace: "nowrap",
-          }}
-        >
+        <div className="whitespace-nowrap rounded-lg bg-vert-energie/15 px-2.5 py-1 text-[13px] font-semibold text-vert-energie">
           {pctDisplay} %
         </div>
       </div>
 
-      {/* Barre de progression animée */}
       <LandingProgressBar pct={pct} />
 
-      {/* Message */}
-      <p
-        style={{
-          fontSize: "13px",
-          color: "rgba(255,255,255,0.4)",
-          margin: "0 0 16px",
-        }}
-      >
-        Plus que{" "}
-        <strong style={{ color: "rgba(255,255,255,0.8)" }}>
-          {remaining.toLocaleString("fr-FR")}
-        </strong>{" "}
+      <p className="mb-4 text-[13px] text-white/40">
+        Plus que <strong className="text-white/80">{remaining.toLocaleString("fr-FR")}</strong>{" "}
         personnes pour le lancement officiel
       </p>
 
-      {/* Jalons */}
       <div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "4px",
-            marginBottom: "6px",
-          }}
-        >
-          {MILESTONES.map(({ threshold }) => {
+        <div className="mb-1.5 grid grid-cols-4 gap-1">
+          {milestones.map(({ threshold }) => {
             const reached = subscriberCount >= threshold;
             return (
               <div
                 key={threshold}
-                style={{
-                  height: "4px",
-                  borderRadius: "2px",
-                  backgroundColor: reached ? "var(--color-vert-energie)" : "rgba(255,255,255,0.08)",
-                }}
+                className={`h-1 rounded-sm ${reached ? "bg-vert-energie" : "bg-white/10"}`}
               />
             );
           })}
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "4px",
-          }}
-        >
-          {MILESTONES.map(({ threshold, label }) => {
+        <div className="grid grid-cols-4 gap-1">
+          {milestones.map(({ threshold, label }) => {
             const reached = subscriberCount >= threshold;
             return (
               <div
                 key={threshold}
-                style={{
-                  fontSize: "10px",
-                  color: reached ? "var(--color-vert-energie)" : "rgba(255,255,255,0.28)",
-                  textAlign: "center",
-                }}
+                className={`text-center text-[10px] ${reached ? "text-vert-energie" : "text-white/30"}`}
               >
                 {label}
               </div>

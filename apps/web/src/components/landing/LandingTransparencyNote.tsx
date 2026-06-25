@@ -1,34 +1,15 @@
 export function LandingTransparencyNote() {
   return (
-    <div
-      style={{
-        backgroundColor: "rgba(0,210,106,0.05)",
-        border: "0.5px solid rgba(0,210,106,0.16)",
-        borderRadius: "14px",
-        padding: "20px 24px",
-        maxWidth: "700px",
-        margin: "0 auto 56px",
-        display: "flex",
-        gap: "14px",
-        alignItems: "flex-start",
-      }}
-    >
-      <span style={{ fontSize: "20px", color: "var(--color-vert-energie)", flexShrink: 0, lineHeight: 1 }}>ℹ</span>
+    <div className="mx-auto mb-14 flex max-w-[700px] items-start gap-3.5 rounded-[14px] border border-vert-energie/20 bg-vert-energie/5 px-6 py-5">
+      <span className="shrink-0 text-xl leading-none text-vert-energie">ℹ</span>
       <div>
-        <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-texte-principal)", margin: "0 0 8px" }}>
+        <p className="mb-2 text-sm font-semibold text-texte-principal">
           Comment votre abonnement profite aux artistes
         </p>
-        <p
-          style={{
-            fontSize: "13px",
-            color: "rgba(255,255,255,0.48)",
-            lineHeight: 1.65,
-            margin: 0,
-          }}
-        >
-          <strong style={{ color: "var(--color-texte-principal)" }}>65 %</strong> de chaque abonnement sont
+        <p className="m-0 text-[13px] leading-relaxed text-white/50">
+          <strong className="text-texte-principal">65 %</strong> de chaque abonnement sont
           partagés entre les artistes que vous écoutez, au prorata de leurs écoutes réelles. Les{" "}
-          <strong style={{ color: "var(--color-texte-principal)" }}>35 %</strong> restants couvrent
+          <strong className="text-texte-principal">35 %</strong> restants couvrent
           l&apos;infrastructure et le développement de la plateforme.
         </p>
       </div>

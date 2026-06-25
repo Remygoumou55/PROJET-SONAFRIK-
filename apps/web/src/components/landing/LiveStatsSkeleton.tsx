@@ -1,20 +1,8 @@
-import type { LandingPublicStats } from "@/lib/landing/constants";
-
 export function LiveStatsSkeleton() {
   return (
     <div
-      className="landing-live-stats-skeleton"
-      style={{
-        borderTop: "1px solid rgba(0,210,106,0.15)",
-        borderBottom: "1px solid rgba(0,210,106,0.15)",
-        backgroundColor: "rgba(0,210,106,0.06)",
-        padding: "16px",
-        marginBottom: "48px",
-        minHeight: "72px",
-      }}
+      className="landing-live-stats-skeleton mb-12 min-h-[72px] border-y border-vert-energie/15 bg-vert-energie/5 px-4 py-4"
       aria-hidden="true"
     />
   );
 }
-
-export type { LandingPublicStats };

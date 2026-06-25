@@ -12,16 +12,6 @@ const HIDDEN: LandingPublicStats = {
 
 /** Stats agrégées anonymisées pour la landing — aucune donnée personnelle. */
 export async function fetchLandingStats(): Promise<LandingPublicStats> {
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") {
-    return {
-      visible: true,
-      activeStreams: 127,
-      totalArtists: 5,
-      royaltiesPaidGnf: 4_250_000,
-      monthlyRoyaltiesGnf: 850_000,
-    };
-  }
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return HIDDEN;

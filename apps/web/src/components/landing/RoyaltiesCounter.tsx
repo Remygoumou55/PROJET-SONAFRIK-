@@ -42,19 +42,11 @@ export function RoyaltiesCounter() {
   return (
     <div
       ref={ref}
-      style={{
-        maxWidth: "520px",
-        margin: "0 auto 28px",
-        backgroundColor: "rgba(0,210,106,0.06)",
-        border: "1px solid rgba(0,210,106,0.15)",
-        borderRadius: "12px",
-        padding: "16px 20px",
-        textAlign: "center",
-      }}
+      className="mx-auto mb-7 max-w-[520px] rounded-xl border border-vert-energie/20 bg-vert-energie/5 px-5 py-4 text-center"
     >
-      <p style={{ margin: 0, fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
+      <p className="m-0 text-[13px] text-white/50">
         💰{" "}
-        <span style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-vert-energie)" }}>
+        <span className="text-2xl font-bold text-vert-energie">
           {display.toLocaleString("fr-FR")} GNF
         </span>{" "}
         versés aux artistes ce mois

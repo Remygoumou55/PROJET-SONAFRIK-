@@ -3,21 +3,21 @@ import { RoyaltiesCounter } from "./RoyaltiesCounter";
 
 const PILLARS = [
   {
-    iconBg: "rgba(0,210,106,0.12)",
+    iconBg: "bg-vert-energie/15",
     icon: "🎵",
     title: "65 % des abonnements pour les artistes",
     body: "Sur chaque abonnement payé, 65 francs sur 100 sont reversés aux artistes — répartis entre eux selon le nombre d'écoutes réelles.",
     note: "Plus votre musique est écoutée, plus votre part est grande. Chaque auditeur contribue à tous les artistes qu'il écoute.",
   },
   {
-    iconBg: "rgba(255,194,14,0.12)",
+    iconBg: "bg-or-solaire/15",
     icon: "🎹",
     title: "Beat Store sans commission",
     body: "Les beatmakers vendent leurs instrumentaux directement sur SONAFRIK, car ils doivent aussi vivre de leur passion et de leurs œuvres.",
     note: "Zéro frais prélevés. Ce que l'acheteur paie vous revient intégralement.",
   },
   {
-    iconBg: "rgba(55,138,221,0.12)",
+    iconBg: "bg-feature-azure/15",
     icon: "💸",
     title: "Pourboires directs aux artistes",
     body: "Quand un fan vous envoie un pourboire, la quasi-totalité lui arrive directement. Le geste du fan devient immédiatement de l'argent pour vous.",
@@ -27,101 +27,34 @@ const PILLARS = [
 
 export function LandingPillars() {
   return (
-    <section style={{ marginBottom: "56px" }}>
-      <LandingSectionHeader
-        label="POUR LES ARTISTES"
-        title="Construit pour les artistes guinéens"
-      />
+    <section className="mb-14">
+      <LandingSectionHeader label="POUR LES ARTISTES" title="Construit pour les artistes guinéens" />
 
       <RoyaltiesCounter />
 
-      {/* Texte intro */}
-      <div
-        style={{
-          maxWidth: "600px",
-          margin: "0 auto 32px",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ fontSize: "17px", fontWeight: 600, color: "var(--color-texte-principal)", margin: 0 }}>
+      <div className="mx-auto mb-8 max-w-[600px] text-center">
+        <p className="m-0 text-[17px] font-semibold text-texte-principal">
           En Guinée, des artistes talentueux créent chaque jour — et ne gagnent presque rien.
         </p>
-        <p
-          style={{
-            fontSize: "15px",
-            color: "rgba(255,255,255,0.45)",
-            marginTop: "10px",
-            marginBottom: 0,
-          }}
-        >
+        <p className="mb-0 mt-2.5 text-[15px] text-white/45">
           SONAFRIK est né pour changer ça...
         </p>
       </div>
 
-      {/* 3 cartes */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "14px",
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
         {PILLARS.map(({ iconBg, icon, title, body, note }) => (
           <div
             key={title}
-            style={{
-              backgroundColor: "rgba(255,255,255,0.03)",
-              border: "0.5px solid rgba(255,255,255,0.08)",
-              borderRadius: "14px",
-              padding: "22px",
-            }}
+            className="rounded-[14px] border border-white/10 bg-white/[0.03] p-[22px]"
           >
             <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                backgroundColor: iconBg,
-                fontSize: "20px",
-                marginBottom: "14px",
-              }}
+              className={`mb-3.5 inline-flex size-10 items-center justify-center rounded-[10px] text-xl ${iconBg}`}
             >
               {icon}
             </div>
-            <h3
-              style={{
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "var(--color-texte-principal)",
-                margin: "0 0 8px",
-              }}
-            >
-              {title}
-            </h3>
-            <p
-              style={{
-                fontSize: "13px",
-                color: "rgba(255,255,255,0.5)",
-                margin: "0 0 10px",
-                lineHeight: 1.6,
-              }}
-            >
-              {body}
-            </p>
-            <p
-              style={{
-                fontSize: "11px",
-                color: "rgba(255,255,255,0.28)",
-                borderTop: "0.5px solid rgba(255,255,255,0.06)",
-                paddingTop: "10px",
-                marginTop: "10px",
-                marginBottom: 0,
-                lineHeight: 1.5,
-              }}
-            >
+            <h3 className="mb-2 text-[15px] font-semibold text-texte-principal">{title}</h3>
+            <p className="mb-2.5 text-[13px] leading-relaxed text-white/50">{body}</p>
+            <p className="mb-0 mt-2.5 border-t border-white/[0.06] pt-2.5 text-[11px] leading-snug text-white/30">
               {note}
             </p>
           </div>

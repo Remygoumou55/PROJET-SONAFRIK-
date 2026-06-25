@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
+import { SonafrikLogo } from "./SonafrikLogo";
 
 const NAV_LINKS = [
   { label: "Comment ça marche", href: "#comment-ca-marche" },
@@ -34,9 +35,7 @@ export function LandingNav() {
       <nav className="landing-nav__inner">
         <Link href="/" className="landing-nav__brand">
           <span className="landing-nav__logo">
-            <span style={{ color: "var(--color-texte-principal)" }}>SON</span>
-            <span style={{ color: "var(--color-or-solaire)" }}>A</span>
-            <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
+            <SonafrikLogo />
           </span>
           <span className="landing-nav-tagline landing-nav__tagline">Notre Bien Commun</span>
         </Link>

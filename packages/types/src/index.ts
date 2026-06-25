@@ -13,3 +13,4 @@ export * from "./admin";
 export * from "./payments";
 export * from "./beats";
 export * from "./metadata";
+export * from "./landing";

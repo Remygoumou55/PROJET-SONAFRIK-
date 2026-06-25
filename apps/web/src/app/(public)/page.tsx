@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createAuthService } from "@sonafrik/api/auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getSubscriberCount } from "@/lib/landing/getSubscriberCount";
+import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
+import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
 import {
   LandingPage,
   LandingHero,
@@ -43,15 +44,7 @@ export const metadata: Metadata = {
 };
 
 function Divider() {
-  return (
-    <hr
-      style={{
-        border: "none",
-        borderTop: "0.5px solid rgba(255,255,255,0.06)",
-        margin: "0 0 48px",
-      }}
-    />
-  );
+  return <hr className="mb-12 border-0 border-t border-white/[0.06]" />;
 }
 
 export default async function LandingV5Page({
@@ -69,13 +62,12 @@ export default async function LandingV5Page({
 
   const isBypass = process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1";
 
-  let profile = null;
-  let subscriberCount = 0;
+  const launchProgressPromise = getLaunchProgress();
+  const artistsSectionPromise = getLandingArtistsSection();
 
-  if (isBypass) {
-    subscriberCount = 42;
-  } else {
-    const subscriberCountPromise = getSubscriberCount();
+  let profile = null;
+
+  if (!isBypass) {
     const supabase = await getSupabaseServerClient();
     const auth = createAuthService(supabase);
     try {
@@ -86,22 +78,28 @@ export default async function LandingV5Page({
 
     if (profile?.onboarding_completed) redirect("/listen");
     if (profile && !profile.onboarding_completed) redirect("/auth/connexion");
-
-    subscriberCount = await subscriberCountPromise;
   }
+
+  const [launchProgress, artistsSection] = await Promise.all([
+    launchProgressPromise,
+    artistsSectionPromise,
+  ]);
 
   return (
     <LandingPage>
       <LandingNav />
       <LandingHero>
-        <LandingProgress subscriberCount={subscriberCount} />
+        <LandingProgress
+          subscriberCount={launchProgress.current}
+          subscriberTarget={launchProgress.target}
+        />
       </LandingHero>
       <LiveStats />
-      <LandingHowItWorks />
+      <LandingHowItWorks featuredTrack={artistsSection.featuredTrack} />
       <Divider />
       <LandingPillars />
       <LandingPartners />
-      <LandingArtists />
+      <LandingArtists section={artistsSection} />
       <LandingPlans />
       <LandingTransparencyNote />
       <Roadmap />

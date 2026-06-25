@@ -11,13 +11,13 @@ const POLL_MS = 30_000;
 function StatColumn({
   value,
   label,
-  color,
+  colorClass,
   animate,
   liveDot = false,
 }: {
   value: number;
   label: string;
-  color: string;
+  colorClass: string;
   animate: boolean;
   liveDot?: boolean;
 }) {
@@ -27,11 +27,11 @@ function StatColumn({
     <div className="flex flex-1 flex-col items-center gap-1 text-center">
       <div className="flex items-center gap-2">
         {liveDot ? <span className="live-dot" aria-hidden="true" /> : null}
-        <span style={{ fontSize: "28px", fontWeight: 700, color, lineHeight: 1 }}>
+        <span className={`text-[28px] font-bold leading-none ${colorClass}`}>
           {display.toLocaleString("fr-FR")}
         </span>
       </div>
-      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>{label}</span>
+      <span className="text-xs text-white/50">{label}</span>
     </div>
   );
 }
@@ -66,56 +66,35 @@ export function LiveStats() {
     stats !== null,
   );
 
+  const shellClass =
+    "mb-12 border-y border-vert-energie/15 bg-vert-energie/5 px-4 py-4 min-h-[72px]";
+
   if (!loaded) {
-    return (
-      <div
-        ref={ref}
-        style={{
-          borderTop: "1px solid rgba(0,210,106,0.15)",
-          borderBottom: "1px solid rgba(0,210,106,0.15)",
-          backgroundColor: "rgba(0,210,106,0.06)",
-          padding: "16px",
-          marginBottom: "48px",
-          minHeight: "72px",
-        }}
-        aria-hidden="true"
-      />
-    );
+    return <div ref={ref} className={shellClass} aria-hidden="true" />;
   }
 
   if (!stats) return null;
 
   return (
-    <div
-      ref={ref}
-      role="region"
-      aria-label="Statistiques en direct"
-      style={{
-        borderTop: "1px solid rgba(0,210,106,0.15)",
-        borderBottom: "1px solid rgba(0,210,106,0.15)",
-        backgroundColor: "rgba(0,210,106,0.06)",
-        padding: "16px",
-        marginBottom: "48px",
-      }}
-    >
+    <div ref={ref} role="region" aria-label="Statistiques en direct" className={shellClass}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
         <StatColumn
           value={stats.activeStreams}
           label="en train d'écouter"
-          color="var(--color-vert-energie)"
+          colorClass="text-vert-energie"
           animate={inView}
           liveDot
         />
         <StatColumn
           value={stats.totalArtists}
           label="artistes inscrits"
-          color="var(--color-or-solaire)"
+          colorClass="text-or-solaire"
           animate={inView}
         />
         <StatColumn
           value={stats.royaltiesPaidGnf}
           label="GNF versés aux artistes"
-          color="var(--color-texte-principal)"
+          colorClass="text-texte-principal"
           animate={inView}
         />
       </div>
