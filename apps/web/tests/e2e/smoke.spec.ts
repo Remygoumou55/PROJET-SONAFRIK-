@@ -10,16 +10,17 @@ test.describe("Pages publiques", () => {
   test("page auth/connexion — se charge et affiche le formulaire téléphone", async ({ page }) => {
     await page.goto("/auth/connexion");
 
-    await expect(page).toHaveTitle(/Connexion/i);
+    await expect(page).toHaveTitle(/Créer votre compte/i);
     // Le champ téléphone doit être présent
     const phoneInput = page.locator("input[type='tel'], input[placeholder*='téléphone'], input[placeholder*='phone']").first();
     await expect(phoneInput).toBeVisible({ timeout: 8_000 });
   });
 
-  test("page auth/inscription — se charge et affiche le formulaire téléphone", async ({ page }) => {
+  test("/auth/inscription redirige vers /auth/connexion", async ({ page }) => {
     await page.goto("/auth/inscription");
 
-    await expect(page).toHaveTitle(/Inscription/i);
+    await page.waitForURL(/\/auth\/connexion/, { timeout: 10_000 });
+    await expect(page).toHaveTitle(/Créer votre compte/i);
     const phoneInput = page.locator("input[type='tel'], input[placeholder*='téléphone'], input[placeholder*='phone']").first();
     await expect(phoneInput).toBeVisible({ timeout: 8_000 });
   });

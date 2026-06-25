@@ -128,14 +128,14 @@ export default async function LancementPage() {
         {/* CTA */}
         <div className="flex flex-wrap gap-3 justify-center">
           <Link
-            href="/auth/inscription"
+            href="/auth/connexion"
             className="rounded-full px-8 py-3 text-sm font-bold transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
           >
             Rejoindre SONAFRIK
           </Link>
           <Link
-            href="/auth/inscription?role=listener"
+            href="/auth/connexion?role=listener"
             className="rounded-full px-8 py-3 text-sm font-medium transition-opacity hover:opacity-80"
             style={{ backgroundColor: "var(--color-surface)", color: "var(--color-texte-principal)", border: "1px solid var(--color-elevated)" }}
           >

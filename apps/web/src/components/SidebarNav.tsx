@@ -18,35 +18,30 @@ interface SidebarNavProps {
 
 export function SidebarNav({ title, items, activePath, backHref, backLabel }: SidebarNavProps) {
   return (
-    <nav className="flex flex-col gap-1">
-      <p className="text-texte-desactive mb-2 px-3 text-xs font-semibold uppercase tracking-wider">
-        {title}
-      </p>
-      {items.map((item) => {
-        const isActive = item.exact
-          ? activePath === item.href
-          : activePath === item.href || activePath.startsWith(`${item.href}/`);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
-              isActive
-                ? "bg-elevated text-vert-energie font-medium"
-                : "text-texte-secondaire hover:bg-elevated hover:text-texte-principal"
-            }`}
-          >
-            <span>{item.label}</span>
-            {item.badge && item.badge > 0 ? (
-              <Badge variant="primary">{item.badge}</Badge>
-            ) : null}
-          </Link>
-        );
-      })}
-      <Link
-        href={backHref}
-        className="text-texte-desactive mt-4 px-3 text-xs hover:text-texte-secondaire"
-      >
+    <nav className="sidebar-nav" aria-label={title}>
+      <p className="sidebar-nav__title">{title}</p>
+      <ul className="sidebar-nav__list">
+        {items.map((item) => {
+          const isActive = item.exact
+            ? activePath === item.href
+            : activePath === item.href || activePath.startsWith(`${item.href}/`);
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={`sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span>{item.label}</span>
+                {item.badge && item.badge > 0 ? (
+                  <Badge variant="primary">{item.badge}</Badge>
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      <Link href={backHref} className="sidebar-nav__back">
         ← {backLabel}
       </Link>
     </nav>

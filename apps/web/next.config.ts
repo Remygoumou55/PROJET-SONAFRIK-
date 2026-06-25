@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  // Repositionne l'indicateur dev Next.js (évite chevauchement sidebar)
+  devIndicators: {
+    position: "bottom-right",
+  },
   transpilePackages: [
     "@sonafrik/ui",
     "@sonafrik/shared",
@@ -35,12 +39,8 @@ const nextConfig: NextConfig = {
       static: 300,
       dynamic: 30,
     },
-    // Tree-shaking des gros packages — réduit le bundle JS client
+    // Tree-shaking — @sonafrik/ui/types/api/shared exclus : barrel optimizer casse les exports runtime en dev
     optimizePackageImports: [
-      "@sonafrik/ui",
-      "@sonafrik/types",
-      "@sonafrik/api",
-      "@sonafrik/shared",
       "@sentry/nextjs",
     ],
   },

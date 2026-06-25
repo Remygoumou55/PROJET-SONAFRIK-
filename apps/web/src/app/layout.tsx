@@ -61,7 +61,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://accounts.google.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="prefetch" href="/listen" as="document" />
-        <link rel="prefetch" href="/auth/inscription" as="document" />
+        <link rel="prefetch" href="/auth/connexion" as="document" />
       </head>
       <body className={`${montserrat.variable} antialiased`}>{children}</body>
     </html>

@@ -118,8 +118,7 @@ export async function middleware(request: NextRequest) {
   // Session active : fetch profil uniquement pour les routes nécessitant
   // une décision de routing (pages auth + onboarding).
   if (
-    (isAuthRoute && !pathname.startsWith("/auth/inscription")) ||
-    isOnboarding
+    (isAuthRoute || isOnboarding)
   ) {
     const profile = await withTimeout(
       Promise.resolve(
