@@ -5,7 +5,11 @@ import type { AddPayoutAccountInput } from "@sonafrik/api/wallet";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS } from "@sonafrik/types";
 import { usePayoutPageData, useRequestWithdrawal } from "../hooks/useWallet";
 
-export const PayoutPage = memo(function PayoutPage() {
+export const PayoutPage = memo(function PayoutPage({
+  withdrawalEnabled = true,
+}: {
+  withdrawalEnabled?: boolean;
+}) {
   const { accounts, withdrawals, isLoading, addAccount, removeAccount } = usePayoutPageData();
   const requestWithdrawal = useRequestWithdrawal();
 
@@ -175,15 +179,22 @@ export const PayoutPage = memo(function PayoutPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold" style={{ color: "var(--color-texte-principal)" }}>Demander un retrait</h2>
             <button
-              onClick={() => setShowWithdrawForm(!showWithdrawForm)}
-              className="text-sm font-medium px-3 py-1.5 rounded-lg"
+              type="button"
+              onClick={() => withdrawalEnabled && setShowWithdrawForm(!showWithdrawForm)}
+              disabled={!withdrawalEnabled}
+              className="text-sm font-medium px-3 py-1.5 rounded-lg disabled:opacity-50"
               style={{ backgroundColor: "var(--color-card)", color: "var(--color-vert-energie)", border: "1px solid var(--color-bordure)" }}
             >
-              Retirer
+              {withdrawalEnabled ? "Retirer" : "Retrait bientôt"}
             </button>
           </div>
+          {!withdrawalEnabled && (
+            <p className="text-xs mb-3" style={{ color: "var(--color-texte-secondaire)" }}>
+              Les retraits seront disponibles avec Orange Money GN très prochainement.
+            </p>
+          )}
 
-          {showWithdrawForm && (
+          {showWithdrawForm && withdrawalEnabled && (
             <form onSubmit={handleWithdraw} className="rounded-xl p-4 mb-4 space-y-3" style={{ backgroundColor: "var(--color-card)" }}>
               <select
                 value={withdrawalForm.payoutAccountId}

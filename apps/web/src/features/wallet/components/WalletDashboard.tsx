@@ -37,12 +37,16 @@ const TransactionRow = memo(function TransactionRow({ tx }: { tx: Transaction })
 
 interface WalletDashboardProps {
   context: WalletContext;
+  topupEnabled: boolean;
+  withdrawalEnabled: boolean;
   onSubscribe: () => void;
   onTopup: () => void;
 }
 
 export const WalletDashboard = memo(function WalletDashboard({
   context,
+  topupEnabled,
+  withdrawalEnabled,
   onSubscribe,
   onTopup,
 }: WalletDashboardProps) {
@@ -61,20 +65,38 @@ export const WalletDashboard = memo(function WalletDashboard({
         </p>
         <div className="flex items-center gap-2 mt-4">
           <button
-            onClick={onTopup}
-            className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
+            type="button"
+            onClick={topupEnabled ? onTopup : undefined}
+            disabled={!topupEnabled}
+            className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-60"
             style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+            title={topupEnabled ? undefined : "Orange Money GN — intégration en cours"}
           >
-            Recharger
+            {topupEnabled ? "Recharger" : "Recharger bientôt"}
           </button>
-          <Link
-            href="/wallet/payout"
-            className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
-          >
-            Retirer
-          </Link>
+          {withdrawalEnabled ? (
+            <Link
+              href="/wallet/payout"
+              className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+            >
+              Retirer
+            </Link>
+          ) : (
+            <Link
+              href="/wallet/payout"
+              className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all opacity-80"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+            >
+              Configurer retrait
+            </Link>
+          )}
         </div>
+        {!topupEnabled && (
+          <p className="text-xs mt-3" style={{ color: "rgba(255, 255, 255, 0.55)" }}>
+            Recharge Mobile Money bientôt disponible — Orange Money GN en cours d&apos;intégration.
+          </p>
+        )}
       </div>
 
       {/* Statut premium */}

@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
 import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
-import { isPaymentsEnabled } from "@/features/wallet/lib/paymentsEnabled";
-import { ComingSoon } from "@/components/ComingSoon";
+import { isTopupEnabled } from "@/features/wallet/lib/paymentsEnabled";
 
 const SubscriptionModal = dynamic(
   () =>
@@ -29,16 +28,6 @@ export function WalletClient() {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showTopup, setShowTopup]               = useState(false);
 
-  if (!isPaymentsEnabled()) {
-    return (
-      <ComingSoon
-        emoji="💳"
-        title="Portefeuille & Paiements"
-        description="Orange Money, MTN MoMo et Wave arrivent bientôt sur SONAFRIK. Rechargez et gérez vos abonnements en quelques secondes."
-      />
-    );
-  }
-
   if (isLoading) {
     return (
       <div className="py-20 flex justify-center">
@@ -59,6 +48,8 @@ export function WalletClient() {
     <>
       <WalletDashboard
         context={context}
+        topupEnabled={isTopupEnabled()}
+        withdrawalEnabled={isTopupEnabled()}
         onSubscribe={() => setShowSubscription(true)}
         onTopup={() => setShowTopup(true)}
       />
@@ -68,7 +59,7 @@ export function WalletClient() {
       </div>
 
       {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} />}
-      {showTopup && (
+      {showTopup && isTopupEnabled() && (
         <TopupModal
           onClose={() => setShowTopup(false)}
           onSuccess={() => { reload(); }}
