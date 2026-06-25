@@ -1,4 +1,5 @@
 export { CreatorService, createCreatorService } from "./creator.service";
+export { CreatorDashboardService, createCreatorDashboardService } from "./creatorDashboard.service";
 export { CreatorRepository } from "./creator.repository";
 export { CreatorError } from "./errors";
 export {

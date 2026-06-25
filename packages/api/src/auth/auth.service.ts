@@ -1,7 +1,7 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { AccountType, Profile } from "@sonafrik/types";
 import { AuthRepository } from "./auth.repository";
-import { AuthError, mapSupabaseAuthError } from "./errors";
+import { AuthError, mapSupabaseAuthError, mapSupabaseOtpSendError, mapSupabaseOtpVerifyError } from "./errors";
 import {
   completeOnboardingSchema,
   registerSessionSchema,
@@ -31,7 +31,7 @@ export class AuthService {
       options: { channel: "sms" },
     });
 
-    if (error) throw mapSupabaseAuthError(error);
+    if (error) throw mapSupabaseOtpSendError(error);
   }
 
   async verifyOtp(input: VerifyOtpInput): Promise<{ userId: string; profile: Profile | null }> {
@@ -47,7 +47,7 @@ export class AuthService {
       type: "sms",
     });
 
-    if (error) throw mapSupabaseAuthError(error);
+    if (error) throw mapSupabaseOtpVerifyError(error);
     if (!data.user) throw new AuthError("unknown");
 
     const profile = await this.repository.getProfile(data.user.id);

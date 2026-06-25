@@ -2,6 +2,7 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Album, CatalogContext, Genre, Track, TrackAppearance, TrackCredit } from "@sonafrik/types";
 import { CatalogError } from "./errors";
 import { CatalogRepository } from "./catalog.repository";
+import { PublicationIntegrationService } from "../publication/integration";
 import {
   catalogAssetUploadSchema,
   createAlbumSchema,
@@ -17,6 +18,22 @@ import {
   type UpdateTrackInput,
 } from "./schemas";
 
+function isDevBypass(): boolean {
+  return (
+    (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") ||
+    process.env.NEXT_PUBLIC_BYPASS_AUTH === "true" ||
+    process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true"
+  );
+}
+
+function toCatalogError(
+  err: unknown,
+  code: "track_create_failed" | "unknown" = "unknown",
+): CatalogError {
+  if (err instanceof CatalogError) return err;
+  return new CatalogError(code);
+}
+
 export class CatalogService {
   private readonly repository: CatalogRepository;
 
@@ -25,20 +42,32 @@ export class CatalogService {
   }
 
   private async requireUserId(): Promise<string> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
     const {
       data: { user },
     } = await this.client.auth.getUser();
-    if (!user) throw new CatalogError("unauthorized");
-    return user.id;
+    if (user) return user.id;
+
+    if (isDevBypass()) return "dev-mock-id";
+    throw new CatalogError("unauthorized");
   }
 
   private async requireCreatorId(): Promise<string> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-creator-id";
-    const userId = await this.requireUserId();
-    const { data } = await this.client.rpc("is_artist_account", { p_user_id: userId });
-    if (!data) throw new CatalogError("not_artist_account");
-    return this.repository.ensureCreatorId();
+    const {
+      data: { user },
+    } = await this.client.auth.getUser();
+
+    if (user) {
+      const { data } = await this.client.rpc("is_artist_account", { p_user_id: user.id });
+      if (!data) throw new CatalogError("not_artist_account");
+      try {
+        return await this.repository.ensureCreatorId();
+      } catch {
+        throw new CatalogError("creator_not_found");
+      }
+    }
+
+    if (isDevBypass()) return "dev-creator-id";
+    throw new CatalogError("unauthorized");
   }
 
   async getCatalogContext(): Promise<CatalogContext> {
@@ -76,10 +105,12 @@ export class CatalogService {
     if (!parsed.success) throw new CatalogError("invalid_album");
 
     const userId = await this.requireUserId();
-    const creatorId = await this.repository.ensureCreatorId();
+    const creatorId = await this.requireCreatorId();
     const slug = this.repository.buildSlug(parsed.data.title, creatorId);
 
-    const album = await this.repository.createAlbum(creatorId, userId, {
+    let album: Album;
+    try {
+      album = await this.repository.createAlbum(creatorId, userId, {
       title: parsed.data.title,
       slug,
       release_type: parsed.data.releaseType,
@@ -87,6 +118,9 @@ export class CatalogService {
       description: parsed.data.description,
       release_date: parsed.data.releaseDate,
     });
+    } catch (err) {
+      throw toCatalogError(err);
+    }
 
     if (parsed.data.genreIds?.length) {
       await this.repository.setAlbumGenres(album.id, parsed.data.genreIds);
@@ -127,8 +161,11 @@ export class CatalogService {
   }
 
   async submitAlbum(albumId: string): Promise<void> {
+    const integration = new PublicationIntegrationService(this.client);
     try {
-      await this.repository.submitAlbum(albumId);
+      await integration.submitAlbum(albumId, async () => {
+        await this.repository.submitAlbum(albumId);
+      });
     } catch {
       throw new CatalogError("publish_submit_failed");
     }
@@ -144,10 +181,12 @@ export class CatalogService {
     if (!parsed.success) throw new CatalogError("invalid_track");
 
     const userId = await this.requireUserId();
-    const creatorId = await this.repository.ensureCreatorId();
+    const creatorId = await this.requireCreatorId();
     const slug = this.repository.buildSlug(parsed.data.title, creatorId);
 
-    const track = await this.repository.createTrack(creatorId, userId, {
+    let track: Track;
+    try {
+      track = await this.repository.createTrack(creatorId, userId, {
       title: parsed.data.title,
       slug,
       album_id: parsed.data.albumId,
@@ -159,6 +198,9 @@ export class CatalogService {
       bpm: parsed.data.bpm,
       musical_key: parsed.data.musicalKey,
     });
+    } catch (err) {
+      throw toCatalogError(err, "track_create_failed");
+    }
 
     if (parsed.data.genreIds?.length) {
       await this.repository.setTrackGenres(track.id, parsed.data.genreIds);
@@ -194,8 +236,11 @@ export class CatalogService {
   }
 
   async submitTrack(trackId: string): Promise<void> {
+    const integration = new PublicationIntegrationService(this.client);
     try {
-      await this.repository.submitTrack(trackId);
+      await integration.submitTrack(trackId, async () => {
+        await this.repository.submitTrack(trackId);
+      });
     } catch {
       throw new CatalogError("publish_submit_failed");
     }

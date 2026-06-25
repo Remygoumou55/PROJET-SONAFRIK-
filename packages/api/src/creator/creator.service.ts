@@ -3,6 +3,7 @@ import type {
   ArtistProfile,
   Creator,
   CreatorContext,
+  CreatorDashboardData,
   CreatorTeamMember,
   CreatorVerification,
   Label,
@@ -264,6 +265,16 @@ export class CreatorService {
 
     if (error) return null;
     return (data?.signedUrl as string | null) ?? null;
+  }
+
+  async getDashboardData(): Promise<CreatorDashboardData> {
+    const { CreatorDashboardService } = await import("./creatorDashboard.service");
+    return new CreatorDashboardService(this.client).getDashboardData();
+  }
+
+  async getDashboardDataForContext(context: CreatorContext): Promise<CreatorDashboardData> {
+    const { CreatorDashboardService } = await import("./creatorDashboard.service");
+    return new CreatorDashboardService(this.client).getDashboardDataForContext(context);
   }
 }
 

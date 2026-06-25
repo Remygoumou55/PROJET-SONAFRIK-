@@ -1,6 +1,6 @@
 {
   "name": "@sonafrik/api",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -84,15 +84,26 @@
     "./listener": {
       "types": "./dist/listener/index.d.ts",
       "default": "./dist/listener/index.js"
+    },
+    "./metadata": {
+      "types": "./dist/metadata/index.d.ts",
+      "default": "./dist/metadata/index.js"
+    },
+    "./publication": {
+      "types": "./dist/publication/index.d.ts",
+      "default": "./dist/publication/index.js"
     }
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@sonafrik/database": "workspace:*",
+    "@sonafrik/persistence": "workspace:*",
     "@sonafrik/shared": "workspace:*",
     "@sonafrik/types": "workspace:*",
     "@supabase/supabase-js": "^2.49.8",
@@ -100,7 +111,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.20",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.28.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

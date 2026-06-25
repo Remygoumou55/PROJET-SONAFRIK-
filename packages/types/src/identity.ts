@@ -153,6 +153,8 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   invalid_otp: "Code de vérification invalide. Entrez 6 chiffres.",
   otp_expired: "Code expiré. Demandez un nouveau code.",
   otp_invalid: "Code incorrect. Vérifiez le SMS reçu.",
+  otp_send_failed: "Impossible d'envoyer le SMS. Réessayez dans quelques instants.",
+  otp_rate_limited: "Trop de tentatives. Patientez avant de redemander un code.",
   session_expired: "Session expirée. Reconnectez-vous.",
   unauthorized: "Accès non autorisé.",
   profile_not_found: "Profil introuvable.",

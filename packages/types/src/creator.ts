@@ -200,6 +200,132 @@ export interface CreatorAnalyticsData {
   royaltyHistory: CreatorRoyaltyHistoryEntry[];
 }
 
+// ─── Creator Dashboard (HQ artiste) ───────────────────────────────────────────
+
+export type CreatorDashboardKpiTrend = "up" | "down" | "flat";
+
+export interface CreatorDashboardKpiEmptyState {
+  icon: string;
+  message: string;
+  subMessage?: string;
+  actionLabel?: string;
+  actionHref?: string;
+}
+
+export interface CreatorDashboardKpi {
+  id: string;
+  label: string;
+  value: string;
+  numericValue: number;
+  deltaPercent: number | null;
+  deltaLabel: string;
+  insight: string;
+  trend: CreatorDashboardKpiTrend;
+  icon: string;
+  emptyState?: CreatorDashboardKpiEmptyState;
+}
+
+export interface CreatorDashboardActivity {
+  id: string;
+  title: string;
+  subtitle: string;
+  occurredAt: string;
+  icon: string;
+  color: string;
+  tone: "success" | "info" | "warning" | "neutral";
+  isFuture?: boolean;
+  actionHref?: string;
+  actionLabel?: string;
+}
+
+export interface CreatorDashboardGoal {
+  id: string;
+  label: string;
+  completed: boolean;
+  progressPercent: number;
+  rewardLabel: string;
+  href: string;
+  category: "daily" | "weekly" | "monthly";
+}
+
+export interface CreatorDashboardCareerStep {
+  id: string;
+  label: string;
+  completed: boolean;
+  progressPercent: number;
+  icon: string;
+}
+
+export type CreatorDashboardAssistantActionType = "link" | "copy_profile";
+
+export interface CreatorDashboardAssistantTip {
+  id: string;
+  icon: string;
+  title: string;
+  time: string;
+  message: string;
+  actionHref?: string;
+  actionLabel?: string;
+  actionType?: CreatorDashboardAssistantActionType;
+  priority: "high" | "medium" | "low";
+}
+
+export interface CreatorInspirationArtist {
+  creatorId: string;
+  stageName: string;
+  genreLabel: string;
+  weeklyStreams: number;
+  coverPath: string | null;
+}
+
+export interface CreatorMonthlyRevenuePoint {
+  month: string;
+  amountGnf: number;
+}
+
+export interface CreatorDashboardQuickAction {
+  id: string;
+  label: string;
+  description: string;
+  href: string;
+  icon: string;
+  variant: "primary" | "outline";
+}
+
+export interface CreatorDashboardHero {
+  greeting: string;
+  headline: string;
+  subline: string;
+  quote: string;
+  profilePercent: number;
+  currentGoal: string;
+  nextStep: string;
+  tierLabel: string;
+  levelLabel: string;
+}
+
+export interface CreatorDashboardData {
+  context: CreatorContext;
+  hero: CreatorDashboardHero;
+  kpis: CreatorDashboardKpi[];
+  activities: CreatorDashboardActivity[];
+  goals: CreatorDashboardGoal[];
+  careerSteps: CreatorDashboardCareerStep[];
+  assistantTips: CreatorDashboardAssistantTip[];
+  quickActions: CreatorDashboardQuickAction[];
+  streamStats: CreatorStreamStats;
+  timeline: StreamTimelineEntry[];
+  topTrack: CreatorTopTrack | null;
+  revenueStats: CreatorRevenueStats;
+  catalogCounts: { tracksPublished: number; albumsPublished: number };
+  paymentConfigured: boolean;
+  profileSlug: string;
+  inspirationArtists: CreatorInspirationArtist[];
+  monthlyRevenue: CreatorMonthlyRevenuePoint[];
+  revenueProjectionGnf: number | null;
+  profileCreatedAt: string;
+}
+
 // ─── Labels / Constantes ─────────────────────────────────────────────────────
 
 export const CREATOR_TEAM_ROLE_LABELS: Record<CreatorTeamRole, string> = {

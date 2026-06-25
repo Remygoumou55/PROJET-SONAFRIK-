@@ -8,6 +8,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./payment": {
+      "types": "./dist/payment/index.d.ts",
+      "default": "./dist/payment/index.js"
+    },
+    "./field-limits": {
+      "types": "./dist/fieldLimits.d.ts",
+      "default": "./dist/fieldLimits.js"
     }
   },
   "scripts": {

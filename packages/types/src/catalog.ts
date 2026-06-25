@@ -133,6 +133,7 @@ export const CATALOG_ERROR_MESSAGES: Record<string, string> = {
   creator_not_found: "Espace créateur introuvable.",
   album_not_found: "Album introuvable.",
   track_not_found: "Morceau introuvable.",
+  track_create_failed: "Impossible de créer le morceau. Connectez-vous avec votre compte artiste.",
   invalid_album: "Données album invalides.",
   invalid_track: "Données morceau invalides.",
   invalid_isrc: "Code ISRC invalide.",

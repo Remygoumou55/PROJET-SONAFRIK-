@@ -60,8 +60,121 @@ export interface StreamSession {
   is_valid_listen: boolean;
   fraud_flags: string[];
   ip_address: string | null;
+  user_agent: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Session state machine — STATE_MACHINE.md §4 (S-S01 → S-S08) */
+export type SessionStateId =
+  | "Authenticated"
+  | "Created"
+  | "Active"
+  | "Heartbeat"
+  | "Suspended"
+  | "FraudReview"
+  | "Expired"
+  | "Closed";
+
+export type SessionClosedSubtype =
+  | "Completed_Valid"
+  | "Completed_Invalid"
+  | "Skipped"
+  | "Invalidated"
+  | "Cancelled";
+
+/** Triggers — STATE_MACHINE.md §5.2 session matrix */
+export type SessionTransitionTrigger =
+  | "AuthValidated"
+  | "OpenSession"
+  | "FirstHeartbeat"
+  | "StartTimeout"
+  | "HeartbeatRecorded"
+  | "PauseRecorded"
+  | "ResumeRecorded"
+  | "CompleteValid"
+  | "CompleteInvalid"
+  | "FraudSuspected"
+  | "FraudConfirmed"
+  | "FraudCleared"
+  | "HeartbeatTimeout"
+  | "RecoverSession";
+
+/** Engine timing — STATE_MACHINE.md §7 */
+export const SESSION_HEARTBEAT_INTERVAL_MS = 10_000;
+export const SESSION_HEARTBEAT_GRACE_MS = 30_000;
+export const SESSION_ORPHAN_TIMEOUT_MS = 5 * 60 * 1000;
+export const SESSION_START_TIMEOUT_MS = 30_000;
+export const SESSION_AUTH_WINDOW_MS = 10_000;
+
+/** Playback state machine — STATE_MACHINE.md §3 (S-P01 → S-P12) */
+export type PlaybackStateId =
+  | "Idle"
+  | "Preparing"
+  | "Loading"
+  | "Buffering"
+  | "Ready"
+  | "Playing"
+  | "Paused"
+  | "Seeking"
+  | "Reconnecting"
+  | "Completed"
+  | "Cancelled"
+  | "Error";
+
+/** Triggers — STATE_MACHINE.md §5.1 playback matrix */
+export type PlaybackTransitionTrigger =
+  | "PlayRequested"
+  | "PreparingSucceeded"
+  | "PreparingFailed"
+  | "CancelRequested"
+  | "StartStreamSucceeded"
+  | "StartStreamFailed"
+  | "BufferFilledReady"
+  | "BufferFilledPlaying"
+  | "BufferTimeout"
+  | "PlaybackStarted"
+  | "PauseRequested"
+  | "ResumeRequested"
+  | "SeekRequested"
+  | "BufferEmpty"
+  | "ConnectionLost"
+  | "TrackEnded"
+  | "AudioError"
+  | "StopRequested"
+  | "SessionExpired"
+  | "SeekCompleted"
+  | "SeekTimeout"
+  | "SeekFailed"
+  | "ConnectionRecoveredPlaying"
+  | "ConnectionRecoveredPaused"
+  | "ReconnectTimeout"
+  | "RetryRequested"
+  | "DismissError"
+  | "FraudDetected"
+  | "ReconcileToIdle";
+
+export type PlaybackQualityLevel = "auto" | "low" | "medium" | "high";
+
+export const PLAYBACK_QUALITY_KBPS: Record<Exclude<PlaybackQualityLevel, "auto">, AudioQualityKbps> = {
+  low: 64,
+  medium: 128,
+  high: 256,
+};
+
+/** Playback timing — STATE_MACHINE.md §3 / §8 */
+export const PLAYBACK_BUFFER_TIMEOUT_MS = 15_000;
+export const PLAYBACK_RECONNECT_TIMEOUT_MS = 60_000;
+export const PLAYBACK_SEEK_TIMEOUT_MS = 5_000;
+export const PLAYBACK_SIGNED_URL_TTL_MS = 30 * 60 * 1000;
+
+export interface IssuedSignedUrl {
+  readonly sessionId: string;
+  readonly signedUrl: string;
+  readonly expiresAt: string;
+  readonly durationSeconds: number;
+  readonly trackFileId?: string | null;
+  readonly qualityKbps?: number | null;
 }
 
 export interface StreamEvent {
