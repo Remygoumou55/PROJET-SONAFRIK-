@@ -35,6 +35,35 @@ const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
   max_stream_sessions:          z.number().int().min(1),
 };
 
+export async function triggerRoyaltyCycleAction(
+  input: {
+    periodStart: string;
+    periodEnd: string;
+    totalRevenueGnf: number;
+    revenuePoolPercent?: number;
+  },
+): Promise<{ error?: string; artistCount?: number; totalDistributed?: number; cycleId?: string }> {
+  const auth = await verifyAdminForAction();
+  if (!auth.ok) return { error: auth.error };
+
+  try {
+    const supabase = getSupabaseAdminClient({ adminVerified: true });
+    const service = createAdminService(supabase);
+    const result = await service.triggerRoyaltyCycle({
+      ...input,
+      revenuePoolPercent: input.revenuePoolPercent ?? 65,
+    });
+    revalidatePath("/admin/finance");
+    return {
+      cycleId: result.cycleId,
+      artistCount: result.calculation.artist_count,
+      totalDistributed: result.distribution.total_gnf,
+    };
+  } catch {
+    return { error: "Impossible de déclencher le cycle royalties." };
+  }
+}
+
 export async function updateSystemSettingAction(
   key: string,
   value: string,

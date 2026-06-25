@@ -5,6 +5,7 @@ import type {
   RoyaltyCycleSummary,
   CreatorRoyaltyHistoryEntry,
   ActiveRoyaltyCycle,
+  RoyaltyCycle,
 } from "@sonafrik/types";
 
 export class RoyaltyRepository {
@@ -66,5 +67,15 @@ export class RoyaltyRepository {
     const { data, error } = await this.client.rpc("get_active_royalty_cycle");
     if (error) throw error;
     return data as unknown as ActiveRoyaltyCycle | null;
+  }
+
+  async listRoyaltyCycles(limit = 12): Promise<RoyaltyCycle[]> {
+    const { data, error } = await this.client
+      .from("royalty_cycles")
+      .select("*")
+      .order("period_start", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data as RoyaltyCycle[]) ?? [];
   }
 }

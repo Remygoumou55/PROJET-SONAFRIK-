@@ -1,8 +1,10 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
+import type { FeatureFlag, SystemSetting, RoyaltyCycle } from "@sonafrik/types";
 import { AdminError } from "./errors";
 import { AdminRepository } from "./admin.repository";
-import { toggleFeatureFlagSchema, updateSystemSettingSchema } from "./schemas";
+import { createRoyaltyService, type RoyaltyService } from "../royalties/royalty.service";
+import { toggleFeatureFlagSchema, updateSystemSettingSchema, triggerRoyaltyCycleSchema } from "./schemas";
+import type { TriggerRoyaltyCycleInput } from "./schemas";
 import type {
   AdminDashboardKpis,
   AdminFraudSession,
@@ -13,9 +15,11 @@ import type {
 
 export class AdminService {
   private readonly repository: AdminRepository;
+  private readonly royalty: RoyaltyService;
 
   constructor(private readonly client: SonafrikSupabaseClient) {
     this.repository = new AdminRepository(client);
+    this.royalty = createRoyaltyService(client);
   }
 
   private async getOptionalUserId(): Promise<string | null> {
@@ -90,6 +94,20 @@ export class AdminService {
 
   async getHealthSnapshot(): Promise<AdminHealthSnapshot> {
     return this.repository.getHealthSnapshot();
+  }
+
+  async listRoyaltyCycles(limit = 12): Promise<RoyaltyCycle[]> {
+    return this.royalty.listRoyaltyCycles(limit);
+  }
+
+  async triggerRoyaltyCycle(input: TriggerRoyaltyCycleInput) {
+    const parsed = triggerRoyaltyCycleSchema.safeParse(input);
+    if (!parsed.success) throw new AdminError("update_failed");
+    try {
+      return await this.royalty.triggerRoyaltyCycle(parsed.data);
+    } catch {
+      throw new AdminError("update_failed");
+    }
   }
 }
 

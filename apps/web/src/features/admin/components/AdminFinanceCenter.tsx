@@ -8,6 +8,8 @@ import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
 import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
+import { AdminRoyaltyPanel } from "./AdminRoyaltyPanel";
+import type { RoyaltyCycle } from "@sonafrik/types";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
@@ -31,9 +33,10 @@ const FILTERS: { label: string; value: StatusFilter }[] = [
 
 interface Props {
   initialQueue: AdminPayoutEntry[];
+  initialRoyaltyCycles: RoyaltyCycle[];
 }
 
-export function AdminFinanceCenter({ initialQueue }: Props) {
+export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles }: Props) {
   const service = usePayoutService();
   const [queue, setQueue] = useState<AdminPayoutEntry[]>(initialQueue);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
@@ -93,6 +96,8 @@ export function AdminFinanceCenter({ initialQueue }: Props) {
         <h1 style={{ color: "var(--color-texte-principal)" }} className="text-2xl font-bold">Finance Center</h1>
         <p style={{ color: "var(--color-texte-secondaire)" }} className="mt-1 text-sm">Gestion des demandes de retrait créateurs</p>
       </div>
+
+      <AdminRoyaltyPanel initialCycles={initialRoyaltyCycles} />
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (

@@ -5,6 +5,7 @@ import type {
   RoyaltyCycleSummary,
   CreatorRoyaltyHistoryEntry,
   ActiveRoyaltyCycle,
+  RoyaltyCycle,
 } from "@sonafrik/types";
 import { RoyaltyEngineError } from "./errors";
 import { RoyaltyRepository } from "./royalty.repository";
@@ -92,6 +93,25 @@ export class RoyaltyService {
     } catch {
       throw new RoyaltyEngineError("active_cycle_failed");
     }
+  }
+
+  async listRoyaltyCycles(limit = 12): Promise<RoyaltyCycle[]> {
+    try {
+      return await this.repository.listRoyaltyCycles(limit);
+    } catch {
+      throw new RoyaltyEngineError("history_failed");
+    }
+  }
+
+  async triggerRoyaltyCycle(input: OpenCycleInput): Promise<{
+    cycleId: string;
+    calculation: RoyaltyCalculationResult;
+    distribution: RoyaltyDistributionResult;
+  }> {
+    const cycleId = await this.openCycle(input);
+    const calculation = await this.calculateRoyalties({ cycleId });
+    const distribution = await this.distributeRoyalties({ cycleId });
+    return { cycleId, calculation, distribution };
   }
 }
 
