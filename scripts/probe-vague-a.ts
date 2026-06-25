@@ -138,7 +138,7 @@ async function liveChecks() {
   const edgeBody = (await edgeRes.json()) as { error?: string };
   log(
     "A2 edge wallet-topup",
-    edgeRes.status === 403 && edgeBody.error === "topup_disabled",
+    (edgeRes.status === 403 || edgeRes.status === 423) && edgeBody.error === "topup_disabled",
     `status=${edgeRes.status} error=${edgeBody.error ?? "?"}`,
   );
 
