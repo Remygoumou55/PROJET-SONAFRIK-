@@ -27,10 +27,16 @@ function scanDir(dir: string, pattern: RegExp): { total: number; files: string[]
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const p = join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (entry.name === "__tests__") continue;
       const sub = scanDir(p, pattern);
       total += sub.total;
       files.push(...sub.files);
-    } else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) {
+    } else if (
+      entry.name.endsWith(".ts") &&
+      !entry.name.endsWith(".d.ts") &&
+      !entry.name.endsWith(".test.ts") &&
+      !entry.name.endsWith(".spec.ts")
+    ) {
       const src = readFileSync(p, "utf8");
       const matches = src.match(pattern) ?? [];
       if (matches.length > 0) {
