@@ -53,7 +53,7 @@ function staticChecks() {
     "artistes, albums, playlists",
   );
 
-  const landing = read("apps/web/src/components/landing/LandingComingSoon.tsx");
+  const landing = read("apps/web/src/components/landing/LandingFooter.tsx");
   log(
     "A3 landing role=artist",
     landing.includes("role=artist") && !landing.includes("role=creator"),
