@@ -3,7 +3,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createRightsService } from "@sonafrik/api/rights";
 import { WorksPageClient } from "@/features/creator/rights/components/WorksPageClient";
 
-export const metadata = { title: "Droits & Contrats — Creator OS SONAFRIK" };
+export const metadata = { title: "Droits et contrats — SONAFRIK" };
 
 export default async function RightsPage() {
   const context = await requireCreatorContext();

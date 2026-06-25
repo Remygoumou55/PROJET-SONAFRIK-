@@ -14,11 +14,11 @@ export function CreatorLayoutClient({
   const title = pathname.startsWith("/creator/catalog/tracks")
     ? "Morceaux"
     : pathname.startsWith("/creator/catalog/releases")
-      ? "Albums & Singles"
+      ? "Albums et morceaux seuls"
       : pathname.startsWith("/creator/catalog")
-        ? "Catalogue"
+        ? "Mon catalogue"
         : pathname.startsWith("/creator/analytics")
-          ? "Analytics Pro"
+          ? "Mes statistiques"
           : pathname.startsWith("/creator/identity")
             ? "Identité artiste"
             : pathname.startsWith("/creator/verification")
@@ -26,18 +26,21 @@ export function CreatorLayoutClient({
               : pathname.startsWith("/creator/labels")
                 ? "Labels"
                 : pathname.startsWith("/creator/rights")
-                  ? "Droits & Contrats"
+                  ? "Droits et contrats"
                   : pathname.startsWith("/creator/team")
                     ? "Équipe"
-                    : "Dashboard créateur";
+                    : "Mon espace artiste";
 
   return (
     <div className="min-h-screen bg-noir-profond">
       <header className="border-b border-bordure px-6 py-4">
         <p className="text-or-solaire text-xs font-semibold uppercase tracking-wider">
-          NOTRE BIEN COMMUN · Creator OS
+          NOTRE BIEN COMMUN · Espace artiste
         </p>
         <h1 className="text-texte-principal mt-1 text-2xl font-bold">{title}</h1>
+        <p className="text-texte-secondaire mt-1 text-sm">
+          Publiez, suivez vos écoutes et développez votre carrière musicale.
+        </p>
       </header>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 lg:flex-row">
         <aside className="lg:w-56 lg:shrink-0">

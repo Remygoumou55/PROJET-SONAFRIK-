@@ -32,28 +32,33 @@ export function StreamStatsGrid({ stats }: { stats: CreatorStreamStats }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-texte-principal text-base font-semibold">Streams</h2>
+      <div>
+        <h2 className="text-texte-principal text-base font-semibold">Vos écoutes</h2>
+        <p className="text-texte-secondaire mt-1 text-sm">
+          Comment votre musique est écoutée sur SONAFRIK.
+        </p>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total streams"
+          label="Total des écoutes"
           value={fmt(stats.total_streams)}
-          sub={`${stats.valid_rate_percent}% validés`}
+          sub={`${stats.valid_rate_percent} % comptabilisées`}
         />
         <StatCard
-          label="Streams validés"
+          label="Écoutes comptabilisées"
           value={fmt(stats.valid_streams)}
           accent
         />
         <StatCard
           label="Aujourd'hui"
           value={fmt(stats.today_streams)}
-          sub="sessions démarrées"
+          sub="écoutes aujourd'hui"
         />
         <StatCard
-          label="Streams fraude"
+          label="Écoutes invalides"
           value={fmt(stats.fraud_streams)}
-          sub="détectés · filtrés"
+          sub="filtrées par notre système"
         />
       </div>
 
@@ -61,12 +66,12 @@ export function StreamStatsGrid({ stats }: { stats: CreatorStreamStats }) {
         <StatCard
           label="7 derniers jours"
           value={fmt(stats.week_streams)}
-          sub={`dont ${fmt(stats.valid_week_streams)} validés`}
+          sub={`dont ${fmt(stats.valid_week_streams)} comptabilisées`}
         />
         <StatCard
           label="30 derniers jours"
           value={fmt(stats.month_streams)}
-          sub={`dont ${fmt(stats.valid_month_streams)} validés`}
+          sub={`dont ${fmt(stats.valid_month_streams)} comptabilisées`}
         />
         <StatCard
           label="90 derniers jours"

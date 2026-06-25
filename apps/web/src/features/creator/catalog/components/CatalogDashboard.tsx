@@ -6,30 +6,35 @@ export function CatalogDashboard({ context }: { context: CatalogContext }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Metric label="Albums / EP" value={String(context.albumsCount)} />
-        <Metric label="Singles" value={String(context.singlesCount)} />
+        <Metric label="Albums et mini-albums" value={String(context.albumsCount)} />
+        <Metric label="Morceaux seuls" value={String(context.singlesCount)} />
         <Metric label="Morceaux" value={String(context.tracksCount)} />
-        <Metric label="En revue" value={String(context.pendingReview)} />
+        <Metric label="En attente de validation" value={String(context.pendingReview)} />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Catalog OS</CardTitle>
+          <CardTitle>Mon catalogue</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Link href="/creator/catalog/releases" className={buttonVariants({ variant: "primary", size: "sm" })}>
-            Gérer les sorties
-          </Link>
-          <Link href="/creator/catalog/tracks" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            Gérer les morceaux
-          </Link>
+        <CardContent className="space-y-4">
+          <p className="text-texte-secondaire text-sm">
+            Gérez vos sorties, ajoutez vos morceaux et suivez leur publication sur SONAFRIK.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/creator/catalog/releases" className={buttonVariants({ variant: "primary", size: "sm" })}>
+              Gérer mes sorties
+            </Link>
+            <Link href="/creator/catalog/tracks" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Gérer mes morceaux
+            </Link>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="text-texte-secondaire py-4 text-sm">
-          Publiés : {context.publishedCount} · ISRC · UPC · assets audio/visuels via URLs signées
-          (CDC Règle #10).
+          {context.publishedCount} élément{context.publishedCount !== 1 ? "s" : ""} publié
+          {context.publishedCount !== 1 ? "s" : ""} · Fichiers audio et pochettes sécurisés pour la diffusion.
         </CardContent>
       </Card>
     </div>

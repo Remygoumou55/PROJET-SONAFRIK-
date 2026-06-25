@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@sonafrik/ui";
 import type { TrackCredit, TrackCreditRole } from "@sonafrik/types";
-import { TRACK_CREDIT_ROLE_LABELS } from "@sonafrik/types";
+import { TRACK_CREDIT_ROLE_LABELS } from "@sonafrik/types/catalog";
 import { useCatalogService } from "../hooks/useCatalog";
 
 const CREDIT_ROLES: TrackCreditRole[] = [

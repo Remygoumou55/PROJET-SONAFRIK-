@@ -28,16 +28,15 @@ export function CreatorAnalyticsDashboard({ data }: { data: CreatorAnalyticsData
         <RevenueCard stats={data.revenueStats} />
       </div>
 
-      {/* Royalty Engine — historique des cycles */}
+      {/* Historique des cycles de revenus */}
       <RoyaltyHistoryCard history={data.royaltyHistory} />
 
       {/* Geo note */}
       <div className="border-bordure rounded-lg border border-dashed p-4">
         <p className="text-texte-desactive text-sm">
           <span className="text-texte-secondaire font-medium">Géographie · </span>
-          Données non disponibles — les sessions de streaming ne collectent pas encore
-          de données géographiques (pays, ville, région). Cette fonctionnalité sera
-          implémentée lors de la mise en place de la collecte IP/profil.
+          Données non disponibles — nous ne collectons pas encore la localisation de vos
+          auditeurs (pays, ville, région). Cette fonctionnalité arrivera prochainement.
         </p>
       </div>
     </div>

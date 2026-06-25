@@ -1,13 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Track } from "@sonafrik/types";
-import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types";
-import { FIELD_LIMITS } from "@sonafrik/shared";
+import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types/catalog";
+import { FIELD_LIMITS } from "@sonafrik/shared/field-limits";
 import { useCatalogService } from "../hooks/useCatalog";
-import { AudioUploader } from "./AudioUploader";
-import { CreditsEditor } from "./CreditsEditor";
+
+const AudioUploader = dynamic(
+  () => import("./AudioUploader").then((m) => ({ default: m.AudioUploader })),
+  { ssr: false, loading: () => <p className="text-texte-desactive text-xs">Chargement…</p> },
+);
+
+const CreditsEditor = dynamic(
+  () => import("./CreditsEditor").then((m) => ({ default: m.CreditsEditor })),
+  { ssr: false, loading: () => <p className="text-texte-desactive text-xs">Chargement…</p> },
+);
 
 const ISRC_MAX = 12;
 
@@ -25,17 +34,25 @@ export function TrackList({
   const [title, setTitle] = useState("");
   const [isrc, setIsrc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expandedAudio, setExpandedAudio] = useState<string | null>(null);
   const [expandedCredits, setExpandedCredits] = useState<string | null>(null);
 
   async function createTrack(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
+    setError(null);
     try {
       const track = await catalog.createTrack({ title, isrc: isrc || null });
       setTracks((current) => [track, ...current]);
       setTitle("");
       setIsrc("");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Impossible de créer le morceau. Réessayez.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -78,6 +95,11 @@ export function TrackList({
             <Button type="submit" disabled={loading || title.length < 2}>
               Créer un morceau
             </Button>
+            {error ? (
+              <p className="text-sm" style={{ color: "var(--color-erreur)" }} role="alert">
+                {error}
+              </p>
+            ) : null}
           </form>
         </CardContent>
       </Card>

@@ -54,7 +54,7 @@ export function TopTracksTable({ tracks }: { tracks: CreatorTopTrack[] }) {
                   {track.title}
                 </p>
                 <p className="text-texte-desactive truncate text-xs">
-                  {track.album_title ?? "Single"} · {fmtDuration(track.duration_seconds)}
+                  {track.album_title ?? "Morceau seul"} · {fmtDuration(track.duration_seconds)}
                 </p>
                 {/* Stream bar */}
                 <div className="bg-surface mt-1.5 h-1 w-full rounded-full">
@@ -73,19 +73,19 @@ export function TopTracksTable({ tracks }: { tracks: CreatorTopTrack[] }) {
                   <p className="text-texte-principal text-sm font-semibold">
                     {track.valid_streams.toLocaleString("fr-FR")}
                   </p>
-                  <p className="text-texte-desactive text-xs">streams</p>
+                  <p className="text-texte-desactive text-xs">écoutes</p>
                 </div>
                 <div className="text-right">
                   <p className="text-texte-principal text-sm font-semibold">
                     {track.like_count.toLocaleString("fr-FR")}
                   </p>
-                  <p className="text-texte-desactive text-xs">likes</p>
+                  <p className="text-texte-desactive text-xs">J&apos;aime</p>
                 </div>
                 <div className="text-right">
                   <p className="text-vert-energie text-sm font-semibold">
                     {track.engagement_score.toLocaleString("fr-FR")}
                   </p>
-                  <p className="text-texte-desactive text-xs">score</p>
+                  <p className="text-texte-desactive text-xs">popularité</p>
                 </div>
               </div>
             </div>

@@ -8,21 +8,21 @@ interface CreatorNavProps {
 
 export function CreatorNav({ activePath, pendingVerifications = 0 }: CreatorNavProps) {
   const items: SidebarNavItem[] = [
-    { href: "/creator", label: "Dashboard", exact: true },
-    { href: "/creator/analytics", label: "Analytics Pro", exact: true },
-    { href: "/creator/catalog", label: "Catalogue", exact: true },
-    { href: "/creator/catalog/releases", label: "Albums & Singles" },
+    { href: "/creator", label: "Vue d'ensemble", exact: true },
+    { href: "/creator/analytics", label: "Mes statistiques", exact: true },
+    { href: "/creator/catalog", label: "Mon catalogue", exact: true },
+    { href: "/creator/catalog/releases", label: "Albums et morceaux seuls" },
     { href: "/creator/catalog/tracks", label: "Morceaux" },
     { href: "/creator/identity", label: "Identité artiste" },
     { href: "/creator/verification", label: "Vérification", badge: pendingVerifications },
-    { href: "/creator/rights", label: "Droits & Contrats" },
+    { href: "/creator/rights", label: "Droits et contrats" },
     { href: "/creator/labels", label: "Labels" },
     { href: "/creator/team", label: "Équipe" },
   ];
 
   return (
     <SidebarNav
-      title="Creator OS"
+      title="Espace artiste"
       items={items}
       activePath={activePath}
       backHref="/profile"

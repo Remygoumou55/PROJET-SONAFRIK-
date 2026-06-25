@@ -4,7 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createRightsService } from "@sonafrik/api/rights";
 import { WorkDetail } from "@/features/creator/rights/components/WorkDetail";
 
-export const metadata = { title: "Détail œuvre — Creator OS SONAFRIK" };
+export const metadata = { title: "Détail de l'œuvre — SONAFRIK" };
 
 export default async function WorkDetailPage({
   params,

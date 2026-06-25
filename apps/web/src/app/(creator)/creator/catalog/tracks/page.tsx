@@ -7,7 +7,13 @@ export default async function CatalogTracksPage() {
   const creator = await requireCreatorContext();
   const supabase = await getSupabaseServerClient();
   const catalog = createCatalogService(supabase);
-  const [tracks, context] = await Promise.all([catalog.listTracks(), catalog.getCatalogContext()]);
-  const stageName = creator.artistProfile?.stage_name ?? "";
-  return <TrackList tracks={tracks} creatorId={context.creatorId} stageName={stageName} />;
+  const tracks = await catalog.listTracks().catch(() => []);
+  const stageName = creator.artistProfile.stage_name ?? "";
+  return (
+    <TrackList
+      tracks={tracks}
+      creatorId={creator.creator.id}
+      stageName={stageName}
+    />
+  );
 }
