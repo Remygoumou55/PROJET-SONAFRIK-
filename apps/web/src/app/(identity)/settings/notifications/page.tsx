@@ -14,9 +14,6 @@ export default async function SettingsNotificationsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold" style={{ color: "var(--color-texte-principal)" }}>
-        Notifications
-      </h1>
       <NotificationsList initialNotifications={notifications} userId={context.profile.id} />
     </div>
   );

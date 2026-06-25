@@ -17,22 +17,20 @@ export function IdentityShell({
   children,
 }: IdentityShellProps) {
   return (
-    <div className="min-h-screen bg-noir-profond">
-      <header className="border-b border-bordure px-6 py-4">
-        <p className="text-or-solaire text-xs font-semibold uppercase tracking-wider">
-          NOTRE BIEN COMMUN
-        </p>
-        <h1 className="text-texte-principal mt-1 text-2xl font-bold">{title}</h1>
+    <div className="identity-shell">
+      <header className="identity-shell__header">
+        <p className="identity-shell__eyebrow">NOTRE BIEN COMMUN</p>
+        <h1 className="identity-shell__title">{title}</h1>
         {description ? (
-          <p className="text-texte-secondaire mt-1 text-sm">{description}</p>
+          <p className="identity-shell__description">{description}</p>
         ) : null}
       </header>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 lg:flex-row">
-        <aside className="lg:w-56 lg:shrink-0">
+      <div className="identity-shell__layout">
+        <aside className="identity-shell__aside" aria-label="Navigation du profil">
           <IdentityNav activePath={activePath} unreadNotifications={unreadNotifications} />
         </aside>
-        <div className="min-w-0 flex-1">{children}</div>
+        <main className="identity-shell__main">{children}</main>
       </div>
     </div>
   );

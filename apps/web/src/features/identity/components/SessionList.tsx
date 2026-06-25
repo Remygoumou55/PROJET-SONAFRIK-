@@ -58,7 +58,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
         {sessions.length === 0 ? (
           <Card>
             <CardContent className="text-texte-secondaire py-12 text-center text-sm">
-              Aucune session active enregistrée.
+              Aucun appareil connecté pour le moment.
             </CardContent>
           </Card>
         ) : (

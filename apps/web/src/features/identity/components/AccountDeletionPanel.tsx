@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Modal } from "@sonafrik/ui";
+import { Button, Modal } from "@sonafrik/ui";
 import { useIdentityService } from "../hooks/useIdentity";
 
 export function AccountDeletionPanel() {
@@ -19,41 +19,40 @@ export function AccountDeletionPanel() {
       await identity.requestAccountDeletion();
       router.push("/auth/connexion");
     } catch {
-      setError("Impossible de supprimer le compte pour le moment.");
+      setError("Impossible de supprimer le compte pour le moment. Réessayez ou contactez le support.");
       setLoading(false);
     }
   }
 
   return (
     <>
-      <Card className="border-rouge-alerte/30">
-        <CardHeader>
-          <CardTitle className="text-rouge-alerte">Zone de danger</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-texte-secondaire text-sm">
-            La suppression de votre compte désactive votre profil SONAFRIK. Cette action est
-            enregistrée dans les journaux d&apos;audit (INSERT ONLY) conformément au CDC.
-          </p>
-          {error ? <p className="text-rouge-alerte text-sm">{error}</p> : null}
-          <Button variant="destructive" onClick={() => setOpen(true)}>
-            Supprimer mon compte
-          </Button>
-        </CardContent>
-      </Card>
+      <section className="identity-account-danger" aria-labelledby="account-danger-title">
+        <h3 id="account-danger-title" className="identity-account-danger__title">
+          Supprimer mon compte
+        </h3>
+        <p className="identity-account-danger__text">
+          Cette action désactive définitivement votre profil SONAFRIK. Vos écoutes, playlists et
+          contenus associés ne seront plus accessibles. Conformément à la loi, certaines traces
+          de sécurité peuvent être conservées.
+        </p>
+        {error ? <p className="identity-account-danger__error">{error}</p> : null}
+        <Button variant="destructive" onClick={() => setOpen(true)}>
+          Supprimer mon compte
+        </Button>
+      </section>
 
       <Modal
         open={open}
         onOpenChange={setOpen}
         title="Confirmer la suppression"
-        description="Cette action est irréversible. Vous serez déconnecté immédiatement."
+        description="Cette action est irréversible. Vous serez déconnecté immédiatement de tous vos appareils."
       >
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Annuler
           </Button>
           <Button variant="destructive" disabled={loading} onClick={confirmDeletion}>
-            {loading ? "Suppression…" : "Confirmer"}
+            {loading ? "Suppression…" : "Confirmer la suppression"}
           </Button>
         </div>
       </Modal>

@@ -91,7 +91,7 @@ export async function requireIdentityContext(): Promise<IdentityContext> {
       redirect("/auth/connexion");
     }
     if (err instanceof IdentityError && err.code === "profile_not_found") {
-      redirect("/auth/inscription");
+      redirect("/auth/connexion");
     }
     // timeout ou erreur réseau → retour connexion
     redirect("/auth/connexion");

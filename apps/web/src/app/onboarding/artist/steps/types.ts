@@ -1,4 +1,5 @@
 import type { WizardControls } from '@/components/onboarding/useOnboardingWizard'
+import type { RevenueDestinationDraft } from '@sonafrik/types'
 
 export interface ArtistOnboardingData {
   [key: string]: unknown
@@ -6,6 +7,7 @@ export interface ArtistOnboardingData {
   mainGenre: string
   songLanguage: string
   originRegion: string
+  revenueDestination: RevenueDestinationDraft
   orangeMoneyNumber: string
   mtnMoneyNumber: string
 }

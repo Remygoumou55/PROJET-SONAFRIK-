@@ -1,27 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { OnboardingPageShell } from "@/components/onboarding/OnboardingPageShell";
 import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { ROLE_ICONS, RoleSelectionCard } from "./RoleSelectionCard";
 
 const ROLES = [
   {
     value: "listener" as const,
     accountType: "auditeur" as const,
-    emoji: "🎧",
     label: "Auditeur",
-    description: "J'écoute de la musique",
+    description: "Découvrir, écouter et soutenir les artistes guinéens",
     dest: "/onboarding/listener",
   },
   {
     value: "artist" as const,
     accountType: "artiste" as const,
-    emoji: "🎤",
     label: "Artiste",
-    description: "Je publie ma musique",
+    description: "Publier mes morceaux et toucher mes revenus",
     dest: "/onboarding/artist",
   },
 ] as const;
+
+const BACK_LINK = (
+  <Link
+    href="/auth/connexion"
+    className="inline-flex text-sm transition-colors hover:underline"
+    style={{ color: "var(--color-texte-secondaire)" }}
+  >
+    ← Retour
+  </Link>
+);
 
 export default function RolePage() {
   const router = useRouter();
@@ -42,121 +53,33 @@ export default function RolePage() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "calc(100vh - 80px)",
-        padding: "40px 20px",
-      }}
+    <OnboardingPageShell
+      leading={BACK_LINK}
+      stepLabel="Étape 1 · Choisir votre profil"
+      title="Comment voulez-vous utiliser SONAFRIK ?"
+      subtitle="Vous pourrez changer de mode plus tard."
     >
-      <div style={{ maxWidth: "440px", width: "100%" }}>
-        <h1
-          style={{
-            fontSize: "22px",
-            fontWeight: 700,
-            color: "var(--color-texte-principal)",
-            textAlign: "center",
-            marginBottom: "8px",
-          }}
-        >
-          Comment voulez-vous utiliser SONAFRIK ?
-        </h1>
-        <p
-          style={{
-            fontSize: "14px",
-            color: "rgba(255,255,255,0.4)",
-            textAlign: "center",
-            marginBottom: "32px",
-          }}
-        >
-          Vous pourrez changer de mode plus tard.
-        </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {ROLES.map((role) => (
-            <button
-              key={role.value}
-              type="button"
-              onClick={() => handleSelect(role)}
-              disabled={loading !== null}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "16px",
-                backgroundColor: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "14px",
-                padding: "18px 20px",
-                cursor: loading !== null ? "not-allowed" : "pointer",
-                opacity: loading !== null && loading !== role.value ? 0.5 : 1,
-                textAlign: "left",
-                transition: "border-color 0.2s, background-color 0.2s",
-                width: "100%",
-              }}
-              onMouseEnter={(e) => {
-                if (loading === null) {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor =
-                    "var(--color-vert-energie)";
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                    "rgba(0,210,106,0.05)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor =
-                  "rgba(255,255,255,0.1)";
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                  "rgba(255,255,255,0.04)";
-              }}
-            >
-              <span style={{ fontSize: "28px" }}>{role.emoji}</span>
-              <div>
-                <p
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: 600,
-                    color: "var(--color-texte-principal)",
-                    margin: "0 0 4px",
-                  }}
-                >
-                  {role.label}
-                </p>
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: "rgba(255,255,255,0.45)",
-                    margin: 0,
-                  }}
-                >
-                  {role.description}
-                </p>
-              </div>
-              {loading === role.value && (
-                <div
-                  style={{ marginLeft: "auto" }}
-                  className="w-5 h-5 rounded-full border-2 animate-spin"
-                  // inline spin styles for reliability
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {error && (
-          <p
-            style={{
-              marginTop: "16px",
-              textAlign: "center",
-              fontSize: "13px",
-              color: "var(--color-erreur)",
-            }}
-          >
-            {error}
-          </p>
-        )}
+      <div className="flex flex-col gap-3">
+        {ROLES.map((role) => (
+          <RoleSelectionCard
+            key={role.value}
+            icon={ROLE_ICONS[role.value]}
+            label={role.label}
+            description={role.description}
+            accent={role.value}
+            loading={loading === role.value}
+            disabled={loading !== null}
+            dimmed={loading !== null && loading !== role.value}
+            onSelect={() => handleSelect(role)}
+          />
+        ))}
       </div>
-    </div>
+
+      {error ? (
+        <p className="mt-4 text-center text-sm text-erreur" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </OnboardingPageShell>
   );
 }

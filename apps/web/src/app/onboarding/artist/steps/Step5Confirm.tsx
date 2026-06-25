@@ -3,6 +3,7 @@
 import { useAuthService } from '@/features/auth/hooks/useAuth'
 import { useIdentityService } from '@/features/identity/hooks/useIdentity'
 import { OnboardingRow } from '@/app/onboarding/shared/OnboardingRow'
+import { getRevenueDestinationRecapLabel, buildE164Phone } from '@sonafrik/shared'
 import type { ArtistWizard } from './types'
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -30,6 +31,12 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
   const { data } = wizard
   const auth = useAuthService()
   const identity = useIdentityService()
+  const { revenueDestination } = data
+  const payoutE164 = buildE164Phone(
+    revenueDestination.countryCode,
+    revenueDestination.fields.phoneNational ?? '',
+  )
+  const payoutLabel = getRevenueDestinationRecapLabel(revenueDestination)
 
   async function handleSubmit() {
     if (bypassAuth) {
@@ -90,8 +97,8 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
         {data.mainGenre && <OnboardingRow label="Genre" value={data.mainGenre} />}
         <OnboardingRow label="Langue" value={LANGUAGE_LABELS[data.songLanguage] ?? data.songLanguage} />
         {data.originRegion && <OnboardingRow label="Région" value={data.originRegion} />}
-        <OnboardingRow label="Orange Money" value={maskPhone(data.orangeMoneyNumber)} />
-        {data.mtnMoneyNumber && <OnboardingRow label="MTN Money" value={maskPhone(data.mtnMoneyNumber)} />}
+        <OnboardingRow label="Réception des revenus" value={payoutLabel} />
+        <OnboardingRow label="Numéro" value={maskPhone(payoutE164 || data.orangeMoneyNumber || data.mtnMoneyNumber)} />
       </div>
 
       {wizard.error && (

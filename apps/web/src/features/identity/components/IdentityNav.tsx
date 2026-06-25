@@ -8,23 +8,22 @@ interface IdentityNavProps {
 
 export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNavProps) {
   const items: SidebarNavItem[] = [
-    { href: "/profile", label: "Profil", exact: true },
-    { href: "/settings", label: "Paramètres", exact: true },
-    { href: "/settings/account", label: "Compte" },
-    { href: "/settings/payment", label: "Paiement" },
-    { href: "/settings/sessions", label: "Sécurité et confidentialité" },
+    { href: "/profile", label: "Mon profil", exact: true },
+    { href: "/settings/account", label: "Mon compte" },
+    { href: "/settings/sessions", label: "Sécurité" },
     { href: "/settings/notifications", label: "Notifications", badge: unreadNotifications },
+    { href: "/settings/payment", label: "Paiements" },
     { href: "/settings/preferences", label: "Préférences" },
     { href: "/settings/help", label: "Aide" },
   ];
 
   return (
     <SidebarNav
-      title="Paramètres"
+      title="Navigation"
       items={items}
       activePath={activePath}
-      backHref="/"
-      backLabel="Retour à l'accueil"
+      backHref="/listen"
+      backLabel="Retour à l'écoute"
     />
   );
 }

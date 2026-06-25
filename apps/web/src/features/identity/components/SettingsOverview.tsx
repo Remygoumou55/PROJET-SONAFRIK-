@@ -9,32 +9,32 @@ interface SettingsOverviewProps {
 const SECTIONS = [
   {
     href: "/settings/account",
-    title: "Compte",
-    description: "Informations personnelles et suppression du compte.",
+    title: "Mon compte",
+    description: "Vos informations personnelles et la gestion de votre compte.",
   },
   {
     href: "/settings/payment",
-    title: "Paiement",
-    description: "Portefeuille, transactions et comptes de retrait artiste.",
+    title: "Paiements",
+    description: "Votre portefeuille et vos moyens de retrait artiste.",
   },
   {
     href: "/settings/sessions",
-    title: "Sécurité et confidentialité",
-    description: "Appareils connectés, déconnexion globale et vie privée.",
+    title: "Sécurité",
+    description: "Appareils connectés, confidentialité et déconnexion.",
   },
   {
     href: "/settings/notifications",
     title: "Notifications",
-    description: "Centre de notifications in-app et historique.",
+    description: "Vos alertes et l'historique de vos messages.",
   },
   {
     href: "/settings/preferences",
     title: "Préférences",
-    description: "Langue, audio, alertes contenu et paramètres avancés.",
+    description: "Langue, qualité audio et expérience d'écoute.",
   },
   {
     href: "/settings/help",
-    title: "Aide et à propos",
+    title: "Aide",
     description: "Support, informations légales et version de l'application.",
   },
 ] as const;
@@ -42,15 +42,15 @@ const SECTIONS = [
 export function SettingsOverview({ context }: SettingsOverviewProps) {
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="identity-settings-summary">
         <CardHeader>
-          <CardTitle>Résumé du compte</CardTitle>
+          <CardTitle>Votre espace en un coup d&apos;œil</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <Metric label="Langue" value={context.preferences.language === "en" ? "English" : "Français"} />
-          <Metric label="Qualité audio" value={context.preferences.audio_quality} />
+          <Metric label="Qualité audio" value={context.preferences.audio_quality === "auto" ? "Automatique" : `${context.preferences.audio_quality} kbps`} />
           <Metric
-            label="Notifications non lues"
+            label="Messages non lus"
             value={String(context.unreadNotifications)}
           />
         </CardContent>
@@ -58,8 +58,8 @@ export function SettingsOverview({ context }: SettingsOverviewProps) {
 
       <div className="grid gap-4 md:grid-cols-2">
         {SECTIONS.map((section) => (
-          <Link key={section.href} href={section.href}>
-            <Card className="hover:border-vert-energie/40 h-full transition-colors">
+          <Link key={section.href} href={section.href} className="identity-settings-card-link">
+            <Card className="identity-settings-card h-full transition-colors hover:border-vert-energie/40">
               <CardHeader>
                 <CardTitle className="text-base">{section.title}</CardTitle>
               </CardHeader>
@@ -78,7 +78,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-texte-desactive text-xs uppercase tracking-wide">{label}</p>
-      <p className="text-texte-principal mt-1 text-sm font-medium capitalize">{value}</p>
+      <p className="text-texte-principal mt-1 text-sm font-medium">{value}</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { createEmptyRevenueDestinationDraft, inferRevenueDestinationFromProfile } from '@sonafrik/shared'
 import { useAuthService } from '@/features/auth/hooks/useAuth'
 import { useOnboardingWizard } from '@/components/onboarding/useOnboardingWizard'
 import { OnboardingProgressBadge } from '@/components/onboarding/OnboardingProgressBadge'
@@ -20,7 +21,8 @@ export function ArtistOnboardingClient({ bypassAuth }: { bypassAuth: boolean }) 
     mainGenre: '',
     songLanguage: 'fr',
     originRegion: '',
-    orangeMoneyNumber: '+224',
+    revenueDestination: createEmptyRevenueDestinationDraft(),
+    orangeMoneyNumber: '',
     mtnMoneyNumber: '',
   })
 
@@ -32,7 +34,11 @@ export function ArtistOnboardingClient({ bypassAuth }: { bypassAuth: boolean }) 
         stageName: profile.stage_name ?? '',
         mainGenre: profile.main_genre ?? '',
         originRegion: profile.origin_region ?? '',
-        orangeMoneyNumber: profile.orange_money_number ?? '+224',
+        revenueDestination: inferRevenueDestinationFromProfile(
+          profile.orange_money_number,
+          profile.mtn_money_number,
+        ),
+        orangeMoneyNumber: profile.orange_money_number ?? '',
         mtnMoneyNumber: profile.mtn_money_number ?? '',
       })
     }).catch(() => { router.replace('/') })
