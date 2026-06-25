@@ -611,6 +611,46 @@ apps/web/tests/e2e/**
 
 ---
 
+## METADATA ENGINE — ROADMAP (hors audit MVP)
+
+| Phase | Statut | Livrable |
+|---|---|---|
+| 1 / 1.5 | ✅ Certifié | Contracts `@sonafrik/metadata` + types |
+| 2 / 2.5 | ✅ Certifié | ISRC Engine headless (96% coverage) |
+| 3 | ✅ Certifié | `@sonafrik/persistence` — adapters, factory, DI |
+| 3.5 | ✅ Certifié | Migrations `metadata_*`, adapters complets, RLS, RPC atomiques |
+| 4 | ✅ Certifié | Application Services `packages/api/metadata` — CQRS, DTO, use cases, 95% coverage |
+| 4.5 | ✅ Certifié | Publication Orchestrator — pipeline dry-run, transactions, rollback |
+| 5 | ✅ Certifié | Publication Workflow Integration — feature flags, CatalogService bridge, progressive rollout |
+| 6 | ⏳ Next | UI publication hooks (affichage statuts, sans ISRC) |
+
+---
+
+## STREAMING RUNTIME — SPRING 2 (Enterprise Program)
+
+> Programme certifié 2026-06-25 — **documentation hardening certifié 2026-06-25** — implémentation 2.1 autorisée.
+
+| Sous-phase | Statut | Livrable |
+|---|---|---|
+| **Docs** | ✅ Certifié | STATE_MACHINE v2.1.0 · DOMAIN_EVENTS v2.1.0 · SEQUENCE_DIAGRAMS v1.1.0 |
+| **2.1** Foundation | ✅ Certifié | Runtime Coordinator + Application Layer + 118 tests |
+| **2.1-C** Certification | ✅ Certifié | Audit architecture · legacy · flags · coverage ≥95 % |
+| **2.2** Session Engine | ✅ Certifié | SessionEngine, state machine §5.2, pipeline handlers, 190 tests |
+| **2.3** Playback Runtime | ✅ Certifié | PlaybackEngine §5.1, signed URLs, buffer/recovery, 258 tests |
+| **2.4** Analytics Engine | 📋 Next | Agrégations fiables, LIMIT, creator stats |
+| **2.5** Anti-Fraud Engine | 📋 Planifié | Scoring multi-signaux, invalidation session |
+| **2.6** Stream Ledger | 📋 Planifié | Journal financier append-only (ADR-002) |
+| **2.7** Certification | 📋 Planifié | Probes, load tests, rapport certification |
+| **2.8** MVP Integration | 📋 Planifié | Feature flags, bridge legacy, zéro changement UI |
+
+**Documents :** `docs/streaming/SPRING_2_PROGRAM.md` · `STATE_MACHINE.md` · `DOMAIN_EVENTS.md` · `SEQUENCE_DIAGRAMS.md` · `DOMAIN_MAP.md` · `DEPENDENCY_RULES.md` · `docs/ADR/`
+
+**Gate Sprint 2.1 :** specs streaming v2.1.0 / v1.1.0 avec ownership, persistence policy et index SEQ-001→SEQ-026 — **validé**.
+
+**Invariant :** Real Listen V7.2 (≥90 % serveur) préservé — wallet/royalties/retraits **non modifiés** pendant SPRING 2.
+
+---
+
 ## LIENS UTILES
 
 | Document | Rôle |
@@ -621,6 +661,13 @@ apps/web/tests/e2e/**
 | `docs/PLAN_CORRECTION_360.md` | Vagues A→E (historique) |
 | `docs/PAIEMENTS.md` | Architecture paiements |
 | `docs/CDC-v9.0.md` | Spec produit |
+| `docs/streaming/SPRING_2_PROGRAM.md` | Programme Streaming Runtime Enterprise |
+| `docs/streaming/STATE_MACHINE.md` | Machines d'état Playback + Session (v2.1.0) |
+| `docs/streaming/DOMAIN_EVENTS.md` | Catalogue 38 Domain Events (v2.1.0) |
+| `docs/streaming/SEQUENCE_DIAGRAMS.md` | Scénarios SEQ-001→SEQ-026 (v1.1.0) |
+| `docs/DOMAIN_MAP.md` | Cartographie domaines |
+| `docs/DEPENDENCY_RULES.md` | Règles de couplage |
+| `docs/ADR/` | Décisions architecture |
 | `CLAUDE.md` | Gouvernance fondatrice |
 
 ---

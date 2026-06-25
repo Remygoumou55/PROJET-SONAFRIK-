@@ -5,6 +5,19 @@
 
 ---
 
+## 0. MODE OPÉRATOIRE OBLIGATOIRE
+
+**Lire en premier :** `docs/NOUVELLE_REGLE_DE_TRAVAIL.md`
+
+- Une mission à la fois (format MISSION / PAGE CIBLE / CRITÈRE / INTERDIT)
+- Validation visuelle avant « terminé »
+- Gel scope MVP jusqu'à chaîne E2E
+- Correction page par page selon l'ordre S0–S23
+
+Sans ce format → **ne pas coder**.
+
+---
+
 ## 1. RÔLES SIMULTANÉS OBLIGATOIRES
 
 Toute IA intervient comme :
@@ -152,6 +165,10 @@ Pont autorisé : `shared/`, `packages/api`, `packages/types`, `packages/ui`.
 | Fichier | Rôle |
 |---|---|
 | `docs/MASTER_PLAN.md` | Audit + roadmap + vagues + lots + fichiers à toucher |
+| `docs/streaming/SPRING_2_PROGRAM.md` | Programme Streaming Runtime Enterprise (SPRING 2) |
+| `docs/DOMAIN_MAP.md` | Cartographie domaines code |
+| `docs/DEPENDENCY_RULES.md` | Règles imports et couplage |
+| `docs/ADR/` | Décisions d'architecture streaming et transverses |
 | `docs/AI_GOVERNANCE.md` | Ce fichier — comportement IA |
 | `docs/EXECUTION_LOG.md` | Journal chronologique interventions |
 | `docs/RAPPORT_COLLECTION.md` | Historique détaillé (legacy — maintenir) |

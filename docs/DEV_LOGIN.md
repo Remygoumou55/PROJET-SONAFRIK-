@@ -33,7 +33,7 @@ Ou via le Studio local (http://127.0.0.1:54323) → SQL Editor → coller le con
 pnpm dev
 ```
 
-Aller sur http://localhost:3003/auth/connexion et se connecter avec les identifiants ci-dessus.
+Aller sur http://localhost:3000/auth/connexion et se connecter avec les identifiants ci-dessus.
 
 ## Important
 

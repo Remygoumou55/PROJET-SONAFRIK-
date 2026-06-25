@@ -10,6 +10,7 @@
 
 | Priorité | Document | Rôle |
 |---|---|---|
+| 0 | **`NOUVELLE_REGLE_DE_TRAVAIL.md`** | **Mode opératoire — une mission, une page, validation visuelle** |
 | 1 | **`MVP_SCOPE_LOCK.md`** (ce fichier) | **Périmètre produit — ce qui est IN / OUT** |
 | 2 | `docs/CDC-v9.0.md` | Spec produit fondatrice |
 | 3 | `docs/AI_GOVERNANCE.md` | Comportement IA |

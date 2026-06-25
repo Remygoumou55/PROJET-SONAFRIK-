@@ -309,6 +309,32 @@ Aucune. Refactoring pur sans changement comportemental.
 
 ---
 
+## [2026-06-24] — Landing V6 fusion mockup G-Stream
+
+**IA/Dev :** Claude Sonnet 4.6
+**Vague :** Landing — V6 mockup
+
+### Fichiers touchés
+- `apps/web/src/components/landing/LandingSearchBar.tsx` — barre recherche hero → `/search`
+- `apps/web/src/components/landing/LandingHowItWorks.tsx` — phone mockup + 3 étapes verticales
+- `apps/web/src/components/landing/LandingPartners.tsx` — Orange Money, MTN MoMo, Wave
+- `apps/web/src/components/landing/LandingFAQ.tsx` — accordéon 5 questions
+- `apps/web/src/components/landing/LandingFooter.tsx` — 3 colonnes + copyright
+- `apps/web/src/components/landing/LandingNav.tsx` — ancres #comment-ca-marche, #tarifs, #faq
+- `apps/web/src/components/landing/LandingHero.tsx` — CTAs simplifiés + search bar
+- `apps/web/src/app/(public)/page.tsx` — nouvel ordre sections, suppression ProductPreview
+- `apps/web/src/app/globals.css` — grilles responsive landing
+- `apps/web/src/components/landing/LandingProductPreview.tsx` — supprimé (fusionné dans HowItWorks)
+
+### Tests effectués
+- [x] pnpm build / lint / typecheck — 0 erreur
+- [ ] Validation visuelle manuelle landing `/`
+
+### Dette créée
+- Barre recherche hero redirige vers `/search` (route listener — peut exiger auth selon middleware)
+
+---
+
 ## PROCHAINE ENTRÉE À CRÉER
 
 Quand tu termines une tâche, copie ce template et remplis-le :
