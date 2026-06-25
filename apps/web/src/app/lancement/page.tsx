@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
 import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
 import { getAvatarPalette } from "@/lib/landing/artistDisplay";
-import { SonafrikLogo } from "@/components/landing/SonafrikLogo";
+import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 
 export const revalidate = 60;
 

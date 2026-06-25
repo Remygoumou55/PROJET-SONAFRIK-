@@ -18,14 +18,14 @@ const NAV_LINKS = [
 async function AdminGuard({ children }: { children: React.ReactNode }) {
   await requireAdmin();
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "var(--color-noir-profond)" }}>
-      <div style={{ backgroundColor: "var(--color-surface)", borderBottom: "1px solid var(--color-elevated)" }}>
+    <div className="min-h-dvh bg-noir-profond">
+      <div className="border-b border-elevated bg-surface">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-center justify-between py-3">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--color-or-solaire)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-or-solaire">
               Admin SONAFRIK
             </p>
-            <Link href="/listen" className="text-xs transition-colors" style={{ color: "var(--color-texte-desactive)" }}>
+            <Link href="/listen" className="text-xs text-texte-desactive transition-colors">
               ← Retour à l&apos;app
             </Link>
           </div>

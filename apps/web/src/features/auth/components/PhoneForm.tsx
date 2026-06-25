@@ -123,15 +123,11 @@ export function PhoneForm({
         type="submit"
         disabled={loading}
         aria-disabled={submitDisabled || loading}
-        className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg text-sm transition-all duration-300 sm:text-base"
-        style={{
-          background: submitDisabled
-            ? "rgba(0, 210, 106, 0.3)"
-            : "var(--color-vert-energie)",
-          cursor: submitDisabled ? "not-allowed" : "pointer",
-          color: submitDisabled ? "rgba(255, 255, 255, 0.4)" : "var(--color-noir-profond)",
-          fontWeight: submitDisabled ? 600 : 700,
-        }}
+        className={`flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg text-sm transition-all duration-300 sm:text-base ${
+          submitDisabled
+            ? "cursor-not-allowed bg-vert-energie/30 font-semibold text-white/40"
+            : "cursor-pointer bg-vert-energie font-bold text-noir-profond"
+        }`}
       >
         {loading ? (
           <>

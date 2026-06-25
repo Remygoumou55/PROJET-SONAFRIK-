@@ -3,9 +3,9 @@ import { AmbientBackgroundGlow } from "@/components/shared/AmbientBackgroundGlow
 
 export default function OnboardingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-noir-profond">
+    <div className="app-page-shell">
       <AmbientBackgroundGlow />
-      <div className="relative z-10">{children}</div>
+      <div className="app-page-main">{children}</div>
     </div>
   );
 }

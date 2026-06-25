@@ -63,7 +63,7 @@ export default function RootLayout({
         <link rel="prefetch" href="/listen" as="document" />
         <link rel="prefetch" href="/auth/connexion" as="document" />
       </head>
-      <body className={`${montserrat.variable} antialiased`}>{children}</body>
+      <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-noir-profond text-texte-principal`}>{children}</body>
     </html>
   );
 }

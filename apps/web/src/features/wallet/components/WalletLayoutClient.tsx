@@ -15,22 +15,22 @@ export function WalletLayoutClient({ children }: { children: React.ReactNode }) 
 
   return (
     <WalletServiceProvider>
-      <div className="min-h-screen" style={{ backgroundColor: "var(--color-noir-profond)" }}>
-        <div className="max-w-2xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--color-texte-principal)" }}>Mon Wallet</h1>
+      <div className="min-h-dvh bg-noir-profond">
+        <div className="mx-auto max-w-2xl px-4 py-6">
+          <h1 className="mb-6 text-2xl font-bold text-texte-principal">Mon Wallet</h1>
 
-          <nav className="flex gap-1 mb-8 rounded-xl p-1" style={{ backgroundColor: "var(--color-surface)" }}>
+          <nav className="mb-8 flex gap-1 rounded-xl bg-surface p-1">
             {NAV_ITEMS.map(({ href, label }) => {
               const isActive = pathname === href;
               return (
                 <Link
                   key={href}
                   href={href}
-                  className="flex-1 text-center py-2 rounded-lg text-sm font-medium transition-all"
-                  style={{
-                    backgroundColor: isActive ? "var(--color-elevated)" : "transparent",
-                    color: isActive ? "var(--color-texte-principal)" : "var(--color-texte-secondaire)",
-                  }}
+                  className={`flex-1 rounded-lg py-2 text-center text-sm font-medium transition-all ${
+                    isActive
+                      ? "bg-elevated text-texte-principal"
+                      : "bg-transparent text-texte-secondaire"
+                  }`}
                 >
                   {label}
                 </Link>

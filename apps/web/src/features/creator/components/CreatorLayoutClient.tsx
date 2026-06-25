@@ -32,7 +32,7 @@ export function CreatorLayoutClient({
                     : "Mon espace artiste";
 
   return (
-    <div className="min-h-screen bg-noir-profond">
+    <div className="min-h-dvh bg-noir-profond">
       <header className="border-b border-bordure px-6 py-4">
         <p className="text-or-solaire text-xs font-semibold uppercase tracking-wider">
           NOTRE BIEN COMMUN · Espace artiste

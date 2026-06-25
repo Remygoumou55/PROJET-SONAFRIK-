@@ -1,8 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AmbientBackgroundGlow } from "@/components/shared/AmbientBackgroundGlow";
-import { AuthBrandLogo } from "./AuthBrandLogo";
+import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 
 interface AuthPageShellProps {
   title: string;
@@ -14,24 +13,19 @@ interface AuthPageShellProps {
 
 export function AuthPageShell({ title, subtitle, leading, children }: AuthPageShellProps) {
   return (
-    <div
-      className="relative min-h-screen"
-      style={{ backgroundColor: "var(--color-noir-profond)" }}
-    >
-      <AmbientBackgroundGlow />
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md space-y-8">
-          {leading ? <div>{leading}</div> : null}
-          <header className="text-center">
-            <AuthBrandLogo />
-            <h1 className="text-2xl font-bold text-texte-principal">{title}</h1>
-            {subtitle ? (
-              <p className="mt-1 text-sm text-texte-secondaire">{subtitle}</p>
-            ) : null}
-          </header>
-          {children}
+    <div className="app-page-content app-page-stack w-full max-w-md space-y-8">
+      {leading ? <div>{leading}</div> : null}
+      <header className="text-center">
+        <div className="mb-4">
+          <SonafrikLogo />
+          <p className="brand-logo-tagline">Notre Bien Commun</p>
         </div>
-      </main>
+        <h1 className="app-page-title text-2xl font-bold text-texte-principal">{title}</h1>
+        {subtitle ? (
+          <p className="app-page-subtitle mt-1 text-sm text-texte-secondaire">{subtitle}</p>
+        ) : null}
+      </header>
+      {children}
     </div>
   );
 }

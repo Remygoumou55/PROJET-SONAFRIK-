@@ -8,17 +8,14 @@ export default function AuthError({
   reset: () => void;
 }) {
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen gap-4 px-4"
-      style={{ backgroundColor: "var(--color-noir-profond)" }}
-    >
-      <p className="text-sm text-center" style={{ color: "var(--color-texte-secondaire)" }}>
+    <div className="app-page-content flex flex-col items-center gap-4 px-4 text-center">
+      <p className="text-sm text-texte-secondaire">
         {"Une erreur est survenue lors de l'authentification."}
       </p>
       <button
+        type="button"
         onClick={reset}
-        className="px-5 py-2.5 rounded-xl text-sm font-semibold"
-        style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
+        className="rounded-xl bg-vert-energie px-5 py-2.5 text-sm font-semibold text-noir-profond"
       >
         Réessayer
       </button>

@@ -18,8 +18,7 @@ const AUTH_SUBTITLE = "Écoute · Participe · Prospère";
 const BACK_LINK = (
   <Link
     href="/"
-    className="inline-flex text-sm transition-colors hover:underline"
-    style={{ color: "var(--color-texte-secondaire)" }}
+    className="inline-flex text-sm text-texte-secondaire transition-colors hover:underline"
   >
     ← Retour à l&apos;accueil
   </Link>
@@ -148,10 +147,7 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
         leading={BACK_LINK}
       >
         <div className="flex justify-center py-12" aria-busy="true" aria-label="Chargement">
-          <div
-            className="h-8 w-8 animate-spin rounded-full border-2"
-            style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
-          />
+          <div className="size-8 animate-spin rounded-full border-2 border-vert-energie border-t-transparent" />
         </div>
       </AuthPageShell>
     );
@@ -163,7 +159,7 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
       subtitle={AUTH_SUBTITLE}
       leading={BACK_LINK}
     >
-      <p className="text-center text-xs" style={{ color: "var(--color-texte-desactive)" }}>
+      <p className="text-center text-xs text-texte-desactive">
         Nouveau ou déjà inscrit — votre numéro suffit
       </p>
       {step === "phone" && (
@@ -184,9 +180,9 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
             }
           />
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
-            <span className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>ou</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "var(--color-bordure)" }} />
+            <div className="h-px flex-1 bg-bordure" />
+            <span className="text-xs text-texte-desactive">ou</span>
+            <div className="h-px flex-1 bg-bordure" />
           </div>
           <GoogleAuthButton
             label="Continuer avec Google"
@@ -208,15 +204,17 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
         />
       )}
       {step === "phone" && error && (
-        <p className="text-center text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>{error}</p>
+        <p className="text-center text-sm text-erreur" role="alert">{error}</p>
       )}
       <p className="text-center text-xs">
         <Link
           href="/auth/mot-de-passe-oublie"
-          className="inline-flex items-center gap-1.5 transition-colors hover:underline"
-          style={{ color: "var(--color-vert-energie)" }}
+          className="inline-flex items-center gap-1.5 text-vert-energie transition-colors hover:underline"
         >
-          <span aria-hidden="true" className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style={{ border: "1.5px solid var(--color-vert-energie)" }}>
+          <span
+            aria-hidden="true"
+            className="inline-flex size-4 items-center justify-center rounded-full border-[1.5px] border-vert-energie text-[10px] font-bold"
+          >
             ?
           </span>
           Problème d&apos;accès à votre compte ?
