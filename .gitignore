@@ -52,3 +52,13 @@ yarn-error.log*
 
 # Scripts temporaires (probes audio locaux)
 scripts/.tmp-test.mp3
+*.tmp
+
+# Coverage et rapports de tests
+coverage/
+packages/api/coverage/
+*.lcov
+packages/api/playback-coverage.txt
+
+# Fichiers temporaires racine
+tmp-creator.html
