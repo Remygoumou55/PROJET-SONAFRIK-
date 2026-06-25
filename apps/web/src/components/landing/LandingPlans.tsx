@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LandingSectionHeader } from "./LandingSectionHeader";
 
 const PAYMENT_ORANGE = {
@@ -168,9 +169,32 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PlanSubscribeLink({ featured = false }: { featured?: boolean }) {
+  return (
+    <Link
+      href="/auth/connexion?role=listener"
+      style={{
+        display: "block",
+        marginTop: "14px",
+        padding: "11px 16px",
+        borderRadius: "8px",
+        fontSize: "13px",
+        fontWeight: 600,
+        textAlign: "center",
+        textDecoration: "none",
+        backgroundColor: featured ? "var(--color-vert-energie)" : "transparent",
+        color: featured ? "var(--color-noir-profond)" : "var(--color-texte-principal)",
+        border: featured ? "none" : "0.5px solid rgba(255,255,255,0.2)",
+      }}
+    >
+      S&apos;abonner →
+    </Link>
+  );
+}
+
 export function LandingPlans() {
   return (
-    <section style={{ marginBottom: "28px" }}>
+    <section id="tarifs" style={{ marginBottom: "28px", scrollMarginTop: "88px" }}>
       <LandingSectionHeader label="ABONNEMENTS" title="Choisissez votre formule" />
 
       {/* Grille 4 formules */}
@@ -265,6 +289,7 @@ export function LandingPlans() {
             {plan.payments.map((p) => (
               <PaymentItem key={p.name} {...p} />
             ))}
+            <PlanSubscribeLink featured={plan.featured} />
           </div>
         ))}
       </div>
@@ -292,6 +317,22 @@ export function LandingPlans() {
             <div
               style={{
                 display: "inline-flex",
+                backgroundColor: "rgba(255,194,14,0.1)",
+                color: "var(--color-or-solaire)",
+                border: "1px solid var(--color-or-solaire)",
+                fontSize: "10px",
+                fontWeight: 600,
+                padding: "4px 10px",
+                borderRadius: "6px",
+                marginBottom: "10px",
+              }}
+            >
+              🌍 Pour les Guinéens de l&apos;étranger
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                marginLeft: "8px",
                 backgroundColor: "rgba(55,138,221,0.12)",
                 color: "var(--color-feature-azure)",
                 fontSize: "10px",
@@ -315,11 +356,26 @@ export function LandingPlans() {
                 color: "rgba(255,255,255,0.4)",
                 maxWidth: "200px",
                 lineHeight: 1.5,
-                margin: 0,
+                margin: "0 0 14px",
               }}
             >
               Vous vivez à l&apos;étranger et voulez soutenir la musique guinéenne ? Ce pack est fait pour vous.
             </p>
+            <Link
+              href="/auth/connexion?role=listener"
+              style={{
+                display: "inline-block",
+                backgroundColor: "var(--color-feature-azure)",
+                color: "var(--color-noir-profond)",
+                fontSize: "13px",
+                fontWeight: 600,
+                padding: "11px 20px",
+                borderRadius: "8px",
+                textDecoration: "none",
+              }}
+            >
+              S&apos;abonner Diaspora →
+            </Link>
           </div>
 
           {/* Colonne droite — 2 sous-colonnes */}

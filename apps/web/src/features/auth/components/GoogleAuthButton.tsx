@@ -6,17 +6,25 @@ import { useAuthService } from "../hooks/useAuth";
 interface GoogleAuthButtonProps {
   label?: string;
   role?: "artist" | "listener";
+  disabled?: boolean;
+  onDisabledClick?: () => void;
 }
 
 export function GoogleAuthButton({
   label = "Continuer avec Google",
   role,
+  disabled = false,
+  onDisabledClick,
 }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const auth = useAuthService();
 
   async function handleGoogleAuth() {
+    if (disabled) {
+      onDisabledClick?.();
+      return;
+    }
     setLoading(true);
     setError(null);
     // NEXT_PUBLIC_APP_URL fixe l'URL stable (prod Vercel) pour éviter que les
@@ -37,7 +45,7 @@ export function GoogleAuthButton({
       <button
         type="button"
         onClick={handleGoogleAuth}
-        disabled={loading}
+        disabled={loading || disabled}
         className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60"
         style={{
           backgroundColor: "var(--color-card)",

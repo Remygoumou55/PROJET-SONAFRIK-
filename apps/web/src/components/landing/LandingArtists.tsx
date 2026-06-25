@@ -10,7 +10,7 @@ const ARTISTS = [
 
 export function LandingArtists() {
   return (
-    <section style={{ marginBottom: "56px", textAlign: "center" }}>
+    <section id="artistes" style={{ marginBottom: "56px", textAlign: "center", scrollMarginTop: "88px" }}>
       <LandingSectionHeader label="DÉJÀ SUR SONAFRIK" title="Les artistes fondateurs" />
 
       {/* Cartes artistes */}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LandingSearchBar } from "./LandingSearchBar";
 
 interface LandingHeroProps {
   children?: ReactNode;
@@ -74,12 +75,12 @@ export function LandingHero({ children }: LandingHeroProps) {
           display: "flex",
           justifyContent: "center",
           gap: "12px",
-          marginBottom: "16px",
+          marginBottom: "8px",
           flexWrap: "wrap",
         }}
       >
         <Link
-          href="/auth/inscription?role=artist"
+          href="/auth/connexion"
           style={{
             backgroundColor: "var(--color-vert-energie)",
             color: "var(--color-noir-profond)",
@@ -91,10 +92,10 @@ export function LandingHero({ children }: LandingHeroProps) {
             display: "inline-block",
           }}
         >
-          Rejoindre comme artiste →
+          Commencer maintenant
         </Link>
         <Link
-          href="/auth/inscription?role=listener"
+          href="#comment-ca-marche"
           style={{
             backgroundColor: "transparent",
             border: "0.5px solid rgba(255,255,255,0.2)",
@@ -107,16 +108,18 @@ export function LandingHero({ children }: LandingHeroProps) {
             display: "inline-block",
           }}
         >
-          Rejoindre comme auditeur
+          En savoir plus
         </Link>
       </div>
+
+      <LandingSearchBar />
 
       {/* Hint */}
       <p
         style={{
           fontSize: "12px",
           color: "rgba(255,255,255,0.28)",
-          margin: "0 0 0",
+          margin: "12px 0 0",
         }}
       >
         Gratuit · Aucune carte requise · 2 minutes

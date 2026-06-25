@@ -142,15 +142,18 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
 
   if (detecting) {
     return (
-      <main
-        className="flex min-h-screen items-center justify-center"
-        style={{ backgroundColor: "var(--color-noir-profond)" }}
+      <AuthPageShell
+        title="Créer votre compte"
+        subtitle={AUTH_SUBTITLE}
+        leading={BACK_LINK}
       >
-        <div
-          className="w-8 h-8 rounded-full border-2 animate-spin"
-          style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
-        />
-      </main>
+        <div className="flex justify-center py-12" aria-busy="true" aria-label="Chargement">
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-2"
+            style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
+          />
+        </div>
+      </AuthPageShell>
     );
   }
 

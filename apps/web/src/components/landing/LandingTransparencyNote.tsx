@@ -26,15 +26,10 @@ export function LandingTransparencyNote() {
             margin: 0,
           }}
         >
-          Sur chaque abonnement, <strong style={{ color: "var(--color-texte-principal)" }}>65 %</strong> sont partagés
-          entre tous les artistes que vous écoutez, au prorata de leurs écoutes.
-          <br />
-          Si vous passez votre mois à écouter un seul artiste, il reçoit la totalité de ces{" "}
-          <strong style={{ color: "var(--color-texte-principal)" }}>65 %</strong>.
-          <br />
-          Si vous en écoutez dix, chacun reçoit sa part.
-          <br />
-          Les 35 % restants couvrent les coûts techniques et le développement de la plateforme.
+          <strong style={{ color: "var(--color-texte-principal)" }}>65 %</strong> de chaque abonnement sont
+          partagés entre les artistes que vous écoutez, au prorata de leurs écoutes réelles. Les{" "}
+          <strong style={{ color: "var(--color-texte-principal)" }}>35 %</strong> restants couvrent
+          l&apos;infrastructure et le développement de la plateforme.
         </p>
       </div>
     </div>

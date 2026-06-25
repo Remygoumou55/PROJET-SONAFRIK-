@@ -1,4 +1,5 @@
 import { LandingSectionHeader } from "./LandingSectionHeader";
+import { RoyaltiesCounter } from "./RoyaltiesCounter";
 
 const PILLARS = [
   {
@@ -28,9 +29,11 @@ export function LandingPillars() {
   return (
     <section style={{ marginBottom: "56px" }}>
       <LandingSectionHeader
-        label="POURQUOI SONAFRIK"
+        label="POUR LES ARTISTES"
         title="Construit pour les artistes guinéens"
       />
+
+      <RoyaltiesCounter />
 
       {/* Texte intro */}
       <div

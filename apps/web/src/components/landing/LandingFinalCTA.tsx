@@ -44,7 +44,7 @@ export function LandingFinalCTA() {
         }}
       >
         <Link
-          href="/auth/inscription"
+          href="/auth/connexion"
           style={{
             backgroundColor: "var(--color-vert-energie)",
             color: "var(--color-noir-profond)",
