@@ -1,0 +1,27 @@
+-- Phase 2 — Extensions revenue destinations (NON EXÉCUTÉ EN MVP)
+-- Référence architecture : packages/shared/src/payment/revenueDestinations.ts
+--
+-- État actuel MVP :
+--   profiles.orange_money_number / mtn_money_number  → onboarding artiste
+--   payout_accounts                                  → retraits wallet (multi-comptes, is_default, verified)
+--
+-- Phase 2 recommandée (sans nouvelle table) :
+--   Étendre payout_accounts avec priority + status pour fallback automatique
+--
+-- BEGIN;
+--
+-- ALTER TABLE public.payout_accounts
+--   ADD COLUMN IF NOT EXISTS priority INT NOT NULL DEFAULT 100,
+--   ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active'
+--     CHECK (status IN ('active', 'inactive', 'pending_verification', 'rejected')),
+--   ADD COLUMN IF NOT EXISTS country_code CHAR(2),
+--   ADD COLUMN IF NOT EXISTS method_id TEXT;
+--
+-- CREATE INDEX IF NOT EXISTS idx_payout_accounts_user_priority
+--   ON public.payout_accounts(user_id, priority)
+--   WHERE deleted_at IS NULL AND status = 'active';
+--
+-- COMMENT ON COLUMN public.payout_accounts.priority IS
+--   'Ordre fallback payout : plus petit = essayé en premier après is_default';
+--
+-- COMMIT;
