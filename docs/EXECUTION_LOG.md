@@ -1,7 +1,80 @@
 # EXECUTION LOG — SONAFRIK
-> Journal de continuité — **chaque intervention doit ajouter une entrée.**  
-> Format obligatoire ci-dessous.  
-> Dernière entrée : 2026-06-25 (SPRING 2.3 — Playback Runtime Engine)
+## Source de vérité unique · Mis à jour au 26 juin 2026
+
+> Ce document est la **SEULE** source de vérité sur l'état du projet SONAFRIK.
+> Les journaux `PLAN_CORRECTION_360.md` et `RAPPORT_COLLECTION.md` sont archivés dans `docs/archive/`.
+> `MASTER_PLAN.md` est un audit figé (24 juin) — consulter cette section pour l'état actuel.
+
+> **Format obligatoire** : chaque intervention doit ajouter une entrée datée ci-dessous.
+
+---
+
+## ÉTAT MESURÉ AU 26 JUIN 2026
+
+### Certification CI
+- Probes : **129/129** (Vagues A→F + 6 globaux)
+- Build : ✅ 9/9 packages, 47 routes Next.js
+- Typecheck : ✅ 15/15 packages
+
+### Base de données live (projet `cxjpburiiazzvlczzupy`)
+- Profils : **189** utilisateurs
+- Tracks publiés : **48** (`published_at IS NOT NULL`)
+- Artistes inscrits : **59** (`artist_profiles`)
+- Stream sessions valides : **5 524** (`is_valid_listen = true`)
+- `wallet_ledger` : **9** entrées (> 0 — premier cycle royalties exécuté)
+- `royalty_cycles` : **1** (premier cycle déclenché manuellement)
+
+### Git
+- Branch : `main` · Local = `origin/main` = Vercel ✅
+- Dernier commit : `53e30b9` — fix(security): CORS strict sur 14 edge functions
+
+### Score MVP réaliste (mesuré, pas optimiste)
+| Dimension | Score |
+|---|---|
+| Architecture | 92/100 |
+| Build & types | 95/100 |
+| Streaming & catalog | 90/100 |
+| UI & pages | 85/100 |
+| Sécurité | 88/100 (CORS fermé ✅) |
+| Chaîne financière | 45/100 (cycle manuel OK, Orange Money pas encore intégré prod) |
+| Tests couverture MVP | 45/100 (258 tests streaming/metadata, 0 wallet/payments) |
+| **GLOBAL** | **76/100** |
+
+### P0 résolus (26 juin 2026)
+- ✅ P0-1 : Git consolidé
+- ✅ P0-3 : CI verte 129/129
+- ✅ P0-2 Phase 1 : `wallet_ledger` > 0, premier cycle royalties
+
+### P1 résolus (26 juin 2026)
+- ✅ Page `/lancement` : données réelles DB (plus de fictifs)
+- ✅ CORS : 14 edge functions sécurisées, `_shared/cors.ts`, fallback strict
+
+### Restant avant lancement public
+- 🟡 Tests wallet/paiements (0 tests actuellement)
+- 🔵 Orange Money GN Phase 2 (credentials en cours — voir `P0-2-PHASE-2-ORANGE-MONEY.md`)
+- 🔵 Artistes fondateurs réels sur `/lancement` (section masquée si vide)
+
+---
+
+## [2026-06-26] — Réconciliation documentation + gouvernance
+**Agent :** Claude Sonnet 4.6  
+**Type :** documentation · gouvernance
+
+### Mission
+Établir `EXECUTION_LOG.md` comme source unique, archiver journaux contradictoires, mettre à jour règles Cursor et index `docs/README.md`.
+
+### Livrables
+- `docs/archive/PLAN_CORRECTION_360.md` — archivé (état 23 juin, score 88/100 obsolète)
+- `docs/archive/RAPPORT_COLLECTION.md` — archivé (stale depuis 24 juin)
+- Stubs redirect dans `docs/PLAN_CORRECTION_360.md` et `docs/RAPPORT_COLLECTION.md`
+- `.cursor/rules/documentation.mdc` — règle source de vérité
+- Mise à jour caméras sécurité / plan / DB / audit
+- `docs/README.md` — index documentation
+- `docs/MVP_SCOPE_LOCK.md` — royalties UI corrigée
+
+### Validation
+- [x] `pnpm probe:certification` — 129/129
+- [x] Aucun code applicatif modifié
 
 ---
 
@@ -760,4 +833,4 @@ Transformer le Dashboard Créateur ERP en quartier général artiste : hero viva
 
 ---
 
-*Les entrées antérieures détaillées restent dans `docs/RAPPORT_COLLECTION.md`.*
+*Les entrées antérieures détaillées restent dans `docs/archive/RAPPORT_COLLECTION.md`.*

@@ -22,7 +22,7 @@ Senior Principal Architect + Product Guardian — challenge before implementing,
 
 1. **MVP-critical?** → If no: propose roadmap, do not implement.
 2. **Cross-domain impact?** → List affected files/features.
-3. **Technical debt?** → Document in `docs/RAPPORT_COLLECTION.md` first.
+3. **Technical debt?** → Document in `docs/EXECUTION_LOG.md` first.
 4. **Existing code?** → Search `packages/`, `features/`, `supabase/` first.
 5. **Architecture compliant?** → See Architecture section below.
 
@@ -82,8 +82,8 @@ Wrap in `BEGIN/COMMIT` when possible. Every new table needs RLS policies.
 
 | File | Purpose |
 |------|---------|
-| `docs/PLAN_CORRECTION_360.md` | Open corrections |
-| `docs/RAPPORT_COLLECTION.md` | Prior AI work — avoid redoing |
+| `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel |
+| `docs/README.md` | Index documentation |
 | `apps/web/src/app/globals.css` | Design tokens |
 | `packages/types/src/index.ts` | Business types |
 | `supabase/migrations/` | DB state |
@@ -108,7 +108,7 @@ supabase db query --linked "SELECT tablename, policyname FROM pg_policies WHERE 
 
 ### Step 3 — Deliverables
 
-1. Update `docs/RAPPORT_COLLECTION.md` (see [reference.md](reference.md) §7)
+1. Update `docs/EXECUTION_LOG.md` (see [reference.md](reference.md) §7)
 2. Produce chat report (template in [reference.md](reference.md) §11)
 3. Commit + push only when user explicitly requests
 
@@ -138,7 +138,7 @@ STATUT GLOBAL : ✅ TERMINÉ / ⚠️ PARTIEL / ❌ ÉCHOUÉ
 • [Dette ou : Aucune]
 
 ─── PROCHAINE ÉTAPE ──────────────────────────
-• [Selon PLAN_CORRECTION_360.md]
+• [Selon EXECUTION_LOG.md]
 ═══════════════════════════════════════════════
 ```
 

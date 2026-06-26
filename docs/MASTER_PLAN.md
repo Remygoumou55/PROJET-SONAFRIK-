@@ -1,9 +1,12 @@
 # MASTER PLAN — SONAFRIK
+> ⚠️ **Audit figé au 24 juin 2026** — ne pas utiliser les scores ci-dessous comme état actuel.
+> **Source de vérité :** [`EXECUTION_LOG.md`](./EXECUTION_LOG.md) · Score MVP mesuré : **76/100** (26 juin 2026)
+
 > Audit forensique 360° + Plan de guerre complet  
 > **Date :** 2026-06-24  
 > **Statut :** Audit terminé — **aucun code applicatif modifié**  
 > **Gouvernance IA :** `docs/AI_GOVERNANCE.md`  
-> **Journal :** `docs/EXECUTION_LOG.md`
+> **Journal actif :** `docs/EXECUTION_LOG.md`
 
 ---
 

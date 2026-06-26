@@ -73,7 +73,7 @@ Retraits
 | **R1** | Aucune feature ne peut être ajoutée si elle ne sert pas directement cette chaîne |
 | **R2** | Toute feature existante hors chaîne est **gelée** jusqu'à complétion MVP Core |
 | **R3** | Le MVP est **incomplet** tant qu'une étape de la chaîne ne fonctionne pas en E2E |
-| **R4** | L'audit technique (103/103 probes) **ne remplace pas** la validation de cette chaîne |
+| **R4** | L'audit technique (129/129 probes) **ne remplace pas** la validation de cette chaîne |
 
 ### État actuel (2026-06-24)
 
@@ -84,7 +84,7 @@ Retraits
 | Album / Cover / Audio | ✅ Opérationnel | Non |
 | Publication | ✅ Opérationnel | Non |
 | Écoutes | ✅ Real Listen V7.2 | Non |
-| Royalties | ❌ UI ComingSoon | **OUI** |
+| Royalties | ✅ UI `/wallet/royalties` (`RoyaltiesPage.tsx`) | Non (E2E prod à valider) |
 | Revenus | ⚠️ Analytics partiel | **OUI** |
 | Retraits | ⚠️ Code prêt, flag + credentials | **OUI** |
 
@@ -183,7 +183,7 @@ Fonctionnalités **absolument indispensables** au lancement. Rien d'autre ne doi
 | **Pourquoi MVP** | Étape obligatoire de la chaîne — l'artiste doit voir **ce qu'il gagne** |
 | **Dépendances** | Streaming (Real Listen), wallet backend, royalty engine SQL |
 
-**État actuel :** backend présent, **UI ComingSoon** → **BLOQUANT MVP**.
+**État actuel :** UI branchée (`RoyaltiesPage.tsx` sur `/wallet/royalties`), backend actif (1 cycle, 9 entrées ledger). **E2E prod** (Orange Money, retraits) reste bloquant lancement public.
 
 ---
 
@@ -268,8 +268,8 @@ Fonctionnalités **déjà présentes dans le codebase** mais sans valeur MVP imm
 |---|---|---|---|
 | `features/marketplace/` (Beat Store) | **GELÉ** | Flag `beat_store=false`, pas de dev | POST-MVP CDC |
 | `/listen/beats` | **GELÉ** | ComingSoon tant que flag off | POST-MVP |
-| `/wallet/royalties` UI | **REPORTÉ → MVP Core** | Brancher `RoyaltiesPage` — **priorité G1** | Bloque chaîne MVP |
-| `RoyaltiesPage.tsx` (composant orphelin) | **À ÉVALUER** | Intégrer ou supprimer après G1 | Code mort actuel |
+| `/wallet/royalties` UI | **MVP Core** | `RoyaltiesPage.tsx` branché — valider E2E avec cycle réel | Chaîne MVP |
+| `RoyaltiesPage.tsx` | **ACTIF** | Route `/wallet/royalties` | — |
 | `SubscriptionModal` / plans MM | **GELÉ** | Pas de dev avant G-5 | POST-MVP |
 | Landing `/` + `/lancement` double | **GELÉ** | Pas de nouvelle feature landing | Marketing post-MVP technique |
 | Discovery / Recommendation repos | **GELÉ** | Pas d'UI, pas de nouveau RPC | Enterprise prématuré |
@@ -292,7 +292,7 @@ Le MVP SONAFRIK est déclaré **TERMINÉ** uniquement si **tous** les critères 
 | **Build PASS** | `pnpm --filter @sonafrik/web build` | ✅ 0 erreur |
 | **Typecheck PASS** | `pnpm typecheck` | ✅ 12/12 packages |
 | **Lint PASS** | `pnpm lint` | ✅ 12/12 packages |
-| **Probes PASS** | `pnpm probe:certification` | ✅ 103/103 |
+| **Probes PASS** | `pnpm probe:certification` | ✅ 129/129 |
 
 ### Runtime & chaîne produit
 
@@ -300,7 +300,7 @@ Le MVP SONAFRIK est déclaré **TERMINÉ** uniquement si **tous** les critères 
 |---|---|---|
 | **Runtime PASS** | App démarre, pas de page blanche/noire sur routes MVP Core | ✅ |
 | **Streaming PASS** | Real Listen ≥90 % enregistré serveur, player fonctionnel | ✅ |
-| **Royalties PASS** | Artiste voit royalties calculées sur `/wallet/royalties` | ❌ **Manquant** |
+| **Royalties PASS** | Artiste voit royalties calculées sur `/wallet/royalties` | ⚠️ UI OK — valider avec données cycle réel |
 | **Revenus PASS** | Solde wallet + historique reflètent royalties + crédits | ⚠️ **Partiel** |
 | **Retraits PASS** | E2E : demande retrait → traitement (sandbox min.) | ❌ **Manquant** |
 | **Régression PASS** | `scripts/artist-journey-live.ts` ou équivalent E2E chaîne complète | ❌ **À exécuter** |
@@ -315,7 +315,7 @@ Compte test → Profil artiste → Créer album → Upload cover + audio
 → Demande retrait initiée
 ```
 
-**Sans ce parcours vert, le MVP n'est PAS terminé** — même si les probes techniques sont à 103/103.
+**Sans ce parcours vert, le MVP n'est PAS terminé** — même si les probes techniques sont à 129/129.
 
 ---
 

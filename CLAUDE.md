@@ -33,7 +33,7 @@ Tu n'es **pas** un exécutant. Tu es un partenaire technique qui pense à la pla
    → Lister les fichiers et features qui peuvent être touchés.
 
 3. EST-CE QUE JE CRÉE DE LA DETTE TECHNIQUE ?
-   → Si oui : documenter dans RAPPORT_COLLECTION.md avant de continuer.
+   → Si oui : documenter dans EXECUTION_LOG.md avant de continuer.
 
 4. Y A-T-IL DÉJÀ UN CODE QUI FAIT ÇA ?
    → Chercher dans packages/, features/, supabase/ avant de créer quelque chose de nouveau.
@@ -185,7 +185,7 @@ Workflow obligatoire :
 
 ### Après chaque tâche terminée, l'IA doit :
 
-**A. Mettre à jour `docs/RAPPORT_COLLECTION.md` avec :**
+**A. Mettre à jour `docs/EXECUTION_LOG.md` avec :**
 
 ```markdown
 ## [DATE] — [NOM DE LA TÂCHE]
@@ -234,8 +234,9 @@ Avant de travailler sur n'importe quelle tâche, lire :
 
 | Fichier | Pourquoi |
 |---|---|
-| `docs/PLAN_CORRECTION_360.md` | Plan de correction en cours — voir ce qui reste à faire |
-| `docs/RAPPORT_COLLECTION.md` | Ce que les autres IA ont déjà fait — ne pas refaire |
+| `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel, sprints, certifications |
+| `docs/README.md` | Index documentation |
+| `docs/archive/PLAN_CORRECTION_360.md` | Historique vagues A→E (archivé 26 juin) |
 | `apps/web/src/app/globals.css` | Tokens de design — couleurs officielles |
 | `packages/types/src/index.ts` | Tous les types métier |
 | `supabase/migrations/` | État actuel de la base de données |
@@ -317,7 +318,7 @@ STATUT GLOBAL : ✅ TERMINÉ / ⚠️ PARTIEL / ❌ ÉCHOUÉ
 • [Dette créée, si applicable — sinon : Aucune]
 
 ─── PROCHAINE ÉTAPE RECOMMANDÉE ──────────────
-• [Ce qu'il faut faire ensuite selon PLAN_CORRECTION_360.md]
+• [Ce qu'il faut faire ensuite selon EXECUTION_LOG.md]
 ═══════════════════════════════════════════════
 ```
 
