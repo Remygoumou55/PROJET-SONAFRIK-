@@ -1,15 +1,14 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  assertBypassForbiddenOnVercel,
+  DEV_MOCK_USER_ID,
+  isDevBypassActive,
+} from "@/lib/auth/guards";
 
 export async function requireAdmin(): Promise<{ userId: string }> {
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
-    throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
-  }
-  // Bypass uniquement si BYPASS_AUTH=true explicite, jamais sur Vercel
-  const isBypassMode =
-    process.env.BYPASS_AUTH === "true" &&
-    process.env.VERCEL !== "1";
-  if (isBypassMode) return { userId: "dev-mock-id" };
+  assertBypassForbiddenOnVercel();
+  if (isDevBypassActive()) return { userId: DEV_MOCK_USER_ID };
 
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -30,10 +29,7 @@ export async function verifyAdminForAction(): Promise<
   if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
     return { ok: false, error: "Configuration invalide." };
   }
-  const isBypassMode =
-    process.env.BYPASS_AUTH === "true" &&
-    process.env.VERCEL !== "1";
-  if (isBypassMode) return { ok: true, userId: "dev-mock-id" };
+  if (isDevBypassActive()) return { ok: true, userId: DEV_MOCK_USER_ID };
 
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();

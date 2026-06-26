@@ -4,6 +4,7 @@ import { createAuthService } from "@sonafrik/api/auth";
 import { createCreatorService } from "@sonafrik/api/creator";
 import type { CreatorContext } from "@sonafrik/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { assertBypassForbiddenOnVercel, isDevBypassActive } from "@/lib/auth/guards";
 
 // ── DEV BYPASS ────────────────────────────────────────────────────────────────
 const DEV_MOCK_CREATOR: CreatorContext = {
@@ -68,9 +69,7 @@ const fetchCreatorContext = cache(async () => {
 });
 
 export async function requireCreatorContext(): Promise<CreatorContext> {
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
-    throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
-  }
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") return DEV_MOCK_CREATOR;
+  assertBypassForbiddenOnVercel();
+  if (isDevBypassActive()) return DEV_MOCK_CREATOR;
   return fetchCreatorContext();
 }

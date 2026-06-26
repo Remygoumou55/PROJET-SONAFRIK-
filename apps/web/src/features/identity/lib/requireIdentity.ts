@@ -4,6 +4,10 @@ import { createIdentityService } from "@sonafrik/api/identity";
 import { IdentityError } from "@sonafrik/api/identity";
 import type { IdentityContext } from "@sonafrik/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  assertBypassForbiddenOnVercel,
+  isDevBypassActive,
+} from "@/lib/auth/guards";
 
 // ── DEV BYPASS ────────────────────────────────────────────────────────────────
 // Activé via BYPASS_AUTH=true dans .env.local — désactiver avant déploiement
@@ -73,11 +77,8 @@ const fetchIdentityContext = cache(async () => {
 });
 
 export async function requireIdentityContext(): Promise<IdentityContext> {
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL === "1") {
-    throw new Error("BYPASS_AUTH ne doit jamais être actif en production");
-  }
-  // Bypass uniquement si BYPASS_AUTH=true explicite, jamais sur Vercel
-  if (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") {
+  assertBypassForbiddenOnVercel();
+  if (isDevBypassActive()) {
     return DEV_MOCK_IDENTITY;
   }
 

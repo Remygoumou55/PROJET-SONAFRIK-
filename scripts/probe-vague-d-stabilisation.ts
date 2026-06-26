@@ -208,13 +208,13 @@ function staticChecks() {
   );
   log(
     "D7-perf-caps",
-    streamingRepo.includes(".limit(10_000)") &&
+    streamingRepo.includes("get_creator_stream_analytics") &&
       streamingSchemas.includes("periodDays: z.number().int().min(1).max(90)") &&
       analyticsSchemas.includes(".max(90)") &&
       analyticsSchemas.includes(".max(50)") &&
       payoutSchemas.includes(".max(200)") &&
       payoutSchemas.includes(".max(100)"),
-    "stream_sessions + periodDays≤90 + Zod caps",
+    "analytics RPC + periodDays≤90 + Zod caps",
   );
 
   const identityRepo = read("packages/api/src/identity/identity.repository.ts");

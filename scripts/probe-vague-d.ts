@@ -134,9 +134,9 @@ function staticChecks() {
   );
   log(
     "D7 stream_sessions cap",
-    streamingRepo.includes(".limit(10_000)") &&
+    streamingRepo.includes("get_creator_stream_analytics") &&
       read("packages/api/src/streaming/schemas.ts").includes(".max(90)"),
-    "analytics plafonnées + periodDays ≤ 90",
+    "analytics RPC + periodDays ≤ 90",
   );
 
   const analyticsSchemas = read("packages/api/src/analytics/schemas.ts");

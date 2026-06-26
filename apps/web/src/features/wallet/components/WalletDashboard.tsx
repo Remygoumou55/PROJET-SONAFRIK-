@@ -15,7 +15,7 @@ const TransactionRow = memo(function TransactionRow({ tx }: { tx: Transaction })
       <div className="flex items-center gap-3">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-          style={{ backgroundColor: isCredit ? "rgba(0,210,106,0.13)" : "rgba(255,68,68,0.13)", color: isCredit ? "var(--color-vert-energie)" : "var(--color-erreur)" }}
+          style={{ backgroundColor: isCredit ? "var(--overlay-vert-soft)" : "var(--overlay-erreur-soft)", color: isCredit ? "var(--color-vert-energie)" : "var(--color-erreur)" }}
         >
           {isCredit ? "+" : "−"}
         </div>

@@ -119,7 +119,7 @@ function DesktopNav({
               key={item.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
               style={{
-                backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
+                backgroundColor: isActive ? "var(--overlay-vert-nav)" : "transparent",
                 color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)",
               }}
             >
@@ -138,7 +138,7 @@ function DesktopNav({
             prefetch={routePrefetchEnabled}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
             style={{
-              backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
+              backgroundColor: isActive ? "var(--overlay-vert-nav)" : "transparent",
               color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)",
             }}
           >

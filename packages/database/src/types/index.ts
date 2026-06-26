@@ -3318,6 +3318,10 @@ export type Database = {
         Args: { p_creator_id: string; p_limit?: number }
         Returns: Json
       }
+      get_creator_stream_analytics: {
+        Args: { p_creator_id: string; p_period_days?: number }
+        Returns: Json
+      }
       get_creator_stream_stats: {
         Args: { p_creator_id: string }
         Returns: Json

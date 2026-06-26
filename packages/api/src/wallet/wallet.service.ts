@@ -11,6 +11,7 @@ import type {
   ListenerPremiumPlan,
 } from "@sonafrik/types";
 import { PREMIUM_GRACE_PERIOD_DAYS } from "@sonafrik/types";
+import { DEV_MOCK_USER_ID, isDevBypassActive } from "@sonafrik/shared/auth";
 import { WalletRepository } from "./wallet.repository";
 import { SubscriptionPlansRepository } from "./subscription-plans.repository";
 import { mapDbPlansToListenerPremium } from "./subscription-plans.mapper";
@@ -46,14 +47,14 @@ export class WalletService {
   }
 
   private async requireUserId(): Promise<string> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
+    if (isDevBypassActive()) return DEV_MOCK_USER_ID;
     const { data: { user }, error } = await this.client.auth.getUser();
     if (error ?? !user) throw new WalletError("UNAUTHORIZED", "Non authentifié");
     return user.id;
   }
 
   async getWalletContext(): Promise<WalletContext> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") {
+    if (isDevBypassActive()) {
       const now = new Date().toISOString();
       return {
         wallet: { id: "dev-wallet", user_id: "dev-mock-id", balance_gnf: 0, currency: "GNF", total_credited_gnf: 0, total_debited_gnf: 0, created_at: now, updated_at: now },
@@ -235,6 +236,18 @@ export class WalletService {
   async getRoyaltyCalculations(): Promise<RoyaltyCalculation[]> {
     const userId = await this.requireUserId();
     return this.repo.getMyRoyaltyCalculations(userId);
+  }
+
+  /** Page wallet — contexte + plans en un seul round-trip parallèle. */
+  async getWalletPageData(): Promise<{
+    context: WalletContext;
+    plans: ListenerPremiumPlan[];
+  }> {
+    const [context, plans] = await Promise.all([
+      this.getWalletContext(),
+      this.getListenerPremiumPlans(),
+    ]);
+    return { context, plans };
   }
 }
 

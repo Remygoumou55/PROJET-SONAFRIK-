@@ -1417,6 +1417,47 @@ Aucun — tous les probes A→E passent après corrections des passes précéden
 
 ---
 
+## [2026-06-24] — War Plan A→E (corrections forensiques post-audit 360°)
+**Agent :** Claude  
+**Type :** exécution plan de guerre A→E (hors A1/A2 roadmap)
+
+### Vague A
+- CI : `pnpm test` (vitest API + shared + persistence + metadata)
+- Migration sync `creators` → `artist_profiles` orphelins
+- E2E MVP chain : + `/library`
+
+### Vague B
+- `packages/shared/src/auth/devBypass.ts` + `apps/web/src/lib/auth/guards.ts`
+- Admin middleware **fail-closed** (timeout → redirect)
+- `docs/MOBILE_WEB_PARITY.md`
+
+### Vague C
+- `useWalletPageData` + `getWalletPageData()` — 1 round-trip wallet
+- Tokens overlay CSS (`--overlay-vert-*`)
+- `docs/METADATA_TABLES_ROADMAP.md`
+
+### Vague D
+- RPC `get_creator_stream_analytics` (agrégation SQL)
+- Flags `performance_africa_mode` + `performance_prefetch` ON
+- Types régénérés
+
+### Vague E
+- `docs/ops/PAYMENT_INCIDENT_RUNBOOK.md`
+- `docs/ROADMAP_BLOCKERS.md` (A1 credentials + A2 LIVE CONTROL)
+- CI job E2E smoke (optional)
+- `pnpm probe:war-plan` → 15/15
+
+### Roadmap (non code)
+- A1 credentials opérateurs prod
+- A2 LIVE CONTROL signature Rémy
+
+### Validation
+- [x] `pnpm build` / `lint` / `typecheck` / tests **283/283**
+- [x] `pnpm probe:war-plan` → **15/15**
+- [x] `pnpm probe:certification-a-e` → **193/193**
+
+---
+
 ## [2026-06-24] — Performance + commit/push global
 **Agent :** Claude  
 **Type :** optimisation performance + livraison complète vagues A→E

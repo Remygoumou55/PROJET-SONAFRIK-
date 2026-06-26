@@ -6,6 +6,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
     "storybook": "turbo run storybook --filter=@sonafrik/ui",
     "build-storybook": "turbo run build-storybook --filter=@sonafrik/ui",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,mjs}\"",
@@ -30,6 +31,7 @@
     "probe:certification-a-e": "npx tsx scripts/probe-certification-vagues-a-e.ts",
     "probe:performance-discovery": "npx tsx scripts/probe-performance-discovery.ts",
     "probe:performance": "npx tsx scripts/probe-performance-certification.ts",
+    "probe:war-plan": "npx tsx scripts/probe-war-plan.ts",
     "analyze:web": "pnpm --filter @sonafrik/web analyze"
   },
   "devDependencies": {

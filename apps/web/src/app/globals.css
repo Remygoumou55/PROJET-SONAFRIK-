@@ -48,6 +48,10 @@
 
   --color-pending: #f5a623;
 
+  --overlay-vert-soft: rgb(0 210 106 / 0.13);
+  --overlay-erreur-soft: rgb(255 68 68 / 0.13);
+  --overlay-vert-nav: rgb(0 210 106 / 0.09);
+
   --font-sans: var(--font-montserrat), Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;

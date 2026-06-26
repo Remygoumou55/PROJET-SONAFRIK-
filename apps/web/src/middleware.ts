@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { getHomeByRole } from "@/lib/auth/redirectByRole";
 import { mapAccountType } from "@/lib/auth/getSessionAndRole";
+import { isMiddlewareBypassActive } from "@/lib/auth/guards";
 
 function getSupabaseEnv(): { url: string; anonKey: string } | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,10 +13,7 @@ function getSupabaseEnv(): { url: string; anonKey: string } | null {
 
 // Dev bypass : BYPASS_AUTH=true explicite uniquement. Jamais sur Vercel.
 function isBypassActive(): boolean {
-  return (
-    process.env.BYPASS_AUTH === "true" &&
-    process.env.VERCEL !== "1"
-  );
+  return isMiddlewareBypassActive();
 }
 
 // Race Supabase contre un timeout — évite de bloquer le middleware indéfiniment
@@ -125,8 +123,8 @@ export async function middleware(request: NextRequest) {
       4000,
       null,
     );
-    // Refus explicite seulement — timeout (null) laisse passer (layout SSR requireAdmin)
-    if (isAdminResult === false) {
+    // Fail-closed : timeout ou erreur RPC → refus admin (layout SSR re-vérifie)
+    if (isAdminResult !== true) {
       return NextResponse.redirect(new URL("/listen", request.url));
     }
     return response;

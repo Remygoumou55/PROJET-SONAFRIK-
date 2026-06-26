@@ -332,84 +332,12 @@ export class StreamingRepository {
   // ---------------------------------------------------------------------------
 
   async getStreamAnalytics(creatorId: string, periodDays: number): Promise<StreamAnalytics> {
-    const since = new Date(Date.now() - periodDays * 24 * 3600 * 1000).toISOString();
-
-    // Récupérer uniquement les tracks de ce créateur avec leur titre
-    const { data: creatorTracks } = await this.client
-      .from("tracks")
-      .select("id, title")
-      .eq("creator_id", creatorId)
-      .eq("publication_status", "published")
-      .is("deleted_at", null);
-
-    const trackIds = (creatorTracks ?? []).map((t) => t.id as string);
-    const titleMap: Record<string, string> = {};
-    for (const t of creatorTracks ?? []) {
-      titleMap[t.id as string] = t.title as string;
-    }
-
-    if (trackIds.length === 0) {
-      return {
-        creator_id: creatorId,
-        period_days: periodDays,
-        total_streams: 0,
-        valid_streams: 0,
-        unique_listeners: 0,
-        total_listened_seconds: 0,
-        top_tracks: [],
-        streams_by_platform: { web: 0, ios: 0, android: 0 },
-      };
-    }
-
-    const { data, error } = await this.client
-      .from("stream_sessions")
-      .select("platform, total_listened_seconds, user_id, track_id")
-      .in("track_id", trackIds)
-      .eq("is_valid_listen", true)
-      .gte("started_at", since)
-      .limit(10_000);
-
+    const { data, error } = await this.client.rpc("get_creator_stream_analytics", {
+      p_creator_id: creatorId,
+      p_period_days: periodDays,
+    });
     if (error) throw error;
-
-    const rows = data ?? [];
-    const total_streams = rows.length;
-    const valid_streams = rows.length;
-    const unique_listeners = new Set(rows.map((r) => r.user_id)).size;
-    const total_listened_seconds = rows.reduce(
-      (acc, r) => acc + ((r.total_listened_seconds as number) ?? 0),
-      0,
-    );
-
-    const streamsByPlatform = { web: 0, ios: 0, android: 0 };
-    for (const r of rows) {
-      const p = r.platform as keyof typeof streamsByPlatform;
-      if (p in streamsByPlatform) streamsByPlatform[p]++;
-    }
-
-    const trackCounts: Record<string, number> = {};
-    for (const r of rows) {
-      const tid = r.track_id as string;
-      trackCounts[tid] = (trackCounts[tid] ?? 0) + 1;
-    }
-    const top_tracks = Object.entries(trackCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10)
-      .map(([track_id, stream_count]) => ({
-        track_id,
-        title: titleMap[track_id] ?? track_id,
-        stream_count,
-      }));
-
-    return {
-      creator_id: creatorId,
-      period_days: periodDays,
-      total_streams,
-      valid_streams,
-      unique_listeners,
-      total_listened_seconds,
-      top_tracks,
-      streams_by_platform: streamsByPlatform,
-    };
+    return data as unknown as StreamAnalytics;
   }
 
   // ---------------------------------------------------------------------------

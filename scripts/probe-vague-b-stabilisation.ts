@@ -77,9 +77,9 @@ function staticChecks() {
   );
 
   log(
-    "B2-middleware-admin-fallback",
-    middleware.includes("isAdminResult === false") && middleware.includes("null,"),
-    "admin timeout ne bloque pas (SSR fallback)",
+    "B2-middleware-admin-fail-closed",
+    middleware.includes("isAdminResult !== true"),
+    "admin timeout → refus (fail-closed War Plan B3)",
   );
 
   log(
@@ -111,20 +111,31 @@ async function liveChecks() {
     `total=${flags?.length} enabled=${enabled.length}`,
   );
 
+  const warPlanPerformanceOn = new Set([
+    "performance_search_cache_enabled",
+    "performance_animation_cdc_compliant_enabled",
+    "performance_africa_mode_enabled",
+    "performance_prefetch_enabled",
+  ]);
   const experimentalOn = enabled.filter(
-    (f) => f.name.startsWith("streaming_") || f.name.startsWith("runtime_") || f.name.startsWith("performance_"),
+    (f) =>
+      f.name.startsWith("streaming_") ||
+      f.name.startsWith("runtime_") ||
+      (f.name.startsWith("performance_") && !warPlanPerformanceOn.has(f.name)),
   );
   log(
     "B3-flags-safe-defaults",
     experimentalOn.length === 0,
-    experimentalOn.length === 0 ? "aucun flag expérimental ON" : `ON: ${experimentalOn.map((f) => f.name).join(",")}`,
+    experimentalOn.length === 0 ? "flags expérimentaux OFF (war plan perf OK)" : `ON: ${experimentalOn.map((f) => f.name).join(",")}`,
   );
 
   const mvpEnabled = ["rights_management", "search_multi_type", "tips_enabled"];
+  const allowedEnabled = [...mvpEnabled, ...warPlanPerformanceOn];
   const enabledNames = enabled.map((f) => f.name).sort();
   log(
     "B3-flags-mvp-only",
-    enabled.length === 3 && mvpEnabled.every((n) => enabledNames.includes(n)),
+    enabled.length === allowedEnabled.length &&
+      allowedEnabled.every((n) => enabledNames.includes(n)),
     `enabled=[${enabledNames.join(",")}]`,
   );
 }

@@ -97,8 +97,8 @@ function staticChecks() {
 
   log(
     "B3 streaming analytics cap",
-    streamingRepo.includes(".limit(10_000)"),
-    "stream_sessions plafonnées",
+    streamingRepo.includes("get_creator_stream_analytics"),
+    "analytics via RPC SQL agrégée",
   );
 
   const streamingSchemas = read("packages/api/src/streaming/schemas.ts");

@@ -17,7 +17,7 @@ test.describe("MVP chain (authenticated)", () => {
     test.skip(!hasAuthState(), "Auth state absent — SUPABASE_SERVICE_ROLE_KEY manquant");
   });
 
-  test("listen → search → wallet sans redirection auth", async ({ page }) => {
+  test("listen → search → library → wallet sans redirection auth", async ({ page }) => {
     await page.goto("/listen");
     await expect(page).not.toHaveURL(/\/auth\//, { timeout: 12_000 });
     await expect(page.locator("body")).toBeVisible();
@@ -25,6 +25,10 @@ test.describe("MVP chain (authenticated)", () => {
     await page.goto("/search");
     await expect(page).not.toHaveURL(/\/auth\//, { timeout: 12_000 });
     await expect(page).toHaveTitle(/Recherche|Search|SONAFRIK/i);
+
+    await page.goto("/library");
+    await expect(page).not.toHaveURL(/\/auth\//, { timeout: 12_000 });
+    await expect(page).toHaveTitle(/Bibliothèque|Library|SONAFRIK/i);
 
     await page.goto("/wallet");
     await expect(page).not.toHaveURL(/\/auth\//, { timeout: 12_000 });
