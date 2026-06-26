@@ -17,11 +17,13 @@ import {
   inviteTeamMemberSchema,
   updateArtistProfileSchema,
   updateLabelSchema,
+  updateCoverGallerySchema,
   type CreateLabelInput,
   type CreateVerificationInput,
   type CreatorAssetUploadInput,
   type InviteTeamMemberInput,
   type UpdateArtistProfileInput,
+  type UpdateCoverGalleryInput,
   type UpdateLabelInput,
 } from "./schemas";
 
@@ -265,6 +267,30 @@ export class CreatorService {
 
     if (error) return null;
     return (data?.signedUrl as string | null) ?? null;
+  }
+
+  async removeProfilePhoto(creatorId: string): Promise<ArtistProfile> {
+    const userId = await this.requireUserId();
+    await this.repository.ensureCreator();
+    return this.repository.updateArtistProfileMedia(creatorId, userId, {
+      profile_photo: null,
+      cover_path: null,
+    });
+  }
+
+  async updateCoverGallery(input: UpdateCoverGalleryInput): Promise<ArtistProfile> {
+    const parsed = updateCoverGallerySchema.safeParse(input);
+    if (!parsed.success) throw new CreatorError("invalid_artist_profile");
+
+    const userId = await this.requireUserId();
+    await this.repository.ensureCreator();
+
+    const coverImages = parsed.data.coverImages;
+    return this.repository.updateArtistProfileMedia(parsed.data.creatorId, userId, {
+      cover_images: coverImages,
+      banner_path: coverImages[0] ?? null,
+      cover_updated_at: new Date().toISOString(),
+    });
   }
 
   async getDashboardData(): Promise<CreatorDashboardData> {

@@ -8,6 +8,7 @@ export {
   inviteTeamMemberSchema,
   createVerificationSchema,
   creatorAssetUploadSchema,
+  updateCoverGallerySchema,
 } from "./schemas";
 export type {
   UpdateArtistProfileInput,
@@ -15,4 +16,5 @@ export type {
   InviteTeamMemberInput,
   CreateVerificationInput,
   CreatorAssetUploadInput,
+  UpdateCoverGalleryInput,
 } from "./schemas";

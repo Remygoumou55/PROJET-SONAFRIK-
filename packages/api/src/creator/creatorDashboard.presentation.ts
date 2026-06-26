@@ -117,7 +117,7 @@ function profileCompletionPercent(profile: ArtistProfile): number {
     Boolean(profile.stage_name?.trim()),
     Boolean(profile.bio?.trim()),
     profile.genres.length > 0,
-    Boolean(profile.cover_path),
+    Boolean(profile.profile_photo ?? profile.cover_path),
     Boolean(profile.banner_path),
     Object.keys(profile.social_links ?? {}).length > 0,
     profile.is_public,

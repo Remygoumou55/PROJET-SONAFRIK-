@@ -184,11 +184,14 @@ export type Database = {
         Row: {
           banner_path: string | null
           bio: string | null
+          cover_images: string[]
           cover_path: string | null
+          cover_updated_at: string | null
           created_at: string
           creator_id: string
           genres: string[]
           is_public: boolean
+          profile_photo: string | null
           slug: string
           social_links: Json
           stage_name: string
@@ -200,11 +203,14 @@ export type Database = {
         Insert: {
           banner_path?: string | null
           bio?: string | null
+          cover_images?: string[]
           cover_path?: string | null
+          cover_updated_at?: string | null
           created_at?: string
           creator_id: string
           genres?: string[]
           is_public?: boolean
+          profile_photo?: string | null
           slug: string
           social_links?: Json
           stage_name: string
@@ -216,11 +222,14 @@ export type Database = {
         Update: {
           banner_path?: string | null
           bio?: string | null
+          cover_images?: string[]
           cover_path?: string | null
+          cover_updated_at?: string | null
           created_at?: string
           creator_id?: string
           genres?: string[]
           is_public?: boolean
+          profile_photo?: string | null
           slug?: string
           social_links?: Json
           stage_name?: string

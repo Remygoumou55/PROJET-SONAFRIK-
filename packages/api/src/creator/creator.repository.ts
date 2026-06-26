@@ -80,6 +80,37 @@ export class CreatorRepository {
     return {
       ...(data as ArtistProfile),
       social_links: (data.social_links as Record<string, string>) ?? {},
+      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
+    };
+  }
+
+  async updateArtistProfileMedia(
+    creatorId: string,
+    userId: string,
+    updates: {
+      profile_photo?: string | null;
+      cover_path?: string | null;
+      cover_images?: string[];
+      banner_path?: string | null;
+      cover_updated_at?: string | null;
+    },
+  ): Promise<ArtistProfile> {
+    const { data, error } = await this.client
+      .from("artist_profiles")
+      .update({ ...updates, updated_by: userId })
+      .eq("creator_id", creatorId)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return {
+      ...(data as ArtistProfile),
+      social_links: (data.social_links as Record<string, string>) ?? {},
+      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
     };
   }
 
@@ -105,6 +136,9 @@ export class CreatorRepository {
     return {
       ...(data as ArtistProfile),
       social_links: (data.social_links as Record<string, string>) ?? {},
+      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
     };
   }
 

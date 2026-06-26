@@ -5,7 +5,7 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_DOC_TYPES = ["application/pdf"];
 const SIGNED_URL_TTL = 3600;
 
-type AssetKind = "banner" | "cover" | "verification" | "label_logo";
+type AssetKind = "banner" | "cover" | "gallery" | "verification" | "label_logo";
 
 interface SignedUrlRequest {
   action: "upload" | "read";
@@ -100,13 +100,19 @@ Deno.serve(async (req) => {
       if (!canMember) {
         const { data: artistProfile } = await adminClient
           .from("artist_profiles")
-          .select("is_public, banner_path, cover_path")
+          .select("is_public, banner_path, cover_path, cover_images")
           .eq("creator_id", body.creatorId)
           .maybeSingle();
 
+        const galleryPaths = Array.isArray(artistProfile?.cover_images)
+          ? (artistProfile.cover_images as string[])
+          : [];
+
         const isPublicAsset =
           artistProfile?.is_public &&
-          (path === artistProfile.banner_path || path === artistProfile.cover_path);
+          (path === artistProfile.banner_path ||
+            path === artistProfile.cover_path ||
+            galleryPaths.includes(path));
 
         if (!isPublicAsset) {
           return json({ error: "Accès non autorisé." }, 403);
@@ -138,6 +144,10 @@ function buildPath(body: SignedUrlRequest): string | null {
       return `${body.creatorId}/banner.${ext}`;
     case "cover":
       return `${body.creatorId}/cover.${ext}`;
+    case "gallery": {
+      const id = crypto.randomUUID();
+      return `${body.creatorId}/gallery/${id}.${ext}`;
+    }
     case "verification":
       if (!body.verificationId) return null;
       return `${body.creatorId}/verification/${body.verificationId}.${ext === "pdf" ? "pdf" : ext}`;
@@ -163,14 +173,47 @@ async function persistPath(
   userId: string,
 ) {
   if (body.assetKind === "banner") {
+    const { data: current } = await client
+      .from("artist_profiles")
+      .select("cover_images")
+      .eq("creator_id", body.creatorId)
+      .maybeSingle();
+    const existing = Array.isArray(current?.cover_images) ? (current.cover_images as string[]) : [];
+    const coverImages = existing.includes(path) ? existing : [path, ...existing.filter((p) => p !== path)].slice(0, 12);
     await client
       .from("artist_profiles")
-      .update({ banner_path: path, updated_by: userId })
+      .update({
+        banner_path: coverImages[0] ?? path,
+        cover_images: coverImages,
+        cover_updated_at: new Date().toISOString(),
+        updated_by: userId,
+      })
       .eq("creator_id", body.creatorId);
   } else if (body.assetKind === "cover") {
     await client
       .from("artist_profiles")
-      .update({ cover_path: path, updated_by: userId })
+      .update({
+        cover_path: path,
+        profile_photo: path,
+        updated_by: userId,
+      })
+      .eq("creator_id", body.creatorId);
+  } else if (body.assetKind === "gallery") {
+    const { data: current } = await client
+      .from("artist_profiles")
+      .select("cover_images")
+      .eq("creator_id", body.creatorId)
+      .maybeSingle();
+    const existing = Array.isArray(current?.cover_images) ? (current.cover_images as string[]) : [];
+    const coverImages = [...existing, path].slice(0, 12);
+    await client
+      .from("artist_profiles")
+      .update({
+        banner_path: coverImages[0] ?? path,
+        cover_images: coverImages,
+        cover_updated_at: new Date().toISOString(),
+        updated_by: userId,
+      })
       .eq("creator_id", body.creatorId);
   } else if (body.assetKind === "verification" && body.verificationId) {
     await client

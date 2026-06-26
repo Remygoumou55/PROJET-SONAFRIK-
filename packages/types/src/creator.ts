@@ -10,7 +10,7 @@ export type LabelMemberRole = "owner" | "admin" | "a_and_r" | "member";
 export type VerificationType = "identity" | "artist" | "label";
 export type VerificationStatus = "draft" | "pending" | "approved" | "rejected";
 export type VerificationDocumentType = "national_id" | "passport" | "business_license" | "other";
-export type CreatorAssetKind = "banner" | "cover" | "verification" | "label_logo";
+export type CreatorAssetKind = "banner" | "cover" | "gallery" | "verification" | "label_logo";
 
 export interface Creator {
   id: string;
@@ -31,6 +31,9 @@ export interface ArtistProfile {
   genres: string[];
   banner_path: string | null;
   cover_path: string | null;
+  profile_photo: string | null;
+  cover_images: string[];
+  cover_updated_at: string | null;
   social_links: Record<string, string>;
   is_public: boolean;
   verified: boolean;

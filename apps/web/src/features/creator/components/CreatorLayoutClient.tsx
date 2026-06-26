@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 import { CreatorNav } from "./CreatorNav";
 
 export function CreatorLayoutClient({
@@ -34,10 +35,16 @@ export function CreatorLayoutClient({
   return (
     <div className="min-h-dvh bg-noir-profond">
       <header className="border-b border-bordure px-6 py-4">
-        <p className="text-or-solaire text-xs font-semibold uppercase tracking-wider">
-          NOTRE BIEN COMMUN · Espace artiste
-        </p>
-        <h1 className="text-texte-principal mt-1 text-2xl font-bold">{title}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <SonafrikLogo size="nav" />
+          <span
+            className="text-xs font-semibold uppercase tracking-wider"
+            style={{ color: "var(--color-texte-secondaire)" }}
+          >
+            • Espace artiste
+          </span>
+        </div>
+        <h1 className="text-texte-principal mt-3 text-2xl font-bold">{title}</h1>
         <p className="text-texte-secondaire mt-1 text-sm">
           Publiez, suivez vos écoutes et développez votre carrière musicale.
         </p>

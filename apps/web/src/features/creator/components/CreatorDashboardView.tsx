@@ -46,7 +46,14 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
     <div className="creator-dashboard">
       <WelcomeModal stageName={context.artistProfile.stage_name} profileCreatedAt={profileCreatedAt} />
 
-      <HeroCard hero={hero} artistProfile={context.artistProfile} />
+      <HeroCard
+        hero={hero}
+        artistProfile={context.artistProfile}
+        creator={context.creator}
+        profileCreatedAt={profileCreatedAt}
+        quickActions={quickActions}
+        kpis={kpis}
+      />
 
       <AssistantCard tips={assistantTips} profileUrl={profileUrl} />
 

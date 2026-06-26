@@ -30,10 +30,15 @@ export const createVerificationSchema = z.object({
 
 export const creatorAssetUploadSchema = z.object({
   creatorId: z.string().uuid(),
-  assetKind: z.enum(["banner", "cover", "verification", "label_logo"]),
+  assetKind: z.enum(["banner", "cover", "gallery", "verification", "label_logo"]),
   contentType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]),
   verificationId: z.string().uuid().optional(),
   labelId: z.string().uuid().optional(),
+});
+
+export const updateCoverGallerySchema = z.object({
+  creatorId: z.string().uuid(),
+  coverImages: z.array(z.string().min(1).max(500)).max(12),
 });
 
 export const updateLabelSchema = z.object({
@@ -47,3 +52,4 @@ export type UpdateLabelInput = z.infer<typeof updateLabelSchema>;
 export type InviteTeamMemberInput = z.infer<typeof inviteTeamMemberSchema>;
 export type CreateVerificationInput = z.infer<typeof createVerificationSchema>;
 export type CreatorAssetUploadInput = z.infer<typeof creatorAssetUploadSchema>;
+export type UpdateCoverGalleryInput = z.infer<typeof updateCoverGallerySchema>;
