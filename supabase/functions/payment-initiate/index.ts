@@ -13,11 +13,7 @@ import {
   initiateWaveCheckout,
   isProviderSandbox,
 } from "../_shared/payments.ts";
-
-const CORS = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { CORS_HEADERS as CORS, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 const VALID_PROVIDERS: PaymentProvider[] = [
   "orange_money_gn",
@@ -65,7 +61,8 @@ async function initiateOperator(
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const preflight = handleCorsPreflightIfNeeded(req);
+  if (preflight) return preflight;
 
   try {
     const authHeader = req.headers.get("Authorization");
