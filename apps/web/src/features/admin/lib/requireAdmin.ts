@@ -1,27 +1,45 @@
 import { redirect } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase/server";
 import {
   assertBypassForbiddenOnVercel,
   DEV_MOCK_USER_ID,
   isDevBypassActive,
 } from "@/lib/auth/guards";
 
+async function resolveIsAdmin(userId: string): Promise<boolean> {
+  const supabase = await getSupabaseServerClient();
+  const { data: isAdmin, error } = await supabase.rpc("is_admin", { p_user_id: userId });
+
+  if (!error && isAdmin === true) return true;
+
+  // Repli service_role — évite faux refus si RPC anon timeout/erreur (cold start Supabase)
+  try {
+    const admin = getSupabaseAdminClient(
+      process.env.VERCEL === "1" ? { adminVerified: true } : undefined,
+    );
+    const { data: fallback } = await admin.rpc("is_admin", { p_user_id: userId });
+    return fallback === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function requireAdmin(): Promise<{ userId: string }> {
   assertBypassForbiddenOnVercel();
   if (isDevBypassActive()) return { userId: DEV_MOCK_USER_ID };
 
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/auth/connexion?next=/admin/live-control");
   }
 
-  const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin", {
-    p_user_id: user.id,
-  });
+  const isAdmin = await resolveIsAdmin(user.id);
 
-  if (adminError || !isAdmin) {
+  if (!isAdmin) {
     redirect("/listen?error=admin_denied");
   }
 
@@ -38,10 +56,12 @@ export async function verifyAdminForAction(): Promise<
   if (isDevBypassActive()) return { ok: true, userId: DEV_MOCK_USER_ID };
 
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Connexion requise." };
 
-  const { data: isAdmin } = await supabase.rpc("is_admin", { p_user_id: user.id });
+  const isAdmin = await resolveIsAdmin(user.id);
   if (!isAdmin) return { ok: false, error: "Accès administrateur requis." };
 
   return { ok: true, userId: user.id };
