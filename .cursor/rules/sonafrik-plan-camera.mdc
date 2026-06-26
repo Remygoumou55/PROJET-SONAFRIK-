@@ -1,52 +1,56 @@
 ---
-description: SONAFRIK plan de correction — état actuel des tâches, ce qui reste à faire avant beta
+description: SONAFRIK plan de correction — état actuel des tâches, ce qui reste avant lancement
 alwaysApply: true
 ---
 
 # Caméra Plan de Correction SONAFRIK
 
-> Dernière mise à jour : 2026-06-21 | Source : `docs/PLAN_CORRECTION_360.md` + Audit V2
+> Dernière mise à jour : **26 juin 2026** | Source : `docs/EXECUTION_LOG.md`
 
 ## Sprints complétés
 
-- ✅ Sprint 0–5 : Foundation, Auth, Streaming, Wallet, Rights, Catalog
-- ✅ Sprint 6 : Streaming OS (WebPlayer, Real Listen Engine, Stream Events)
+- ✅ Sprint 0–6 : Foundation, Auth, Streaming, Wallet, Rights, Catalog, Streaming OS
+- ✅ Vagues A→F : Sécurité, stabilisation, API, typage, paiements, domaines
+- ✅ SPRING 2.1–2.3 : Runtime Foundation, Session Engine (LOCKED), Playback Runtime
 
 ## Corrections prioritaires restantes
 
-### 🔴 CRITIQUE (bloquant beta)
+### 🔴 CRITIQUE (bloquant lancement public)
 
 | ID | Problème | Fichier/Zone | Action |
 |---|---|---|---|
-| PAY | 4 opérateurs paiement = TODO stubs | `supabase/functions/payment-initiate/` | Intégrer au moins Wave GN |
-| DB-1 | `subscription_plans` table absente de DB | supabase/migrations/ | Créer table + RLS |
-| MOB-AUTH | Aucun guard auth sur tabs layout mobile | `apps/mobile/app/(tabs)/_layout.tsx` | Ajouter guard session |
-| E5 | AsyncStorage non chiffré mobile | `apps/mobile/lib/supabase.ts` | Migrer vers expo-secure-store |
-| TEST | 0 tests unitaires | partout | Vitest sur modules financiers |
-| TYPES | DB types périmés (39 as never) | `packages/database/src/types/index.ts` | supabase gen types |
+| PAY-PROD | Credentials opérateurs prod absents | Supabase Secrets | Orange Money GN Phase 2 |
+| TEST-WALLET | 0 tests wallet/payments | `packages/api/src/wallet/` | Vitest modules financiers |
+| E2E-FIN | Chaîne financière non validée E2E | wallet + payment-initiate | Test retrait réel |
 
 ### 🟡 HAUTE (avant lancement)
 
 | ID | Problème | Fichier/Zone | Action |
 |---|---|---|---|
 | E1 | FLAC/OGG désactivés, WAV brut servi | catalog/schemas.ts, edge functions | Transcodeur HLS |
-| DEAD-1 | `LaunchCounter` non utilisé | `features/launch/components/` | Supprimer ou brancher |
-| DEAD-2 | `AuthHomeActions` non utilisé | `features/auth/components/` | Supprimer ou brancher |
-| DEAD-3 | `useEngagementStats` non utilisé | `features/social/hooks/` | Supprimer |
-| HEX | 39 fichiers hex hardcodés restants | `apps/web/src/` | Migrer vers tokens CSS |
-| LANCEMENT | 5 artistes fictifs hardcodés | `app/lancement/page.tsx` | Brancher à DB réelle |
-| ADMIN-DOC | ADMIN_GUIDE référence mauvais noms | `docs/ADMIN_GUIDE.md` | Corriger audit_log→audit_logs, subscription_plans, user_id→creator_id |
+| ADMIN-DOC | ADMIN_GUIDE référence mauvais noms | `docs/ADMIN_GUIDE.md` | Corriger noms tables |
+| DEAD | Composants dead non supprimés | LaunchCounter, AuthHomeActions, useEngagementStats | Supprimer ou brancher |
 
 ### 🟢 BASSE (post-beta)
 
 | ID | Problème | Action |
 |---|---|---|
 | PERF | getStreamAnalytics sans LIMIT | Limiter à N dernières sessions |
-| DUP | toggleFavoriteSchema en double | Supprimer doublon streaming/schemas.ts |
-| DUP | toggleFavorite RPC pour likes+favoris | Créer toggle_like RPC distinct |
-| 87-CLIENT | 87 "use client" excessifs | Convertir progressivement en RSC |
-| storybook | storybook-static committé (60k lignes) | Ajouter à .gitignore + git rm |
+| 87-CLIENT | "use client" excessifs | Convertir progressivement en RSC |
+
+## ✅ Résolu (ne plus traiter comme ouvert)
+
+- ~~AsyncStorage mobile~~ → expo-secure-store ✅
+- ~~Guard auth tabs mobile~~ → `(tabs)/_layout.tsx` ✅
+- ~~Payment stubs sans architecture~~ → `_shared/payments.ts` + sandbox ✅
+- ~~subscription_plans absent~~ → migration 20260621 ✅
+- ~~0 tests projet~~ → 258 tests streaming/metadata ✅
+- ~~CORS wildcard~~ → `_shared/cors.ts` ✅
+- ~~CI 103/103~~ → **129/129** ✅
+- ~~Artistes fictifs /lancement~~ → DB réelle ✅
 
 ## Règle MVP-first
 
 Ne pas implémenter Beat Store, Marketplace, ML Recommandation, Multi-currency avant la beta validée.
+
+**Journal actif :** `docs/EXECUTION_LOG.md` — **76/100** MVP au 26 juin 2026.

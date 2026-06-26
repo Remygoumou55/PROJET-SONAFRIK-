@@ -1,14 +1,17 @@
 ---
-description: SONAFRIK security surveillance — BYPASS_AUTH, AsyncStorage, hex, clés API, failles connues
+description: SONAFRIK security surveillance — BYPASS_AUTH, CORS, clés API, failles connues
 alwaysApply: true
 ---
 
 # Caméra Sécurité SONAFRIK
 
-## État sécurité actuel (Jun 2026)
+## État sécurité actuel (26 juin 2026)
 
 ### ✅ Correct
 - `BYPASS_AUTH` bloqué sur Vercel dans middleware.ts, requireAdmin.ts, requireCreator.ts, requireIdentity.ts
+- `expo-secure-store` utilisé pour tokens mobile (`apps/mobile/lib/supabase.ts`) — AsyncStorage retiré
+- Guard auth actif sur `(tabs)/_layout.tsx` mobile (redirect `/auth/connexion`)
+- CORS fermé : `_shared/cors.ts`, fallback strict `https://sonafrik.vercel.app` (14 edge functions)
 - `moment.js` supprimé (0 imports)
 - `console.log` = 0 dans apps/ (aucune fuite de données en prod)
 - `as any` = 1 occurrence isolée (admin/health/page.tsx — @ts-ignore intentionnel)
@@ -18,33 +21,19 @@ alwaysApply: true
 
 | Risque | Fichier | Priorité |
 |---|---|---|
-| AsyncStorage non chiffré pour auth tokens | `apps/mobile/lib/supabase.ts` | HAUTE |
-| Aucun guard auth sur `(tabs)/_layout.tsx` mobile | `apps/mobile/app/(tabs)/_layout.tsx` | HAUTE |
-| CORS `"*"` fallback sur 11 edge functions | `supabase/functions/*/index.ts` | HAUTE |
-| 4 opérateurs paiement = TODO stubs (0 intégration réelle) | `supabase/functions/payment-initiate/index.ts` | CRITIQUE |
-| `subscription_plans` table absente de DB live | supabase/migrations/ | CRITIQUE |
-| Texte "Sprint 2 — Auth OTP SMS" en production mobile | `apps/mobile/app/index.tsx` | HAUTE |
-| 5 artistes hardcodés fictifs sur page lancement | `apps/web/src/app/lancement/page.tsx` | MOYENNE |
-| 0 tests (aucun .test.ts ni .spec.ts) | partout | HAUTE |
+| Paiements prod = credentials opérateurs manquants | `supabase/functions/_shared/payments.ts` | CRITIQUE |
+| Orange Money GN Phase 2 non validée en prod | `docs/P0-2-PHASE-2-ORANGE-MONEY.md` | CRITIQUE |
+| 0 tests wallet/payments | `packages/api/src/wallet/`, `payments/` | HAUTE |
 | CSP unsafe-eval + unsafe-inline en production | `apps/web/next.config.ts` | MOYENNE |
 | URL signées audio = 7200s (2h) — trop long | `supabase/functions/stream-start/index.ts` | BASSE |
+| Texte "Sprint 2 — Auth OTP SMS" en production mobile | `apps/mobile/app/index.tsx` | BASSE |
 
-## AsyncStorage → SecureStore (À faire)
-
-```typescript
-// ❌ ACTUEL (apps/mobile/lib/supabase.ts)
-import AsyncStorage from "@react-native-async-storage/async-storage";
-storage: AsyncStorage, // stockage clair, non chiffré
-
-// ✅ CORRECT (à implémenter)
-import * as SecureStore from "expo-secure-store";
-const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => SecureStore.getItemAsync(key),
-  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
-};
-storage: ExpoSecureStoreAdapter,
-```
+### ✅ Résolu récemment (ne plus remonter comme ouvert)
+- ~~AsyncStorage non chiffré~~ → SecureStore ✅
+- ~~Pas de guard auth tabs mobile~~ → guard actif ✅
+- ~~CORS `"*"` fallback~~ → `_shared/cors.ts` ✅
+- ~~subscription_plans absent DB~~ → migration 20260621, 3 plans ✅
+- ~~5 artistes fictifs /lancement~~ → données DB réelles ✅
 
 ## Règles absolues
 
@@ -53,3 +42,4 @@ storage: ExpoSecureStoreAdapter,
 - ❌ NEVER BYPASS_AUTH sur Vercel (VERCEL=1)
 - ❌ NEVER git push --force sur main
 - ❌ NEVER --no-verify sur pre-commit hooks
+- ❌ NEVER fallback CORS `"*"` sur edge functions

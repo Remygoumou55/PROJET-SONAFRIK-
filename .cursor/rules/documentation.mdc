@@ -1,0 +1,21 @@
+---
+description: Source de vérité documentation SONAFRIK
+globs: ["**/*.md", "**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Source de vérité documentation
+
+La documentation SONAFRIK suit ces règles depuis le **26 juin 2026** :
+
+1. **Source unique** : `docs/EXECUTION_LOG.md` est le seul journal actif
+2. **Archivés** : `PLAN_CORRECTION_360.md`, `RAPPORT_COLLECTION.md` → `docs/archive/`
+3. **Score MVP réaliste** : **76/100** au 26 juin 2026 (pas 88/100 ni 68/100)
+4. **CI** : **129/129** probes (pas 103/103)
+5. **`wallet_ledger`** : > 0 (9 entrées, 1 cycle royalties — 26 juin 2026)
+6. **CORS** : fermé sur 14 edge functions (`_shared/cors.ts`, fallback `sonafrik.vercel.app`)
+7. **Session Engine** : LOCKED depuis SPRING 2.2 — ne pas modifier sans ADR
+
+Ne jamais citer un score ou un état projet sans vérifier `docs/EXECUTION_LOG.md` d'abord.
+
+Index : `docs/README.md`

@@ -43,7 +43,7 @@ EOF
 git push origin main
 ```
 
-### Étape 4 — Rapport final structuré (dans `docs/RAPPORT_COLLECTION.md`)
+### Étape 4 — Rapport final structuré (dans `docs/EXECUTION_LOG.md`)
 
 ```markdown
 ## [DATE] — [NOM DE LA TÂCHE]

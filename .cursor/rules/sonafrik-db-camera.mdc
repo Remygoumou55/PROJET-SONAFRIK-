@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## Projet Supabase : `cxjpburiiazzvlczzupy`
 
-## DB live vérifiée le 2026-06-21 : 53 tables, TOUTES avec RLS=true
+## DB live vérifiée le 2026-06-26 : 53+ tables, TOUTES avec RLS=true
 
 Tables confirmées en production :
 `admin_notifications` · `album_genres` · `albums` · `artist_profiles` · `audit_logs`
@@ -17,35 +17,42 @@ Tables confirmées en production :
 `ownerships` · `payment_intents` · `payout_accounts` · `payout_audit_logs` · `payout_batches`
 `permissions` · `playback_positions` · `playlist_tracks` · `playlists` · `profiles`
 `rate_limits` · `rights_claims` · `role_permissions` · `roles` · `royalty_calculations`
-`royalty_cycles` · `stream_events` · `stream_sessions` · `studios` · `system_settings`
-`tips` · `track_credits` · `track_files` · `track_genres` · `tracks`
+`royalty_cycles` · `stream_events` · `stream_sessions` · `studios` · `subscription_plans`
+`system_settings` · `tips` · `track_credits` · `track_files` · `track_genres` · `tracks`
 `transactions` · `user_preferences` · `user_roles` · `user_sessions` · `wallet_ledger`
 `wallets` · `withdrawals` · `works`
 
-## Tables ORPHELINES (dans DB mais pas utilisées par packages/api)
+## Métriques live (26 juin 2026)
 
-- `creators` — Doublon de `artist_profiles` ? Relation inconnue
-- `studios` — Feature non implémentée dans packages/api
+| Métrique | Valeur |
+|---|---|
+| Profils | 189 |
+| Tracks publiés | 48 |
+| Artistes | 59 |
+| Stream sessions valides | 5 524 |
+| `wallet_ledger` | 9 entrées |
+| `royalty_cycles` | 1 |
+| `subscription_plans` | 3 plans (migration 20260621) |
+
+## Tables ORPHELINES (dans DB mais peu/pas utilisées par packages/api)
+
+- `creators` — Doublon potentiel de `artist_profiles`
+- `studios` — Feature non implémentée
 - `creator_roles` — RBAC créateur non connecté
-- `label_members` — packages/api utilise le vieux nom `team_members` qui n'existe PAS en DB
-- `labels` — non référencée dans packages/api
-
-## Table MANQUANTE (seule absente)
-
-- `subscription_plans` — CONFIRMÉE ABSENTE de la DB live — à créer avant paiements
+- `label_members` — packages/api utilise parfois le vieux nom `team_members`
+- `labels` — partiellement référencée
 
 ## Incohérences documentées dans ADMIN_GUIDE.md
 
 | Ce que dit ADMIN_GUIDE | Réalité en DB |
 |---|---|
 | `audit_log` | Table = `audit_logs` (avec s) |
-| `subscription_plans` | Table n'existe PAS |
 | `artist_profiles.user_id` | Colonne = `creator_id` |
 
-## Types DB périmés → cause des 39 as never
+## Types DB
 
+Régénérer si drift :
 ```bash
-# Régénérer les types TypeScript depuis la DB live
 supabase gen types typescript --project-id cxjpburiiazzvlczzupy \
   --schema public > packages/database/src/types/index.ts
 ```

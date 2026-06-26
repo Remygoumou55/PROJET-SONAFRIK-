@@ -34,6 +34,7 @@ apps/web/src/features/
 - `toggleFavoriteSchema` défini dans DEUX fichiers (streaming/schemas.ts + social/schemas.ts)
 - 87 composants "use client" — préférer RSC quand pas d'interactivité
 - `LaunchCounter`, `AuthHomeActions`, `useEngagementStats` — composants dead non supprimés
+- **Session Engine** (`packages/api/src/streaming/session/`) — **LOCKED** depuis SPRING 2.2 — ne pas modifier
 
 ## Vérifications avant chaque PR
 
