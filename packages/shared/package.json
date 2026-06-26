@@ -16,18 +16,24 @@
     "./field-limits": {
       "types": "./dist/fieldLimits.d.ts",
       "default": "./dist/fieldLimits.js"
+    },
+    "./performance": {
+      "types": "./dist/performance/index.d.ts",
+      "default": "./dist/performance/index.js"
     }
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@sonafrik/types": "workspace:*"
   },
   "devDependencies": {
     "eslint": "^9.28.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.6"
   }
 }

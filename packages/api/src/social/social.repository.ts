@@ -13,18 +13,16 @@ export class SocialRepository {
   constructor(private readonly client: SonafrikSupabaseClient) {}
 
   async toggleLike(trackId: string): Promise<boolean> {
-    const { data, error } = await this.client.rpc("toggle_favorite", {
-      p_entity_type: "track",
-      p_entity_id: trackId,
+    const { data, error } = await this.client.rpc("toggle_like", {
+      p_track_id: trackId,
     });
     if (error) throw error;
     return data as boolean;
   }
 
   async isLiked(trackId: string): Promise<boolean> {
-    const { data, error } = await this.client.rpc("is_favorited", {
-      p_entity_type: "track",
-      p_entity_id: trackId,
+    const { data, error } = await this.client.rpc("is_liked", {
+      p_track_id: trackId,
     });
     if (error) throw error;
     return data as boolean;

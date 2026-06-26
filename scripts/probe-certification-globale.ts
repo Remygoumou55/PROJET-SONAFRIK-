@@ -70,7 +70,7 @@ function extraChecks(): { passed: number; total: number } {
   const pkg = JSON.parse(readFileSync(resolve(ROOT, "package.json"), "utf8")) as { scripts?: Record<string, string> };
   log(
     "G4 scripts probes A-F",
-    ["probe:vague-a", "probe:vague-b", "probe:vague-c", "probe:vague-d", "probe:vague-e", "probe:vague-f", "probe:hex-colors"].every(
+    ["probe:vague-a", "probe:vague-b", "probe:vague-c", "probe:vague-d", "probe:vague-d-stabilisation", "probe:vague-e", "probe:vague-e-stabilisation", "probe:vague-f", "probe:hex-colors"].every(
       (s) => pkg.scripts?.[s],
     ),
     "pnpm probe:vague-* + hex",

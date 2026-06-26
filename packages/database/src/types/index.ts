@@ -948,6 +948,416 @@ export type Database = {
           },
         ]
       }
+      likes: {
+        Row: {
+          created_at: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metadata_audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          audit_metadata_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          payload: Json
+          row_version: number
+          source: string
+          status: string
+          updated_at: string
+          validation_state: string
+          visibility: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          audit_metadata_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id: string
+          payload?: Json
+          row_version?: number
+          source?: string
+          status?: string
+          updated_at?: string
+          validation_state?: string
+          visibility?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          audit_metadata_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          payload?: Json
+          row_version?: number
+          source?: string
+          status?: string
+          updated_at?: string
+          validation_state?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
+      metadata_fingerprint_records: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          creator_id: string | null
+          fingerprint_id: string
+          hash: string | null
+          payload: Json
+          row_version: number
+          status: string
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          fingerprint_id: string
+          hash?: string | null
+          payload: Json
+          row_version?: number
+          status?: string
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          fingerprint_id?: string
+          hash?: string | null
+          payload?: Json
+          row_version?: number
+          status?: string
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metadata_fingerprint_records_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metadata_isrc_registry: {
+        Row: {
+          created_at: string
+          isrc: string
+          metadata_id: string | null
+          reserved_at: string | null
+          reserved_by: string | null
+          row_version: number
+          status: string
+          track_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          isrc: string
+          metadata_id?: string | null
+          reserved_at?: string | null
+          reserved_by?: string | null
+          row_version?: number
+          status?: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          isrc?: string
+          metadata_id?: string | null
+          reserved_at?: string | null
+          reserved_by?: string | null
+          row_version?: number
+          status?: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metadata_isrc_registry_metadata_id_fkey"
+            columns: ["metadata_id"]
+            isOneToOne: false
+            referencedRelation: "metadata_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metadata_isrc_registry_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metadata_isrc_sequence: {
+        Row: {
+          country_code: string
+          last_designation: number
+          registrant_code: string
+          row_version: number
+          updated_at: string
+          year_of_reference: string
+        }
+        Insert: {
+          country_code: string
+          last_designation?: number
+          registrant_code: string
+          row_version?: number
+          updated_at?: string
+          year_of_reference: string
+        }
+        Update: {
+          country_code?: string
+          last_designation?: number
+          registrant_code?: string
+          row_version?: number
+          updated_at?: string
+          year_of_reference?: string
+        }
+        Relationships: []
+      }
+      metadata_platform_health: {
+        Row: {
+          checked_at: string
+          id: number
+        }
+        Insert: {
+          checked_at?: string
+          id?: number
+        }
+        Update: {
+          checked_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
+      metadata_records: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          creator_id: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          payload: Json
+          row_version: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          payload: Json
+          row_version?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          payload?: Json
+          row_version?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      metadata_registry_index: {
+        Row: {
+          created_at: string
+          id: string
+          identifier_type: string
+          identifier_value: string
+          metadata_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier_type: string
+          identifier_value: string
+          metadata_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier_type?: string
+          identifier_value?: string
+          metadata_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metadata_registry_index_metadata_id_fkey"
+            columns: ["metadata_id"]
+            isOneToOne: false
+            referencedRelation: "metadata_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metadata_release_records: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          creator_id: string | null
+          payload: Json
+          release_id: string
+          row_version: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          payload: Json
+          release_id: string
+          row_version?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          payload?: Json
+          release_id?: string
+          row_version?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      metadata_upc_registry: {
+        Row: {
+          album_id: string | null
+          created_at: string
+          reserved_at: string | null
+          reserved_by: string | null
+          row_version: number
+          status: string
+          upc: string
+          updated_at: string
+        }
+        Insert: {
+          album_id?: string | null
+          created_at?: string
+          reserved_at?: string | null
+          reserved_by?: string | null
+          row_version?: number
+          status?: string
+          upc: string
+          updated_at?: string
+        }
+        Update: {
+          album_id?: string | null
+          created_at?: string
+          reserved_at?: string | null
+          reserved_by?: string | null
+          row_version?: number
+          status?: string
+          upc?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metadata_upc_registry_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "albums"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metadata_version_snapshots: {
+        Row: {
+          action: string
+          created_at: string
+          creator_id: string | null
+          entity_id: string
+          entity_type: string
+          row_version: number
+          snapshot: Json
+          source: string
+          status: string
+          updated_at: string
+          validation_state: string
+          version_id: string
+          visibility: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          creator_id?: string | null
+          entity_id: string
+          entity_type: string
+          row_version?: number
+          snapshot: Json
+          source?: string
+          status?: string
+          updated_at?: string
+          validation_state?: string
+          version_id: string
+          visibility?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          creator_id?: string | null
+          entity_id?: string
+          entity_type?: string
+          row_version?: number
+          snapshot?: Json
+          source?: string
+          status?: string
+          updated_at?: string
+          validation_state?: string
+          version_id?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -3003,6 +3413,7 @@ export type Database = {
         Args: { p_label_id: string; p_user_id?: string }
         Returns: boolean
       }
+      is_liked: { Args: { p_track_id: string }; Returns: boolean }
       is_premium_user: { Args: { p_user_id?: string }; Returns: boolean }
       log_audit_event: {
         Args: {
@@ -3033,6 +3444,59 @@ export type Database = {
       mark_payout_paid: {
         Args: { p_reference: string; p_withdrawal_id: string }
         Returns: Json
+      }
+      metadata_advance_isrc_sequence: {
+        Args: {
+          p_country_code: string
+          p_registrant_code: string
+          p_year_of_reference: string
+        }
+        Returns: {
+          country_code: string
+          last_designation: number
+          registrant_code: string
+          updated_at: string
+          year_of_reference: string
+        }[]
+      }
+      metadata_reserve_isrc: {
+        Args: { p_actor_id: string; p_isrc: string }
+        Returns: {
+          created_at: string
+          isrc: string
+          metadata_id: string | null
+          reserved_at: string | null
+          reserved_by: string | null
+          row_version: number
+          status: string
+          track_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "metadata_isrc_registry"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      metadata_reserve_upc: {
+        Args: { p_actor_id: string; p_upc: string }
+        Returns: {
+          album_id: string | null
+          created_at: string
+          reserved_at: string | null
+          reserved_by: string | null
+          row_version: number
+          status: string
+          upc: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "metadata_upc_registry"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       open_royalty_cycle: {
         Args: {
@@ -3128,6 +3592,7 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: boolean
       }
+      toggle_like: { Args: { p_track_id: string }; Returns: boolean }
       topup_wallet: {
         Args: {
           p_amount_gnf: number

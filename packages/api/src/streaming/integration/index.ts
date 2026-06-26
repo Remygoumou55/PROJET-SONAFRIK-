@@ -9,3 +9,15 @@ export type {
   StreamingRuntimeFeatureFlagState,
   StreamingRuntimeConfig,
 } from "./feature-flags";
+export {
+  StreamingPlaybackBridge,
+  createStreamingPlaybackBridge,
+  defaultBridgeRuntimeStatus,
+} from "./streaming-playback-bridge";
+export type {
+  StreamingPlaybackMode,
+  StreamingBridgeObserveEvent,
+  StreamingPlaybackBridgeOptions,
+  StreamingPlaybackBridgeDeps,
+  StreamingRuntimeFoundationBundle,
+} from "./streaming-playback-bridge";

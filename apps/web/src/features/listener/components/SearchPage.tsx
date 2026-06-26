@@ -20,7 +20,7 @@ const SearchResults = dynamic(
   },
 );
 
-const TABS: { id: SearchType; label: string }[] = [
+const ALL_TABS: { id: SearchType; label: string }[] = [
   { id: "all", label: "Tout" },
   { id: "tracks", label: "Morceaux" },
   { id: "artists", label: "Artistes" },
@@ -32,20 +32,34 @@ const TABS: { id: SearchType; label: string }[] = [
 interface Props {
   initialGenre?: string;
   initialQuery?: string;
+  beatStoreEnabled?: boolean;
 }
 
-export function SearchPage({ initialGenre, initialQuery }: Props) {
+export function SearchPage({ initialGenre, initialQuery, beatStoreEnabled = false }: Props) {
+  const TABS = beatStoreEnabled
+    ? ALL_TABS
+    : ALL_TABS.filter((t) => t.id !== "beats");
   const seed = initialQuery ?? initialGenre ?? "";
   const [query, setQuery] = useState(seed);
   const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const [activeTab, setActiveTab] = useState<SearchType>("all");
-  const { results, isSearching, error, search, clearSearch } = useSearch();
+  const { results, isSearching, error, search, clearSearch } = useSearch(beatStoreEnabled);
 
   useEffect(() => {
     if (seed.trim().length >= 2) {
       search(seed, activeTab);
     }
   }, [seed, search, activeTab]);
+
+  useEffect(() => {
+    if (!beatStoreEnabled && activeTab === "beats") {
+      setActiveTab("all");
+    }
+  }, [beatStoreEnabled, activeTab]);
+
+  const emptyStateHint = beatStoreEnabled
+    ? "Morceaux, albums, artistes, playlists, beats africains"
+    : "Morceaux, albums, artistes et playlists";
 
   const handleChange = (value: string) => {
     setQuery(value);
@@ -66,6 +80,14 @@ export function SearchPage({ initialGenre, initialQuery }: Props) {
     setQuery("");
     clearSearch();
   };
+
+  const searchPlaceholder = beatStoreEnabled
+    ? activeGenre
+      ? `Chercher dans ${activeGenre}…`
+      : "Artiste, morceau, album, beat…"
+    : activeGenre
+      ? `Chercher dans ${activeGenre}…`
+      : "Artiste, morceau, album…";
 
   return (
     <div className="p-6 max-w-3xl">
@@ -113,7 +135,7 @@ export function SearchPage({ initialGenre, initialQuery }: Props) {
           type="text"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
-          placeholder={activeGenre ? `Chercher dans ${activeGenre}…` : "Artiste, morceau, album, beat…"}
+          placeholder={searchPlaceholder}
           className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none"
           style={{
             backgroundColor: "var(--color-card)",
@@ -178,7 +200,7 @@ export function SearchPage({ initialGenre, initialQuery }: Props) {
             Recherchez votre musique
           </p>
           <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
-            Morceaux, albums, artistes, playlists, beats africains
+            {emptyStateHint}
           </p>
         </div>
       )}

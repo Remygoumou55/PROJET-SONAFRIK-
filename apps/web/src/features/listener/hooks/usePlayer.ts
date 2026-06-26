@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayerContext } from "../lib/playerContext";
-import { useStreamingService } from "./useStreaming";
+import { useStreamingPlaybackBridge } from "../integration/useStreamingPlaybackBridge";
 import { useStreamQuality } from "./useStreamQuality";
 
 export function usePlayer() {
   const player = usePlayerContext();
-  const streaming = useStreamingService();
+  const { bridge: streaming } = useStreamingPlaybackBridge();
   const { bitrate } = useStreamQuality();
   // Limite à 1 tentative de rechargement par erreur pour éviter les boucles infinies
   const retryAttemptRef = useRef(false);

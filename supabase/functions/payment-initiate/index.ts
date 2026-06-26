@@ -120,7 +120,7 @@ Deno.serve(async (req: Request) => {
     const intentId = intent.id;
 
     if (isProviderSandbox(provider)) {
-      await userClient
+      const { error: updateErr } = await userClient
         .from("payment_intents")
         .update({
           status: "pending",
@@ -128,13 +128,15 @@ Deno.serve(async (req: Request) => {
         })
         .eq("id", intentId);
 
+      if (updateErr) return json({ error: "intent_update_failed" }, 500);
+
       return json({ intentId, sandbox: true, ussdPush: provider !== "wave_gn" });
     }
 
     try {
       const op = await initiateOperator(provider, intentId, body.amountGnf, body.phone);
 
-      await userClient
+      const { error: updateErr } = await userClient
         .from("payment_intents")
         .update({
           status: "pending",
@@ -146,6 +148,8 @@ Deno.serve(async (req: Request) => {
         })
         .eq("id", intentId);
 
+      if (updateErr) return json({ error: "intent_update_failed" }, 500);
+
       return json({
         intentId,
         checkoutUrl: op.checkoutUrl,
@@ -153,19 +157,24 @@ Deno.serve(async (req: Request) => {
         provider,
       });
     } catch (err) {
-      await userClient
+      const operatorMessage = err instanceof Error ? err.message : "operator_failed";
+      const { error: failUpdateErr } = await userClient
         .from("payment_intents")
         .update({
           status: "failed",
           failed_at: new Date().toISOString(),
           metadata: {
-            operator_error: err instanceof Error ? err.message : "operator_failed",
+            operator_error: operatorMessage,
           },
         })
         .eq("id", intentId);
 
+      if (failUpdateErr) {
+        console.error("[payment-initiate] failed status update:", failUpdateErr.message);
+      }
+
       return json(
-        { error: "provider_error", message: err instanceof Error ? err.message : "operator_failed" },
+        { error: "provider_error", message: operatorMessage },
         502,
       );
     }

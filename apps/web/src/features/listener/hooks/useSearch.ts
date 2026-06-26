@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SearchResult, SearchType } from "@sonafrik/types";
+import {
+  buildSearchCacheKey,
+  getCachedSearchResult,
+  setCachedSearchResult,
+} from "@sonafrik/shared/performance";
+import { usePerformanceFlags } from "@/lib/performance";
 import { useStreamingService } from "./useStreaming";
 
-export function useSearch() {
+export function useSearch(beatStoreEnabled = false) {
+  const performanceFlags = usePerformanceFlags();
+  const cacheEnabled = performanceFlags.searchCacheEnabled;
   const streaming = useStreamingService();
   const [results, setResults] = useState<SearchResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -23,12 +31,34 @@ export function useSearch() {
 
       debounceRef.current = setTimeout(async () => {
         const currentId = ++searchIdRef.current;
+        const cacheKey = buildSearchCacheKey(query, type);
+
+        if (cacheEnabled) {
+          const cached = getCachedSearchResult(cacheKey);
+          if (cached) {
+            if (currentId === searchIdRef.current) {
+              setResults(cached);
+              setError(null);
+              setIsSearching(false);
+            }
+            return;
+          }
+        }
+
         setIsSearching(true);
         setError(null);
         try {
-          const data = await streaming.search({ query, limit: 20, type });
+          const data = await streaming.search({
+            query,
+            limit: 20,
+            type,
+            includeBeats: beatStoreEnabled,
+          });
           if (currentId === searchIdRef.current) {
             setResults(data);
+            if (cacheEnabled) {
+              setCachedSearchResult(cacheKey, data);
+            }
           }
         } catch {
           if (currentId === searchIdRef.current) {
@@ -42,7 +72,7 @@ export function useSearch() {
         }
       }, 300);
     },
-    [streaming],
+    [streaming, cacheEnabled, beatStoreEnabled],
   );
 
   const clearSearch = useCallback(() => {

@@ -2,10 +2,11 @@
 
 import { memo } from "react";
 import { REVENUE_POOL_PERCENT } from "@sonafrik/types";
+import { formatGnf } from "@sonafrik/shared";
 import { useRoyalties } from "../hooks/useWallet";
 
 export const RoyaltiesPage = memo(function RoyaltiesPage() {
-  const { royalties, isLoading } = useRoyalties();
+  const { royalties, isLoading, error } = useRoyalties();
 
   const totalNet = royalties.reduce((sum, r) => sum + r.net_amount_gnf, 0);
   const totalListens = royalties.reduce((sum, r) => sum + r.valid_listen_count, 0);
@@ -26,7 +27,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
         <div className="rounded-xl p-4" style={{ backgroundColor: "var(--color-card)" }}>
           <p className="text-sm font-medium" style={{ color: "var(--color-texte-secondaire)" }}>Total gagné</p>
           <p className="text-xl font-bold mt-1" style={{ color: "var(--color-vert-energie)" }}>
-            {new Intl.NumberFormat("fr-GN").format(Math.round(totalNet))} GNF
+            {formatGnf(Math.round(totalNet))}
           </p>
         </div>
         <div className="rounded-xl p-4" style={{ backgroundColor: "var(--color-card)" }}>
@@ -36,6 +37,20 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
           </p>
         </div>
       </div>
+
+      {error && (
+        <div
+          className="rounded-xl p-4 text-sm"
+          style={{
+            backgroundColor: "var(--color-card)",
+            border: "1px solid rgba(255,77,79,0.25)",
+            color: "var(--color-erreur)",
+          }}
+          role="alert"
+        >
+          {error}
+        </div>
+      )}
 
       {/* Historique par cycle */}
       {isLoading ? (
@@ -52,7 +67,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
             </div>
           ))}
         </div>
-      ) : royalties.length === 0 ? (
+      ) : error ? null : royalties.length === 0 ? (
         <div className="py-10 text-center rounded-xl" style={{ backgroundColor: "var(--color-card)" }}>
           <p className="text-2xl mb-2">🎵</p>
           <p className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
@@ -66,7 +81,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>
-                    {new Intl.NumberFormat("fr-GN").format(Math.round(r.net_amount_gnf))} GNF net
+                    {formatGnf(Math.round(r.net_amount_gnf))} net
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
                     {r.valid_listen_count} écoutes · {r.listen_share_percent.toFixed(4)}% du pool

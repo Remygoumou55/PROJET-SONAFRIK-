@@ -8,6 +8,9 @@ export default defineConfig({
       "src/metadata/**/*.test.ts",
       "src/publication/**/*.test.ts",
       "src/streaming/**/*.test.ts",
+      "src/wallet/**/*.test.ts",
+      "src/payments/**/*.test.ts",
+      "src/social/**/*.test.ts",
     ],
     coverage: {
       provider: "v8",

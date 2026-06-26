@@ -59,18 +59,6 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Rafraîchissement du token — timeout 4s pour éviter l'écran noir sur cold start
-  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
-  try {
-    user = await withTimeout(
-      supabase.auth.getUser().then((r) => r.data.user),
-      4000,
-      null,
-    );
-  } catch {
-    // Supabase indisponible → on laisse passer (redirect si route protégée)
-  }
-
   const isAuthRoute =
     pathname.startsWith("/auth/") && pathname !== "/auth/callback";
   const isOnboarding = pathname.startsWith("/onboarding");
@@ -87,6 +75,34 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute =
     pathname === "/admin" || pathname.startsWith("/admin/");
 
+  // Session cookie (rapide, local) puis validation réseau avec timeout.
+  // Évite les redirects auth intempestifs quand Supabase cold-start dépasse le délai.
+  const { data: { session } } = await supabase.auth.getSession();
+  let user = session?.user ?? null;
+
+  if (!user) {
+    try {
+      user = await withTimeout(
+        supabase.auth.getUser().then((r) => r.data.user),
+        4000,
+        null,
+      );
+    } catch {
+      // Supabase indisponible — pas de session locale
+    }
+  } else if (isAdminRoute) {
+    try {
+      const verified = await withTimeout(
+        supabase.auth.getUser().then((r) => r.data.user),
+        4000,
+        session!.user,
+      );
+      user = verified ?? session!.user;
+    } catch {
+      user = session!.user;
+    }
+  }
+
   // Pas de session → connexion (routes protégées), landing (onboarding)
   if (!user) {
     if (isProtected || isAdminRoute) {
@@ -102,14 +118,15 @@ export async function middleware(request: NextRequest) {
 
   // Routes admin : session requise + rôle admin (complète le layout SSR)
   if (isAdminRoute) {
-    const isAdmin = await withTimeout(
+    const isAdminResult = await withTimeout<boolean | null>(
       Promise.resolve(
         supabase.rpc("is_admin", { p_user_id: user.id }).then((r) => r.data === true),
       ),
       4000,
-      false,
+      null,
     );
-    if (!isAdmin) {
+    // Refus explicite seulement — timeout (null) laisse passer (layout SSR requireAdmin)
+    if (isAdminResult === false) {
       return NextResponse.redirect(new URL("/listen", request.url));
     }
     return response;

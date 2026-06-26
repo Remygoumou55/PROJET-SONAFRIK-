@@ -56,11 +56,17 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
   const [intentStatus, setIntentStatus] = useState<PaymentIntentStatus | null>(null);
   const [pollSeconds, setPollSeconds]   = useState(0);
 
-  const effectiveAmount = customAmount ? Number(customAmount) : amountGnf;
+  const resolveAmount = useCallback((): number | null => {
+    const amount = customAmount.trim() ? Number(customAmount) : amountGnf;
+    if (!Number.isFinite(amount) || amount < 1_000) return null;
+    return amount;
+  }, [customAmount, amountGnf]);
+
+  const effectiveAmount = resolveAmount() ?? amountGnf;
 
   // ── Étape 1 → 2 : valider montant et passer au choix du numéro ──────────
   const handleAmountNext = () => {
-    if (effectiveAmount < 1_000) {
+    if (resolveAmount() === null) {
       setError("Montant minimum : 1 000 GNF");
       return;
     }
@@ -78,10 +84,15 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
     setIsLoading(true);
     setError(null);
     try {
+      const amountGnf = resolveAmount();
+      if (amountGnf === null) {
+        setError("Montant minimum : 1 000 GNF");
+        return;
+      }
       const result = await paymentsService.initiatePayment({
         provider,
         purpose:   "topup",
-        amountGnf: effectiveAmount,
+        amountGnf,
         phone:     trimmed,
       });
       setIntentId(result.intentId);
@@ -100,7 +111,7 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
     } finally {
       setIsLoading(false);
     }
-  }, [paymentsService, provider, effectiveAmount, phone]);
+  }, [paymentsService, provider, resolveAmount, phone]);
 
   // ── Polling ──────────────────────────────────────────────────────────────
   useEffect(() => {

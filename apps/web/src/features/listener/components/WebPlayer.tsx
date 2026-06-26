@@ -21,6 +21,13 @@ export const WebPlayer = memo(function WebPlayer() {
   const { qualityLevel } = useStreamQuality();
 
   useEffect(() => {
+    document.documentElement.dataset.playerActive = currentTrack ? "true" : "false";
+    return () => {
+      delete document.documentElement.dataset.playerActive;
+    };
+  }, [currentTrack]);
+
+  useEffect(() => {
     setShowTip(false);
     setShowCredits(false);
   }, [currentTrack?.id]);

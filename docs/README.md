@@ -33,7 +33,10 @@
 | [`DEPENDENCY_RULES.md`](./DEPENDENCY_RULES.md) | Règles imports / couplage |
 | [`CDC-v9.0.md`](./CDC-v9.0.md) | Cahier des charges |
 | [`ADR/`](./ADR/) | Décisions d'architecture |
+| [`streaming/SPRING_2_MVP_INTEGRATION.md`](./streaming/SPRING_2_MVP_INTEGRATION.md) | Intégration Runtime → app (discovery 26 juin) |
+| [`streaming/LIVE_CONTROL_SPRING2.md`](./streaming/LIVE_CONTROL_SPRING2.md) | Checklist LIVE CONTROL Rémy |
 | [`streaming/`](./streaming/) | Specs streaming (SPRING 2) |
+| [`performance/`](./performance/) | Certification UX & Performance MVP |
 | [`metadata/`](./metadata/) | Specs metadata / ISRC |
 | [`DEV_LOGIN.md`](./DEV_LOGIN.md) | Comptes dev local |
 | [`ADMIN_GUIDE.md`](./ADMIN_GUIDE.md) | Guide admin (vérifier noms tables) |
@@ -117,6 +120,7 @@ Stubs : [`MASTER_PLAN.md`](./MASTER_PLAN.md) · [`PLAN_CORRECTION_360.md`](./PLA
 
 ```powershell
 pnpm probe:certification   # 129 checks — gate CI
+pnpm probe:performance     # Performance & UX discovery gate
 pnpm build && pnpm lint && pnpm typecheck
 ```
 

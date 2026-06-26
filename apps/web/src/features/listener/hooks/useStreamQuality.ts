@@ -3,6 +3,7 @@
 import type { AudioQualityKbps } from "@sonafrik/types";
 import { useNetworkAware } from "@/lib/networkAware";
 import { useQualityPreference } from "@/lib/qualityPreferenceContext";
+import { usePerformanceFlags } from "@/lib/performance";
 import type { QualityLevel } from "@/lib/networkAware";
 
 export type { QualityLevel };
@@ -26,26 +27,28 @@ function qualityLevelToBitrate(level: QualityLevel): AudioQualityKbps {
 export function useStreamQuality(): StreamQuality {
   const { isSlowNetwork, qualityLevel: networkLevel } = useNetworkAware();
   const userPref = useQualityPreference();
+  const { africaMode } = usePerformanceFlags();
 
   let bitrate: AudioQualityKbps;
   let effectiveLevel: QualityLevel;
 
   if (userPref === "256") {
-    // Toujours haute qualité — ignore le réseau
-    bitrate = 128;
-    effectiveLevel = "standard";
+    bitrate = africaMode ? 96 : 128;
+    effectiveLevel = africaMode ? "economique" : "standard";
   } else if (userPref === "64") {
-    // Toujours économiser — ignore le réseau
     bitrate = 64;
     effectiveLevel = "ultra_economique";
   } else if (userPref === "128") {
-    // Standard fixe — ignore le réseau
     bitrate = 96;
     effectiveLevel = "economique";
   } else {
-    // auto — détection réseau
     effectiveLevel = networkLevel;
     bitrate = qualityLevelToBitrate(networkLevel);
+  }
+
+  if (africaMode && effectiveLevel === "standard") {
+    effectiveLevel = "economique";
+    bitrate = 96;
   }
 
   return {

@@ -55,7 +55,7 @@ function IntentRow({ intent }: { intent: PaymentIntent }) {
 }
 
 export const PaymentHistory = memo(function PaymentHistory() {
-  const { intents, isLoading } = usePaymentHistory(10);
+  const { intents, isLoading, error } = usePaymentHistory(10);
 
   if (isLoading) {
     return (
@@ -65,6 +65,14 @@ export const PaymentHistory = memo(function PaymentHistory() {
           style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-sm" role="alert" style={{ color: "var(--color-erreur)" }}>
+        {error}
+      </p>
     );
   }
 

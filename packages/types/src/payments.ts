@@ -55,6 +55,8 @@ export const PAYMENT_INTENT_STATUS_LABELS: Record<PaymentIntentStatus, string> =
 
 export const PAYMENT_ERROR_MESSAGES: Record<string, string> = {
   intent_not_found:    "Intention de paiement introuvable.",
+  intent_list_failed:  "Impossible de charger l'historique des paiements.",
+  intent_fetch_failed: "Impossible de vérifier le statut du paiement.",
   expired:             "Le délai de paiement a expiré. Réessayez.",
   already_confirmed:   "Ce paiement a déjà été confirmé.",
   provider_error:      "Erreur opérateur. Réessayez.",

@@ -84,9 +84,9 @@ Retraits
 | Album / Cover / Audio | ✅ Opérationnel | Non |
 | Publication | ✅ Opérationnel | Non |
 | Écoutes | ✅ Real Listen V7.2 | Non |
-| Royalties | ✅ UI `/wallet/royalties` (`RoyaltiesPage.tsx`) | Non (E2E prod à valider) |
+| Royalties | ⚠️ UI OK, cycles E2E prod à valider | Partiel |
 | Revenus | ⚠️ Analytics partiel | **OUI** |
-| Retraits | ⚠️ Code prêt, flag + credentials | **OUI** |
+| Retraits | ⚠️ Code prêt, flag + credentials (G5) | **OUI** |
 
 ---
 

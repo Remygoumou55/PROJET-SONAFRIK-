@@ -321,7 +321,7 @@ export class StreamingRepository {
       .ilike("title", `%${query}%`)
       .order("created_at", { ascending: false })
       .limit(limit);
-    if (error) return [];
+    if (error) throw error;
     const rows = (data ?? []) as BeatSearchResult[];
     const q = query.toLowerCase();
     return rows.sort((a, b) => relevanceScore(a.title, q) - relevanceScore(b.title, q));
@@ -418,7 +418,7 @@ export class StreamingRepository {
 
   async hasStreamingPermission(): Promise<boolean> {
     const { data, error } = await this.client.rpc("has_streaming_permission");
-    if (error) return true; // fallback permissif en dev
+    if (error) throw error;
     return data as boolean;
   }
 

@@ -5,7 +5,8 @@ import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
 import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWallet } from "@/features/wallet/hooks/useWallet";
-import { isTopupEnabled } from "@/features/wallet/lib/paymentsEnabled";
+import { useSubscriptionPlans } from "@/features/wallet/hooks/useSubscriptionPlans";
+import { isTopupEnabled, isWithdrawalEnabled } from "@/features/wallet/lib/paymentsEnabled";
 
 const SubscriptionModal = dynamic(
   () =>
@@ -25,6 +26,7 @@ const TopupModal = dynamic(
 
 export function WalletClient() {
   const { context, isLoading, error, reload } = useWallet();
+  const { plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
   const [showSubscription, setShowSubscription] = useState(false);
   const [showTopup, setShowTopup]               = useState(false);
 
@@ -49,7 +51,9 @@ export function WalletClient() {
       <WalletDashboard
         context={context}
         topupEnabled={isTopupEnabled()}
-        withdrawalEnabled={isTopupEnabled()}
+        withdrawalEnabled={isWithdrawalEnabled()}
+        plans={plans}
+        plansLoading={plansLoading}
         onSubscribe={() => setShowSubscription(true)}
         onTopup={() => setShowTopup(true)}
       />
@@ -58,7 +62,14 @@ export function WalletClient() {
         <PaymentHistory />
       </div>
 
-      {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} />}
+      {showSubscription && (
+        <SubscriptionModal
+          plans={plans}
+          isLoading={plansLoading}
+          loadError={plansError}
+          onClose={() => setShowSubscription(false)}
+        />
+      )}
       {showTopup && isTopupEnabled() && (
         <TopupModal
           onClose={() => setShowTopup(false)}

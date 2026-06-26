@@ -7,3 +7,5 @@
 > - **Index** : [`README.md`](./README.md)
 
 Ne plus utiliser ce fichier pour l'état du projet. Score obsolète (78/100) — score mesuré actuel : **76/100**.
+
+Programmes actifs documentés ailleurs : [`performance/PERFORMANCE_UX_CERTIFICATION.md`](./performance/PERFORMANCE_UX_CERTIFICATION.md) · [`streaming/SPRING_2_MVP_INTEGRATION.md`](./streaming/SPRING_2_MVP_INTEGRATION.md)

@@ -280,7 +280,7 @@ export class StreamingService {
 
     await this.requireUserId();
 
-    const { query, limit, type } = parsed.data;
+    const { query, limit, type, includeBeats } = parsed.data;
 
     const safe = async <T>(run: () => Promise<T>, fallback: T): Promise<T> => {
       try {
@@ -310,7 +310,9 @@ export class StreamingService {
           ? safe(() => this.repository.searchPlaylists(query, type === "all" ? perType : limit), [])
           : Promise.resolve([]),
         type === "all" || type === "beats"
-          ? safe(() => this.repository.searchBeats(query, type === "all" ? perType : limit), [])
+          ? includeBeats
+            ? safe(() => this.repository.searchBeats(query, type === "all" ? perType : limit), [])
+            : Promise.resolve([])
           : Promise.resolve([]),
       ]);
 

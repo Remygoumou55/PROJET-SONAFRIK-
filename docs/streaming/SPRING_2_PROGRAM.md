@@ -1,7 +1,8 @@
 # SPRING 2 — Streaming Runtime Enterprise Program
 
 > **Programme officiel** — Architecture, roadmap, certification  
-> Date : 2026-06-25 | Statut : ✅ PROGRAMME CERTIFIÉ  
+> Date : 2026-06-25 | Statut : ✅ PROGRAMME CERTIFIÉ (construction)  
+> **Intégration MVP :** voir [`SPRING_2_MVP_INTEGRATION.md`](./SPRING_2_MVP_INTEGRATION.md) — ❌ refusée tant que LIVE CONTROL non signé  
 > Prérequis : Publication Platform Phase 5 certifiée
 
 ---

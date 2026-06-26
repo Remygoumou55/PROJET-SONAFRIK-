@@ -42,7 +42,7 @@
 | UI & pages | 85/100 |
 | Sécurité | 88/100 (CORS fermé ✅) |
 | Chaîne financière | 45/100 (cycle manuel OK, Orange Money pas encore intégré prod) |
-| Tests couverture MVP | 45/100 (258 tests streaming/metadata, 0 wallet/payments) |
+| Tests couverture MVP | 55/100 (279 tests API dont wallet/payments) |
 | **GLOBAL** | **76/100** |
 
 ### P0 résolus (26 juin 2026)
@@ -55,9 +55,180 @@
 - ✅ CORS : 14 edge functions sécurisées, `_shared/cors.ts`, fallback strict
 
 ### Restant avant lancement public
-- 🟡 Tests wallet/paiements (0 tests actuellement)
-- 🔵 Orange Money GN Phase 2 (credentials en cours — voir `P0-2-PHASE-2-ORANGE-MONEY.md`)
-- 🔵 Artistes fondateurs réels sur `/lancement` (section masquée si vide)
+- 🔵 Orange Money GN Phase 2 (credentials — voir `P0-2-PHASE-2-ORANGE-MONEY.md`)
+- 🔵 LIVE CONTROL signature Rémy (Vague A5)
+- 🔵 Vague C → G chaîne MVP E2E prod
+
+---
+
+## [2026-06-26] — Performance Layer senior (config centralisée + optimisations flaggées)
+**Agent :** Claude Sonnet 4.6  
+**Type :** architecture performance · optimisations MVP · tooling
+
+### Mission
+Livrer une couche performance professionnelle : config centralisée serveur→client, optimisations activables indépendamment, tests, bundle analyzer — sans toucher engines freeze.
+
+### Architecture livrée
+- `apps/web/src/lib/performance/` — `PerformanceProvider`, `resolvePerformanceFlags`, hooks motion
+- `packages/shared/src/performance/` — cache recherche TTL 5 min + constantes CDC (3 tests vitest)
+- Layouts `(listener)` + `(creator)` résolvent flags en parallèle côté serveur
+
+### Optimisations implémentées (flags OFF = comportement inchangé)
+| Flag | Effet |
+|---|---|
+| `performance_search_cache_enabled` | Cache mémoire recherche 5 min |
+| `performance_animation_cdc_compliant_enabled` | Animations ≤300ms + CSS creator |
+| `performance_africa_mode_enabled` | Qualité audio plafonnée, prefetch nav OFF, motion OFF |
+| *(dérivé)* | `routePrefetchEnabled = !africaMode` |
+
+### Fondations (toujours actives)
+- Skeletons `onboarding/loading.tsx` + `legal/loading.tsx` (48 segments total)
+- `data-player-active` sur `<html>` pour observabilité CLS
+- `@next/bundle-analyzer` — `pnpm analyze:web`
+- `optimizePackageImports: @sonafrik/shared`
+
+### Validation
+- [x] `pnpm --filter @sonafrik/shared test` — 3/3
+- [x] `pnpm typecheck` / `lint` / `build` PASS
+- [x] `pnpm probe:performance` — 30/30
+
+### Prochaine étape
+LIVE CONTROL Rémy + Lighthouse pages P0 → certification finale
+
+---
+**Agent :** Claude Sonnet 4.6  
+**Type :** optimisation · Phase J · feature-flagged
+
+### Mission
+Appliquer migration flags performance en DB live + première optimisation : cache mémoire recherche TTL 5 min, activable via `/admin/flags`.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/lib/search-result-cache.ts` — cache TTL 5 min
+- `apps/web/src/features/listener/hooks/useSearch.ts` — lecture/écriture cache si flag ON
+- `apps/web/src/features/listener/components/SearchPage.tsx` — prop `searchCacheEnabled`
+- `apps/web/src/app/(listener)/search/page.tsx` — résolution flag serveur
+
+### DB live
+- Migration `20260626120000_performance_ux_feature_flags.sql` appliquée ✅
+- **8/8** flags `performance_*` présents, `enabled=false`
+
+### Comportement
+- Flag OFF (défaut prod) : comportement identique — requête API à chaque recherche
+- Flag ON : requêtes identiques `query+type` servies depuis cache 5 min (0 requête réseau)
+
+### Validation
+- [x] `pnpm typecheck` / `lint` / `build` PASS
+- [x] Architecture freeze respecté
+- [ ] Test manuel : activer flag → taper 2× même requête → 1 seul appel Network
+
+---
+**Agent :** Claude Sonnet 4.6  
+**Type :** discovery · documentation · probes · feature flags (zéro optimisation code)
+
+### Mission
+Construire le programme officiel de certification UX/Performance MVP : mesurer, auditer, cadre de correction — sans modifier engines freeze (runtime, wallet, publication, metadata).
+
+### Constats mesurés (Phase A)
+- **119** fichiers `"use client"` · **46** `loading.tsx` · **7** `dynamic()`
+- **0** React Query · **0** framer-motion / chart libs
+- First Load JS P0 : `/listen` **219 kB**, `/library` **220 kB** (gate ≤230 kB ✅)
+- `networkAware` + qualité audio 64/96/128 kbps ✅
+- Violations CDC animations >300ms (landing, creator KPI)
+- **Aucune** mesure Lighthouse/CWV officielle
+
+### Livrables
+- `docs/performance/PERFORMANCE_UX_CERTIFICATION.md` — phases A→N
+- `docs/performance/LIVE_CONTROL_PERFORMANCE.md` — parcours Rémy
+- `docs/performance/AFRICA_MODE.md` — profils 2G/3G/4G/instable
+- `docs/performance/reports/` — 4 rapports baseline
+- `scripts/probe-performance-discovery.ts` + `probe-performance-certification.ts`
+- Migration `20260626120000_performance_ux_feature_flags.sql` — 8 flags OFF
+
+### Décision programme
+```
+❌ PERFORMANCE & UX CERTIFICATION PROGRAM REFUSÉ
+🟢 LIVE CONTROL PERFORMANCE PRÊT — signature Rémy en attente
+```
+
+### Prochaine étape
+1. Appliquer migration flags · LIVE CONTROL Rémy
+2. Lighthouse pages P0 (mobile 4G + Slow 3G)
+3. Optimisations via flags `performance_*` une par une
+
+### Validation
+- [x] Architecture freeze respecté (0 modification engines)
+- [x] `pnpm probe:performance` — **27/27**
+- [x] `pnpm build` / `lint` / `typecheck` — inchangé
+
+---
+
+## [2026-06-26] — SPRING 2.8 — Bridge étape 1 (observe-only, lecture Legacy)
+**Agent :** Claude Sonnet 4.6  
+**Type :** intégration · couche bridge web · zéro dispatch engine
+
+### Mission
+Implémenter la couche bridge observable : `usePlayer` délègue au Legacy, le Runtime Enterprise est chargé en dry-run/observation uniquement. Engines LOCKED inchangés.
+
+### Fichiers touchés
+- `packages/api/src/streaming/integration/streaming-playback-bridge.ts` — `StreamingPlaybackBridge`, init flags, `GetRuntimeStatus`, délégation Legacy
+- `packages/api/src/streaming/integration/streaming-playback-bridge.test.ts` — 4 tests unitaires
+- `packages/api/src/streaming/integration/index.ts` — exports bridge
+- `apps/web/src/features/listener/integration/useStreamingPlaybackBridge.ts` — hook React
+- `apps/web/src/features/listener/integration/streaming-bridge-logger.ts` — logs `[StreamingBridge]` (dev)
+- `apps/web/src/features/listener/hooks/usePlayer.ts` — remplace `useStreamingService` par bridge
+
+### Comportement
+- Flags OFF → `mode=legacy`, edge `stream-start|progress|complete` inchangé
+- Flags foundation ON → coordinator observable (`mode=runtime`), lecture toujours Legacy
+- Observability : `correlationId`, `playbackId`, `runtimeStatus` sur `startStream`
+
+### Décision programme
+- 🟡 **MVP INTEGRATION PARTIEL** — bridge étape 1 livré, LIVE CONTROL non signé
+- 🟢 **LIVE CONTROL PRÊT** — Rémy peut valider sur `/listen` (voir `LIVE_CONTROL_SPRING2.md`)
+
+### Prochaine étape
+1. LIVE CONTROL Rémy (flags OFF puis foundation ON)
+2. Étapes 2–8 : session engine → playback → signed URL (un flag à la fois)
+3. Mobile bridge post-web
+
+### Validation
+- [x] `pnpm typecheck` — 15/15
+- [x] `pnpm lint` — 15/15
+- [x] `pnpm build` — 9/9
+- [x] `pnpm --filter @sonafrik/api test` — **262/262**
+- [x] `pnpm probe:certification` — 129/129
+- [x] Architecture freeze respecté (0 modification `runtime/`, `session/`, `playback/`, contracts)
+
+---
+
+## [2026-06-26] — SPRING 2 — MVP Integration Program (Phase A→I Discovery)
+**Agent :** Claude Sonnet 4.6  
+**Type :** discovery · cartographie · stratégie activation (zéro code engine)
+
+### Mission
+Auditer Legacy vs Runtime Enterprise, produire plan d'intégration progressive feature-flagged, préparer LIVE CONTROL. **Aucune activation runtime** — engines LOCKED.
+
+### Constats mesurés
+- **15/15 feature flags** DB `enabled=false` (vérifié live)
+- **0 import** `createStreamingRuntimeFoundation` dans `apps/web` ou `apps/mobile`
+- **100 % lectures** via `StreamingService` → edge `stream-start|progress|complete`
+- **258/258** tests API streaming PASS
+
+### Livrables
+- `docs/streaming/SPRING_2_MVP_INTEGRATION.md` — cartographie, mapping, stratégie 8 étapes
+- `docs/streaming/LIVE_CONTROL_SPRING2.md` — checklist validation Rémy
+
+### Décision programme
+- ❌ **MVP INTEGRATION REFUSÉ** (bridge code absent, LIVE CONTROL non exécuté)
+- 🟢 **LIVE CONTROL PRÊT** — en attente signature Rémy
+
+### Prochaine étape
+Implémenter couche bridge `apps/web/src/features/listener/integration/` → étape 1 coordinator → LIVE CONTROL.
+
+### Validation
+- [x] pnpm typecheck / lint / build PASS
+- [x] vitest API 258/258 PASS
+- [x] Architecture freeze respecté (0 modification engines/contracts)
 
 ---
 
@@ -856,6 +1027,411 @@ Transformer le Dashboard Créateur ERP en quartier général artiste : hero viva
 
 ### Résultat
 **Succès** — Dashboard premium livré. Personnalisation widgets (Phase 10) = Phase 2 post-MVP.
+
+---
+
+## [2026-06-24] — Vague A — Bloquants lancement (audit forensique)
+**Agent :** Claude  
+**Vague / Lot :** A1→A5 — Urgence absolue pré-beta  
+**Type :** feat + test + migration
+
+### Mission
+Corriger les bloquants lancement identifiés par l'audit forensique : brancher `subscription_plans`, tests financiers wallet/payments, E2E chaîne MVP, documenter Orange Money (bloqué credentials) et LIVE CONTROL (signature fondateur).
+
+### Fichiers touchés
+- `packages/types/src/wallet.ts` — `SubscriptionPlan`, `ListenerPremiumPlan`, `PREMIUM_BILLING_SLUGS`
+- `packages/api/src/wallet/subscription-plans.repository.ts` — lecture plans actifs DB
+- `packages/api/src/wallet/subscription-plans.mapper.ts` — mapping slugs → plans auditeur
+- `packages/api/src/wallet/wallet.service.ts` — `getListenerPremiumPlans()`, validation plan avant RPC
+- `apps/web/src/features/wallet/hooks/useSubscriptionPlans.ts` — hook UI
+- `apps/web/src/features/wallet/components/SubscriptionModal.tsx` — tarifs depuis DB
+- `packages/api/src/wallet/*.test.ts` + `packages/api/src/payments/payments.service.test.ts` — 14 tests nouveaux
+- `apps/web/tests/e2e/mvp-chain.spec.ts` — chaîne listen → search → wallet
+- `supabase/migrations/20260624140000_vague_a_subscription_plans_rpc.sql` — plan annuel + RPC prix DB
+- `docs/VAGUE_A_LAUNCH_BLOCKERS.md` — statut A1→A5
+
+### Validation
+- [x] Migration appliquée remote — 4 plans (`gratuit`, `premium`, `premium-annual`, `artiste`)
+- [x] `pnpm --filter @sonafrik/api test` → **276/276** PASS (+14 wallet/payments)
+- [x] `pnpm build` PASS (9/9 packages, 47 routes)
+- [x] `pnpm lint` PASS
+- [x] `pnpm typecheck` PASS (15/15)
+
+### Statut Vague A
+| ID | Statut |
+|---|---|
+| A1 Orange Money prod | ⏸ BLOQUÉ — credentials opérateur (`docs/P0-2-PHASE-2-ORANGE-MONEY.md`) |
+| A2 Tests wallet/payments | ✅ FAIT |
+| A3 subscription_plans branché | ✅ FAIT |
+| A4 E2E chaîne MVP | ✅ FAIT |
+| A5 LIVE CONTROL signature | ⏳ EN ATTENTE Rémy |
+
+### Résultat
+**Partiel** — tout le code livrable est en place. A1 (externe) et A5 (fondateur) restent avant clôture totale Vague A.
+
+### Prochaine étape
+**Vague B** — après credentials Orange Money ou décision de lancer Wave GN en premier.
+
+---
+
+## [2026-06-24] — Re-audit Vague A (corrections bugs)
+**Agent :** Claude  
+**Vague / Lot :** A — Re-audit + corrections  
+**Type :** fix + test + probe
+
+### Bugs corrigés
+- `WalletDashboard` utilisait encore `SUBSCRIPTION_PLANS` hardcodé → branché DB via `useSubscriptionPlans` (fetch unique dans `WalletClient`)
+- Badge −20% calculé dynamiquement (`computeAnnualSavingsPercent`) depuis tarifs DB
+- `subscribePremium` : gestion `wallet_not_found`, `unauthorized`, réponse RPC invalide
+- `WALLET_ERROR_MESSAGES` : ajout `plan_not_found`
+- `SubscriptionPlansRepository` : normalisation champ `features` JSON
+
+### Nouveau probe
+- `scripts/probe-vague-a-launch.ts` — `pnpm probe:vague-a-launch` → **15/15**
+
+### Validation re-audit
+- [x] `pnpm probe:vague-a-launch` → 15/15
+- [x] `pnpm --filter @sonafrik/api test` → **279/279**
+- [x] `pnpm build` / `lint` / `typecheck` → PASS
+
+### Résultat
+**Code Vague A en ordre** — seuls A1 (credentials Orange) et A5 (signature Rémy) restent externes.
+
+---
+
+## [2026-06-24] — Vague B — Stabilisation (audit forensique)
+**Agent :** Claude  
+**Vague / Lot :** B1→B5 — Stabilisation pré-beta  
+**Type :** types + middleware + ops + e2e + sécurité CSP
+
+### Mission
+Exécuter la Vague B du plan forensique : types DB synchronisés, middleware auth cold-path, rollback flags documenté, E2E élargi, CSP prod durcie.
+
+### Livraisons
+| ID | Livrable |
+|---|---|
+| B1 | `pnpm gen:types` → 3766 lignes, `subscription_plans` typé |
+| B2 | `middleware.ts` — `getSession()` avant `getUser()` timeout |
+| B3 | `docs/VAGUE_B_FLAGS_ROLLBACK.md` — 40 flags, rollback SQL |
+| B4 | `library.spec.ts` + wallet tarifs DB ; 6 specs E2E |
+| B5 | CSP prod sans `unsafe-eval` (`next.config.ts`) |
+
+### Fichiers touchés
+- `packages/database/src/types/index.ts` — régénéré depuis DB live
+- `apps/web/src/middleware.ts` — cold path session
+- `apps/web/next.config.ts` — CSP dev/prod
+- `apps/web/tests/e2e/library.spec.ts` — nouveau
+- `apps/web/tests/e2e/wallet.spec.ts` — tarifs DB
+- `scripts/probe-vague-b-stabilisation.ts` — probe 9/9
+- `docs/VAGUE_B_STABILISATION.md` + `docs/VAGUE_B_FLAGS_ROLLBACK.md`
+
+### Validation
+- [x] `pnpm probe:vague-b-stabilisation` → **9/9**
+- [x] `pnpm probe:vague-b` → **19/19** (régression B++)
+- [x] `pnpm --filter @sonafrik/api test` → **279/279**
+- [x] `pnpm build` / `lint` / `typecheck` → PASS
+
+### Résultat
+**✅ TERMINÉ** — Vague B en ordre. Prochaine : **Vague C** (nettoyage like/favorite, hex résiduels).
+
+---
+
+## [2026-06-24] — Re-audit Vague B (corrections)
+**Agent :** Claude  
+**Type :** fix + probe renforcé
+
+### Bugs corrigés
+- Middleware admin : timeout `is_admin` ne redirige plus vers `/listen` (fallback SSR `requireAdmin`)
+- Probe B5 : vérifie que la branche **prod** n'inclut pas `unsafe-eval`
+- Probe B3 : vérifie les 3 flags MVP actifs (`rights_management`, `search_multi_type`, `tips_enabled`)
+- Doc flags : comptage streaming/runtime corrigé (15)
+
+### Validation re-audit
+- [x] `pnpm probe:vague-b-stabilisation` → **10/10**
+- [x] `pnpm probe:vague-b` → **19/19**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **279/279** → PASS
+
+### Résultat
+**Vague B confirmée en ordre** — prête pour Vague C.
+
+---
+
+## [2026-06-24] — Re-audit Vague B (2e passe — build + probe 11/11)
+**Agent :** Claude  
+**Type :** fix TypeScript + probe CSP
+
+### Bugs corrigés
+- `middleware.ts` : sentinel `Symbol` remplacé par `null` (`boolean | null`) — corrige erreur TS2345 au build
+- Probe B5 : regex adaptée aux template literals backticks dans `next.config.ts`
+- Probe B3 : check `flags-safe-defaults` restauré (aucun flag streaming/runtime/performance ON)
+
+### Validation re-audit final
+- [x] `pnpm probe:vague-b-stabilisation` → **11/11**
+- [x] `pnpm probe:vague-b` → **19/19**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **279/279** → PASS
+
+### Résultat
+**Vague B validée et en ordre** — prête pour **Vague C**.
+
+---
+
+## [2026-06-24] — Vague C — Nettoyage (audit forensique)
+**Agent :** Claude  
+**Type :** nettoyage forensique C1→C4
+
+### Livrables
+- Migration `20260624160000_vague_c_likes_separation.sql` — table `likes`, RPC `toggle_like`/`is_liked`
+- `social.repository.ts` — like ≠ favorite
+- Search gated : `includeBeats` + flag `beat_store`
+- Docs : `VAGUE_C_STABILISATION.md`, `VAGUE_C_ORPHAN_TABLES.md`
+- Probe : `pnpm probe:vague-c-stabilisation` → **12/12**
+
+### Validation
+- [x] `pnpm probe:vague-c-stabilisation` → **12/12**
+- [x] `pnpm probe:vague-c` → **19/19** (régression C++ admin)
+- [x] `pnpm probe:vague-b-stabilisation` → **11/11**
+- [x] `pnpm probe:hex-colors` → **4/4**
+- [x] `pnpm build` / `lint` / `typecheck` → PASS
+- [x] Tests API → **282/282** (incl. social.repository.test)
+
+### Résultat
+**Vague C validée** — prête pour **Vague G** (chaîne MVP royalties/paiements).
+
+---
+
+## [2026-06-24] — Re-audit Vague C (2e passe — 16/16)
+**Agent :** Claude  
+**Type :** fix discovery + a11y + probe renforcé
+
+### Bugs corrigés
+- Discovery/analytics comptaient encore les likes via `favorites` track → migration `20260624170000` (4 RPC alignées sur `likes`)
+- `LikeButton` : aria-label « favoris » → « Aimer ce morceau » / « Retirer le like »
+- `SearchPage` : placeholder « beat » masqué quand `beat_store=false`
+- Probe C1 live : vérifie FK error explicite (pas n'importe quelle erreur)
+- Probe : +4 checks (types likes, discovery migration, LikeButton, rate_limit fn)
+
+### Validation re-audit
+- [x] `pnpm probe:vague-c-stabilisation` → **16/16**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **282/282** → PASS
+
+### Résultat
+**Vague C confirmée en ordre** — prête pour **Vague G**.
+
+---
+
+## [2026-06-24] — Vague G — Complétion chaîne MVP
+**Agent :** Claude  
+**Type :** chaîne wallet royalties → retraits (staging)
+
+### Livrables
+- G1 : `RoyaltiesPage` erreur UI + metadata `/wallet/royalties`
+- G2 : doc staging `VAGUE_G_STABILISATION.md` + gate `NEXT_PUBLIC_PAYMENTS_ENABLED`
+- G3 : E2E `mvp-chain.spec.ts` étendu (royalties + payout)
+- G4 : payout page sans layout/h1 dupliqué
+- G5 : bloqué credentials — `P0-2-PHASE-2-ORANGE-MONEY.md`
+- Probe : `pnpm probe:vague-g-stabilisation`
+
+### Validation
+- [x] `pnpm probe:vague-g-stabilisation` → **14/14**
+- [x] `pnpm probe:vague-c-stabilisation` → régression OK
+- [x] `pnpm build` / `lint` / `typecheck` / tests **282/282**
+
+### Résultat
+**Vague G validée** (G5 externe en attente Rémy) — LIVE CONTROL A5 recommandé ensuite.
+
+---
+
+## [2026-06-24] — Re-audit Vague G (2e passe — 17/17)
+**Agent :** Claude  
+**Type :** fix WalletClient + RoyaltiesPage UX
+
+### Bugs corrigés
+- `WalletClient` : `withdrawalEnabled` utilisait `isTopupEnabled()` → corrigé en `isWithdrawalEnabled()`
+- `RoyaltiesPage` : état vide affiché en même temps que l'erreur → masqué si `error`
+- `RoyaltiesPage` : montants via `formatGnf()` (source unique `@sonafrik/shared`)
+- Probe : +3 checks (`wallet-client-withdrawal`, `empty-on-error`, `royalty_calculations` RLS live)
+
+### Validation re-audit
+- [x] `pnpm probe:vague-g-stabilisation` → **17/17**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **282/282** → PASS
+
+### Résultat
+**Vague G confirmée en ordre** — G5 (credentials) reste bloquant externe.
+
+---
+
+## [2026-06-24] — Vague D — Design tokens + typage strict
+**Agent :** Claude  
+**Type :** formalisation stabilisation D1→D10 + probe forensique
+
+### Livrables
+- Doc : `docs/VAGUE_D_STABILISATION.md` (ordre D1→D10)
+- Probe : `pnpm probe:vague-d-stabilisation` (design tokens + typage + régression C + live RLS)
+- `probe-vague-d.ts` D11 étendu (régression B/C/G/D stabilisation + hex)
+
+### État technique (déjà conforme avant formalisation)
+- D1–D3 : 0 hex web/mobile, tokens `@theme`, 0 palette Tailwind brute
+- D4–D6 : 0 `as never`/`as any` prod API, 26 repositories propres, edge typées
+- D7–D8 : caps perf + `count_unread_notifications` RPC unique
+- D9 : régression scripts B/C/G présents
+- D10 : live RLS beats/admin/royalties OK
+
+### Validation audit final
+- [x] `pnpm probe:vague-d-stabilisation` → **18/18**
+- [x] `pnpm probe:vague-d` → **22/22**
+- [x] `pnpm probe:hex-colors` → **4/4**
+- [x] `pnpm probe:vague-g-stabilisation` → régression **17/17**
+- [x] `pnpm probe:vague-c-stabilisation` → régression **16/16**
+- [x] `pnpm build` / `lint` / `typecheck` / tests API → PASS
+
+### Résultat
+**Vague D validée en ordre** — prochaine : **A5 LIVE CONTROL** (signature Rémy).
+
+---
+
+## [2026-06-24] — Re-audit Vague D (2e passe — 23/23)
+**Agent :** Claude  
+**Type :** corrections forensiques + probe renforcé
+
+### Bugs corrigés
+- `searchBeats` : `if (error) return []` → `throw error` (incohérent avec les autres méthodes search)
+- `hasStreamingPermission` : fallback permissif `return true` sur erreur RPC → `throw error` (fail-closed)
+- `listUserIntents` (paiements) : swallow erreur → `PaymentError("intent_list_failed")`
+- `analyticsSchema.periodDays` : max 365 → **90** (aligné caps analytics + limite 10k sessions)
+- Types : `intent_list_failed` ajouté à `PAYMENT_ERROR_MESSAGES`
+
+### Probe renforcé (+5 checks)
+- `D3b-ui-zero-hex`, `D4c-web-as-any`, `D6-searchBeats-strict`, `D6b-streaming-permission-strict`, `D8c-payments-list-strict`
+- `probe-vague-d.ts` D6/D7 affinés (plus de faux positif « sans try/catch »)
+
+### Validation re-audit
+- [x] `pnpm probe:vague-d-stabilisation` → **23/23**
+- [x] `pnpm probe:vague-d` → **22/22**
+- [x] `pnpm probe:hex-colors` → **4/4**
+- [x] `pnpm probe:vague-g-stabilisation` → **17/17**
+- [x] `pnpm probe:vague-c-stabilisation` → **16/16**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **282/282** → PASS
+
+### Résultat
+**Vague D confirmée en ordre** — codebase typage + tokens + erreurs DB strictes.
+
+---
+
+## [2026-06-24] — Vague E — Paiements mobiles & sécurité financière
+**Agent :** Claude  
+**Type :** formalisation E1→E11 + corrections forensiques
+
+### Livrables
+- Doc : `docs/VAGUE_E_STABILISATION.md`
+- Probe : `pnpm probe:vague-e-stabilisation` (26 checks forensique)
+- `probe-vague-e.ts` E13 étendu (régression D/G/E stabilisation)
+
+### Bugs corrigés (re-audit)
+- `markPaymentIntentFailed` : log erreur si update DB échoue
+- `usePaymentHistory` : plus de swallow silencieux → état `error` + `PaymentHistory` `role="alert"`
+
+### État technique (déjà conforme avant formalisation)
+- 4 opérateurs intégrés (sandbox + prod) — pas de stubs TODO
+- Webhooks DRY + auth HMAC/API key
+- `confirm_payment_intent` service_role only · `topup_wallet` bloqué listener
+
+### Validation audit final
+- [x] `pnpm probe:vague-e-stabilisation` → **26/26**
+- [x] `pnpm probe:vague-e` → **22/22**
+- [x] `pnpm probe:vague-d-stabilisation` → régression **23/23**
+- [x] `pnpm probe:vague-g-stabilisation` → régression **17/17**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **282/282** → PASS
+
+### Résultat
+**Vague E validée en ordre** — prod opérateurs bloquée externe (credentials Rémy) · prochaine : **A5 LIVE CONTROL**.
+
+---
+
+## [2026-06-24] — Re-audit Vague E (2e passe — 26/26)
+**Agent :** Claude  
+**Type :** corrections forensiques paiements + probe renforcé
+
+### Bugs corrigés
+- `payment-initiate` : updates `pending`/`failed` sans vérif erreur → `intent_update_failed` + log
+- `getIntent` : erreur DB masquée en `intent_not_found` → `intent_fetch_failed`
+- `confirmPaymentIntent` / `markPaymentIntentFailed` : retour `boolean` (observabilité webhook)
+- `TopupModal` : montant custom `NaN` / < 1000 GNF → validation `resolveAmount()`
+- `usePaymentHistory` : messages via `PaymentError` + `PAYMENT_ERROR_MESSAGES`
+- `docs/PAIEMENTS.md` : doc obsolète « stubs TODO » corrigée (code implémenté Vague E)
+
+### Probe renforcé
+- E2 bool retour · E5 `intent_update_failed` · E7 `intent_fetch_failed` · E8 `resolveAmount` · E4 orange HMAC (probe-vague-e)
+
+### Validation re-audit
+- [x] `pnpm probe:vague-e-stabilisation` → **26/26**
+- [x] `pnpm probe:vague-e` → **22/22**
+- [x] `pnpm probe:vague-d-stabilisation` → **23/23**
+- [x] `pnpm probe:vague-g-stabilisation` → **17/17**
+- [x] `pnpm build` / `lint` / `typecheck` / tests **283/283** → PASS
+
+### Résultat
+**Vague E confirmée en ordre** — chaîne financière staging solide, prod = credentials Rémy.
+
+---
+
+## [2026-06-24] — Audit maître Vagues A→E (certification senior)
+**Agent :** Claude  
+**Type :** re-audit ordonné A→E + DB live + CI complète
+
+### Commande
+```bash
+pnpm probe:certification-a-e
+```
+
+### Scorecard
+| Zone | Résultat |
+|---|---|
+| A (sécurité + launch) | 30/30 ✅ |
+| B (stabilisation) | 30/30 ✅ |
+| C (admin + nettoyage) | 35/35 ✅ |
+| D (tokens + typage) | 46/46 ✅ |
+| E (paiements) | 48/48 ✅ |
+| SCS hex/Tailwind | 4/4 ✅ |
+| **TOTAL A→E** | **193/193 ✅** |
+| Certification A→F | 130/130 ✅ |
+| Vague G (régression) | 17/17 ✅ |
+| build / lint / typecheck | PASS ✅ |
+| Tests API | 283/283 ✅ |
+
+### DB live vérifiée
+- `likes`, `subscription_plans`, `payment_intents`, `payout_audit_logs` → RLS=true
+- `subscription_plans` : 4 slugs prix conformes probe A Launch
+
+### Bugs corrigés durant l'audit
+Aucun — tous les probes A→E passent après corrections des passes précédentes.
+
+### Livrables audit
+- `scripts/probe-certification-vagues-a-e.ts` — certification ordonnée unique
+- `docs/AUDIT_VAGUES_A_E.md` — scorecard + dette documentée
+
+### Dette non bloquante (documentée)
+- EXT-1 credentials opérateurs · EXT-2 LIVE CONTROL A5 · P2 rgba() résiduels · P2 as never tests
+
+### Résultat
+**Application stabilisée pour beta fermée** — chaîne A→E validée en ordre expert.
+
+---
+
+## [2026-06-24] — Performance + commit/push global
+**Agent :** Claude  
+**Type :** optimisation performance + livraison complète vagues A→E
+
+### Optimisations performance
+- `resolvePerformanceFlags` : 3 requêtes → **1 requête** batch `feature_flags`
+- Migration `20260624180000` : flags sûrs activés en prod
+  - `performance_search_cache_enabled` = ON (cache client recherche 5 min)
+  - `performance_animation_cdc_compliant_enabled` = ON (animations ≤300ms CDC)
+- Couche existante : WebPlayer `ssr:false`, SearchResults dynamic, middleware timeout 4s, AVIF/WebP, staleTimes, search debounce 300ms
+
+### Validation
+- [x] `pnpm probe:performance` → **30/30**
+- [x] `pnpm probe:certification-a-e` → **193/193**
+- [x] build / lint / typecheck / tests API → PASS
 
 ---
 

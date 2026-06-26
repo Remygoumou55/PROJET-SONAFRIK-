@@ -9,12 +9,43 @@ export type RoyaltyCycleStatus = "open" | "calculating" | "ready" | "distributed
 export type RoyaltyCalculationStatus = "pending" | "approved" | "paid" | "cancelled";
 export type PayoutBatchStatus = "open" | "processing" | "completed" | "closed";
 
+/** @deprecated Préférer `getListenerPremiumPlans()` — tarifs depuis `subscription_plans` en DB */
 export const SUBSCRIPTION_PLANS = {
   MONTHLY: { type: "monthly" as const, price_gnf: 50_000, label: "Mensuel", duration_days: 30 },
   ANNUAL:  { type: "annual"  as const, price_gnf: 480_000, label: "Annuel", duration_days: 365 },
 } as const;
 
 export type SubscriptionPlanType = keyof typeof SUBSCRIPTION_PLANS;
+
+/** Ligne `subscription_plans` — source de vérité tarifs abonnement */
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  slug: string;
+  price_gnf: number;
+  features: Record<string, unknown>;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Plan premium auditeur — dérivé de la DB + mapping billing */
+export interface ListenerPremiumPlan {
+  id: string;
+  billingPeriod: "monthly" | "annual";
+  planType: "monthly" | "annual";
+  label: string;
+  priceGnf: number;
+  durationDays: number;
+  slug: string;
+}
+
+/** Slugs DB attendus pour les périodes de facturation premium auditeur */
+export const PREMIUM_BILLING_SLUGS = {
+  monthly: { slug: "premium", label: "Mensuel", durationDays: 30, planType: "monthly" as const },
+  annual:  { slug: "premium-annual", label: "Annuel", durationDays: 365, planType: "annual" as const },
+} as const;
 
 export interface Wallet {
   id: string;
@@ -309,6 +340,7 @@ export const WALLET_ERROR_MESSAGES: Record<string, string> = {
   payout_account_not_found:     "Compte de retrait introuvable.",
   minimum_withdrawal_5000:      "Le retrait minimum est de 5 000 GNF.",
   subscription_failed:          "Impossible de souscrire. Vérifiez votre solde.",
+  plan_not_found:               "Plan d'abonnement introuvable.",
   topup_failed:                 "Échec de la recharge. Réessayez.",
   withdrawal_failed:            "Impossible d'initier le retrait.",
   payout_account_create_failed: "Impossible d'ajouter le compte de retrait.",

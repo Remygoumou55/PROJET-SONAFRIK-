@@ -4,6 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { memo } from "react";
 import { usePathname } from "next/navigation";
+import { usePerformanceFlags } from "@/lib/performance";
 import { PlayerProvider } from "../lib/playerContext";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
@@ -101,6 +102,7 @@ function DesktopNav({
   initialUnreadCount: number;
 }) {
   const pathname = usePathname();
+  const { routePrefetchEnabled } = usePerformanceFlags();
   return (
     <nav
       className="hidden md:flex w-64 flex-shrink-0 flex-col gap-1 p-4 h-screen sticky top-0"
@@ -133,7 +135,7 @@ function DesktopNav({
           <Link
             key={item.href}
             href={item.href}
-            prefetch
+            prefetch={routePrefetchEnabled}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
             style={{
               backgroundColor: isActive ? "rgba(0,210,106,0.09)" : "transparent",
@@ -157,6 +159,7 @@ function MobileBottomNav({
   initialUnreadCount: number;
 }) {
   const pathname = usePathname();
+  const { routePrefetchEnabled } = usePerformanceFlags();
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-1 py-2"
@@ -188,7 +191,7 @@ function MobileBottomNav({
           <Link
             key={item.href}
             href={item.href}
-            prefetch
+            prefetch={routePrefetchEnabled}
             className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors"
             style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
           >

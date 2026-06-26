@@ -114,7 +114,7 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
         .eq("id", intentId)
         .maybeSingle();
 
-      if (error) throw new PaymentError("intent_not_found");
+      if (error) throw new PaymentError("intent_fetch_failed");
       return data as PaymentIntent | null;
     },
 
@@ -128,7 +128,7 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
         .order("created_at", { ascending: false })
         .limit(limit);
 
-      if (error) return [];
+      if (error) throw new PaymentError("intent_list_failed");
       return (data ?? []) as PaymentIntent[];
     },
   };

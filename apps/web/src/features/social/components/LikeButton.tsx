@@ -18,7 +18,7 @@ export function LikeButton({ trackId, showCount = false, size = "md" }: Props) {
     <button
       onClick={toggleLike}
       disabled={isLoading}
-      aria-label={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
+      aria-label={isLiked ? "Retirer le like" : "Aimer ce morceau"}
       aria-pressed={isLiked}
       className="flex items-center gap-1.5 rounded-lg transition-opacity disabled:opacity-50"
       style={{ color: isLiked ? "var(--color-vert-energie)" : "var(--color-texte-secondaire)" }}

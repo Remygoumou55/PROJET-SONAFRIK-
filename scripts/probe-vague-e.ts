@@ -77,17 +77,22 @@ function staticChecks() {
 
   const waveCb = read("supabase/functions/payment-wave-callback/index.ts");
   const soutraCb = read("supabase/functions/payment-soutra-callback/index.ts");
+  const orangeCb = read("supabase/functions/payment-orange-callback/index.ts");
   log(
-    "E4 HMAC wave + soutra",
-    waveCb.includes("verifyHmacSha256") && soutraCb.includes("verifyHmacSha256"),
-    "webhooks signés",
+    "E4 HMAC wave + soutra + orange",
+    waveCb.includes("verifyHmacSha256") &&
+      soutraCb.includes("verifyHmacSha256") &&
+      orangeCb.includes("verifyHmacSha256"),
+    "webhooks signés (3 opérateurs HMAC)",
   );
 
   const initiate = read("supabase/functions/payment-initiate/index.ts");
   log(
     "E5 payment-initiate",
-    initiate.includes("isProviderSandbox") && !initiate.includes("TODO:"),
-    "sandbox + prod",
+    initiate.includes("isProviderSandbox") &&
+      !initiate.includes("TODO:") &&
+      initiate.includes("intent_update_failed"),
+    "sandbox + prod + vérif update",
   );
 
   log(
@@ -148,8 +153,11 @@ function staticChecks() {
   );
 
   log(
-    "E13 régression probes A-D",
-    ["a", "b", "c", "d"].every((v) => existsSync(resolve(ROOT, `scripts/probe-vague-${v}.ts`))),
+    "E13 régression probes A-D + stabilisation D/G/E",
+    ["a", "b", "c", "d"].every((v) => existsSync(resolve(ROOT, `scripts/probe-vague-${v}.ts`))) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-d-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-g-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-e-stabilisation.ts")),
     "certifications précédentes",
   );
 }

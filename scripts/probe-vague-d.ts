@@ -116,12 +116,28 @@ function staticChecks() {
   }
 
   const streamingRepo = read("packages/api/src/streaming/streaming.repository.ts");
+  const searchBeatsBlock =
+    streamingRepo.match(/async searchBeats[\s\S]*?^  async /m)?.[0] ?? streamingRepo;
   log(
     "D6 searchBeats typé",
-    streamingRepo.includes('.from("beats")') && !streamingRepo.includes("as never"),
-    "sans try/catch défensif",
+    streamingRepo.includes('.from("beats")') &&
+      !streamingRepo.includes("as never") &&
+      searchBeatsBlock.includes("if (error) throw error") &&
+      !searchBeatsBlock.includes("if (error) return []"),
+    "erreurs propagées (pas de swallow)",
   );
-  log("D7 stream_sessions cap", streamingRepo.includes(".limit(10_000)"), "analytics plafonnées");
+  log(
+    "D6b hasStreamingPermission strict",
+    streamingRepo.includes("async hasStreamingPermission") &&
+      !streamingRepo.includes("if (error) return true"),
+    "pas de fallback permissif sur erreur RPC",
+  );
+  log(
+    "D7 stream_sessions cap",
+    streamingRepo.includes(".limit(10_000)") &&
+      read("packages/api/src/streaming/schemas.ts").includes(".max(90)"),
+    "analytics plafonnées + periodDays ≤ 90",
+  );
 
   const analyticsSchemas = read("packages/api/src/analytics/schemas.ts");
   const payoutSchemas = read("packages/api/src/payout/schemas.ts");
@@ -152,10 +168,13 @@ function staticChecks() {
   );
 
   log(
-    "D11 régression probes A/B/C",
+    "D11 régression probes A/B/C/G + D stabilisation",
     existsSync(resolve(ROOT, "scripts/probe-vague-a.ts")) &&
-      existsSync(resolve(ROOT, "scripts/probe-vague-b.ts")) &&
-      existsSync(resolve(ROOT, "scripts/probe-vague-c.ts")),
+      existsSync(resolve(ROOT, "scripts/probe-vague-b-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-c-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-g-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-vague-d-stabilisation.ts")) &&
+      existsSync(resolve(ROOT, "scripts/probe-hex-colors.ts")),
     "certifications précédentes",
   );
 }

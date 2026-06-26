@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { memo } from "react";
-import type { WalletContext, Transaction } from "@sonafrik/types";
-import { TRANSACTION_TYPE_LABELS, SUBSCRIPTION_PLANS } from "@sonafrik/types";
+import type { WalletContext, Transaction, ListenerPremiumPlan } from "@sonafrik/types";
+import { TRANSACTION_TYPE_LABELS } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
+import { computeAnnualSavingsPercent } from "@sonafrik/api/wallet";
 import { formatDate } from "@/lib/formatters";
 
 const TransactionRow = memo(function TransactionRow({ tx }: { tx: Transaction }) {
@@ -39,6 +40,8 @@ interface WalletDashboardProps {
   context: WalletContext;
   topupEnabled: boolean;
   withdrawalEnabled: boolean;
+  plans: ListenerPremiumPlan[];
+  plansLoading: boolean;
   onSubscribe: () => void;
   onTopup: () => void;
 }
@@ -47,10 +50,13 @@ export const WalletDashboard = memo(function WalletDashboard({
   context,
   topupEnabled,
   withdrawalEnabled,
+  plans,
+  plansLoading,
   onSubscribe,
   onTopup,
 }: WalletDashboardProps) {
   const { wallet, isPremium, premiumExpiresAt, isInGracePeriod, recentTransactions, pendingWithdrawals } = context;
+  const annualSavings = computeAnnualSavingsPercent(plans);
 
   return (
     <div className="space-y-6">
@@ -170,27 +176,44 @@ export const WalletDashboard = memo(function WalletDashboard({
         </div>
       )}
 
-      {/* Plans */}
+      {/* Plans — tarifs depuis subscription_plans (DB) */}
       <div>
         <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-texte-principal)" }}>Abonnements</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {Object.values(SUBSCRIPTION_PLANS).map((plan) => (
-            <button
-              key={plan.type}
-              onClick={onSubscribe}
-              className="rounded-xl p-4 text-left transition-all"
-              style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-bordure)" }}
-            >
-              <p className="font-semibold" style={{ color: "var(--color-texte-principal)" }}>{plan.label}</p>
-              <p className="text-lg font-bold mt-1" style={{ color: "var(--color-or-solaire)" }}>
-                {formatGnf(plan.price_gnf)}
-              </p>
-              <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
-                {plan.duration_days} jours · Écoute illimitée
-              </p>
-            </button>
-          ))}
-        </div>
+        {plansLoading ? (
+          <div className="grid grid-cols-2 gap-3">
+            {[0, 1].map((i) => (
+              <div key={i} className="rounded-xl p-4 h-24 animate-pulse" style={{ backgroundColor: "var(--color-card)" }} />
+            ))}
+          </div>
+        ) : plans.length === 0 ? (
+          <p className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>Tarifs indisponibles pour le moment.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {plans.map((plan) => (
+              <button
+                key={plan.id}
+                onClick={onSubscribe}
+                className="rounded-xl p-4 text-left transition-all"
+                style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-bordure)" }}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <p className="font-semibold text-sm" style={{ color: "var(--color-texte-principal)" }}>{plan.label}</p>
+                  {plan.billingPeriod === "annual" && annualSavings != null && annualSavings > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: "rgba(255,194,14,0.13)", color: "var(--color-or-solaire)" }}>
+                      −{annualSavings}%
+                    </span>
+                  )}
+                </div>
+                <p className="text-lg font-bold mt-1" style={{ color: "var(--color-or-solaire)" }}>
+                  {formatGnf(plan.priceGnf)}
+                </p>
+                <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
+                  {plan.durationDays} jours · Écoute illimitée
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

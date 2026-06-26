@@ -1,26 +1,42 @@
 "use client";
 
-import { memo, useState } from "react";
-import { SUBSCRIPTION_PLANS } from "@sonafrik/types";
-import type { SubscriptionPlanType } from "@sonafrik/types";
+import { memo, useEffect, useState } from "react";
+import type { ListenerPremiumPlan } from "@sonafrik/types";
+import { computeAnnualSavingsPercent } from "@sonafrik/api/wallet";
 import { useWallet } from "../hooks/useWallet";
 
 interface SubscriptionModalProps {
+  plans: ListenerPremiumPlan[];
+  isLoading: boolean;
+  loadError: string | null;
   onClose: () => void;
 }
 
-export const SubscriptionModal = memo(function SubscriptionModal({ onClose }: SubscriptionModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanType>("MONTHLY");
+export const SubscriptionModal = memo(function SubscriptionModal({
+  plans,
+  isLoading: plansLoading,
+  loadError: plansError,
+  onClose,
+}: SubscriptionModalProps) {
+  const [selectedPlan, setSelectedPlan] = useState<ListenerPremiumPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const { subscribePremium } = useWallet();
+  const annualSavings = computeAnnualSavingsPercent(plans);
+
+  useEffect(() => {
+    if (plans.length > 0 && !selectedPlan) {
+      setSelectedPlan(plans[0] ?? null);
+    }
+  }, [plans, selectedPlan]);
 
   const handleSubscribe = async () => {
+    if (!selectedPlan) return;
     setIsLoading(true);
     setError(null);
     try {
-      await subscribePremium({ planType: SUBSCRIPTION_PLANS[selectedPlan].type });
+      await subscribePremium({ planType: selectedPlan.planType });
       setSuccess(true);
       setTimeout(onClose, 1500);
     } catch (err) {
@@ -29,6 +45,8 @@ export const SubscriptionModal = memo(function SubscriptionModal({ onClose }: Su
       setIsLoading(false);
     }
   };
+
+  const displayError = error ?? plansError;
 
   return (
     <div
@@ -51,16 +69,26 @@ export const SubscriptionModal = memo(function SubscriptionModal({ onClose }: Su
             <p className="text-3xl mb-2">🎉</p>
             <p className="font-semibold" style={{ color: "var(--color-vert-energie)" }}>Abonnement activé !</p>
           </div>
+        ) : plansLoading ? (
+          <div className="py-10 flex justify-center">
+            <div
+              className="w-6 h-6 rounded-full border-2 animate-spin"
+              style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
+            />
+          </div>
+        ) : plans.length === 0 ? (
+          <p className="text-sm text-center py-6" style={{ color: "var(--color-texte-secondaire)" }}>
+            {displayError ?? "Aucun plan disponible pour le moment."}
+          </p>
         ) : (
           <>
             <div className="space-y-3">
-              {(Object.keys(SUBSCRIPTION_PLANS) as SubscriptionPlanType[]).map((key) => {
-                const plan = SUBSCRIPTION_PLANS[key];
-                const isSelected = selectedPlan === key;
+              {plans.map((plan) => {
+                const isSelected = selectedPlan?.id === plan.id;
                 return (
                   <button
-                    key={key}
-                    onClick={() => setSelectedPlan(key)}
+                    key={plan.id}
+                    onClick={() => setSelectedPlan(plan)}
                     className="w-full rounded-xl p-4 text-left transition-all"
                     style={{
                       backgroundColor: isSelected ? "rgba(0,210,106,0.13)" : "var(--color-elevated)",
@@ -69,34 +97,36 @@ export const SubscriptionModal = memo(function SubscriptionModal({ onClose }: Su
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-semibold" style={{ color: "var(--color-texte-principal)" }}>{plan.label}</span>
-                      {key === "ANNUAL" && (
+                      {plan.billingPeriod === "annual" && annualSavings != null && annualSavings > 0 && (
                         <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(255,194,14,0.13)", color: "var(--color-or-solaire)" }}>
-                          −20%
+                          −{annualSavings}%
                         </span>
                       )}
                     </div>
                     <p className="text-xl font-bold mt-1" style={{ color: isSelected ? "var(--color-vert-energie)" : "var(--color-texte-principal)" }}>
-                      {new Intl.NumberFormat("fr-GN").format(plan.price_gnf)} GNF
+                      {new Intl.NumberFormat("fr-GN").format(plan.priceGnf)} GNF
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
-                      {plan.duration_days} jours · Écoute illimitée
+                      {plan.durationDays} jours · Écoute illimitée
                     </p>
                   </button>
                 );
               })}
             </div>
 
-            {error && (
-              <p className="text-sm text-center" style={{ color: "var(--color-erreur)" }}>{error}</p>
+            {displayError && (
+              <p className="text-sm text-center" style={{ color: "var(--color-erreur)" }}>{displayError}</p>
             )}
 
             <button
               onClick={handleSubscribe}
-              disabled={isLoading}
+              disabled={isLoading || !selectedPlan}
               className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
               style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
             >
-              {isLoading ? "Traitement…" : `S'abonner — ${new Intl.NumberFormat("fr-GN").format(SUBSCRIPTION_PLANS[selectedPlan].price_gnf)} GNF`}
+              {isLoading
+                ? "Traitement…"
+                : `S'abonner — ${selectedPlan ? new Intl.NumberFormat("fr-GN").format(selectedPlan.priceGnf) : "—"} GNF`}
             </button>
 
             <p className="text-xs text-center" style={{ color: "var(--color-texte-desactive)" }}>

@@ -45,7 +45,7 @@ export class SocialService {
   }
 
   // ---------------------------------------------------------------------------
-  // Likes — track favorites
+  // Likes — engagement track (table likes, distinct des favoris bibliothèque)
   // ---------------------------------------------------------------------------
 
   async toggleLike(input: ToggleLikeInput): Promise<boolean> {

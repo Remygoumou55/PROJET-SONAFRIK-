@@ -8,9 +8,12 @@ import type {
   PayoutAccount,
   RoyaltyCalculation,
   WalletContext,
+  ListenerPremiumPlan,
 } from "@sonafrik/types";
 import { PREMIUM_GRACE_PERIOD_DAYS } from "@sonafrik/types";
 import { WalletRepository } from "./wallet.repository";
+import { SubscriptionPlansRepository } from "./subscription-plans.repository";
+import { mapDbPlansToListenerPremium } from "./subscription-plans.mapper";
 import { WalletError } from "./errors";
 import {
   subscribePremiumSchema,
@@ -25,9 +28,21 @@ import {
 
 export class WalletService {
   private readonly repo: WalletRepository;
+  private readonly plansRepo: SubscriptionPlansRepository;
 
   constructor(private readonly client: SupabaseClient<Database>) {
     this.repo = new WalletRepository(client);
+    this.plansRepo = new SubscriptionPlansRepository(client);
+  }
+
+  /** Plans premium auditeur — lecture publique (RLS `plans_public_read`). */
+  async getListenerPremiumPlans(): Promise<ListenerPremiumPlan[]> {
+    const dbPlans = await this.plansRepo.listActive();
+    const mapped = mapDbPlansToListenerPremium(dbPlans);
+    if (mapped.length === 0) {
+      throw new WalletError("PLAN_NOT_FOUND", "Aucun plan d'abonnement disponible");
+    }
+    return mapped;
   }
 
   private async requireUserId(): Promise<string> {
@@ -137,18 +152,36 @@ export class WalletService {
     const parsed = subscribePremiumSchema.parse(input);
     await this.requireUserId();
 
+    const plans = await this.getListenerPremiumPlans();
+    if (!plans.some((plan) => plan.planType === parsed.planType)) {
+      throw new WalletError("PLAN_NOT_FOUND", "Plan d'abonnement introuvable");
+    }
+
     const { data, error } = await this.client.rpc("subscribe_premium", {
       p_plan_type: parsed.planType,
     });
 
     if (error) {
-      if (error.message.includes("insufficient_balance")) {
+      const msg = error.message ?? "";
+      if (msg.includes("insufficient_balance")) {
         throw new WalletError("INSUFFICIENT_BALANCE", "Solde insuffisant");
+      }
+      if (msg.includes("plan_not_found")) {
+        throw new WalletError("PLAN_NOT_FOUND", "Plan d'abonnement introuvable");
+      }
+      if (msg.includes("wallet_not_found")) {
+        throw new WalletError("WALLET_NOT_FOUND", "Portefeuille introuvable");
+      }
+      if (msg.includes("unauthorized")) {
+        throw new WalletError("UNAUTHORIZED", "Non authentifié");
       }
       throw new WalletError("SUBSCRIPTION_FAILED", "Échec de la souscription");
     }
 
-    const result = data as { success: boolean; expires_at: string; amount_debited_gnf: number };
+    const result = data as { success?: boolean; expires_at?: string; amount_debited_gnf?: number } | null;
+    if (!result?.success || !result.expires_at || result.amount_debited_gnf == null) {
+      throw new WalletError("SUBSCRIPTION_FAILED", "Échec de la souscription");
+    }
     return { expiresAt: result.expires_at, amountDebitedGnf: result.amount_debited_gnf };
   }
 

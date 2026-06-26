@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
@@ -42,6 +47,7 @@ const nextConfig: NextConfig = {
     // Tree-shaking — @sonafrik/ui/types/api/shared exclus : barrel optimizer casse les exports runtime en dev
     optimizePackageImports: [
       "@sentry/nextjs",
+      "@sonafrik/shared",
     ],
   },
   async redirects() {
@@ -64,10 +70,13 @@ const nextConfig: NextConfig = {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://*.supabase.co";
     const supabaseOrigin = supabaseUrl.startsWith("http") ? new URL(supabaseUrl).origin : supabaseUrl;
     const supabaseWss    = supabaseOrigin.replace("https://", "wss://");
+    const isProd = process.env.NODE_ENV === "production";
+    const scriptSrc = isProd
+      ? `'self' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`
+      : `'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`;
     const csp = [
       "default-src 'self'",
-      // Next.js requires 'unsafe-eval' in dev; 'unsafe-inline' for HMR + styled-jsx
-      `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`,
+      `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: ${supabaseOrigin} https://lh3.googleusercontent.com`,
       `media-src 'self' blob: ${supabaseOrigin}`,
@@ -131,4 +140,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

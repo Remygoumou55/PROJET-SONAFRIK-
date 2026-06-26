@@ -624,6 +624,21 @@ body {
   font-size: 0.8125rem;
 }
 
+/* ─── Performance CDC (flag performance_animation_cdc_compliant_enabled) ─── */
+html[data-perf-cdc="true"] .creator-hero__progress-fill--animated {
+  animation-duration: 0.3s;
+}
+
+html[data-perf-cdc="true"] .creator-quick-action--pulse {
+  animation: none;
+  box-shadow: 0 0 0 0 rgba(0, 210, 106, 0);
+}
+
+html[data-perf-africa="true"] .creator-hero__progress-fill--animated {
+  animation: none;
+  width: var(--progress, 0%);
+}
+
 .identity-profile-completion__value {
   color: var(--color-vert-energie);
   font-size: 0.8125rem;

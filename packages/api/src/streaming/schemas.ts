@@ -44,11 +44,13 @@ export const searchSchema = z.object({
   query: z.string().trim().min(1).max(200),
   limit: z.number().int().min(1).max(50).default(20),
   type: z.enum(["all", "tracks", "artists", "albums", "playlists", "beats"]).optional().default("all"),
+  /** Beat Store post-MVP — false par défaut (flag beat_store) */
+  includeBeats: z.boolean().optional().default(false),
 });
 
 export const analyticsSchema = z.object({
   creatorId: z.string().uuid(),
-  periodDays: z.number().int().min(1).max(365).default(30),
+  periodDays: z.number().int().min(1).max(90).default(30),
 });
 
 export type StartStreamInput = z.infer<typeof startStreamSchema>;

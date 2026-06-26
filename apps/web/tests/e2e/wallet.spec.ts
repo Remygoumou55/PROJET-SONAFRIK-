@@ -38,4 +38,12 @@ test.describe("Wallet", () => {
     await expect(page.locator("body")).toBeVisible({ timeout: 10_000 });
     await expect(page.locator("[class*='error'], [data-error]")).not.toBeVisible();
   });
+
+  test("/wallet — section Abonnements avec tarif DB premium", async ({ page }) => {
+    await page.goto("/wallet");
+    await expect(page).not.toHaveURL(/\/auth\//);
+
+    await expect(page.locator("text=/Abonnements/i").first()).toBeVisible({ timeout: 12_000 });
+    await expect(page.locator("text=/50.?000|50 000/i").first()).toBeVisible({ timeout: 12_000 });
+  });
 });

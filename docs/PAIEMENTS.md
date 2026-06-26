@@ -12,7 +12,7 @@ Client (browser)
        └─ usePaymentService → createPaymentsService
             └─ Edge Function payment-initiate
                  ├─ INSERT payment_intents (status = initiated → pending)
-                 └─ TODO: push USSD vers l'opérateur (credentials production requis)
+                 └─ Appel opérateur via `_shared/payments.ts` (sandbox si credentials absents)
 
 Opérateur (webhook POST)
   └─ Edge Function payment-{orange|mtn|wave|soutra}-callback
@@ -108,18 +108,19 @@ SELECT public.confirm_payment_intent(
 
 ---
 
-## Intégrations opérateurs à finaliser (TODO)
+## Credentials opérateurs prod (bloqué externe)
 
-Chaque opérateur nécessite un accès commercial avant de pouvoir utiliser leur API en production :
+Le code d'intégration est **implémenté** dans `supabase/functions/_shared/payments.ts` (Vague E).  
+La prod réelle nécessite les secrets opérateurs chez Rémy → `docs/P0-2-PHASE-2-ORANGE-MONEY.md`.
 
-| Opérateur | Ressource | Statut |
-|---|---|---|
-| Orange Money GN | [developer.orange.com](https://developer.orange.com) — accès commercial requis | TODO |
-| MTN MoMo | [momodeveloper.mtn.com](https://momodeveloper.mtn.com) | TODO |
-| Wave | Contacter Wave Business GN | TODO |
-| Soutra Money | Contacter support@soutra.money | TODO |
+| Opérateur | Ressource | Statut code | Statut prod |
+|---|---|---|---|
+| Orange Money GN | [developer.orange.com](https://developer.orange.com) | ✅ Implémenté | ⏸ Credentials Rémy |
+| MTN MoMo | [momodeveloper.mtn.com](https://momodeveloper.mtn.com) | ✅ Implémenté | ⏸ Credentials Rémy |
+| Wave | Wave Business GN | ✅ Implémenté | ⏸ Credentials Rémy |
+| Soutra Money | support@soutra.money | ✅ Implémenté | ⏸ Credentials Rémy |
 
-Les stubs d'intégration (corps TODO commentés) se trouvent dans `supabase/functions/payment-initiate/index.ts`.
+Staging web : `NEXT_PUBLIC_PAYMENTS_ENABLED=false` dans `.env.example`.
 
 ---
 

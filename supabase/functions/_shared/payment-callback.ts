@@ -15,16 +15,17 @@ export async function confirmPaymentIntent(
   intentId: string,
   providerRef: string,
   logPrefix: string,
-): Promise<void> {
+): Promise<boolean> {
   const { data, error } = await client.rpc("confirm_payment_intent", {
     p_intent_id: intentId,
     p_provider_ref: providerRef,
   });
   if (error) {
     console.error(`[${logPrefix}] confirm_payment_intent error :`, error.message);
-  } else {
-    console.log(`[${logPrefix}] paiement confirmé :`, data);
+    return false;
   }
+  console.log(`[${logPrefix}] paiement confirmé :`, data);
+  return true;
 }
 
 export async function markPaymentIntentFailed(
@@ -32,8 +33,8 @@ export async function markPaymentIntentFailed(
   intentId: string,
   metadata: Record<string, unknown>,
   providerRef?: string,
-): Promise<void> {
-  await client
+): Promise<boolean> {
+  const { error } = await client
     .from("payment_intents")
     .update({
       status: "failed",
@@ -43,4 +44,9 @@ export async function markPaymentIntentFailed(
     })
     .eq("id", intentId)
     .in("status", ["initiated", "pending"]);
+  if (error) {
+    console.error("[payment-callback] markPaymentIntentFailed:", error.message);
+    return false;
+  }
+  return true;
 }
