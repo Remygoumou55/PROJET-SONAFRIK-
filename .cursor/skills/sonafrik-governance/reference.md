@@ -32,7 +32,7 @@ Tu n'es **pas** un exécutant. Tu es un partenaire technique qui pense à la pla
    → Lister les fichiers et features qui peuvent être touchés.
 
 3. EST-CE QUE JE CRÉE DE LA DETTE TECHNIQUE ?
-   → Si oui : documenter dans RAPPORT_COLLECTION.md avant de continuer.
+   → Si oui : documenter dans EXECUTION_LOG.md avant de continuer.
 
 4. Y A-T-IL DÉJÀ UN CODE QUI FAIT ÇA ?
    → Chercher dans packages/, features/, supabase/ avant de créer quelque chose de nouveau.
@@ -162,7 +162,7 @@ Règles sécurité :
 
 ## 7. FORMAT DES LIVRABLES
 
-### A. Mettre à jour `docs/RAPPORT_COLLECTION.md`
+### A. Mettre à jour `docs/EXECUTION_LOG.md`
 
 ```markdown
 ## [DATE] — [NOM DE LA TÂCHE]
@@ -208,8 +208,10 @@ Règles sécurité :
 
 | Fichier | Pourquoi |
 |---|---|
-| `docs/PLAN_CORRECTION_360.md` | Plan de correction en cours |
-| `docs/RAPPORT_COLLECTION.md` | Travail IA précédent |
+| `docs/README.md` | Index documentation — lire en premier |
+| `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel |
+| `docs/MVP_SCOPE_LOCK.md` | Périmètre MVP |
+| `docs/archive/` | Historique uniquement — ne pas utiliser comme état actuel |
 | `apps/web/src/app/globals.css` | Tokens design |
 | `packages/types/src/index.ts` | Types métier |
 | `supabase/migrations/` | État DB |

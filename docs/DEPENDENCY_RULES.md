@@ -114,7 +114,7 @@ Nouveaux types SPRING 2 : `StreamLedgerEntry`, `FraudScore`, `PlaybackSessionSta
 
 ```
 ✅ Auth JWT obligatoire
-✅ CORS ALLOWED_ORIGIN (pas "*" en prod — dette sécurité existante)
+✅ CORS ALLOWED_ORIGIN strict (`_shared/cors.ts` — fermé 26 juin 2026)
 ✅ Edge = transport fin — logique métier migre vers packages/api engines
 ❌ Calcul Real Listen côté client
 ❌ service_role key exposée

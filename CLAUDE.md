@@ -234,12 +234,14 @@ Avant de travailler sur n'importe quelle tâche, lire :
 
 | Fichier | Pourquoi |
 |---|---|
-| `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel, sprints, certifications |
-| `docs/README.md` | Index documentation |
-| `docs/archive/PLAN_CORRECTION_360.md` | Historique vagues A→E (archivé 26 juin) |
+| `docs/README.md` | Index — point d'entrée documentation |
+| `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel, sprints, métriques |
+| `docs/MVP_SCOPE_LOCK.md` | Périmètre MVP · chaîne E2E |
+| `docs/AI_GOVERNANCE.md` | Comportement IA · ordre de lecture |
 | `apps/web/src/app/globals.css` | Tokens de design — couleurs officielles |
 | `packages/types/src/index.ts` | Tous les types métier |
 | `supabase/migrations/` | État actuel de la base de données |
+| `docs/archive/` | Historique uniquement — **ne pas** utiliser comme état actuel |
 
 ---
 

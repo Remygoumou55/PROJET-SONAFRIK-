@@ -3,7 +3,7 @@
 
 > Ce document est la **SEULE** source de vérité sur l'état du projet SONAFRIK.
 > Les journaux `PLAN_CORRECTION_360.md` et `RAPPORT_COLLECTION.md` sont archivés dans `docs/archive/`.
-> `MASTER_PLAN.md` est un audit figé (24 juin) — consulter cette section pour l'état actuel.
+> `MASTER_PLAN.md`, audits et anciens journaux sont dans `docs/archive/` — ne pas utiliser comme état actuel.
 
 > **Format obligatoire** : chaque intervention doit ajouter une entrée datée ci-dessous.
 
@@ -26,7 +26,12 @@
 
 ### Git
 - Branch : `main` · Local = `origin/main` = Vercel ✅
-- Dernier commit : `53e30b9` — fix(security): CORS strict sur 14 edge functions
+- Dernier commit : voir `git log -1` — branche `main` sync Vercel ✅
+
+### Documentation (gouvernance)
+- **Source unique** : ce fichier + `docs/README.md`
+- **Archivés** : `docs/archive/*` (6 documents historiques)
+- **Probe G3** : EXECUTION_LOG + README + PAIEMENTS
 
 ### Score MVP réaliste (mesuré, pas optimiste)
 | Dimension | Score |
@@ -56,7 +61,28 @@
 
 ---
 
-## [2026-06-26] — Réconciliation documentation + gouvernance
+## [2026-06-26] — Réconciliation documentation v2 (100 %)
+**Agent :** Claude Sonnet 4.6  
+**Type :** documentation · gouvernance · finalisation
+
+### Mission
+Compléter la réconciliation : zéro document actif contradictoire, gouvernance IA alignée, probe G3 sur fichiers vivants.
+
+### Livrables
+- Archivés avec stubs : `MASTER_PLAN`, `RAPPORT-CERTIFICATION-GLOBALE`, `AUDIT-GLOBAL-HANDOFF-IA`, `AUDIT-COMPLET-HISTORIQUE`
+- `docs/AI_GOVERNANCE.md` réécrit — ordre lecture README → EXECUTION_LOG
+- `NOUVELLE_REGLE_DE_TRAVAIL.md` — royalties UI ✅, S20 ⚠️
+- `reference.md` skill gouvernance — EXECUTION_LOG partout
+- `scripts/probe-certification-globale.ts` G3 → EXECUTION_LOG + README + PAIEMENTS
+- `DEPENDENCY_RULES.md`, `streaming/Risks.md` — CORS résolu
+
+### Validation
+- [x] `pnpm probe:certification` — 129/129
+- [x] Grep actifs : plus de référence « état actuel » vers docs archivés
+
+---
+
+## [2026-06-26] — Réconciliation documentation + gouvernance (v1)
 **Agent :** Claude Sonnet 4.6  
 **Type :** documentation · gouvernance
 

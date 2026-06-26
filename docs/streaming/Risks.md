@@ -12,7 +12,7 @@
 | R8 | Mobile player désaligné | Plateforme | M | M | **4** | Même bridge `@sonafrik/api` | Mobile |
 | R9 | Coverage <95 % bloque merge | Qualité | L | H | **4** | vitest thresholds dès 2.1 | QA |
 | R10 | Scale millions sans partition | Performance | L | H | **4** | Roadmap partition post-MVP | DevOps |
-| R11 | CORS `*` edge functions | Sécurité | H | M | **6** | ALLOWED_ORIGIN prod — vague sécurité | DevOps |
+| R11 | ~~CORS `*` edge functions~~ | Sécurité | — | — | **0** | ✅ Résolu 26/06 — `_shared/cors.ts` | DevOps |
 | R12 | Signed URL 7200s | Sécurité | M | L | **3** | Playback Engine TTL 1800s (2.3) | Playback |
 | R13 | Concurrence sessions | Intégrité | M | M | **4** | RPC Sprint 13c + Session Engine | Session |
 | R14 | Dette analytics duplicate | Architecture | M | L | **3** | Frontière `analytics/` vs `streaming/analytics/` | Architect |

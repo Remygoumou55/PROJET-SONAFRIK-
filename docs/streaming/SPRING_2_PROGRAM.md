@@ -48,7 +48,7 @@ Construire le **Streaming Runtime** qui deviendra la **source de vérité financ
 | G4 | Anti-fraude mono-heuristique | Fraude sophistiquée non détectée |
 | G5 | SSR listener → Supabase direct | Contourne API, surface RLS |
 | G6 | Signed URL 7200s | Fenêtre trop large (dette BASSE) |
-| G7 | 0 tests unitaires streaming package | Certification impossible |
+| G7 | ~~0 tests unitaires streaming~~ | ✅ Résolu SPRING 2.3 — 258+ tests API streaming/metadata |
 
 ### 2.3 Invariants CDC à préserver
 

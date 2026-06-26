@@ -253,15 +253,15 @@ Compte → Profil Artiste → Album → Cover → Audio → Publication
   → Écoutes → Royalties → Revenus → Retraits
 ```
 
-### État actuel (2026-06-24)
+### État actuel (2026-06-26) — voir `docs/EXECUTION_LOG.md`
 
 | Étape | Statut |
 |---|---|
 | Compte → Publication | ✅ |
 | Écoutes | ✅ |
-| Royalties | ❌ UI ComingSoon — **BLOQUANT** |
-| Revenus | ⚠️ Partiel — **BLOQUANT** |
-| Retraits | ⚠️ Gated — **BLOQUANT** |
+| Royalties | ✅ UI `/wallet/royalties` (`RoyaltiesPage.tsx`) — E2E prod à valider |
+| Revenus | ⚠️ Partiel — **BLOQUANT** lancement public |
+| Retraits | ⚠️ Gated credentials — **BLOQUANT** lancement public |
 
 ### Gelé jusqu'à fin chaîne E2E
 
@@ -341,7 +341,7 @@ Légende statut initial :
 | **17** | Bibliothèque | http://localhost:3000/library | ✅ | Favoris/playlists ou état vide cohérent |
 | **18** | Recherche | http://localhost:3000/search | ✅ | Résultats sur requête test |
 | **19** | Revenus — analytics | http://localhost:3000/creator/analytics | ⚠️ | Stats écoutes visibles pour artiste |
-| **20** | Royalties | http://localhost:3000/wallet/royalties | ❌ | Montants royalties (pas ComingSoon) |
+| **20** | Royalties | http://localhost:3000/wallet/royalties | ⚠️ | UI branchée — montants visibles si cycle royalties exécuté |
 | **21** | Wallet / revenus | http://localhost:3000/wallet | ⚠️ | Solde GNF + historique cohérent |
 | **22** | Retraits | http://localhost:3000/wallet/payout | ⚠️ | Demande retrait sandbox initiée |
 

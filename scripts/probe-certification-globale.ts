@@ -61,10 +61,10 @@ function extraChecks(): { passed: number; total: number } {
 
   log(
     "G3 docs clés",
-    existsSync(resolve(ROOT, "docs/PLAN_CORRECTION_360.md")) &&
-      existsSync(resolve(ROOT, "docs/PAIEMENTS.md")) &&
-      existsSync(resolve(ROOT, "docs/RAPPORT-CERTIFICATION-GLOBALE.md")),
-    "PLAN + PAIEMENTS + RAPPORT",
+    existsSync(resolve(ROOT, "docs/EXECUTION_LOG.md")) &&
+      existsSync(resolve(ROOT, "docs/README.md")) &&
+      existsSync(resolve(ROOT, "docs/PAIEMENTS.md")),
+    "EXECUTION_LOG + README + PAIEMENTS",
   );
 
   const pkg = JSON.parse(readFileSync(resolve(ROOT, "package.json"), "utf8")) as { scripts?: Record<string, string> };

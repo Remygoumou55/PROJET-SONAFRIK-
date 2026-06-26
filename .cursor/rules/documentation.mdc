@@ -9,7 +9,7 @@ alwaysApply: true
 La documentation SONAFRIK suit ces règles depuis le **26 juin 2026** :
 
 1. **Source unique** : `docs/EXECUTION_LOG.md` est le seul journal actif
-2. **Archivés** : `PLAN_CORRECTION_360.md`, `RAPPORT_COLLECTION.md` → `docs/archive/`
+2. **Archivés** : voir `docs/archive/` (6 documents) + stubs redirect
 3. **Score MVP réaliste** : **76/100** au 26 juin 2026 (pas 88/100 ni 68/100)
 4. **CI** : **129/129** probes (pas 103/103)
 5. **`wallet_ledger`** : > 0 (9 entrées, 1 cycle royalties — 26 juin 2026)
