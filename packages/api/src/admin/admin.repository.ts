@@ -9,6 +9,7 @@ import type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminRightsClaim,
+  LiveControlSnapshot,
   PendingCatalogItem,
 } from "./types";
 
@@ -78,5 +79,9 @@ export class AdminRepository {
 
   getHealthSnapshot(): Promise<AdminHealthSnapshot> {
     return this.dashboard.getHealthSnapshot();
+  }
+
+  getLiveControlSnapshot(): Promise<LiveControlSnapshot> {
+    return this.dashboard.getLiveControlSnapshot();
   }
 }

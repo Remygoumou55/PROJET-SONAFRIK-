@@ -1,5 +1,11 @@
 import { countQuery, type AdminRepoClient } from "./admin.shared";
-import type { AdminAlert, AdminDashboardKpis, AdminHealthCheck, AdminHealthSnapshot } from "./types";
+import type {
+  AdminAlert,
+  AdminDashboardKpis,
+  AdminHealthCheck,
+  AdminHealthSnapshot,
+  LiveControlSnapshot,
+} from "./types";
 
 export class AdminDashboardRepository {
   constructor(private readonly client: AdminRepoClient) {}
@@ -154,6 +160,77 @@ export class AdminDashboardRepository {
     return {
       checks: [db, storage, wallets, payments],
       alerts,
+    };
+  }
+
+  async getLiveControlSnapshot(): Promise<LiveControlSnapshot> {
+    const [
+      totalUsers,
+      publishedTracks,
+      validListens,
+      royaltyCycles,
+      ledgerEntries,
+      recentTracksRes,
+      recentListensRes,
+      recentCyclesRes,
+      recentLedgerRes,
+    ] = await Promise.all([
+      countQuery(
+        this.client.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null),
+      ),
+      countQuery(
+        this.client
+          .from("tracks")
+          .select("*", { count: "exact", head: true })
+          .eq("publication_status", "published"),
+      ),
+      countQuery(
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .eq("is_valid_listen", true),
+      ),
+      countQuery(this.client.from("royalty_cycles").select("*", { count: "exact", head: true })),
+      countQuery(this.client.from("wallet_ledger").select("*", { count: "exact", head: true })),
+      this.client
+        .from("tracks")
+        .select("id, title, publication_status, created_at")
+        .eq("publication_status", "published")
+        .order("created_at", { ascending: false })
+        .limit(5),
+      this.client
+        .from("stream_sessions")
+        .select("id, is_valid_listen, created_at")
+        .eq("is_valid_listen", true)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      this.client
+        .from("royalty_cycles")
+        .select("id, status, created_at")
+        .order("created_at", { ascending: false })
+        .limit(3),
+      this.client
+        .from("wallet_ledger")
+        .select("id, amount_gnf, entry_type, created_at")
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
+
+    if (recentTracksRes.error) throw recentTracksRes.error;
+    if (recentListensRes.error) throw recentListensRes.error;
+    if (recentCyclesRes.error) throw recentCyclesRes.error;
+    if (recentLedgerRes.error) throw recentLedgerRes.error;
+
+    return {
+      totalUsers,
+      publishedTracks,
+      validListens,
+      royaltyCycles,
+      ledgerEntries,
+      recentTracks: recentTracksRes.data ?? [],
+      recentListens: recentListensRes.data ?? [],
+      recentCycles: recentCyclesRes.data ?? [],
+      recentLedger: recentLedgerRes.data ?? [],
     };
   }
 }

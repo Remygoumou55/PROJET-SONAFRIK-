@@ -66,3 +66,41 @@ export type AdminHealthSnapshot = {
   checks: AdminHealthCheck[];
   alerts: AdminAlert[];
 };
+
+export type LiveControlRecentTrack = {
+  id: string;
+  title: string;
+  publication_status: string;
+  created_at: string;
+};
+
+export type LiveControlRecentListen = {
+  id: string;
+  is_valid_listen: boolean;
+  created_at: string;
+};
+
+export type LiveControlRecentCycle = {
+  id: string;
+  status: string;
+  created_at: string;
+};
+
+export type LiveControlRecentLedger = {
+  id: string;
+  amount_gnf: number;
+  entry_type: string;
+  created_at: string;
+};
+
+export type LiveControlSnapshot = {
+  totalUsers: number;
+  publishedTracks: number;
+  validListens: number;
+  royaltyCycles: number;
+  ledgerEntries: number;
+  recentTracks: LiveControlRecentTrack[];
+  recentListens: LiveControlRecentListen[];
+  recentCycles: LiveControlRecentCycle[];
+  recentLedger: LiveControlRecentLedger[];
+};

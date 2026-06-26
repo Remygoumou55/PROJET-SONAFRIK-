@@ -10,6 +10,7 @@ import type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminRightsClaim,
+  LiveControlSnapshot,
   PendingCatalogItem,
 } from "./types";
 
@@ -96,6 +97,10 @@ export class AdminService {
     return this.repository.getHealthSnapshot();
   }
 
+  async getLiveControlSnapshot(): Promise<LiveControlSnapshot> {
+    return this.repository.getLiveControlSnapshot();
+  }
+
   async listRoyaltyCycles(limit = 12): Promise<RoyaltyCycle[]> {
     return this.royalty.listRoyaltyCycles(limit);
   }
@@ -120,5 +125,6 @@ export type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminRightsClaim,
+  LiveControlSnapshot,
   PendingCatalogItem,
 } from "./types";
