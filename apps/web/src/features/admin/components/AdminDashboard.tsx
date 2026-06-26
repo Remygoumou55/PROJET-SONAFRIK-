@@ -171,6 +171,7 @@ export function AdminDashboard({ kpis }: Props) {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
+            { href: "/admin/live-control", label: "Live Control MVP", desc: "Tableau de bord chaîne MVP — test fondateur" },
             { href: "/admin/catalog", label: "Revue Catalogue", desc: "Approuver / rejeter les soumissions pending_review" },
             { href: "/admin/finance", label: "Finances", desc: "File de retraits artistes à valider" },
             { href: "/admin/fraud", label: "Fraude", desc: "Sessions avec flags anti-fraude levés" },

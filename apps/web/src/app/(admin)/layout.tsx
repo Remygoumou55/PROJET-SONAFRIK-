@@ -5,6 +5,7 @@ import { AdminNavLink } from "@/features/admin/components/AdminNavLink";
 import AdminLoading from "./loading";
 
 const NAV_LINKS = [
+  { href: "/admin/live-control", label: "Live Control" },
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/catalog", label: "Catalogue" },
   { href: "/admin/finance", label: "Finances" },
