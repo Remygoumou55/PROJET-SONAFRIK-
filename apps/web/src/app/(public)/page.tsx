@@ -89,10 +89,12 @@ export default async function LandingV5Page({
     <LandingPage>
       <LandingNav />
       <LandingHero>
-        <LandingProgress
-          subscriberCount={launchProgress.current}
-          subscriberTarget={launchProgress.target}
-        />
+        {launchProgress ? (
+          <LandingProgress
+            subscriberCount={launchProgress.current}
+            subscriberTarget={launchProgress.target}
+          />
+        ) : null}
       </LandingHero>
       <LiveStats />
       <LandingHowItWorks featuredTrack={artistsSection.featuredTrack} />

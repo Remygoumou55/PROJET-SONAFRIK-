@@ -24,8 +24,11 @@ export default async function LancementPage() {
     getLandingArtistsSection(),
   ]);
 
+  const showStats =
+    progress !== null && (progress.artistCount > 0 || progress.trackCount > 0);
+
   return (
-    <div className="flex min-h-screen flex-col bg-noir-profond text-texte-principal">
+    <div className="flex min-h-dvh flex-col bg-noir-profond text-texte-principal">
       <header className="flex items-center justify-between px-6 py-5">
         <div>
           <SonafrikLogo size="footer" />
@@ -60,32 +63,40 @@ export default async function LancementPage() {
             Objectif de lancement — CDC Règle #7
           </p>
 
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <span className="text-6xl font-black tabular-nums leading-none text-vert-energie">
-                {progress.current.toLocaleString("fr-FR")}
-              </span>
-              <span className="ml-2 text-2xl font-bold text-texte-desactive">
-                /{progress.target.toLocaleString("fr-FR")}
-              </span>
-            </div>
-            <span className="text-lg font-semibold text-vert-energie">
-              {progress.percent.toFixed(1)} %
-            </span>
-          </div>
+          {progress ? (
+            <>
+              <div className="mb-4 flex items-end justify-between">
+                <div>
+                  <span className="text-6xl font-black tabular-nums leading-none text-vert-energie">
+                    {progress.current.toLocaleString("fr-FR")}
+                  </span>
+                  <span className="ml-2 text-2xl font-bold text-texte-desactive">
+                    /{progress.target.toLocaleString("fr-FR")}
+                  </span>
+                </div>
+                <span className="text-lg font-semibold text-vert-energie">
+                  {progress.percent.toFixed(1)} %
+                </span>
+              </div>
 
-          <div className="h-2 w-full overflow-hidden rounded border border-elevated bg-card">
-            <div
-              className="h-full rounded bg-vert-energie transition-[width] duration-500 ease-out"
-              style={{ width: `${progress.percent}%` }}
-            />
-          </div>
+              <div className="h-2 w-full overflow-hidden rounded border border-elevated bg-card">
+                <div
+                  className="h-full rounded bg-vert-energie transition-[width] duration-500 ease-out"
+                  style={{ width: `${progress.percent}%` }}
+                />
+              </div>
 
-          <p className="mt-3 text-center text-sm text-texte-desactive">
-            {progress.launched
-              ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
-              : `${(progress.target - progress.current).toLocaleString("fr-FR")} abonnés manquants pour le lancement`}
-          </p>
+              <p className="mt-3 text-center text-sm text-texte-desactive">
+                {progress.launched
+                  ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
+                  : `Plus que ${(progress.target - progress.current).toLocaleString("fr-FR")} personnes pour le lancement officiel`}
+              </p>
+            </>
+          ) : (
+            <p className="text-center text-sm text-texte-secondaire">
+              Lancement en cours de préparation
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap justify-center gap-3">
@@ -122,7 +133,9 @@ export default async function LancementPage() {
 
         {artistsSection.artists.length > 0 ? (
           <div className="mb-8 mt-12 w-full max-w-2xl text-center">
-            <p className="mb-1 text-base font-bold text-texte-principal">Déjà sur SONAFRIK</p>
+            <p className="mb-1 text-base font-bold text-texte-principal">
+              Les artistes fondateurs
+            </p>
             <p className="mb-6 text-sm text-texte-secondaire">
               Les premiers artistes qui font confiance à la plateforme
             </p>
@@ -144,20 +157,24 @@ export default async function LancementPage() {
                     <p className="text-xs font-medium leading-snug text-texte-principal">
                       {artist.stageName}
                     </p>
-                    <p className="text-[11px] leading-snug text-texte-secondaire">{artist.genre}</p>
+                    <p className="text-[11px] leading-snug text-texte-secondaire">
+                      {artist.genre}
+                    </p>
                   </Link>
                 );
               })}
             </div>
 
-            <div className="mt-5 inline-block">
-              <span className="inline-block rounded-full border border-elevated bg-card px-4 py-1.5 text-xs text-texte-secondaire">
-                🎵 {artistsSection.artists.length} artiste
-                {artistsSection.artists.length > 1 ? "s" : ""} ·{" "}
-                {artistsSection.trackCount.toLocaleString("fr-FR")} morceau
-                {artistsSection.trackCount > 1 ? "x" : ""} · Guinée Conakry
-              </span>
-            </div>
+            {showStats && progress ? (
+              <div className="mt-5 inline-block">
+                <span className="inline-block rounded-full border border-elevated bg-card px-4 py-1.5 text-xs text-texte-secondaire">
+                  🎵 {progress.artistCount.toLocaleString("fr-FR")} artiste
+                  {progress.artistCount > 1 ? "s" : ""} ·{" "}
+                  {progress.trackCount.toLocaleString("fr-FR")} morceau
+                  {progress.trackCount > 1 ? "x" : ""} · Guinée Conakry
+                </span>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </main>

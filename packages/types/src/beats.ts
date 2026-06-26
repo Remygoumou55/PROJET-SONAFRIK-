@@ -50,10 +50,12 @@ export interface BeatPurchase {
 }
 
 export interface LaunchProgress {
-  current:  number;
-  target:   number;
-  percent:  number;
-  launched: boolean;
+  current:      number;
+  target:       number;
+  percent:      number;
+  launched:     boolean;
+  artistCount:  number;
+  trackCount:   number;
 }
 
 export const BEAT_LICENSE_LABELS: Record<BeatLicenseType, string> = {
