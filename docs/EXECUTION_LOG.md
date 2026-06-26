@@ -9,6 +9,70 @@
 
 ---
 
+## 2026-06-26 — Audio Pipeline Remediation Program
+
+### Fichiers touchés
+- `supabase/migrations/20260626140000_audio_integrity_remediation.sql` — integrity_status + gate submit
+- `packages/shared/src/audio/audio-integrity.ts` — validation magic bytes (source unique)
+- `supabase/functions/_shared/audio-integrity.ts` — mirror Deno
+- `supabase/functions/catalog-asset-signed-url` — action `confirm` post-upload
+- `supabase/functions/stream-start` — blocage assets invalid/needs_review
+- `apps/web/.../AudioUploader.tsx` — hardening hash + confirm
+- `packages/api/src/catalog/catalog.service.ts` — `confirmAssetUpload`
+- `scripts/remediate-audio-storage.ts` — scan idempotent dry-run/apply
+- `docs/audio/AUDIO_REMEDIATION.md` + `AUDIO_HARDENING.md`
+
+### Commandes
+- `pnpm probe:audio-remediation` — probe statique
+- `pnpm remediate:audio:dry-run` / `pnpm remediate:audio` — data remediation
+- `pnpm test:audio` — policy + shared integrity
+
+### Statut
+- **Automatisé** : après migration + deploy edge + remediate
+- **LIVE CONTROL Rémy** : ⏳ checklist `AUDIO_HARDENING.md`
+
+---
+
+## 2026-06-26 — Audio Pipeline Certification Program
+
+### Fichiers touchés
+- `scripts/lib/audio-pipeline-policy.ts` — politique MIME, magic bytes, TTL
+- `scripts/lib/audio-pipeline-policy.test.ts` — 9 tests unitaires
+- `scripts/probe-audio-pipeline-certification.ts` — probe phases A→N
+- `scripts/vitest.audio-pipeline.config.ts` — config vitest
+- `docs/audio/AUDIO_PIPELINE.md` — cartographie pipeline
+- `docs/audio/AUDIO_CERTIFICATION.md` — checklist certification + Live Control Rémy
+- `package.json` — `pnpm test:audio-pipeline`, `pnpm probe:audio-certification`
+- `scripts/probe-audio-format.ts` — fix variable `q` undefined
+
+### Commandes
+- `pnpm test:audio-pipeline` — 9/9 tests policy
+- `pnpm probe:audio-certification` — 58/58 checks (live stream-start + HEAD)
+
+### Statut certification
+- **Automatisé** : ✅ (probe + tests PASS)
+- **Live Control humain (Rémy)** : ⏳ checklist 10/10 dans `AUDIO_CERTIFICATION.md`
+
+---
+
+## 2026-06-26 — CORS Infrastructure Hardening Program
+
+### Fichiers touchés
+- `supabase/functions/_shared/cors-policy.ts` — whitelist dynamique Zero Trust
+- `supabase/functions/_shared/cors.ts` — `buildCorsHeaders(req)`, preflight, webhooks
+- 14 Edge Functions migrées (10 browser + 4 webhooks)
+- `docs/infrastructure/CORS_ARCHITECTURE.md` — référence officielle
+- `scripts/probe-cors-infrastructure.ts` + `cors-policy.test.ts`
+
+### Correction racine Live Control
+- `catalog-asset-signed-url` reflète désormais `http://localhost:3000` au lieu de l'origine prod statique
+
+### Tests
+- `pnpm test:cors` — 8 tests unitaires cors-policy
+- `pnpm probe:cors` — certification statique 24+ checks
+
+---
+
 ## ÉTAT MESURÉ AU 26 JUIN 2026
 
 ### Certification CI

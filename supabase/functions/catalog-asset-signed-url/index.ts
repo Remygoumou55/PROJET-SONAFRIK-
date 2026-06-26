@@ -1,25 +1,26 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-import { CORS_HEADERS as corsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { corsJsonResponse, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { MAX_UPLOAD_BYTES, MIN_BLOB_BYTES, validateAudioAsset } from "../_shared/audio-integrity.ts";
 
-// WAV retiré du serving : 30-40MB impraticables sur connexion mobile (Orange/MTN Guinée).
-// Pipeline WAV→MP3 prévu en Phase 2. Les uploads WAV existants en base sont bloqués
-// côté client — si un ancien WAV est demandé, l'URL signée est refusée (format rejeté).
 const AUDIO_TYPES: Record<string, string> = {
-  "audio/mpeg":  "mp3",
-  "audio/mp3":   "mp3",
-  "audio/mp4":   "aac",
-  "audio/m4a":   "aac",
+  "audio/mpeg": "mp3",
+  "audio/mp3": "mp3",
+  "audio/mp4": "aac",
+  "audio/m4a": "aac",
   "audio/x-m4a": "aac",
 };
 
-// Limite de taille du plan Supabase Free (50 MB)
-const MAX_AUDIO_SIZE_BYTES = 50 * 1024 * 1024;
+const MIME_BY_FORMAT: Record<string, string> = {
+  mp3: "audio/mpeg",
+  aac: "audio/mp4",
+  m4a: "audio/mp4",
+};
 
 const VISUAL_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SIGNED_URL_TTL = 3600;
 
 interface CatalogAssetRequest {
-  action: "upload" | "read";
+  action: "upload" | "read" | "confirm";
   assetType: "audio" | "cover";
   creatorId: string;
   trackId?: string;
@@ -28,11 +29,17 @@ interface CatalogAssetRequest {
   path?: string;
   format?: "mp3" | "aac";
   bitrateKbps?: number;
+  fileSizeBytes?: number;
+  durationSeconds?: number;
+  contentHash?: string;
 }
 
 Deno.serve(async (req) => {
   const preflight = handleCorsPreflightIfNeeded(req);
   if (preflight) return preflight;
+
+  const json = (body: Record<string, unknown>, status = 200) =>
+    corsJsonResponse(req, body, status);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -60,12 +67,16 @@ Deno.serve(async (req) => {
     const body = (await req.json()) as CatalogAssetRequest;
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    if (body.action === "upload") {
+    if (body.action === "upload" || body.action === "confirm") {
       const { data: canEdit } = await adminClient.rpc("can_edit_creator", {
         p_creator_id: body.creatorId,
         p_user_id: user.id,
       });
       if (!canEdit) return json({ error: "Accès non autorisé." }, 403);
+    }
+
+    if (body.action === "confirm") {
+      return await handleConfirm(adminClient, body, user.id, json);
     }
 
     const builtPath =
@@ -79,10 +90,6 @@ Deno.serve(async (req) => {
       if (body.assetType === "audio") {
         if (!AUDIO_TYPES[body.contentType]) {
           return json({ error: "Format audio non autorisé. Formats acceptés : MP3, M4A." }, 400);
-        }
-        const contentLength = req.headers.get("content-length");
-        if (contentLength && parseInt(contentLength, 10) > MAX_AUDIO_SIZE_BYTES) {
-          return json({ error: `Fichier trop volumineux. Maximum autorisé : 50 MB.` }, 413);
         }
       }
       if (body.assetType === "cover" && !VISUAL_TYPES.includes(body.contentType)) {
@@ -132,6 +139,98 @@ Deno.serve(async (req) => {
   }
 });
 
+async function handleConfirm(
+  client: ReturnType<typeof createClient>,
+  body: CatalogAssetRequest,
+  userId: string,
+  json: (body: Record<string, unknown>, status?: number) => Response,
+): Promise<Response> {
+  if (body.assetType !== "audio" || !body.trackId || !body.path) {
+    return json({ error: "Paramètres confirm invalides." }, 400);
+  }
+
+  const format = body.format ?? "mp3";
+  const mime = body.contentType ?? MIME_BY_FORMAT[format] ?? "audio/mpeg";
+
+  const { data: blob, error: dlErr } = await client.storage
+    .from("catalog-audio")
+    .download(body.path);
+
+  if (dlErr || !blob) {
+    await markIntegrity(client, body.trackId, body.path, {
+      integrity_status: "invalid",
+      integrity_message: "Objet Storage introuvable après upload.",
+      validated_at: new Date().toISOString(),
+      updated_by: userId,
+    });
+    return json({ error: "Fichier introuvable en Storage.", integrityStatus: "invalid" }, 422);
+  }
+
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const fileSizeBytes = body.fileSizeBytes ?? bytes.length;
+
+  const validation = validateAudioAsset({
+    header: bytes.slice(0, 512),
+    mime,
+    fileSizeBytes,
+    dbFormat: format,
+  });
+
+  const updatePayload: Record<string, unknown> = {
+    integrity_status: validation.status,
+    integrity_message: validation.message,
+    file_size_bytes: fileSizeBytes,
+    validated_at: new Date().toISOString(),
+    updated_by: userId,
+  };
+  if (body.durationSeconds != null && body.durationSeconds > 0) {
+    updatePayload.duration_seconds = Math.round(body.durationSeconds);
+  }
+  if (body.contentHash) updatePayload.content_hash = body.contentHash;
+
+  await markIntegrity(client, body.trackId, body.path, updatePayload);
+
+  if (validation.status === "valid" && body.durationSeconds) {
+    await client
+      .from("tracks")
+      .update({
+        duration_seconds: Math.round(body.durationSeconds),
+        updated_by: userId,
+      })
+      .eq("id", body.trackId);
+  }
+
+  if (validation.status === "invalid") {
+    return json({
+      error: validation.message,
+      integrityStatus: validation.status,
+      container: validation.container,
+    }, 422);
+  }
+
+  return json({
+    integrityStatus: validation.status,
+    message: validation.message,
+    webCompatible: validation.webCompatible,
+    fileSizeBytes,
+  });
+}
+
+async function markIntegrity(
+  client: ReturnType<typeof createClient>,
+  trackId: string,
+  path: string,
+  fields: Record<string, unknown>,
+) {
+  const { error } = await client
+    .from("track_files")
+    .update(fields)
+    .eq("track_id", trackId)
+    .eq("file_path", path)
+    .eq("is_primary", true);
+  if (error) throw new Error(error.message);
+}
+
 function buildPath(body: CatalogAssetRequest): string | null {
   if (body.assetType === "audio") {
     if (!body.trackId) return null;
@@ -167,6 +266,8 @@ async function persistAsset(
       file_path: path,
       bitrate_kbps: body.bitrateKbps ?? null,
       is_primary: true,
+      integrity_status: "pending",
+      integrity_message: "En attente de confirmation post-upload.",
       created_by: userId,
       updated_by: userId,
     });
@@ -196,18 +297,11 @@ async function isPublicAsset(
     if (track?.publication_status !== "published") return false;
     const { data: file } = await client
       .from("track_files")
-      .select("file_path")
+      .select("file_path, integrity_status")
       .eq("track_id", body.trackId)
       .eq("is_primary", true)
       .maybeSingle();
-    return file?.file_path === path;
+    return file?.file_path === path && file.integrity_status !== "invalid";
   }
   return false;
-}
-
-function json(body: Record<string, unknown>, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
 }

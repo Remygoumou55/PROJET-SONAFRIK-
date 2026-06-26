@@ -1,23 +1,18 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import {
+  detectContainerFromBytes,
+  mimeToUploadFormat,
+  sha256Hex,
+  validateAudioAsset,
+  MAX_UPLOAD_BYTES,
+} from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 
 type AudioFormat = "mp3" | "aac";
 
-// WAV retiré : fichiers de 30-40MB impraticables sur connexion mobile (Orange/MTN Guinée).
-// Pipeline de transcodage WAV→MP3 prévu en Phase 2. En attendant, les créateurs
-// exportent directement en MP3 depuis leur DAW.
-const ACCEPTED_TYPES: Record<string, AudioFormat> = {
-  "audio/mpeg":  "mp3",
-  "audio/mp3":   "mp3",
-  "audio/m4a":   "aac",
-  "audio/mp4":   "aac",
-  "audio/x-m4a": "aac",
-};
 const ACCEPTED_EXTENSIONS = ".mp3,.m4a";
-// 50 MB — limite du plan Supabase Storage Free (non modifiable sans upgrade de plan)
-const MAX_SIZE_BYTES = 50 * 1024 * 1024;
 const MAX_SIZE_MB = 50;
 
 interface Props {
@@ -31,6 +26,7 @@ type UploadState =
   | { status: "analyzing"; fileName: string }
   | { status: "ready"; file: File; durationSeconds: number; format: AudioFormat }
   | { status: "uploading"; file: File; durationSeconds: number; format: AudioFormat; progress: number }
+  | { status: "validating"; fileName: string }
   | { status: "success"; durationSeconds: number }
   | { status: "error"; message: string };
 
@@ -44,7 +40,6 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
 }
 
-// Singleton — les navigateurs limitent le nombre de AudioContext simultanés (~25 sur Chrome)
 let _audioCtx: AudioContext | null = null;
 function getAudioCtx(): AudioContext {
   if (!_audioCtx || _audioCtx.state === "closed") {
@@ -55,7 +50,6 @@ function getAudioCtx(): AudioContext {
 
 async function getAudioDuration(file: File): Promise<number> {
   const arrayBuffer = await file.arrayBuffer();
-  // slice(0) évite la détachement du buffer sur certains navigateurs
   const decoded = await getAudioCtx().decodeAudioData(arrayBuffer.slice(0));
   return decoded.duration;
 }
@@ -66,34 +60,64 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
   const [state, setState] = useState<UploadState>({ status: "idle" });
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const validate = useCallback((file: File): string | null => {
-    const format = ACCEPTED_TYPES[file.type];
+  const validate = useCallback(async (file: File): Promise<string | null> => {
+    const format = mimeToUploadFormat(file.type);
     if (!format) {
-      return "Format non supporté. Formats acceptés actuellement : MP3, WAV, M4A. Le support FLAC et OGG sera réactivé une fois notre système de conversion audio mis en place, pour garantir une expérience optimale à tous les auditeurs quel que soit leur réseau.";
+      return "Format non supporté. Formats acceptés : MP3, M4A.";
     }
-    if (file.size > MAX_SIZE_BYTES) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       const fileMB = (file.size / (1024 * 1024)).toFixed(1);
       return `Fichier trop volumineux (${fileMB} MB). Maximum autorisé : ${MAX_SIZE_MB} MB.`;
     }
+    if (file.size === 0) {
+      return "Fichier vide.";
+    }
+
+    const header = new Uint8Array(await file.slice(0, 512).arrayBuffer());
+    const precheck = validateAudioAsset({
+      header,
+      mime: file.type,
+      fileSizeBytes: file.size,
+      dbFormat: format === "mp3" ? "mp3" : "aac",
+    });
+    if (precheck.status === "invalid") {
+      return precheck.message;
+    }
+    if (precheck.status === "needs_review") {
+      return precheck.message;
+    }
+
+    const container = detectContainerFromBytes(header);
+    if (container === "unknown") {
+      return "Fichier audio illisible ou corrompu.";
+    }
+
     return null;
   }, []);
 
   const handleFile = useCallback(async (file: File) => {
-    const error = validate(file);
+    setState({ status: "analyzing", fileName: file.name });
+
+    const error = await validate(file);
     if (error) {
       setState({ status: "error", message: error });
       return;
     }
 
-    const format: AudioFormat = ACCEPTED_TYPES[file.type] ?? "mp3";
-    setState({ status: "analyzing", fileName: file.name });
+    const format: AudioFormat = mimeToUploadFormat(file.type) === "mp3" ? "mp3" : "aac";
 
     try {
       const durationSeconds = await getAudioDuration(file);
+      if (durationSeconds <= 0) {
+        setState({ status: "error", message: "Durée audio invalide." });
+        return;
+      }
       setState({ status: "ready", file, durationSeconds, format });
     } catch {
-      // Si Web Audio API échoue (rare), on continue sans durée connue
-      setState({ status: "ready", file, durationSeconds: 0, format });
+      setState({
+        status: "error",
+        message: "Impossible de décoder ce fichier. Vérifiez qu'il s'agit d'un MP3 ou M4A valide.",
+      });
     }
   }, [validate]);
 
@@ -123,7 +147,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
     setState({ status: "uploading", file, durationSeconds, format, progress: 0 });
 
     try {
-      const { signedUrl } = await catalog.requestAssetUploadUrl({
+      const { signedUrl, path } = await catalog.requestAssetUploadUrl({
         creatorId,
         assetType: "audio",
         contentType: file.type,
@@ -146,15 +170,30 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
         };
 
         xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Erreur serveur (${xhr.status})`));
-          }
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Erreur serveur (${xhr.status})`));
         };
         xhr.onerror = () => reject(new Error("Connexion perdue pendant l'envoi."));
         xhr.send(file);
       });
+
+      setState({ status: "validating", fileName: file.name });
+
+      const contentHash = await sha256Hex(await file.arrayBuffer());
+      const confirm = await catalog.confirmAssetUpload({
+        creatorId,
+        trackId,
+        path,
+        format,
+        contentType: file.type,
+        fileSizeBytes: file.size,
+        durationSeconds: Math.round(durationSeconds),
+        contentHash,
+      });
+
+      if (confirm.integrityStatus === "invalid") {
+        throw new Error(confirm.message || "Fichier rejeté après validation serveur.");
+      }
 
       setState({ status: "success", durationSeconds });
       onSuccess?.(Math.round(durationSeconds));
@@ -166,16 +205,12 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
 
   const reset = useCallback(() => setState({ status: "idle" }), []);
 
-  // ── Rendu ──────────────────────────────────────────────────────────────────
-
   if (state.status === "success") {
     return (
       <div className="flex items-center gap-2">
         <span style={{ color: "var(--color-vert-energie)" }} className="text-sm font-medium">
-          ✓ Fichier audio envoyé
-          {state.durationSeconds > 0
-            ? ` (${formatDuration(state.durationSeconds)})`
-            : ""}
+          ✓ Fichier audio validé
+          {state.durationSeconds > 0 ? ` (${formatDuration(state.durationSeconds)})` : ""}
         </span>
         <button onClick={reset} className="text-xs underline" style={{ color: "var(--color-texte-secondaire)" }}>
           Remplacer
@@ -184,7 +219,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
     );
   }
 
-  if (state.status === "analyzing") {
+  if (state.status === "analyzing" || state.status === "validating") {
     return (
       <div className="flex items-center gap-2 py-2">
         <div
@@ -192,7 +227,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
           style={{ borderColor: "var(--color-vert-energie)", borderTopColor: "transparent" }}
         />
         <span className="text-sm" style={{ color: "var(--color-texte-secondaire)" }}>
-          Analyse de {state.fileName}…
+          {state.status === "analyzing" ? `Analyse de ${state.fileName}…` : `Validation serveur de ${state.fileName}…`}
         </span>
       </div>
     );
@@ -206,7 +241,6 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
           className="flex items-center gap-4 rounded-xl p-4"
           style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-bordure)" }}
         >
-          {/* Icône audio */}
           <div
             className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: "var(--color-elevated)" }}
@@ -225,18 +259,12 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
             </p>
             <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
               {state.format.toUpperCase()} · {formatBytes(state.file.size)}
-              {state.durationSeconds > 0
-                ? ` · ${formatDuration(state.durationSeconds)}`
-                : ""}
+              {state.durationSeconds > 0 ? ` · ${formatDuration(state.durationSeconds)}` : ""}
             </p>
 
-            {/* Barre de progression */}
             {isUploading && (
               <div className="mt-2">
-                <div
-                  className="h-1.5 rounded-full overflow-hidden"
-                  style={{ backgroundColor: "var(--color-bordure)" }}
-                >
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--color-bordure)" }}>
                   <div
                     className="h-full rounded-full transition-all duration-200"
                     style={{ width: `${state.progress}%`, backgroundColor: "var(--color-vert-energie)" }}
@@ -274,7 +302,6 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
 
   return (
     <div className="space-y-2">
-      {/* Zone drag-and-drop */}
       <div
         role="button"
         tabIndex={0}
@@ -299,11 +326,10 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
           Glissez un fichier audio ou cliquez pour choisir
         </p>
         <p className="text-xs" style={{ color: "var(--color-texte-desactive)" }}>
-          MP3 · WAV · M4A — max {MAX_SIZE_MB} MB
+          MP3 · M4A — max {MAX_SIZE_MB} MB
         </p>
       </div>
 
-      {/* Message d'erreur */}
       {state.status === "error" && (
         <p className="text-xs px-1" style={{ color: "var(--color-danger)" }}>
           {state.message}

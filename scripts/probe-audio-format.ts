@@ -52,10 +52,10 @@ async function main() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ trackId, platform: "web", qualityKbps: q }),
+      body: JSON.stringify({ trackId, platform: "web" }),
     });
     const body = await res.json();
-    console.log(`\nstream-start q=${q ?? "default"}`, res.status, {
+    console.log(`\nstream-start track=${trackId}`, res.status, {
       sessionId: body.sessionId,
       url: body.signedUrl?.slice(0, 80),
     });

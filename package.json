@@ -32,6 +32,16 @@
     "probe:performance-discovery": "npx tsx scripts/probe-performance-discovery.ts",
     "probe:performance": "npx tsx scripts/probe-performance-certification.ts",
     "probe:war-plan": "npx tsx scripts/probe-war-plan.ts",
+    "test:cors": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.cors.config.ts",
+    "test:audio-pipeline": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.audio-pipeline.config.ts",
+    "probe:audio-certification": "npx tsx scripts/probe-audio-pipeline-certification.ts",
+    "probe:audio-remediation": "npx tsx scripts/probe-audio-remediation.ts",
+    "remediate:audio": "npx tsx scripts/remediate-audio-storage.ts --apply",
+    "remediate:audio:dry-run": "npx tsx scripts/remediate-audio-storage.ts",
+    "test:audio": "pnpm test:audio-pipeline && pnpm --filter @sonafrik/shared test",
+    "test:storage": "pnpm remediate:audio:dry-run",
+    "test:player": "pnpm --filter @sonafrik/api exec vitest run src/streaming/playback/playback.certification.test.ts src/streaming/playback/playback-engine.test.ts",
+    "probe:cors": "npx tsx scripts/probe-cors-infrastructure.ts",
     "analyze:web": "pnpm --filter @sonafrik/web analyze"
   },
   "devDependencies": {

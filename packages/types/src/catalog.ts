@@ -3,6 +3,8 @@
 export type ReleaseType = "album" | "single" | "ep";
 export type PublicationStatus = "draft" | "pending_review" | "published" | "rejected" | "archived";
 export type TrackFileFormat = "mp3" | "aac" | "flac" | "wav";
+
+export type TrackFileIntegrityStatus = "pending" | "valid" | "invalid" | "needs_review";
 export type CatalogAssetType = "audio" | "cover";
 export type TrackCreditRole =
   | "artiste_principal"
@@ -79,6 +81,10 @@ export interface TrackFile {
   file_size_bytes: number | null;
   duration_seconds: number | null;
   is_primary: boolean;
+  integrity_status: TrackFileIntegrityStatus;
+  integrity_message: string | null;
+  content_hash: string | null;
+  validated_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -5,12 +5,14 @@ import { CatalogRepository } from "./catalog.repository";
 import { PublicationIntegrationService } from "../publication/integration";
 import {
   catalogAssetUploadSchema,
+  catalogAssetConfirmSchema,
   createAlbumSchema,
   createTrackSchema,
   setTrackCreditsSchema,
   updateAlbumSchema,
   updateTrackSchema,
   type CatalogAssetUploadInput,
+  type CatalogAssetConfirmInput,
   type CreateAlbumInput,
   type CreateTrackInput,
   type SetTrackCreditsInput,
@@ -288,6 +290,41 @@ export class CatalogService {
 
     if (error || !data?.signedUrl) throw new CatalogError("asset_upload_failed");
     return data as { signedUrl: string; path: string; token: string; expiresIn: number };
+  }
+
+  async confirmAssetUpload(input: CatalogAssetConfirmInput): Promise<{
+    integrityStatus: string;
+    message: string;
+    webCompatible: boolean;
+    fileSizeBytes: number;
+  }> {
+    const parsed = catalogAssetConfirmSchema.safeParse(input);
+    if (!parsed.success) throw new CatalogError("asset_type_invalid");
+
+    await this.requireUserId();
+
+    const { data, error } = await this.client.functions.invoke("catalog-asset-signed-url", {
+      body: {
+        action: "confirm",
+        assetType: "audio",
+        creatorId: parsed.data.creatorId,
+        trackId: parsed.data.trackId,
+        path: parsed.data.path,
+        format: parsed.data.format,
+        contentType: parsed.data.contentType,
+        fileSizeBytes: parsed.data.fileSizeBytes,
+        durationSeconds: parsed.data.durationSeconds,
+        contentHash: parsed.data.contentHash,
+      },
+    });
+
+    if (error || !data?.integrityStatus) throw new CatalogError("asset_upload_failed");
+    return data as {
+      integrityStatus: string;
+      message: string;
+      webCompatible: boolean;
+      fileSizeBytes: number;
+    };
   }
 }
 

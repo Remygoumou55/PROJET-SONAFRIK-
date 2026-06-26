@@ -173,9 +173,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           mediaErr?.code === MediaError.MEDIA_ERR_NETWORK ? "network" :
           "expired";
         const errorMsg =
-          errorType === "codec"   ? "Format audio non supporté." :
-          errorType === "network" ? "Erreur réseau — vérifiez votre connexion." :
-                                    "Lien audio expiré. Rechargement en cours…";
+          errorType === "codec"
+            ? "Ce morceau ne peut pas être lu (fichier corrompu ou format incompatible)."
+            : errorType === "network"
+              ? "Erreur réseau — vérifiez votre connexion."
+              : "Lien audio expiré. Nouvelle tentative…";
         console.error("[Player] Erreur audio", errorType, mediaErr?.code);
         clearHeartbeat();
         setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: errorMsg }));

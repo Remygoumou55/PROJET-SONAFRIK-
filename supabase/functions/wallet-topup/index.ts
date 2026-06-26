@@ -5,18 +5,14 @@
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { CORS_HEADERS as CORS, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
-
-function json(body: Record<string, unknown>, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS, "Content-Type": "application/json" },
-  });
-}
+import { corsJsonResponse, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 Deno.serve(async (req: Request) => {
   const preflight = handleCorsPreflightIfNeeded(req);
   if (preflight) return preflight;
+
+  const json = (body: Record<string, unknown>, status = 200) =>
+    corsJsonResponse(req, body, status);
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return json({ error: "unauthorized" }, 401);

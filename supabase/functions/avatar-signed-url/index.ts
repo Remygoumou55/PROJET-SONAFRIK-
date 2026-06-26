@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-import { CORS_HEADERS as corsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { corsJsonResponse, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const SIGNED_URL_TTL = 3600;
@@ -12,6 +12,9 @@ interface SignedUrlRequest {
 Deno.serve(async (req) => {
   const preflight = handleCorsPreflightIfNeeded(req);
   if (preflight) return preflight;
+
+  const json = (body: Record<string, unknown>, status = 200) =>
+    corsJsonResponse(req, body, status);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -103,10 +106,3 @@ Deno.serve(async (req) => {
     return json({ error: "Erreur interne du serveur." }, 500);
   }
 });
-
-function json(body: Record<string, unknown>, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}

@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { CORS_HEADERS as CORS, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { buildCorsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 Deno.serve(async (req: Request) => {
   const preflight = handleCorsPreflightIfNeeded(req);
@@ -10,7 +10,7 @@ Deno.serve(async (req: Request) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...CORS, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...CORS, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -37,7 +37,7 @@ Deno.serve(async (req: Request) => {
     if (!payoutAccountId || !amountGnf || amountGnf < 5000) {
       return new Response(JSON.stringify({ error: "minimum_withdrawal_5000_gnf" }), {
         status: 400,
-        headers: { ...CORS, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -56,18 +56,18 @@ Deno.serve(async (req: Request) => {
 
       return new Response(JSON.stringify({ error: clientError }), {
         status: 400,
-        headers: { ...CORS, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
     return new Response(
       JSON.stringify({ success: true, withdrawal_id: withdrawalId }),
-      { status: 200, headers: { ...CORS, "Content-Type": "application/json" } },
+      { status: 200, headers: buildCorsHeaders(req, { "Content-Type": "application/json" }) },
     );
   } catch (err) {
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : "internal_error" }),
-      { status: 500, headers: { ...CORS, "Content-Type": "application/json" } },
+      { status: 500, headers: buildCorsHeaders(req, { "Content-Type": "application/json" }) },
     );
   }
 });

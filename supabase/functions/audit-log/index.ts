@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
-import { CORS_HEADERS as corsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { buildCorsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 interface AuditLogRequest {
   action: string;
@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     if (!supabaseUrl || !serviceRoleKey) {
       return new Response(JSON.stringify({ error: "Configuration serveur manquante." }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorisé." }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Session invalide." }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     if (!body.action) {
       return new Response(JSON.stringify({ error: "Action requise." }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -68,18 +68,18 @@ Deno.serve(async (req) => {
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
     return new Response(JSON.stringify({ id: data }), {
       status: 201,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
     });
   } catch {
     return new Response(JSON.stringify({ error: "Erreur interne du serveur." }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
     });
   }
 });

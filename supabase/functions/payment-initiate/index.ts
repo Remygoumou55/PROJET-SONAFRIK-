@@ -13,7 +13,7 @@ import {
   initiateWaveCheckout,
   isProviderSandbox,
 } from "../_shared/payments.ts";
-import { CORS_HEADERS as CORS, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { corsJsonResponse, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 const VALID_PROVIDERS: PaymentProvider[] = [
   "orange_money_gn",
@@ -29,13 +29,6 @@ const VALID_PURPOSES = [
   "subscription_yearly",
   "subscription_diaspora",
 ];
-
-function json(body: Record<string, unknown>, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS, "Content-Type": "application/json" },
-  });
-}
 
 async function initiateOperator(
   provider: PaymentProvider,
@@ -63,6 +56,9 @@ async function initiateOperator(
 Deno.serve(async (req: Request) => {
   const preflight = handleCorsPreflightIfNeeded(req);
   if (preflight) return preflight;
+
+  const json = (body: Record<string, unknown>, status = 200) =>
+    corsJsonResponse(req, body, status);
 
   try {
     const authHeader = req.headers.get("Authorization");

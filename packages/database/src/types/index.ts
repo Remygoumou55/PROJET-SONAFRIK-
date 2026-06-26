@@ -2565,6 +2565,7 @@ export type Database = {
       track_files: {
         Row: {
           bitrate_kbps: number | null
+          content_hash: string | null
           created_at: string
           created_by: string | null
           duration_seconds: number | null
@@ -2572,13 +2573,17 @@ export type Database = {
           file_size_bytes: number | null
           format: string
           id: string
+          integrity_message: string | null
+          integrity_status: string
           is_primary: boolean
           track_id: string
           updated_at: string
           updated_by: string | null
+          validated_at: string | null
         }
         Insert: {
           bitrate_kbps?: number | null
+          content_hash?: string | null
           created_at?: string
           created_by?: string | null
           duration_seconds?: number | null
@@ -2586,13 +2591,17 @@ export type Database = {
           file_size_bytes?: number | null
           format: string
           id?: string
+          integrity_message?: string | null
+          integrity_status?: string
           is_primary?: boolean
           track_id: string
           updated_at?: string
           updated_by?: string | null
+          validated_at?: string | null
         }
         Update: {
           bitrate_kbps?: number | null
+          content_hash?: string | null
           created_at?: string
           created_by?: string | null
           duration_seconds?: number | null
@@ -2600,10 +2609,13 @@ export type Database = {
           file_size_bytes?: number | null
           format?: string
           id?: string
+          integrity_message?: string | null
+          integrity_status?: string
           is_primary?: boolean
           track_id?: string
           updated_at?: string
           updated_by?: string | null
+          validated_at?: string | null
         }
         Relationships: [
           {

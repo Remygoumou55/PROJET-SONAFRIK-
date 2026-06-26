@@ -3,6 +3,7 @@
  * Webhook Soutra Money → confirm_payment_intent (Vague E++).
  */
 
+import { handleWebhookPreflightIfNeeded } from "../_shared/cors.ts";
 import { verifyHmacSha256 } from "../_shared/payments.ts";
 import {
   confirmPaymentIntent,
@@ -15,7 +16,8 @@ function ok(): Response {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return ok();
+  const preflight = handleWebhookPreflightIfNeeded(req);
+  if (preflight) return preflight;
 
   try {
     const rawBody = await req.text();

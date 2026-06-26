@@ -3,6 +3,7 @@
  * Webhook MTN MoMo GN → confirm_payment_intent (Vague E++).
  */
 
+import { handleWebhookPreflightIfNeeded } from "../_shared/cors.ts";
 import {
   confirmPaymentIntent,
   createServiceClient,
@@ -14,7 +15,8 @@ function ok(): Response {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return ok();
+  const preflight = handleWebhookPreflightIfNeeded(req);
+  if (preflight) return preflight;
 
   try {
     const rawBody = await req.text();

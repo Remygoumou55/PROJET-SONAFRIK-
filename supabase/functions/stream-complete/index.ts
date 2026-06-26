@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { CORS_HEADERS as corsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { buildCorsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 /** Real Listen V7.2 — seuil de validité : 90% */
 const VALID_LISTEN_THRESHOLD = 0.9;
@@ -13,7 +13,7 @@ Deno.serve(async (req: Request) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -27,7 +27,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
     if (!sessionId) {
       return new Response(JSON.stringify({ error: "session_not_found" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -62,7 +62,7 @@ Deno.serve(async (req: Request) => {
         }),
         {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
         },
       );
     }
@@ -99,14 +99,14 @@ Deno.serve(async (req: Request) => {
           }),
           {
             status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
           },
         );
       }
 
       return new Response(JSON.stringify({ error: "session_not_found" }), {
         status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -155,7 +155,7 @@ Deno.serve(async (req: Request) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       },
     );
   } catch {
@@ -163,7 +163,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({ error: "stream_complete_failed" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       },
     );
   }

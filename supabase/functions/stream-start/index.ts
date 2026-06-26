@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { CORS_HEADERS as corsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
+import { buildCorsHeaders, handleCorsPreflightIfNeeded } from "../_shared/cors.ts";
 
 Deno.serve(async (req: Request) => {
   const preflight = handleCorsPreflightIfNeeded(req);
@@ -10,7 +10,7 @@ Deno.serve(async (req: Request) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -39,7 +39,7 @@ Deno.serve(async (req: Request) => {
     if (!trackId) {
       return new Response(JSON.stringify({ error: "track_not_found" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -55,7 +55,7 @@ Deno.serve(async (req: Request) => {
     if (trackError || !track) {
       return new Response(JSON.stringify({ error: "track_not_found" }), {
         status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -64,18 +64,20 @@ Deno.serve(async (req: Request) => {
 
     let fileQuery = supabase
       .from("track_files")
-      .select("id, file_path, bitrate_kbps, format")
+      .select("id, file_path, bitrate_kbps, format, integrity_status")
       .eq("track_id", trackId)
       .eq("is_primary", true)
       .in("format", WEB_AUDIO_FORMATS)
+      .not("integrity_status", "eq", "invalid")
       .limit(1);
 
     if (qualityKbps) {
       fileQuery = supabase
         .from("track_files")
-        .select("id, file_path, bitrate_kbps, format")
+        .select("id, file_path, bitrate_kbps, format, integrity_status")
         .eq("track_id", trackId)
         .in("format", WEB_AUDIO_FORMATS)
+        .not("integrity_status", "eq", "invalid")
         .lte("bitrate_kbps", qualityKbps)
         .order("bitrate_kbps", { ascending: false })
         .limit(1);
@@ -87,29 +89,27 @@ Deno.serve(async (req: Request) => {
     if (!trackFile?.file_path && qualityKbps) {
       const { data: primaryFile } = await supabase
         .from("track_files")
-        .select("id, file_path, bitrate_kbps, format")
+        .select("id, file_path, bitrate_kbps, format, integrity_status")
         .eq("track_id", trackId)
         .eq("is_primary", true)
         .in("format", WEB_AUDIO_FORMATS)
+        .not("integrity_status", "eq", "invalid")
         .limit(1)
         .maybeSingle();
       trackFile = primaryFile;
-    }
-    if (!trackFile?.file_path) {
-      const { data: anyPrimary } = await supabase
-        .from("track_files")
-        .select("id, file_path, bitrate_kbps, format")
-        .eq("track_id", trackId)
-        .eq("is_primary", true)
-        .limit(1)
-        .maybeSingle();
-      trackFile = anyPrimary;
     }
 
     if (!trackFile?.file_path) {
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {
         status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
+      });
+    }
+
+    if (trackFile.integrity_status === "invalid" || trackFile.integrity_status === "needs_review") {
+      return new Response(JSON.stringify({ error: "stream_start_failed", reason: "asset_invalid" }), {
+        status: 422,
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -128,7 +128,7 @@ Deno.serve(async (req: Request) => {
     if (metaSize !== undefined && metaSize < 64) {
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {
         status: 422,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -143,7 +143,7 @@ Deno.serve(async (req: Request) => {
     if (signedError || !signedData?.signedUrl) {
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -159,7 +159,7 @@ Deno.serve(async (req: Request) => {
     if (sessionError) {
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       });
     }
 
@@ -174,7 +174,7 @@ Deno.serve(async (req: Request) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       },
     );
   } catch {
@@ -182,7 +182,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({ error: "stream_start_failed" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
       },
     );
   }

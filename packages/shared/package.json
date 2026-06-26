@@ -24,6 +24,10 @@
     "./auth": {
       "types": "./dist/auth/devBypass.d.ts",
       "default": "./dist/auth/devBypass.js"
+    },
+    "./audio": {
+      "types": "./dist/audio/audio-integrity.d.ts",
+      "default": "./dist/audio/audio-integrity.js"
     }
   },
   "scripts": {

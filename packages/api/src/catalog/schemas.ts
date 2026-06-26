@@ -49,6 +49,17 @@ export const catalogAssetUploadSchema = z.object({
   bitrateKbps: z.number().int().positive().optional(),
 });
 
+export const catalogAssetConfirmSchema = z.object({
+  creatorId: z.string().uuid(),
+  trackId: z.string().uuid(),
+  path: z.string().min(1),
+  format: z.enum(["mp3", "aac"]),
+  contentType: z.string().min(3),
+  fileSizeBytes: z.number().int().positive().max(50 * 1024 * 1024),
+  durationSeconds: z.number().int().min(0).optional(),
+  contentHash: z.string().length(64).optional(),
+});
+
 export const trackCreditItemSchema = z.object({
   contributorName: z.string().trim().min(1).max(100),
   role: z.enum([
@@ -75,5 +86,6 @@ export type UpdateAlbumInput = z.infer<typeof updateAlbumSchema>;
 export type CreateTrackInput = z.infer<typeof createTrackSchema>;
 export type UpdateTrackInput = z.infer<typeof updateTrackSchema>;
 export type CatalogAssetUploadInput = z.infer<typeof catalogAssetUploadSchema>;
+export type CatalogAssetConfirmInput = z.infer<typeof catalogAssetConfirmSchema>;
 export type TrackCreditItem = z.infer<typeof trackCreditItemSchema>;
 export type SetTrackCreditsInput = z.infer<typeof setTrackCreditsSchema>;
