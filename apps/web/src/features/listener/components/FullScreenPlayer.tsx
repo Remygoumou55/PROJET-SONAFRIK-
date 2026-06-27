@@ -8,7 +8,10 @@ import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
 import { useListenFeatures } from "../lib/listenFeaturesContext";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
-import { ShareButton } from "./ShareButton";
+const ShareButton = dynamic(
+  () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
+  { ssr: false },
+);
 
 const LiveReactions = dynamic(
   () => import("./LiveReactions").then((m) => ({ default: m.LiveReactions })),

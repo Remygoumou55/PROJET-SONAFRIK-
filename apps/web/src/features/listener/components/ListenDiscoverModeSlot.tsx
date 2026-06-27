@@ -1,7 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useListenFeatures } from "../lib/listenFeaturesContext";
-import { DiscoverModeButton } from "./DiscoverModeButton";
+
+const DiscoverModeButton = dynamic(
+  () => import("./DiscoverModeButton").then((m) => ({ default: m.DiscoverModeButton })),
+  { ssr: false },
+);
 
 export function ListenDiscoverModeSlot() {
   const { discoverMode } = useListenFeatures();

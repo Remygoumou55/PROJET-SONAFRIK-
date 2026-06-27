@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { ListenerSidebarData } from "@sonafrik/types";
 import type { ListenFeatureFlags } from "@/lib/listen/listen-feature-flags";
+import { hasAnyListenFeature } from "@/lib/listen/get-cached-listen-feature-flags";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { ListenFeaturesProvider } from "../lib/listenFeaturesContext";
@@ -12,6 +13,11 @@ import { MobileBottomNav } from "./ListenerMobileBottomNav";
 
 const GlobalPlayer = dynamic(
   () => import("./GlobalPlayer").then((m) => ({ default: m.GlobalPlayer })),
+  { ssr: false },
+);
+
+const ListenFutureStyles = dynamic(
+  () => import("./ListenFutureStyles").then((m) => ({ default: m.ListenFutureStyles })),
   { ssr: false },
 );
 
@@ -32,9 +38,12 @@ export function StreamingLayoutClient({
   sidebarDataPromise,
   listenFeatures,
 }: StreamingLayoutClientProps) {
+  const loadFutureStyles = hasAnyListenFeature(listenFeatures);
+
   return (
     <QualityPreferenceProvider value={audioQualityPreference}>
       <ListenFeaturesProvider flags={listenFeatures}>
+        {loadFutureStyles ? <ListenFutureStyles /> : null}
         <DevAuthBootstrap />
         <PlayerProvider>
         <div

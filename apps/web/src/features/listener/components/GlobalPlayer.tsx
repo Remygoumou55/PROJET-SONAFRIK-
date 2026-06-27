@@ -10,7 +10,10 @@ import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
-import { ShareButton } from "./ShareButton";
+const ShareButton = dynamic(
+  () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
+  { ssr: false },
+);
 
 const PlayerExpandedPanel = dynamic(
   () => import("./PlayerExpandedPanel").then((m) => ({ default: m.PlayerExpandedPanel })),

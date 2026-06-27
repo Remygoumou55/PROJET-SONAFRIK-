@@ -4,20 +4,17 @@ import { requireIdentityContext, redirectIfOnboardingIncomplete } from "@/featur
 import { getListenSidebarData } from "@/features/listener/lib/getListenSidebarData";
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
-import { resolveListenFeatureFlags } from "@/lib/listen/listen-feature-flags";
-import { getSupabasePublicClient } from "@/lib/supabase/public";
+import { getCachedListenFeatureFlags } from "@/lib/listen/get-cached-listen-feature-flags";
 import StreamingLoading from "./loading";
 import "@/app/styles/listen-home.css";
-import "@/app/styles/listen-future.css";
 
 async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
   redirectIfOnboardingIncomplete(context.profile);
 
-  const supabase = getSupabasePublicClient();
   const [performanceFlags, listenFeatures] = await Promise.all([
     getCachedPerformanceFlags(),
-    resolveListenFeatureFlags(supabase),
+    getCachedListenFeatureFlags(),
   ]);
   const sidebarDataPromise = getListenSidebarData(context.profile.id);
 

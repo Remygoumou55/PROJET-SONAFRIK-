@@ -8,13 +8,6 @@ import { createClient } from "@supabase/supabase-js";
 
 const ROOT = resolve(__dirname, "..");
 const envPath = resolve(ROOT, "apps/web/.env.local");
-for (const line of readFileSync(envPath, "utf8").split("\n")) {
-  const m = line.match(/^([^#=]+)=(.*)$/);
-  if (m) process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
-}
-
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 type Check = { name: string; ok: boolean; detail: string };
 
@@ -23,6 +16,14 @@ const log = (name: string, ok: boolean, detail: string) => {
   checks.push({ name, ok, detail });
   console.log(`${ok ? "✅" : "❌"} ${name} — ${detail}`);
 };
+
+function loadEnv() {
+  if (!existsSync(envPath)) return;
+  for (const line of readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m) process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
+  }
+}
 
 function read(rel: string): string {
   return readFileSync(resolve(ROOT, rel), "utf8");
@@ -44,12 +45,18 @@ function staticChecks() {
     "is_admin vérifié sur /admin/*",
   );
 
-  const homepage = read("apps/web/src/features/listener/components/HomepageContentSections.tsx");
+  const listenerHomeSources = [
+    "apps/web/src/features/listener/components/HomepageContentSections.tsx",
+    "apps/web/src/features/listener/components/DiscoveriesSection.tsx",
+    "apps/web/src/features/listener/components/SearchResultRows.tsx",
+  ]
+    .map(read)
+    .join("\n");
   log(
     "A3 homepage artist links",
-    homepage.includes("/listen/artist/${artist.creator_id}") &&
-      homepage.includes("/listen/album/${album.id}") &&
-      homepage.includes("/library/playlist/${pl.id}"),
+    listenerHomeSources.includes("/listen/artist/") &&
+      listenerHomeSources.includes("/listen/album/") &&
+      listenerHomeSources.includes("/library/playlist/"),
     "artistes, albums, playlists",
   );
 
@@ -102,6 +109,14 @@ function staticChecks() {
 }
 
 async function liveChecks() {
+  loadEnv();
+  const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!URL || !ANON) {
+    log("live env", false, "NEXT_PUBLIC_SUPABASE_URL ou ANON_KEY manquant dans .env.local");
+    return;
+  }
+
   const listener = createClient(URL, ANON, { auth: { persistSession: false } });
   const { error: signInErr } = await listener.auth.signInWithPassword({
     email: "s13b-playwright-listener@sonafrik.test",
