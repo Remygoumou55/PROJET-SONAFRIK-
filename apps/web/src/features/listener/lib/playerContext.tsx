@@ -167,9 +167,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const mediaErr = audio.error;
         // Ignorer les erreurs transitoires lors d'un changement de piste
         if (mediaErr?.code === MediaError.MEDIA_ERR_ABORTED) return;
+        // Code 4 (SRC_NOT_SUPPORTED) = souvent JSON 403/404 Supabase, pas un vrai codec — retry via "expired"
         const errorType: AudioErrorType =
-          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ||
-          mediaErr?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED ? "codec" :
+          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ? "codec" :
           mediaErr?.code === MediaError.MEDIA_ERR_NETWORK ? "network" :
           "expired";
         const errorMsg =
@@ -177,8 +177,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             ? "Ce morceau ne peut pas être lu (fichier corrompu ou format incompatible)."
             : errorType === "network"
               ? "Erreur réseau — vérifiez votre connexion."
-              : "Lien audio expiré. Nouvelle tentative…";
-        console.error("[Player] Erreur audio", errorType, mediaErr?.code);
+              : "Lecture interrompue. Nouvelle tentative…";
+        if (process.env.NODE_ENV === "development") {
+          console.error("[Player] Erreur audio", errorType, mediaErr?.code);
+        }
         clearHeartbeat();
         setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: errorMsg }));
         onErrorCallbackRef.current?.(errorType, audio.currentTime);
