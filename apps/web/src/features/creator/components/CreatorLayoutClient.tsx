@@ -3,12 +3,24 @@
 import { usePathname } from "next/navigation";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 import { CreatorNav } from "./CreatorNav";
+import { CreatorMobileNav } from "./CreatorMobileNav";
+import { CreatorHeaderUtilities } from "../dashboard/components/enterprise/CreatorHeaderUtilities";
 
 export function CreatorLayoutClient({
   pendingVerifications,
+  userId,
+  initialUnreadCount,
+  stageName,
+  creatorId,
+  avatarPath,
   children,
 }: {
   pendingVerifications: number;
+  userId: string;
+  initialUnreadCount: number;
+  stageName: string;
+  creatorId: string;
+  avatarPath: string | null;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -33,25 +45,44 @@ export function CreatorLayoutClient({
                     : "Mon espace artiste";
 
   return (
-    <div className="min-h-dvh bg-noir-profond">
-      <header className="creator-header border-b border-bordure px-6 py-4">
-        <div className="creator-breadcrumb">
-          <SonafrikLogo size="nav" />
-          <span className="creator-breadcrumb__sep" aria-hidden="true">
-            ·
-          </span>
-          <span className="creator-breadcrumb__section">Espace Artiste</span>
+    <div className="min-h-dvh bg-noir-profond creator-workspace">
+      <header className="creator-header border-b border-bordure">
+        <div className="creator-header__inner">
+          <div className="creator-header__row">
+            <div className="creator-header__copy">
+              <div className="creator-breadcrumb">
+                <SonafrikLogo variant="wordmark" size="sm" href="/" />
+                <span className="creator-breadcrumb__sep" aria-hidden="true">
+                  ·
+                </span>
+                <span className="creator-breadcrumb__section">Espace Artiste</span>
+              </div>
+              <h1 className="creator-page-title">{title}</h1>
+              <p className="creator-page-sub">
+                Publiez, développez votre carrière et suivez votre évolution.
+              </p>
+            </div>
+            <CreatorHeaderUtilities
+              userId={userId}
+              initialUnreadCount={initialUnreadCount}
+              stageName={stageName}
+              creatorId={creatorId}
+              avatarPath={avatarPath}
+            />
+          </div>
         </div>
-        <h1 className="creator-page-title">{title}</h1>
-        <p className="creator-page-sub">
-          Publiez, suivez vos écoutes et développez votre carrière musicale.
-        </p>
       </header>
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 lg:flex-row">
-        <aside className="creator-sidebar lg:w-[200px] lg:shrink-0">
+
+      <CreatorMobileNav
+        activePath={pathname}
+        pendingVerifications={pendingVerifications}
+      />
+
+      <div className="creator-workspace__frame">
+        <aside className="creator-sidebar lg:w-[220px] lg:shrink-0">
           <CreatorNav activePath={pathname} pendingVerifications={pendingVerifications} />
         </aside>
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="min-w-0 flex-1 creator-workspace__main">{children}</div>
       </div>
     </div>
   );

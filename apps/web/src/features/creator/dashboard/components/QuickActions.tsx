@@ -24,9 +24,8 @@ function selectPrimaryQuickActions(
 ): CreatorDashboardQuickAction[] {
   const byId = new Map(actions.map((action) => [action.id, action]));
 
-  const primary =
+  const publish =
     byId.get("publish") ??
-    byId.get("stats") ??
     ({
       id: "publish",
       label: "Publier un morceau",
@@ -37,48 +36,60 @@ function selectPrimaryQuickActions(
     } satisfies CreatorDashboardQuickAction);
 
   const profile = byId.get("profile") ?? PROFILE_FALLBACK;
-  const catalog = byId.get("catalog") ?? {
-    id: "catalog",
-    label: "Mon catalogue",
-    description: "Gérer titres et albums",
-    href: "/creator/catalog",
-    icon: "📀",
-    variant: "outline",
-  } satisfies CreatorDashboardQuickAction;
+  const catalog =
+    byId.get("catalog") ??
+    ({
+      id: "catalog",
+      label: "Mon catalogue",
+      description: "Gérer titres et albums",
+      href: "/creator/catalog",
+      icon: "📀",
+      variant: "outline",
+    } satisfies CreatorDashboardQuickAction);
 
-  const revenue =
-    byId.get("payment") ?? byId.get("withdraw") ?? REVENUE_FALLBACK;
+  const revenue = byId.get("payment") ?? byId.get("withdraw") ?? REVENUE_FALLBACK;
 
-  return [primary, profile, catalog, revenue];
+  return [publish, profile, catalog, revenue];
 }
 
 export function QuickActions({
   actions,
   pulsePrimary = false,
+  sectionId = "creator-quick-actions",
 }: {
   actions: CreatorDashboardQuickAction[];
   pulsePrimary?: boolean;
+  sectionId?: string;
 }) {
   const primaryActions = selectPrimaryQuickActions(actions);
 
   return (
-    <section className="creator-quick-actions" aria-label="Actions rapides">
-      <h2 className="creator-widget__title">Actions rapides</h2>
-      <div className="creator-quick-actions__grid">
+    <section
+      id={sectionId}
+      className="dash-quick-actions"
+      aria-label="Actions rapides"
+    >
+      <h2 className="dash-section-title">Actions rapides</h2>
+      <div className="dash-quick-actions__grid">
         {primaryActions.map((action) => (
           <Link
             key={action.id}
             href={action.href}
-            className={`creator-quick-action creator-quick-action--${action.variant}${
-              pulsePrimary && action.variant === "primary" ? " creator-quick-action--pulse" : ""
+            className={`dash-quick-actions__card dash-quick-actions__card--${action.variant}${
+              pulsePrimary && action.variant === "primary"
+                ? " dash-quick-actions__card--pulse"
+                : ""
             }`}
             aria-label={`${action.label} — ${action.description}`}
           >
-            <span className="creator-quick-action__icon" aria-hidden="true">
+            <span className="dash-quick-actions__icon" aria-hidden="true">
               {action.icon}
             </span>
-            <span className="creator-quick-action__label">{action.label}</span>
-            <span className="creator-quick-action__desc">{action.description}</span>
+            <span className="dash-quick-actions__label">{action.label}</span>
+            <span className="dash-quick-actions__desc">{action.description}</span>
+            <span className="dash-quick-actions__arrow" aria-hidden="true">
+              →
+            </span>
           </Link>
         ))}
       </div>

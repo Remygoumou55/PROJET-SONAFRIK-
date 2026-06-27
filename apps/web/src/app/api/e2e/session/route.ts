@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 const E2E_EMAIL = process.env.PLAYWRIGHT_TEST_EMAIL ?? "s13b-playwright-listener@sonafrik.test";
 const E2E_PASSWORD = process.env.PLAYWRIGHT_TEST_PASSWORD ?? "S13BCert2026!";
 
-/** Connexion E2E — cookies SSR réels (dev uniquement). */
+/** Connexion E2E — cookies SSR réels (dev local uniquement, jamais Vercel). */
 export async function POST() {
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV !== "development" || process.env.VERCEL === "1") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

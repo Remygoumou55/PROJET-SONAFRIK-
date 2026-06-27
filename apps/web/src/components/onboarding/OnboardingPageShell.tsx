@@ -25,9 +25,8 @@ export function OnboardingPageShell({
       {leading ? <div>{leading}</div> : null}
 
       <header className="text-center">
-        <div className="mb-4">
-          <SonafrikLogo />
-          <p className="brand-logo-tagline">Notre Bien Commun</p>
+        <div className="mb-4 flex justify-center">
+          <SonafrikLogo variant="full" priority />
         </div>
         {stepLabel ? <OnboardingStepPill label={stepLabel} /> : null}
         <h1 className="app-page-title text-2xl font-bold text-texte-principal sm:text-[26px]">

@@ -33,9 +33,7 @@ export function LandingFooter() {
     <footer className="mt-2 border-t border-bordure pt-10">
       <div className="landing-footer-grid mb-8 grid grid-cols-[1.2fr_repeat(3,1fr)] gap-8">
         <div>
-          <p className="mb-2">
-            <SonafrikLogo size="footer" />
-          </p>
+          <SonafrikLogo variant="nav" size="sm" showTagline href="/" />
           <p className="m-0 text-[13px] leading-relaxed text-texte-secondaire">
             La musique guinéenne mérite sa plateforme.
             <br />

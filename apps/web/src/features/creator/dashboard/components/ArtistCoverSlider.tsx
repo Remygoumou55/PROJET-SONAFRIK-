@@ -8,6 +8,7 @@ interface ArtistCoverSliderProps {
   creatorId: string;
   stageName: string;
   coverImages: string[];
+  variant?: "default" | "compact";
 }
 
 const SLIDE_MS = 6000;
@@ -16,10 +17,12 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
   creatorId,
   stageName,
   coverImages,
+  variant = "default",
 }: ArtistCoverSliderProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [managerOpen, setManagerOpen] = useState(false);
   const slides = useMemo(() => coverImages.filter(Boolean), [coverImages]);
+  const isCompact = variant === "compact";
 
   const goNext = useCallback(() => {
     if (slides.length <= 1) return;
@@ -32,45 +35,39 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
     return () => window.clearInterval(timer);
   }, [goNext, slides.length]);
 
-  const prefetchIndex = slides.length > 1 ? (activeIndex + 1) % slides.length : -1;
+  const sliderClass = isCompact
+    ? "artist-hero__cover-slider artist-hero__cover-slider--compact"
+    : "artist-hero__cover-slider";
+
+  const activePath = slides[activeIndex] ?? null;
 
   return (
     <div className="artist-hero__cover-wrap">
       <div
-        className="artist-hero__cover-slider"
+        className={sliderClass}
         role="region"
         aria-label="Photos de couverture"
         aria-live="polite"
       >
-        {slides.length > 0 ? (
-          slides.map((path, index) => {
-            const isActive = index === activeIndex;
-            const shouldLoad = isActive || index === prefetchIndex;
-            return (
-              <div
-                key={path}
-                className={`artist-hero__cover-slide${isActive ? " artist-hero__cover-slide--active" : ""}`}
-                aria-hidden={!isActive}
-              >
-                {shouldLoad ? (
-                  <CreatorAssetImage
-                    creatorId={creatorId}
-                    path={path}
-                    assetKind="gallery"
-                    alt={`Couverture ${stageName}`}
-                    fit="contain"
-                    className="artist-hero__cover-img"
-                    sizes="(max-width: 768px) 100vw, 66vw"
-                    priority={index === 0}
-                    fallback={<div className="artist-hero__cover-fallback" />}
-                  />
-                ) : null}
-              </div>
-            );
-          })
+        {activePath ? (
+          <div className="artist-hero__cover-slide artist-hero__cover-slide--active">
+            <CreatorAssetImage
+              creatorId={creatorId}
+              path={activePath}
+              assetKind="gallery"
+              alt={`Couverture ${stageName}`}
+              fit="cover"
+              layout="bounded"
+              className="artist-hero__cover-img"
+              priority
+              fallback={<div className="artist-hero__cover-fallback" />}
+            />
+          </div>
         ) : (
           <div className="artist-hero__cover-fallback" aria-hidden="true" />
         )}
+
+        <div className="artist-hero__cover-scrim" aria-hidden="true" />
 
         {slides.length > 1 ? (
           <div className="artist-hero__cover-dots" role="tablist" aria-label="Navigation couverture">

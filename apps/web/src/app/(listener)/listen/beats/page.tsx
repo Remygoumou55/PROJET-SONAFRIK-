@@ -3,10 +3,11 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createBeatsService } from "@sonafrik/api/beats";
 import { createListenerService } from "@sonafrik/api/listener";
 import { BeatStoreClient } from "@/features/marketplace/components/BeatStoreClient";
-import { ComingSoon } from "@/components/ComingSoon";
+import { redirect } from "next/navigation";
 
 export const metadata = { title: "Beat Store — SONAFRIK" };
 
+/** Post-MVP — gelé par défaut (`beat_store` flag off → redirect). */
 export default async function BeatStorePage({
   searchParams,
 }: {
@@ -17,16 +18,8 @@ export default async function BeatStorePage({
   const supabase = await getSupabaseServerClient();
   const listener = createListenerService(supabase);
 
-  const flagEnabled = await listener.isFeatureEnabled("beat_store");
-
-  if (!flagEnabled) {
-    return (
-      <ComingSoon
-        emoji="🎹"
-        title="Beat Store"
-        description="Les producteurs guinéens pourront vendre leurs instrumentaux sur SONAFRIK, commission 0% (CDC Règle #4)."
-      />
-    );
+  if (!(await listener.isFeatureEnabled("beat_store"))) {
+    redirect("/listen");
   }
 
   const service = createBeatsService(supabase);
@@ -38,10 +31,8 @@ export default async function BeatStorePage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--color-texte-principal)" }}>
-          Beat Store
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-texte-desactive)" }}>
+        <h1 className="text-2xl font-bold text-texte-principal">Beat Store</h1>
+        <p className="mt-1 text-sm text-texte-desactive">
           Instrumentaux de producteurs guinéens — commission 0% (CDC Règle #4)
         </p>
       </div>

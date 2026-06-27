@@ -60,5 +60,5 @@ packages/api/coverage/
 *.lcov
 packages/api/playback-coverage.txt
 
-# Fichiers temporaires racine
-tmp-creator.html
+# Rapports audio générés localement (ne pas committer)
+docs/audio/remediation-report.json

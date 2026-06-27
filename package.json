@@ -32,6 +32,7 @@
     "probe:performance-discovery": "npx tsx scripts/probe-performance-discovery.ts",
     "probe:performance": "npx tsx scripts/probe-performance-certification.ts",
     "probe:war-plan": "npx tsx scripts/probe-war-plan.ts",
+    "probe:withdrawal-sandbox": "npx tsx scripts/probe-withdrawal-sandbox.ts",
     "test:cors": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.cors.config.ts",
     "test:audio-pipeline": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.audio-pipeline.config.ts",
     "probe:audio-certification": "npx tsx scripts/probe-audio-pipeline-certification.ts",

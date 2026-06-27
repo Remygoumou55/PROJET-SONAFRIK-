@@ -6,7 +6,7 @@
 ## En 30 secondes
 
 1. Lire **[`EXECUTION_LOG.md`](./EXECUTION_LOG.md)** section **« ÉTAT MESURÉ AU 26 JUIN 2026 »**
-2. Score MVP : **76/100** · Probes : **129/129** · DB live vérifiée
+2. Score MVP : **76/100** · Probes : **130/130** · DB live vérifiée
 3. Ne **jamais** utiliser un fichier dans `archive/` comme état actuel
 
 ---
@@ -42,6 +42,11 @@
 | [`ADMIN_GUIDE.md`](./ADMIN_GUIDE.md) | Guide admin (vérifier noms tables) |
 | [`RPC_REFERENCE.md`](./RPC_REFERENCE.md) | Référence RPC Supabase |
 | [`CHECKLIST_LAUNCH.md`](./CHECKLIST_LAUNCH.md) | Checklist lancement |
+| [`PAYMENTS_LAUNCH_CHECKLIST.md`](./PAYMENTS_LAUNCH_CHECKLIST.md) | Credentials + sandbox retraits |
+| [`MVP_DB_SCOPE.md`](./MVP_DB_SCOPE.md) | Tables MVP vs gel post-MVP |
+| [`MVP_PACKAGE_FREEZE.md`](./MVP_PACKAGE_FREEZE.md) | Gel metadata/persistence/mobile |
+| [`MIGRATIONS_POLICY.md`](./MIGRATIONS_POLICY.md) | Politique migrations SQL |
+| [`HTML_DOCS_INDEX.md`](./HTML_DOCS_INDEX.md) | Index guides HTML |
 
 Racine : [`CLAUDE.md`](../CLAUDE.md) · Règles Cursor : [`.cursor/rules/`](../.cursor/rules/)
 
@@ -67,7 +72,7 @@ Stubs : [`MASTER_PLAN.md`](./MASTER_PLAN.md) · [`PLAN_CORRECTION_360.md`](./PLA
 ## État mesuré (26 juin 2026)
 
 ### CI & build
-- Probes : **129/129**
+- Probes : **130/130**
 - Build : 9/9 packages · 47 routes Next.js
 - Typecheck : 15/15 packages
 

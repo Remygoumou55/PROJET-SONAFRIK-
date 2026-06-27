@@ -3,6 +3,7 @@ import type {
   UserPayoutEntry,
   PayoutSummary,
   AdminPayoutEntry,
+  PayoutBatch,
 } from "@sonafrik/types";
 
 export class PayoutRepository {
@@ -94,5 +95,15 @@ export class PayoutRepository {
     });
     if (error) throw error;
     return data as string;
+  }
+
+  async listPayoutBatches(limit = 20): Promise<PayoutBatch[]> {
+    const { data, error } = await this.client
+      .from("payout_batches")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []) as PayoutBatch[];
   }
 }

@@ -9,7 +9,8 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        <Text style={styles.sona}>SONA</Text>
+        <Text style={styles.son}>SON</Text>
+        <Text style={styles.a}>A</Text>
         <Text style={styles.frik}>FRIK</Text>
       </Text>
       <Text style={styles.slogan}>{SONAFRIK_BRAND.slogan}</Text>
@@ -35,9 +36,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
   },
-  title: { fontSize: 36, fontWeight: "800", marginBottom: 8 },
-  sona: { color: colors.textePrincipal },
-  frik: { color: colors.vertEnergie },
+  title: { fontSize: 36, fontWeight: "800", marginBottom: 8, letterSpacing: 2 },
+  son: { color: colors.vertEnergie },
+  a: { color: colors.orSolaire },
+  frik: { color: colors.textePrincipal },
   slogan: { color: colors.orSolaire, fontSize: 18, fontWeight: "600", marginBottom: 4 },
   signature: { color: colors.texteSecondaire, fontSize: 14, marginBottom: 32 },
   button: {

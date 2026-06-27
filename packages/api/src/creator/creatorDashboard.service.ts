@@ -2,7 +2,6 @@ import type { CreatorContext } from "@sonafrik/types";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { createAnalyticsService } from "../analytics/analytics.service";
-import { createRecommendationService } from "../recommendation/recommendation.service";
 import { CreatorService } from "./creator.service";
 import { CreatorDashboardRepository } from "./creatorDashboard.repository";
 import { buildCreatorDashboardData, computeRevenueProjection } from "./creatorDashboard.presentation";
@@ -48,13 +47,11 @@ const EMPTY_REVENUE = {
 export class CreatorDashboardService {
   private readonly creatorService: CreatorService;
   private readonly analyticsService: ReturnType<typeof createAnalyticsService>;
-  private readonly recommendationService: ReturnType<typeof createRecommendationService>;
   private readonly dashboardRepo: CreatorDashboardRepository;
 
   constructor(private readonly client: SonafrikSupabaseClient) {
     this.creatorService = new CreatorService(client);
     this.analyticsService = createAnalyticsService(client);
-    this.recommendationService = createRecommendationService(client);
     this.dashboardRepo = new CreatorDashboardRepository(client);
   }
 
@@ -75,7 +72,6 @@ export class CreatorDashboardService {
       revenueStats,
       catalogCounts,
       paymentConfigured,
-      trendingTracks,
       monthlyRevenue,
     ] = await Promise.all([
       this.analyticsService.getStreamStats({ creatorId }).catch(() => EMPTY_STREAM_STATS),
@@ -89,16 +85,8 @@ export class CreatorDashboardService {
         playlistsCount: 0,
       })),
       this.dashboardRepo.isPaymentConfigured(userId).catch(() => false),
-      this.recommendationService.getTrendingTracks({ window: "7d", limit: 30 }).catch(() => []),
       this.dashboardRepo.getMonthlyRoyalties(creatorId).catch(() => []),
     ]);
-
-    const inspirationArtists =
-      catalogCounts.tracksPublished === 0
-        ? await this.dashboardRepo
-            .getInspirationArtists(trendingTracks, creatorId)
-            .catch(() => [])
-        : [];
 
     const revenueProjectionGnf = computeRevenueProjection(streamStats.week_streams, revenueStats);
 
@@ -112,7 +100,7 @@ export class CreatorDashboardService {
       catalogCounts,
       playlistsCount: catalogCounts.playlistsCount,
       paymentConfigured,
-      inspirationArtists,
+      inspirationArtists: [],
       monthlyRevenue,
       revenueProjectionGnf,
     });

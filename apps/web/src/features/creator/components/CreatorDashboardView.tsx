@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { HeroCard } from "../dashboard/components/HeroCard";
-import { KpiGrid } from "../dashboard/components/KpiCard";
 import { QuickActions } from "../dashboard/components/QuickActions";
-import { AssistantCard } from "../dashboard/components/AssistantCard";
 import { ActivityFeed } from "../dashboard/components/ActivityFeed";
-import { CareerOsCard } from "../dashboard/components/career-os";
-import { InspirationSection } from "../dashboard/components/InspirationSection";
-import { filterValidInspirationArtists } from "../dashboard/lib/inspirationArtists.presentation";
 import { WelcomeModal } from "../dashboard/components/WelcomeModal";
+import {
+  GlanceKpiGrid,
+  NextObjectiveCard,
+  WeeklySonafrikPanel,
+  ConseilBanner,
+  StatsCareerSection,
+} from "../dashboard/components/enterprise";
 
 export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
   const {
@@ -22,47 +23,44 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
     assistantTips,
     quickActions,
     catalogCounts,
-    inspirationArtists,
-    profileSlug,
+    timeline,
     profileCreatedAt,
   } = data;
 
-  const [profileUrl, setProfileUrl] = useState(`/listen/artist/${profileSlug}`);
-
-  useEffect(() => {
-    setProfileUrl(`${window.location.origin}/listen/artist/${profileSlug}`);
-  }, [profileSlug]);
-
-  const validInspirationArtists = filterValidInspirationArtists(inspirationArtists);
-  const showInspiration =
-    catalogCounts.tracksPublished === 0 && validInspirationArtists.length > 0;
   const pulsePublish = catalogCounts.tracksPublished === 0;
 
   return (
-    <div className="creator-dashboard">
-      <WelcomeModal stageName={context.artistProfile.stage_name} profileCreatedAt={profileCreatedAt} />
+    <div className="creator-dashboard creator-dashboard--enterprise">
+      <WelcomeModal
+        stageName={context.artistProfile.stage_name}
+        profileCreatedAt={profileCreatedAt}
+      />
 
       <HeroCard
         hero={hero}
         artistProfile={context.artistProfile}
         creator={context.creator}
         profileCreatedAt={profileCreatedAt}
-        kpis={kpis}
       />
 
-      <AssistantCard tips={assistantTips} profileUrl={profileUrl} />
+      <GlanceKpiGrid data={data} />
 
-      <QuickActions actions={quickActions} pulsePrimary={pulsePublish} />
+      <NextObjectiveCard careerOs={careerOs} />
 
-      <div className="creator-two-col">
-        <KpiGrid kpis={kpis} profileUrl={profileUrl} />
-        <CareerOsCard careerOs={careerOs} />
-      </div>
+      <QuickActions
+        actions={quickActions}
+        pulsePrimary={pulsePublish}
+        sectionId="creator-quick-actions"
+      />
 
-      <div className="creator-bottom-sections">
+      <StatsCareerSection kpis={kpis} timeline={timeline} careerOs={careerOs} />
+
+      <div className="dash-bottom-row">
         <ActivityFeed activities={activities} />
-        {showInspiration ? <InspirationSection artists={validInspirationArtists} /> : null}
+        <WeeklySonafrikPanel data={data} />
       </div>
+
+      <ConseilBanner tips={assistantTips} />
     </div>
   );
 }

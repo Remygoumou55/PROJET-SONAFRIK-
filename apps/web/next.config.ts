@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 604800,
     deviceSizes: [390, 640, 768, 1080, 1280],
     imageSizes: [32, 40, 64, 96, 128],
+    qualities: [55, 75, 80],
     remotePatterns: supabaseStorageRemotePatterns,
   },
   serverExternalPackages: ["@supabase/supabase-js", "@supabase/ssr"],
@@ -73,6 +74,8 @@ const nextConfig: NextConfig = {
     const supabaseOrigin = supabaseUrl.startsWith("http") ? new URL(supabaseUrl).origin : supabaseUrl;
     const supabaseWss    = supabaseOrigin.replace("https://", "wss://");
     const isProd = process.env.NODE_ENV === "production";
+    // CSP prod : unsafe-inline requis par Next.js 15 (scripts inline) + Tailwind + Vercel Analytics.
+    // Roadmap post-beta : nonces script-src (middleware) + style-src sans unsafe-inline.
     const scriptSrc = isProd
       ? `'self' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`
       : `'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`;

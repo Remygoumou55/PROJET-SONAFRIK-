@@ -4,17 +4,33 @@ import { DevAuthBootstrap } from "@/features/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { PerformanceProvider, resolvePerformanceFlags } from "@/lib/performance";
+import { createNotificationsService } from "@sonafrik/api/notifications";
 import CreatorLoading from "./loading";
 
 async function CreatorGuard({ children }: { children: React.ReactNode }) {
   const context = await requireCreatorContext();
   const supabase = await getSupabaseServerClient();
-  const performanceFlags = await resolvePerformanceFlags(supabase);
+  const notifications = createNotificationsService(supabase);
+
+  const [performanceFlags, unreadCount] = await Promise.all([
+    resolvePerformanceFlags(supabase),
+    notifications.countUnread(context.creator.owner_id).catch(() => 0),
+  ]);
+
+  const avatarPath =
+    context.artistProfile.profile_photo ?? context.artistProfile.cover_path;
 
   return (
     <PerformanceProvider flags={performanceFlags}>
       <DevAuthBootstrap />
-      <CreatorLayoutClient pendingVerifications={context.pendingVerifications}>
+      <CreatorLayoutClient
+        pendingVerifications={context.pendingVerifications}
+        userId={context.creator.owner_id}
+        initialUnreadCount={unreadCount}
+        stageName={context.artistProfile.stage_name}
+        creatorId={context.creator.id}
+        avatarPath={avatarPath}
+      >
         {children}
       </CreatorLayoutClient>
     </PerformanceProvider>

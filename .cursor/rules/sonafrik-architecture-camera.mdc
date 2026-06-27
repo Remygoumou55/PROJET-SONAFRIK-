@@ -33,7 +33,8 @@ apps/web/src/features/
 - `toggleFavorite` RPC utilisé pour les likes ET les favoris (social.repository.ts)
 - `toggleFavoriteSchema` défini dans DEUX fichiers (streaming/schemas.ts + social/schemas.ts)
 - 87 composants "use client" — préférer RSC quand pas d'interactivité
-- `LaunchCounter`, `AuthHomeActions`, `useEngagementStats` — composants dead non supprimés
+- `LaunchCounter`, `AuthHomeActions`, `useEngagementStats` — supprimés ✅ (2026-06-27)
+- Career OS UI mort (`career-os/*`, KpiCard, etc.) — supprimés ✅
 - **Session Engine** (`packages/api/src/streaming/session/`) — **LOCKED** depuis SPRING 2.2 — ne pas modifier
 
 ## Vérifications avant chaque PR

@@ -139,7 +139,7 @@ export function ArtistProfilePhoto({ creatorId, stageName, photoPath }: ArtistPr
                   path={localPath}
                   assetKind="cover"
                   alt={stageName}
-                  sizes="96px"
+                  layout="bounded"
                   priority
                   fallback={<span className="artist-hero__avatar-fallback">{initials || "🎤"}</span>}
                 />

@@ -9,7 +9,8 @@ import { formatDateTime } from "@/lib/formatters";
 import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
 import { AdminRoyaltyPanel } from "./AdminRoyaltyPanel";
-import type { RoyaltyCycle } from "@sonafrik/types";
+import { AdminPayoutBatchPanel } from "./AdminPayoutBatchPanel";
+import type { RoyaltyCycle, PayoutBatch } from "@sonafrik/types";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
@@ -34,9 +35,10 @@ const FILTERS: { label: string; value: StatusFilter }[] = [
 interface Props {
   initialQueue: AdminPayoutEntry[];
   initialRoyaltyCycles: RoyaltyCycle[];
+  initialBatches: PayoutBatch[];
 }
 
-export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles }: Props) {
+export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initialBatches }: Props) {
   const service = usePayoutService();
   const [queue, setQueue] = useState<AdminPayoutEntry[]>(initialQueue);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
@@ -98,6 +100,8 @@ export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles }: Props
       </div>
 
       <AdminRoyaltyPanel initialCycles={initialRoyaltyCycles} />
+
+      <AdminPayoutBatchPanel initialBatches={initialBatches} />
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (

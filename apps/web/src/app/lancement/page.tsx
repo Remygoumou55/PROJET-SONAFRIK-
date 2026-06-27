@@ -30,10 +30,7 @@ export default async function LancementPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-noir-profond text-texte-principal">
       <header className="flex items-center justify-between px-6 py-5">
-        <div>
-          <SonafrikLogo size="footer" />
-          <span className="ml-2 text-xs text-texte-desactive">NOTRE BIEN COMMUN</span>
-        </div>
+        <SonafrikLogo variant="nav" size="sm" href="/" />
         <Link
           href="/auth/connexion"
           className="rounded-full border border-elevated bg-surface px-4 py-1.5 text-sm font-medium text-texte-principal transition-opacity hover:opacity-80"

@@ -33,12 +33,7 @@ export function LandingNav() {
   return (
     <div className={`landing-nav${scrolled ? " landing-nav--scrolled" : ""}`}>
       <nav className="landing-nav__inner">
-        <Link href="/" className="landing-nav__brand">
-          <span className="landing-nav__logo">
-            <SonafrikLogo />
-          </span>
-          <span className="landing-nav-tagline landing-nav__tagline">Notre Bien Commun</span>
-        </Link>
+        <SonafrikLogo variant="nav" size="sm" href="/" priority className="landing-nav__brand" />
 
         <div className="landing-nav-links landing-nav__links">
           {NAV_LINKS.map(({ label, href }) => (

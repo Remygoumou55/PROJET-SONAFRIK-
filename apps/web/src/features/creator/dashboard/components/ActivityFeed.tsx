@@ -17,57 +17,58 @@ function formatRelative(iso: string): string {
 export function ActivityFeed({ activities }: { activities: CreatorDashboardActivity[] }) {
   if (activities.length === 0) {
     return (
-      <section className="creator-widget creator-activity">
-        <h2 className="creator-widget__title">Activité récente</h2>
-        <div className="creator-empty">
-          <p className="creator-empty__emoji" aria-hidden="true">✨</p>
-          <p className="creator-empty__title">Votre histoire commence ici</p>
-          <p className="creator-empty__text">Publiez un morceau pour voir votre feed s&apos;animer.</p>
-          <Link href="/creator/catalog/tracks" className="creator-empty__cta">
-            Publier maintenant
-          </Link>
+      <section className="dash-activity" aria-label="Activité récente">
+        <h2 className="dash-section-title">Activité récente</h2>
+        <div className="dash-activity__empty">
+          <p className="dash-activity__empty-title">Votre histoire commence ici</p>
+          <p className="dash-activity__empty-text">
+            Vos actions récentes apparaîtront ici au fil de votre progression.
+          </p>
         </div>
+        <Link href="/creator/analytics" className="dash-activity__footer-link">
+          Voir toute l&apos;activité →
+        </Link>
       </section>
     );
   }
 
   return (
-    <section className="creator-widget creator-activity" aria-label="Activité récente">
-      <h2 className="creator-widget__title">Activité récente</h2>
-      <ul className="creator-activity__timeline">
+    <section className="dash-activity" aria-label="Activité récente">
+      <h2 className="dash-section-title">Activité récente</h2>
+      <ul className="dash-activity__timeline">
         {activities.map((item) => (
           <li
             key={item.id}
-            className={`creator-activity__item ${item.isFuture ? "creator-activity__item--future" : ""}`}
+            className={`dash-activity__item ${item.isFuture ? "dash-activity__item--future" : ""}`}
           >
             <span
-              className="creator-activity__dot"
-              style={{ backgroundColor: item.isFuture ? "rgba(255,255,255,0.15)" : item.color }}
+              className="dash-activity__dot"
+              style={{ backgroundColor: item.isFuture ? "rgba(255,255,255,0.12)" : item.color }}
               aria-hidden="true"
             >
               {item.icon}
             </span>
-            <div className="creator-activity__body">
-              <div className="creator-activity__row">
-                <p className="creator-activity__title">{item.title}</p>
+            <div className="dash-activity__body">
+              <div className="dash-activity__row">
+                <p className="dash-activity__title">{item.title}</p>
                 {!item.isFuture ? (
-                  <time className="creator-activity__time" dateTime={item.occurredAt}>
+                  <time className="dash-activity__time" dateTime={item.occurredAt}>
                     {formatRelative(item.occurredAt)}
                   </time>
-                ) : null}
+                ) : (
+                  <span className="dash-activity__time">À venir...</span>
+                )}
               </div>
-              <p className="creator-activity__subtitle">
-                {item.isFuture ? "À venir..." : item.subtitle}
-              </p>
-              {item.actionHref && item.actionLabel && !item.isFuture ? (
-                <Link href={item.actionHref} className="creator-activity__action">
-                  {item.actionLabel}
-                </Link>
+              {!item.isFuture && item.subtitle ? (
+                <p className="dash-activity__subtitle">{item.subtitle}</p>
               ) : null}
             </div>
           </li>
         ))}
       </ul>
+      <Link href="/creator/analytics" className="dash-activity__footer-link">
+        Voir toute l&apos;activité →
+      </Link>
     </section>
   );
 }

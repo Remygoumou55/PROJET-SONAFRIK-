@@ -16,9 +16,8 @@ export function AuthPageShell({ title, subtitle, leading, children }: AuthPageSh
     <div className="app-page-content app-page-stack w-full max-w-md space-y-8">
       {leading ? <div>{leading}</div> : null}
       <header className="text-center">
-        <div className="mb-4">
-          <SonafrikLogo />
-          <p className="brand-logo-tagline">Notre Bien Commun</p>
+        <div className="mb-4 flex justify-center">
+          <SonafrikLogo variant="full" priority />
         </div>
         <h1 className="app-page-title text-2xl font-bold text-texte-principal">{title}</h1>
         {subtitle ? (

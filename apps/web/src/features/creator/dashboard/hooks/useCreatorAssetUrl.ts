@@ -14,10 +14,9 @@ export function useCreatorAssetUrl(
   assetKind: CreatorAssetKind,
 ): { url: string | null; loading: boolean; error: boolean } {
   const creatorService = useCreatorService();
-  const [url, setUrl] = useState<string | null>(() =>
-    path ? getCachedCreatorAssetUrl(creatorId, path) : null,
-  );
-  const [loading, setLoading] = useState(Boolean(path && !url));
+  // Never read session cache in useState — SSR and first client paint must match.
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(Boolean(path));
   const [error, setError] = useState(false);
 
   useEffect(() => {

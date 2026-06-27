@@ -29,7 +29,7 @@ alwaysApply: true
 |---|---|---|---|
 | E1 | FLAC/OGG désactivés, WAV brut servi | catalog/schemas.ts, edge functions | Transcodeur HLS |
 | ADMIN-DOC | ADMIN_GUIDE référence mauvais noms | `docs/ADMIN_GUIDE.md` | Corriger noms tables |
-| DEAD | Composants dead non supprimés | LaunchCounter, AuthHomeActions, useEngagementStats | Supprimer ou brancher |
+| DEAD | Composants dead non supprimés | — | ✅ Supprimés 2026-06-27 (career-os, KpiCard, etc.) |
 
 ### 🟢 BASSE (post-beta)
 

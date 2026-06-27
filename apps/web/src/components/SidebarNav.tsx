@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Badge } from "@sonafrik/ui";
 
@@ -69,9 +71,16 @@ export function SidebarNav({
                 ) : null}
                 <span className="sidebar-nav__text">
                   <span className="sidebar-nav__label">{item.label}</span>
-                  {item.description ? (
-                    <span className="sidebar-nav__description">{item.description}</span>
-                  ) : null}
+                  <span
+                    className={
+                      item.description
+                        ? "sidebar-nav__description"
+                        : "sidebar-nav__description sidebar-nav__description--empty"
+                    }
+                    aria-hidden={item.description ? undefined : true}
+                  >
+                    {item.description ?? ""}
+                  </span>
                 </span>
                 {item.badge && item.badge > 0 ? (
                   <Badge variant="primary">{item.badge}</Badge>

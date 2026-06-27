@@ -3,6 +3,7 @@ import type {
   UserPayoutEntry,
   PayoutSummary,
   AdminPayoutEntry,
+  PayoutBatch,
 } from "@sonafrik/types";
 import { PayoutEngineError } from "./errors";
 import { PayoutRepository } from "./payout.repository";
@@ -134,6 +135,14 @@ export class PayoutService {
       return await this.repo.createPayoutBatch(parsed.data.name, parsed.data.notes);
     } catch {
       throw new PayoutEngineError("batch_name_required");
+    }
+  }
+
+  async listPayoutBatches(limit = 20): Promise<PayoutBatch[]> {
+    try {
+      return await this.repo.listPayoutBatches(limit);
+    } catch {
+      throw new PayoutEngineError("queue_failed");
     }
   }
 }

@@ -8,12 +8,13 @@ Ce guide est destiné à M. Rémy Goumou pour la gestion quotidienne de la plate
 
 1. Se connecter sur [sonafrik.vercel.app](https://sonafrik.vercel.app)
 2. Naviguer vers `/admin` (ou utiliser le lien "Admin" dans le menu profil)
-3. La page est protégée — seuls les comptes avec `role = 'admin'` y accèdent
+3. La page est protégée — seuls les comptes passant le RPC `is_admin(user_id)` y accèdent (table `user_roles` + rôle `admin`)
 
-> Pour attribuer le rôle admin à un compte, exécuter dans Supabase Dashboard → SQL Editor :
+> Pour attribuer le rôle admin à un compte (service_role uniquement) :
 > ```sql
-> UPDATE public.profiles SET role = 'admin' WHERE email = 'votre@email.com';
+> SELECT public.assign_admin_role('<user-uuid>');
 > ```
+> Ne pas modifier `profiles.role` directement — le modèle officiel passe par `user_roles`.
 
 ---
 
@@ -64,7 +65,7 @@ Dans Supabase SQL Editor :
 ```sql
 UPDATE public.artist_profiles
 SET verified = true
-WHERE user_id = '<user-id>';
+WHERE creator_id = '<creator-uuid>';
 ```
 
 ### Suspendre un artiste
@@ -99,21 +100,28 @@ WHERE plan_type = 'monthly';
 
 ## Consulter le journal d'audit
 
-Toutes les actions sensibles sont enregistrées dans `audit_log` :
+Actions sensibles — deux journaux :
+
+| Table | Usage |
+|---|---|
+| `audit_logs` | Actions applicatives (edge `audit-log`) |
+| `payout_audit_logs` | Retraits et actions admin payout (immuable) |
 
 ```sql
--- 50 dernières actions
+-- 50 dernières actions applicatives
 SELECT actor_id, action, resource_type, resource_id, created_at
-FROM public.audit_log
+FROM public.audit_logs
 ORDER BY created_at DESC
 LIMIT 50;
 
--- Actions d'un utilisateur spécifique
-SELECT * FROM public.audit_log
-WHERE actor_id = '<user-id>'
+-- Audit retraits (demande, approbation, rejet)
+SELECT withdrawal_id, action, performed_by, created_at
+FROM public.payout_audit_logs
 ORDER BY created_at DESC
 LIMIT 20;
 ```
+
+> `payout_batches` : lots de virements admin — créés via RPC admin (voir `docs/RPC_REFERENCE.md`). Pas encore d'écran dédié dans `/admin/finance` au 27 juin 2026.
 
 ---
 
