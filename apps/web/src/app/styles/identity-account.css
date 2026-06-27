@@ -1,0 +1,335 @@
+.identity-profile-completion__value {
+  color: var(--color-vert-energie);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.identity-profile-completion__track {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+
+.identity-profile-completion__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-vert-energie), var(--color-or-solaire));
+  transition: width 0.3s ease;
+}
+
+.identity-profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.identity-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.identity-activity {
+  border: 1px solid var(--color-bordure);
+  border-radius: 1.25rem;
+  background-color: var(--color-surface);
+  padding: 1.5rem;
+}
+
+.identity-activity__title {
+  color: var(--color-texte-principal);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.identity-activity__subtitle {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.identity-activity__grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .identity-activity__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .identity-activity__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.identity-activity-item {
+  border: 1px solid var(--color-bordure);
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1rem;
+}
+
+.identity-activity-item__label {
+  color: var(--color-texte-desactive);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.identity-activity-item__value {
+  color: var(--color-texte-principal);
+  margin-top: 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.identity-activity-item__hint {
+  color: var(--color-texte-desactive);
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.identity-become-artist {
+  overflow: hidden;
+  border: 1px solid rgba(255, 194, 14, 0.18);
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgba(255, 194, 14, 0.06), transparent 55%);
+  padding: 1.5rem;
+}
+
+.identity-become-artist__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.identity-become-artist__icon {
+  font-size: 1.25rem;
+}
+
+.identity-become-artist__title {
+  color: var(--color-or-solaire);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.identity-become-artist__text {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.identity-settings-card-link {
+  display: block;
+  text-decoration: none;
+}
+
+@media (max-width: 1023px) {
+  .sidebar-nav__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar-nav__list {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-profile-actions > a {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── Identity / Account (S5) ─────────────────────────────────────────────── */
+
+.identity-account {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.identity-account-intro {
+  border: 1px solid var(--color-bordure);
+  border-radius: 1.25rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  padding: 1.5rem;
+}
+
+.identity-account-intro__eyebrow {
+  color: var(--color-or-solaire);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.identity-account-intro__title {
+  color: var(--color-texte-principal);
+  margin-top: 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.identity-account-intro__text {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.5rem;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.identity-account-intro__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.identity-account-card {
+  border: 1px solid var(--color-bordure);
+  border-radius: 1.25rem;
+  background-color: var(--color-surface);
+  padding: 1.5rem;
+}
+
+.identity-account-card__title {
+  color: var(--color-texte-principal);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.identity-account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.identity-account-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--color-bordure);
+  padding: 0.875rem 0;
+}
+
+.identity-account-detail:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .identity-account-detail {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+}
+
+.identity-account-detail__label {
+  color: var(--color-texte-secondaire);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.identity-account-detail__value {
+  color: var(--color-texte-principal);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .identity-account-detail__value {
+    text-align: right;
+    max-width: 60%;
+  }
+}
+
+.identity-account-card__note {
+  color: var(--color-texte-desactive);
+  margin: 1rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.identity-account-link {
+  color: var(--color-vert-energie);
+  text-decoration: underline;
+}
+
+.identity-account-link:focus-visible {
+  outline: 2px solid var(--color-vert-energie);
+  outline-offset: 2px;
+}
+
+.identity-account-danger {
+  border: 1px solid rgba(255, 68, 68, 0.25);
+  border-radius: 1.25rem;
+  background: rgba(255, 68, 68, 0.04);
+  padding: 1.5rem;
+}
+
+.identity-account-danger__title {
+  color: var(--color-erreur);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.identity-account-danger__text {
+  color: var(--color-texte-secondaire);
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  max-width: 40rem;
+}
+
+.identity-account-danger__error {
+  color: var(--color-erreur);
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+}
+
+.onboarding-payment-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.onboarding-payment-step__continue {
+  width: 100%;
+  background-color: rgba(0, 210, 106, 0.25);
+  color: var(--color-noir-profond);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.875rem;
+  border-radius: 0.625rem;
+  border: none;
+  cursor: not-allowed;
+  transition: background-color 0.2s;
+  font-family: inherit;
+}
+
+.onboarding-payment-step__continue[data-enabled="true"] {
+  background-color: var(--color-vert-energie);
+  cursor: pointer;
+}

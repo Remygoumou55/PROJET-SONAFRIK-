@@ -1,0 +1,216 @@
+/* ─── Hero vitrine — carte compacte enterprise (~320px max) ─────────────── */
+.artist-hero--vitrine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  max-height: 20rem;
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+.artist-hero--vitrine .artist-hero__banner--vitrine {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 1rem 1rem 0 0;
+  max-height: 7rem;
+}
+
+.artist-hero--vitrine .artist-hero__cover-wrap {
+  position: relative;
+  overflow: hidden;
+  max-height: 7rem;
+  height: 7rem;
+}
+
+.artist-hero--vitrine .artist-hero__cover-slider--compact,
+.artist-hero--vitrine .artist-hero__cover-slider.artist-hero__cover-slider--compact {
+  aspect-ratio: unset !important;
+  max-height: 7rem !important;
+  height: 7rem !important;
+  overflow: hidden;
+  background: var(--color-noir-profond);
+}
+
+.artist-hero--vitrine .artist-hero__cover-slide {
+  position: relative;
+  inset: unset;
+  opacity: 1;
+  overflow: hidden;
+  transform: none !important;
+  transition: none;
+  will-change: auto;
+  height: 100%;
+  width: 100%;
+  contain: strict;
+}
+
+.artist-hero--vitrine .artist-hero__cover-slide--active {
+  transform: none !important;
+}
+
+.artist-hero--vitrine .artist-hero__cover-img,
+.artist-hero--vitrine .artist-hero__cover-slide img {
+  object-fit: cover !important;
+  object-position: center center;
+}
+
+.artist-hero--vitrine .artist-hero__cover-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 13, 13, 0.05) 0%,
+    rgba(13, 13, 13, 0.45) 70%,
+    rgba(13, 13, 13, 0.75) 100%
+  );
+}
+
+.artist-hero--vitrine .artist-hero__cover-edit {
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 4;
+  background: rgba(13, 13, 13, 0.78);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.artist-hero--vitrine .artist-hero__cover-dots {
+  bottom: 0.4rem;
+  z-index: 3;
+}
+
+.artist-hero--vitrine .artist-hero__body--vitrine {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem 0.875rem;
+  min-height: unset;
+  background: var(--color-surface);
+}
+
+.artist-hero--vitrine .artist-hero__avatar-wrap--vitrine {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.artist-hero--vitrine .artist-hero__avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-width: 2px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.artist-hero--vitrine .artist-hero__identity-block--vitrine {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.artist-hero--vitrine .artist-hero__name--vitrine {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.artist-hero__identity--vitrine {
+  text-align: left;
+}
+
+.artist-hero__note {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.artist-hero--vitrine .artist-hero__type--vitrine {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 0.75rem;
+  color: var(--color-texte-secondaire);
+}
+
+.artist-hero--vitrine .artist-hero__badges--vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  justify-content: flex-start;
+}
+
+.artist-hero--vitrine .artist-hero__badge {
+  font-size: 0.625rem;
+  padding: 0.16rem 0.42rem;
+}
+
+.artist-hero__badge--online {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-vert-energie);
+  border-color: rgba(0, 210, 106, 0.35);
+  background: rgba(0, 210, 106, 0.08);
+}
+
+.artist-hero__online-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-vert-energie);
+  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .artist-hero--vitrine {
+    max-height: none;
+  }
+
+  .artist-hero--vitrine .artist-hero__banner--vitrine,
+  .artist-hero--vitrine .artist-hero__cover-wrap,
+  .artist-hero--vitrine .artist-hero__cover-slider--compact {
+    max-height: 6rem !important;
+    height: 6rem !important;
+  }
+
+  .artist-hero--vitrine .artist-hero__body--vitrine {
+    align-items: flex-start;
+    padding: 0.65rem 0.875rem 0.75rem;
+  }
+
+  .artist-hero--vitrine .artist-hero__avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .artist-hero--vitrine .artist-hero__banner--vitrine,
+  .artist-hero--vitrine .artist-hero__cover-wrap,
+  .artist-hero--vitrine .artist-hero__cover-slider--compact {
+    max-height: 5.5rem !important;
+    height: 5.5rem !important;
+    aspect-ratio: unset !important;
+  }
+
+  .artist-hero--vitrine .artist-hero__name--vitrine {
+    font-size: 1rem;
+  }
+}
+
+html[data-perf-cdc="true"] .artist-hero--vitrine .artist-hero__cover-slide,
+html[data-perf-africa="true"] .artist-hero--vitrine .artist-hero__cover-slide {
+  transition: opacity 0.2s ease;
+  transform: none !important;
+}

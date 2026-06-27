@@ -1,0 +1,136 @@
+.dash-stats-career__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1024px) {
+  .dash-stats-career__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.dash-stats__card,
+.dash-career-level {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 10.5rem;
+  padding: 0.875rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dash-stats__head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dash-stats__icon {
+  font-size: 0.875rem;
+}
+
+.dash-stats__label {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-texte-desactive);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dash-stats__value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-texte-principal);
+}
+
+.dash-stats__hint {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-texte-secondaire);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.dash-stats__spark {
+  margin-top: auto;
+  height: 2rem;
+}
+
+.dash-career-level__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.dash-career-level__kicker {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-or-solaire);
+}
+
+.dash-career-level__badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  color: var(--color-noir-profond);
+  background: var(--color-vert-energie);
+}
+
+.dash-career-level__body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dash-career-level__icon {
+  font-size: 1.25rem;
+}
+
+.dash-career-level__name {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.dash-career-level__track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.dash-career-level__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-vert-energie);
+}
+
+.dash-career-level__meta,
+.dash-career-level__next {
+  margin: 0;
+  font-size: 0.625rem;
+  color: var(--color-texte-desactive);
+  line-height: 1.35;
+}
+
+.dash-bottom-row {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .dash-bottom-row {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: start;
+  }
+}

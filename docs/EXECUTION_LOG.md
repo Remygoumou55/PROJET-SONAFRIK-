@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-06-27 — Audit 360 phase 3 : split CSS par domaine
+
+### Fichiers touchés
+- `landing.css` → `identity.css` (shell profil + sidebar)
+- `performance.css` → `identity-account.css` (compte + onboarding)
+- `creator/enterprise.css` → 6 modules (`base`, `vitrine`, `glance`, `actions`, `stats`, `panels`)
+- `apps/web/scripts/split-styles-phase3.mjs` — script idempotent
+- `globals.css` — imports `identity.css` + `identity-account.css`
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` — ✅
+- `pnpm probe:certification` — **130/130** ✅
+
+---
+
 ## 2026-06-27 — Audit 360 phases 1–3 (doc sync phase 2)
 
 ### Fichiers touchés
