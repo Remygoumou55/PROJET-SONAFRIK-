@@ -18,7 +18,6 @@ import {
 } from "@sonafrik/api/listener";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
-import { getDailyProverb } from "@/lib/proverbs";
 import { HomepageHero } from "@/features/listener/components/HomepageHero";
 import { ListenStreamingHeader } from "@/features/listener/components/ListenStreamingHeader";
 import { HomepageContentSections, ContentSkeleton } from "@/features/listener/components/HomepageContentSections";
@@ -152,17 +151,11 @@ export default async function ListenPage({
   const contentPromise = createHomepageLoader(category)();
   const { profile, unreadNotifications } = await requireIdentityContext();
 
-  const hour = new Date().getUTCHours();
-  const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
-  const proverb = getDailyProverb();
-
   return (
     <div className="listen-page" style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100%" }}>
       <ListenStreamingHeader fullName={profile.full_name} unreadNotifications={unreadNotifications} />
       <HomepageHero
         fullName={profile.full_name}
-        greeting={greeting}
-        proverb={proverb}
         unreadNotifications={unreadNotifications}
         compactActions
       />

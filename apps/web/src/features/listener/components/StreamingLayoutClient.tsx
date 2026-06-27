@@ -8,8 +8,8 @@ import { PlayerProvider } from "../lib/playerContext";
 import { ListenerDesktopSidebar } from "./ListenerDesktopSidebar";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
 
-const WebPlayer = dynamic(
-  () => import("./WebPlayer").then((m) => ({ default: m.WebPlayer })),
+const GlobalPlayer = dynamic(
+  () => import("./GlobalPlayer").then((m) => ({ default: m.GlobalPlayer })),
   { ssr: false },
 );
 
@@ -32,20 +32,21 @@ export function StreamingLayoutClient({
     <QualityPreferenceProvider value={audioQualityPreference}>
       <DevAuthBootstrap />
       <PlayerProvider>
-        <div style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}>
-          <div className="md:flex md:h-screen md:overflow-hidden">
-            <ListenerDesktopSidebar
-              userId={userId}
-              initialUnreadCount={initialUnreadCount}
-              sidebarData={sidebarData}
-            />
-            <main className="flex-1 overflow-y-auto pb-40 md:pb-24 md:min-h-screen">
-              {children}
-            </main>
-          </div>
-          <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
+        <div
+          className="has-global-player md:flex md:h-screen md:overflow-hidden"
+          style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
+        >
+          <ListenerDesktopSidebar
+            userId={userId}
+            initialUnreadCount={initialUnreadCount}
+            sidebarData={sidebarData}
+          />
+          <main className="flex-1 overflow-y-auto pb-40 md:pb-[88px] md:min-h-screen">
+            {children}
+          </main>
         </div>
-        <WebPlayer />
+        <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
+        <GlobalPlayer />
       </PlayerProvider>
     </QualityPreferenceProvider>
   );

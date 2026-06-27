@@ -2666,6 +2666,74 @@ export type Database = {
           },
         ]
       }
+      track_reaction_counts: {
+        Row: {
+          count: number
+          emoji: string
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          emoji: string
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          emoji?: string
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_reaction_counts_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      track_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_reactions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "track_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           album_id: string | null
@@ -3230,6 +3298,10 @@ export type Database = {
           p_type: string
         }
         Returns: string
+      }
+      add_track_reaction: {
+        Args: { p_emoji: string; p_track_id: string }
+        Returns: undefined
       }
       append_stream_session_fraud_flags: {
         Args: { p_flags: string[]; p_session_id: string }
