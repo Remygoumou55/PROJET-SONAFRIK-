@@ -7,7 +7,7 @@ import { KpiGrid } from "../dashboard/components/KpiCard";
 import { QuickActions } from "../dashboard/components/QuickActions";
 import { AssistantCard } from "../dashboard/components/AssistantCard";
 import { ActivityFeed } from "../dashboard/components/ActivityFeed";
-import { CareerProgressCard } from "../dashboard/components/CareerProgressCard";
+import { CareerOsCard } from "../dashboard/components/career-os";
 import { InspirationSection } from "../dashboard/components/InspirationSection";
 import { filterValidInspirationArtists } from "../dashboard/lib/inspirationArtists.presentation";
 import { WelcomeModal } from "../dashboard/components/WelcomeModal";
@@ -18,7 +18,7 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
     hero,
     kpis,
     activities,
-    careerSteps,
+    careerOs,
     assistantTips,
     quickActions,
     catalogCounts,
@@ -56,7 +56,7 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
 
       <div className="creator-two-col">
         <KpiGrid kpis={kpis} profileUrl={profileUrl} />
-        <CareerProgressCard steps={careerSteps} />
+        <CareerOsCard careerOs={careerOs} />
       </div>
 
       <div className="creator-bottom-sections">

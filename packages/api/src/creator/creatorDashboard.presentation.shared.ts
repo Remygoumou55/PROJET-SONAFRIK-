@@ -18,6 +18,7 @@ export interface BuildDashboardInput {
   revenueStats: CreatorRevenueStats;
   topTrack: CreatorTopTrack | null;
   catalogCounts: CreatorCatalogCounts;
+  playlistsCount: number;
   paymentConfigured: boolean;
   inspirationArtists: CreatorInspirationArtist[];
   monthlyRevenue: CreatorMonthlyRevenuePoint[];

@@ -83,9 +83,10 @@ export class CreatorDashboardService {
       this.analyticsService.getTopTracks({ creatorId, limit: 1 }).catch(() => []),
       this.analyticsService.getAudienceStats({ creatorId }).catch(() => EMPTY_AUDIENCE),
       this.analyticsService.getRevenueStats({ creatorId }).catch(() => EMPTY_REVENUE),
-      this.dashboardRepo.getCatalogCounts(creatorId).catch(() => ({
+      this.dashboardRepo.getCatalogCounts(creatorId, userId).catch(() => ({
         tracksPublished: 0,
         albumsPublished: 0,
+        playlistsCount: 0,
       })),
       this.dashboardRepo.isPaymentConfigured(userId).catch(() => false),
       this.recommendationService.getTrendingTracks({ window: "7d", limit: 30 }).catch(() => []),
@@ -109,6 +110,7 @@ export class CreatorDashboardService {
       revenueStats,
       topTrack: topTracks[0] ?? null,
       catalogCounts,
+      playlistsCount: catalogCounts.playlistsCount,
       paymentConfigured,
       inspirationArtists,
       monthlyRevenue,

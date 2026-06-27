@@ -259,6 +259,43 @@ export interface CreatorDashboardCareerStep {
   icon: string;
 }
 
+/** SONAFRIK Career OS — mission guidée pour l'évolution artiste */
+export interface CreatorCareerMission {
+  id: string;
+  label: string;
+  whyImportant: string;
+  icon: string;
+  href: string;
+  actionLabel: string;
+  completed: boolean;
+  current: number;
+  target: number;
+  progressPercent: number;
+  rewardBadge: string;
+}
+
+/** Niveau de carrière automatique (Career OS) */
+export interface CreatorCareerLevel {
+  id: string;
+  label: string;
+  icon: string;
+  unlocked: boolean;
+  isCurrent: boolean;
+}
+
+/** État complet du moteur Career OS */
+export interface CreatorCareerOsState {
+  level: CreatorCareerLevel;
+  levels: CreatorCareerLevel[];
+  currentMission: CreatorCareerMission | null;
+  missions: CreatorCareerMission[];
+  completedMissionCount: number;
+  totalMissionCount: number;
+  overallProgressPercent: number;
+  motivationMessage: string;
+  encouragementTone: "launch" | "progress" | "almost" | "celebrate" | "mentor";
+}
+
 export type CreatorDashboardAssistantActionType = "link" | "copy_profile";
 
 export interface CreatorDashboardAssistantTip {
@@ -314,13 +351,14 @@ export interface CreatorDashboardData {
   activities: CreatorDashboardActivity[];
   goals: CreatorDashboardGoal[];
   careerSteps: CreatorDashboardCareerStep[];
+  careerOs: CreatorCareerOsState;
   assistantTips: CreatorDashboardAssistantTip[];
   quickActions: CreatorDashboardQuickAction[];
   streamStats: CreatorStreamStats;
   timeline: StreamTimelineEntry[];
   topTrack: CreatorTopTrack | null;
   revenueStats: CreatorRevenueStats;
-  catalogCounts: { tracksPublished: number; albumsPublished: number };
+  catalogCounts: { tracksPublished: number; albumsPublished: number; playlistsCount: number };
   paymentConfigured: boolean;
   profileSlug: string;
   inspirationArtists: CreatorInspirationArtist[];

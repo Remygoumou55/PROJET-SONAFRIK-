@@ -3,6 +3,7 @@ import { buildActivities } from "./creatorDashboard.activities.presentation";
 import { buildHero } from "./creatorDashboard.hero.presentation";
 import { buildKpis } from "./creatorDashboard.kpis.presentation";
 import type { BuildDashboardInput } from "./creatorDashboard.presentation.shared";
+import { buildCareerOs } from "./career";
 import {
   buildAssistantTips,
   buildCareerSteps,
@@ -36,6 +37,7 @@ export function buildCreatorDashboardData(input: BuildDashboardInput): CreatorDa
     activities: buildActivities(input),
     goals: buildGoals(input),
     careerSteps: buildCareerSteps(input),
+    careerOs: buildCareerOs(input),
     assistantTips: buildAssistantTips(input, hero.profilePercent),
     quickActions: buildQuickActions(input),
     streamStats: input.streamStats,

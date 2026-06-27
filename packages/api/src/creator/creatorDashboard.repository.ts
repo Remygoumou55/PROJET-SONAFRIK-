@@ -5,13 +5,14 @@ import type { TrendingTrack } from "@sonafrik/types";
 export interface CreatorCatalogCounts {
   tracksPublished: number;
   albumsPublished: number;
+  playlistsCount: number;
 }
 
 export class CreatorDashboardRepository {
   constructor(private readonly client: SonafrikSupabaseClient) {}
 
-  async getCatalogCounts(creatorId: string): Promise<CreatorCatalogCounts> {
-    const [tracksRes, albumsRes] = await Promise.all([
+  async getCatalogCounts(creatorId: string, userId: string): Promise<CreatorCatalogCounts> {
+    const [tracksRes, albumsRes, playlistsRes] = await Promise.all([
       this.client
         .from("tracks")
         .select("id", { count: "exact", head: true })
@@ -22,11 +23,17 @@ export class CreatorDashboardRepository {
         .select("id", { count: "exact", head: true })
         .eq("creator_id", creatorId)
         .eq("publication_status", "published"),
+      this.client
+        .from("playlists")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .is("deleted_at", null),
     ]);
 
     return {
       tracksPublished: tracksRes.count ?? 0,
       albumsPublished: albumsRes.count ?? 0,
+      playlistsCount: playlistsRes.count ?? 0,
     };
   }
 
