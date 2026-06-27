@@ -1,5 +1,16 @@
 export function getInitials(name: string): string {
-  return name.split(" ").map((w) => w[0] ?? "").join("").slice(0, 2).toUpperCase();
+  const trimmed = name.trim();
+  if (!trimmed) return "?";
+
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return trimmed.slice(0, 2).toUpperCase();
+
+  return words
+    .slice(0, 2)
+    .map((word) => word[0] ?? "")
+    .join("")
+    .toUpperCase();
 }
 
 export function formatCount(n: number): string {

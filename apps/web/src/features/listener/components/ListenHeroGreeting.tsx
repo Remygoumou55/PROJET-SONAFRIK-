@@ -71,7 +71,7 @@ export function ListenHeroGreeting({
                   boxShadow: "0 0 14px rgba(0, 210, 106, 0.4)",
                 }}
               >
-                {getInitials(fullName ?? firstName)}
+                {getInitials(firstName)}
               </div>
             </Link>
           </div>

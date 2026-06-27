@@ -36,7 +36,7 @@ export function ListenStreamingHeader({ fullName, unreadNotifications }: ListenS
           ) : null}
         </Link>
         <Link href="/profile" aria-label={`Profil de ${firstName}`}>
-          <div className="header-avatar">{getInitials(fullName ?? firstName)}</div>
+          <div className="header-avatar">{getInitials(firstName)}</div>
         </Link>
       </div>
     </header>

@@ -26,6 +26,7 @@ export function SidebarMiniPlayer() {
           <CoverImage
             coverPath={currentTrack.cover_url}
             alt={currentTrack.title}
+            artistName={currentTrack.artist_name}
             imgSizes="40px"
           />
         </div>

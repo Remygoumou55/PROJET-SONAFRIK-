@@ -8,6 +8,7 @@ import { usePerformanceFlags } from "@/lib/performance/performance-context";
 import { NotificationBell } from "@/features/shared/notifications/components/NotificationBell";
 import { RecentlyPlayedSection } from "./RecentlyPlayedSection";
 import { QuickPlaylists } from "./QuickPlaylists";
+import { SidebarMiniPlayer } from "./SidebarMiniPlayer";
 
 const NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" },
@@ -138,6 +139,7 @@ export function ListenerDesktopSidebar({
         favoritesCount={sidebarData.favoritesCount}
         downloadsCount={sidebarData.downloadsCount}
       />
+      <SidebarMiniPlayer />
     </aside>
   );
 }

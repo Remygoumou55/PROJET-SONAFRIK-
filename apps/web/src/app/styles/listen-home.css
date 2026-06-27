@@ -431,6 +431,8 @@
   min-height: 100vh;
   position: sticky;
   top: 0;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .sidebar-nav {
@@ -571,20 +573,23 @@
 }
 
 .sidebar-mini-player {
-  margin: 8px 0 0;
+  margin: 8px 10px 16px;
   padding: 12px;
-  background: var(--overlay-vert-nav);
+  background: rgb(0 210 106 / 0.06);
   border: 1px solid rgb(0 210 106 / 0.15);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .smp-track-info {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .smp-cover {
@@ -605,9 +610,13 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--color-texte-principal);
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .smp-artist {
