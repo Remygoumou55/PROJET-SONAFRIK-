@@ -161,11 +161,7 @@ export default async function ListenPage({
   return (
     <div className="listen-page" style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100%" }}>
       <ListenStreamingHeader fullName={profile.full_name} unreadNotifications={unreadNotifications} />
-      <HomepageHero
-        fullName={profile.full_name}
-        unreadNotifications={unreadNotifications}
-        compactActions
-      />
+      <HomepageHero fullName={profile.full_name} />
       <Suspense fallback={<ContentSkeleton />}>
         <HomepageContentFetcher promise={contentPromise} />
       </Suspense>
