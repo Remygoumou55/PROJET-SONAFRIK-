@@ -62,3 +62,6 @@ packages/api/playback-coverage.txt
 
 # Rapports audio générés localement (ne pas committer)
 docs/audio/remediation-report.json
+
+# Fichiers temporaires racine
+tmp-creator.html

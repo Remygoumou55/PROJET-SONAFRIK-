@@ -28,6 +28,13 @@
    - Programme développeur : https://developers.orange.com/
    - Documentation API Orange Money GN spécifique à obtenir
 
+### Validation automatisée (avant credentials prod)
+
+```powershell
+pnpm probe:payment-credentials   # sandbox OK = clés prod absentes (attendu)
+pnpm run:finance-sandbox-e2e     # chaîne topup → payout_account → withdrawal
+```
+
 ### Critère de succès Phase 2
 
 Un artiste reçoit des GNF sur son numéro Orange Money guinéen depuis SONAFRIK — prouvé par une transaction visible dans l'historique Orange Money **et** dans `wallet_ledger`.

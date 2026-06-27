@@ -36,10 +36,18 @@ Callbacks enregistrés chez chaque opérateur :
 
 ### Étape 2 — Sandbox staging
 
-1. `TOPUP_SANDBOX=true` (staging uniquement)
-2. Topup **5 000 GNF** numéro test → vérifier `payment_intents.status = confirmed`
+**Automatisé (compte certifié S12B) :**
+
+```powershell
+pnpm probe:payment-credentials    # état sandbox vs credentials prod
+pnpm probe:withdrawal-sandbox     # infra RPC + wallet_ledger
+pnpm run:finance-sandbox-e2e      # topup + payout_account + withdrawal
+```
+
+1. `TOPUP_SANDBOX=true` sur Edge Functions (staging uniquement, optionnel si script E2E)
+2. Topup **5 000 GNF** → vérifier `payment_intents.status = confirmed`
 3. Vérifier entrée `wallet_ledger`
-4. Demande retrait test → vérifier `withdrawals` + `payout_audit_logs.action = requested`
+4. Demande retrait test → vérifier `withdrawals > 0` + `payout_accounts > 0` + `payout_audit_logs`
 
 ```sql
 SELECT id, status, amount_gnf, provider FROM payment_intents ORDER BY created_at DESC LIMIT 5;
@@ -68,7 +76,9 @@ Voir `docs/P0-2-PHASE-2-ORANGE-MONEY.md`.
 ```powershell
 pnpm test --filter @sonafrik/api
 pnpm probe:certification
-npx tsx scripts/probe-withdrawal-sandbox.ts
+pnpm probe:payment-credentials
+pnpm probe:withdrawal-sandbox
+pnpm run:finance-sandbox-e2e
 ```
 
 ## En cas d'échec

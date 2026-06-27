@@ -9,6 +9,27 @@
 
 ---
 
+## 2026-06-27 — CRITIQUE lancement : finance E2E + fix confirm_payment_intent
+
+### Fichiers touchés
+- `supabase/migrations/20260627140000_fix_confirm_payment_intent_method_map.sql` — map `orange_money_gn` → `payment_method` + fix `log_audit_event`
+- `supabase/migrations/20260627140100_finance_service_role_grants.sql` — GRANT SELECT finance tables → service_role
+- `scripts/run-finance-sandbox-e2e.ts` — topup + payout_account + withdrawal automatisé
+- `scripts/probe-payment-credentials.ts` — état sandbox vs prod par opérateur
+- `docs/PAYMENTS_LAUNCH_CHECKLIST.md`, `docs/P0-2-PHASE-2-ORANGE-MONEY.md` — procédures automatisées
+
+### Validation DB live
+- `withdrawals` : **4** (compte certifié S12B)
+- `payout_accounts` : **1**
+- `pnpm run:finance-sandbox-e2e` ✅
+- `pnpm probe:payment-credentials` — sandbox OK (clés prod = action Rémy)
+
+### Bloquant restant (Rémy)
+- [ ] Injecter secrets opérateurs Supabase (prod)
+- [ ] Orange Money Phase 2 — 1 transaction réelle GN
+
+---
+
 ## 2026-06-27 — Audit complet + certification 130/130 + perf dashboard
 
 ### Fichiers touchés
