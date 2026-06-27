@@ -1,5 +1,7 @@
 # EXECUTION LOG — SONAFRIK
-## Source de vérité unique · Mis à jour au 26 juin 2026
+## Source de vérité unique · Mis à jour au 27 juin 2026
+
+> Entrées avant **2026-06-26** = journal historique sprint. **État courant** = section « ÉTAT MESURÉ » + entrées datées ci-dessous.
 
 > Ce document est la **SEULE** source de vérité sur l'état du projet SONAFRIK.
 > Les journaux `PLAN_CORRECTION_360.md` et `RAPPORT_COLLECTION.md` sont archivés dans `docs/archive/`.
@@ -9,7 +11,27 @@
 
 ---
 
-## 2026-06-27 — Phase HAUTE audit v3 : CSS creator + dead code + probes
+## 2026-06-27 — Audit 360 phases 1–3 (doc sync phase 2)
+
+### Fichiers touchés
+- `docs/MVP_DB_SCOPE.md` — noms metadata réels + likes/playlists/wallet sandbox
+- `docs/MIGRATIONS_POLICY.md` — 90 migrations + ordre collisions timestamp
+- Probes **130/130** propagés : `AI_GOVERNANCE`, `MVP_SCOPE_LOCK`, `RAPPORT-CERTIFICATION-GLOBALE`, perf docs
+- `.cursor/rules/` — Career OS actif, probes 130/130
+
+### Career OS
+- **Actif MVP** : `packages/api/src/creator/career/` + composants enterprise dashboard (`NextObjectiveCard`, `StatsCareerSection`, `CareerLevelCompact`)
+
+---
+
+## 2026-06-27 — Audit 360 phase 1 : dead code + CSS orphelin
+
+### Fichiers touchés
+- Supprimés : `useSubscriptionPlans`, `AccountTypeSelector`, `AuthBrandLogo`, `MobileMoneySetup`, `getSubscriberCount`
+- CSS : purge `creator-hero`, `mobile-money-setup`, fix perf `dash-quick-actions__card--pulse`
+- `split-globals-css.mjs` supprimé · `async-storage` retiré mobile
+
+---
 
 ### Fichiers touchés
 - `apps/web/src/app/styles/creator.css` — hub `@import` (4 modules)
@@ -135,10 +157,10 @@
 
 ---
 
-## ÉTAT MESURÉ AU 26 JUIN 2026
+## ÉTAT MESURÉ AU 27 JUIN 2026
 
 ### Certification CI
-- Probes : **129/129** (Vagues A→F + 6 globaux)
+- Probes : **130/130** (Vagues A→F + 6 globaux)
 - Build : ✅ 9/9 packages, 47 routes Next.js
 - Typecheck : ✅ 15/15 packages
 
@@ -146,8 +168,9 @@
 - Profils : **189** utilisateurs
 - Tracks publiés : **48** (`published_at IS NOT NULL`)
 - Artistes inscrits : **59** (`artist_profiles`)
-- Stream sessions valides : **5 524** (`is_valid_listen = true`)
-- `wallet_ledger` : **9** entrées (> 0 — premier cycle royalties exécuté)
+- Stream sessions valides : **5 874** (`is_valid_listen = true`)
+- `wallet_ledger` : **15** entrées
+- `withdrawals` : **4** (sandbox S12B)
 - `royalty_cycles` : **1** (premier cycle déclenché manuellement)
 
 ### Git
@@ -173,7 +196,7 @@
 
 ### P0 résolus (26 juin 2026)
 - ✅ P0-1 : Git consolidé
-- ✅ P0-3 : CI verte 129/129
+- ✅ P0-3 : CI verte 130/130
 - ✅ P0-2 Phase 1 : `wallet_ledger` > 0, premier cycle royalties
 
 ### P1 résolus (26 juin 2026)

@@ -46,7 +46,7 @@ alwaysApply: true
 - ~~subscription_plans absent~~ → migration 20260621 ✅
 - ~~0 tests projet~~ → 258 tests streaming/metadata ✅
 - ~~CORS wildcard~~ → `_shared/cors.ts` ✅
-- ~~CI 103/103~~ → **129/129** ✅
+- ~~CI 103/103~~ → **130/130** ✅
 - ~~Artistes fictifs /lancement~~ → DB réelle ✅
 
 ## Règle MVP-first

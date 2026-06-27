@@ -73,7 +73,7 @@ Retraits
 | **R1** | Aucune feature ne peut être ajoutée si elle ne sert pas directement cette chaîne |
 | **R2** | Toute feature existante hors chaîne est **gelée** jusqu'à complétion MVP Core |
 | **R3** | Le MVP est **incomplet** tant qu'une étape de la chaîne ne fonctionne pas en E2E |
-| **R4** | L'audit technique (129/129 probes) **ne remplace pas** la validation de cette chaîne |
+| **R4** | L'audit technique (130/130 probes) **ne remplace pas** la validation de cette chaîne |
 
 ### État actuel (2026-06-24)
 
@@ -292,7 +292,7 @@ Le MVP SONAFRIK est déclaré **TERMINÉ** uniquement si **tous** les critères 
 | **Build PASS** | `pnpm --filter @sonafrik/web build` | ✅ 0 erreur |
 | **Typecheck PASS** | `pnpm typecheck` | ✅ 12/12 packages |
 | **Lint PASS** | `pnpm lint` | ✅ 12/12 packages |
-| **Probes PASS** | `pnpm probe:certification` | ✅ 129/129 |
+| **Probes PASS** | `pnpm probe:certification` | ✅ 130/130 |
 
 ### Runtime & chaîne produit
 
@@ -315,7 +315,7 @@ Compte test → Profil artiste → Créer album → Upload cover + audio
 → Demande retrait initiée
 ```
 
-**Sans ce parcours vert, le MVP n'est PAS terminé** — même si les probes techniques sont à 129/129.
+**Sans ce parcours vert, le MVP n'est PAS terminé** — même si les probes techniques sont à 130/130.
 
 ---
 

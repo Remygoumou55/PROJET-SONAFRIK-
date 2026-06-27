@@ -58,7 +58,7 @@ Toute IA intervient comme :
 
 | Indicateur | Valeur mesurée |
 |---|---|
-| Probes CI | **129/129** |
+| Probes CI | **130/130** |
 | Score MVP global | **76/100** |
 | Tests | 258+ (streaming/metadata) · 0 wallet/payments |
 | DB live | 189 profils · 48 tracks · 59 artistes · 5524 streams valides |
@@ -134,7 +134,7 @@ Détails : `.cursor/rules/sonafrik-security-camera.mdc`
 pnpm typecheck          # 15/15 packages
 pnpm lint               # 15/15 packages
 pnpm build              # 9/9 packages
-pnpm probe:certification   # 129/129 checks
+pnpm probe:certification   # 130/130 checks
 pnpm probe:vague-f         # selon le lot
 supabase migration list    # drift local/remote
 ```

@@ -272,7 +272,7 @@ Comparer Legacy vs Runtime sur même track, même réseau :
 | `pnpm build` | ✅ 9/9 |
 | `pnpm --filter @sonafrik/api test` | ✅ **262/262** |
 | Legacy player (prod) | ✅ Inchangé |
-| `pnpm probe:certification` | ✅ 129/129 |
+| `pnpm probe:certification` | ✅ 130/130 |
 
 ---
 

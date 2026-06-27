@@ -99,7 +99,7 @@ Stubs : [`MASTER_PLAN.md`](./MASTER_PLAN.md) · [`PLAN_CORRECTION_360.md`](./PLA
 | Tests MVP | 45 |
 
 ### P0/P1 terminés
-- P0-1 Git · P0-3 CI 129/129 · P0-2 Phase 1 wallet_ledger
+- P0-1 Git · P0-3 CI 130/130 · P0-2 Phase 1 wallet_ledger
 - P1 `/lancement` DB réelle · P1 CORS 14 edge functions
 
 ### Bloquant lancement public

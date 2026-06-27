@@ -8,7 +8,7 @@
 
 ## Contexte
 
-L'architecture Enterprise (streaming, metadata, publication) est certifiée techniquement (262 tests API, probes 129/129). **Aucune mesure officielle** n'a été réalisée sur :
+L'architecture Enterprise (streaming, metadata, publication) est certifiée techniquement (262 tests API, probes 130/130). **Aucune mesure officielle** n'a été réalisée sur :
 
 - expérience utilisateur et fluidité
 - Core Web Vitals
@@ -412,7 +412,7 @@ Le programme est **certifié** uniquement si :
 - [ ] Time to play ≤3s (4G simulée)
 - [ ] UX fluidifiée (animations CDC ≤300ms app)
 - [ ] Africa Mode validé 3G/instable
-- [ ] Aucun impact fonctionnel (régression tests 129/129 + 262 API)
+- [ ] Aucun impact fonctionnel (régression tests 130/130 + 262 API)
 - [ ] `pnpm typecheck` · `lint` · `build` PASS
 - [ ] LIVE CONTROL signé Rémy
 

@@ -62,7 +62,7 @@
 | `pnpm build` | ✅ | — |
 | `pnpm typecheck` | ✅ | — |
 | `pnpm lint` | ✅ | — |
-| `pnpm probe:certification` | 129/129 | — |
+| `pnpm probe:certification` | 130/130 | — |
 | `pnpm probe:performance-discovery` | À exécuter | — |
 
 ---
