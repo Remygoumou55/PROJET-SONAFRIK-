@@ -48,6 +48,18 @@ export function humanizeRole(role: UserRole): string {
 }
 
 export function computeProfileCompletion(profile: Profile): number {
+  return getProfileCompletionState(profile).percent;
+}
+
+export function getProfileRemainingSteps(profile: Profile): number {
+  return getProfileCompletionState(profile).remainingSteps;
+}
+
+function getProfileCompletionState(profile: Profile): {
+  percent: number;
+  remainingSteps: number;
+  totalSteps: number;
+} {
   const isArtist = isArtistAccount(profile.account_type);
   const checks = isArtist
     ? [
@@ -66,7 +78,32 @@ export function computeProfileCompletion(profile: Profile): number {
       ];
 
   const filled = checks.filter(Boolean).length;
-  return Math.round((filled / checks.length) * 100);
+  const totalSteps = checks.length;
+  return {
+    percent: Math.round((filled / totalSteps) * 100),
+    remainingSteps: totalSteps - filled,
+    totalSteps,
+  };
+}
+
+const COUNTRY_LABELS: Record<string, string> = {
+  GN: "Guinée",
+  SN: "Sénégal",
+  CI: "Côte d'Ivoire",
+  ML: "Mali",
+  FR: "France",
+  US: "États-Unis",
+};
+
+export function getCountryLabel(code: string | null): string | null {
+  if (!code?.trim()) return null;
+  return COUNTRY_LABELS[code.toUpperCase()] ?? code.toUpperCase();
+}
+
+export function getGreetingFirstName(profile: Profile, displayName: string): string {
+  const fromFullName = profile.full_name?.trim().split(/\s+/)[0];
+  if (fromFullName) return fromFullName;
+  return displayName.trim().split(/\s+/)[0] || "Membre";
 }
 
 export interface ProfileActivitySummary {

@@ -237,13 +237,19 @@
     padding: 1rem;
   }
 
-  .identity-profile-hero__name {
+  .identity-profile-hero__name,
+  .identity-profile-passport__name {
     font-size: 1.375rem;
     overflow-wrap: anywhere;
   }
 
-  .identity-profile-hero__bio {
+  .identity-profile-hero__bio,
+  .identity-profile-passport__bio {
     overflow-wrap: anywhere;
+  }
+
+  .identity-profile-passport {
+    padding: 1rem;
   }
 }
 
