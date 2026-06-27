@@ -2,8 +2,10 @@
 
 import dynamic from "next/dynamic";
 import type { ListenerSidebarData } from "@sonafrik/types";
+import type { ListenFeatureFlags } from "@/lib/listen/listen-feature-flags";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
+import { ListenFeaturesProvider } from "../lib/listenFeaturesContext";
 import { PlayerProvider } from "../lib/playerContext";
 import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
@@ -19,6 +21,7 @@ interface StreamingLayoutClientProps {
   initialUnreadCount: number;
   audioQualityPreference: import("@sonafrik/types").AudioQualityPreference;
   sidebarDataPromise: Promise<ListenerSidebarData>;
+  listenFeatures: ListenFeatureFlags;
 }
 
 export function StreamingLayoutClient({
@@ -27,11 +30,13 @@ export function StreamingLayoutClient({
   initialUnreadCount,
   audioQualityPreference,
   sidebarDataPromise,
+  listenFeatures,
 }: StreamingLayoutClientProps) {
   return (
     <QualityPreferenceProvider value={audioQualityPreference}>
-      <DevAuthBootstrap />
-      <PlayerProvider>
+      <ListenFeaturesProvider flags={listenFeatures}>
+        <DevAuthBootstrap />
+        <PlayerProvider>
         <div
           className="has-global-player md:flex md:h-screen md:overflow-hidden"
           style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
@@ -47,7 +52,8 @@ export function StreamingLayoutClient({
         </div>
         <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
         <GlobalPlayer />
-      </PlayerProvider>
+        </PlayerProvider>
+      </ListenFeaturesProvider>
     </QualityPreferenceProvider>
   );
 }
