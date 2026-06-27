@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { CoverImage } from "@/components/CoverImage";
 import { formatTrackDuration } from "../lib/formatTrackDuration";
 
@@ -14,7 +15,7 @@ interface TrackCardProps {
   onPlay?: () => void;
 }
 
-export function TrackCard({
+export const TrackCard = memo(function TrackCard({
   title,
   artistName,
   coverPath,
@@ -62,4 +63,4 @@ export function TrackCard({
       </div>
     </button>
   );
-}
+});

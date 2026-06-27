@@ -1,14 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { memo, useEffect, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
 import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
-import { PlayerExpandedPanel } from "./PlayerExpandedPanel";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
+
+const PlayerExpandedPanel = dynamic(
+  () => import("./PlayerExpandedPanel").then((m) => ({ default: m.PlayerExpandedPanel })),
+  { ssr: false },
+);
 
 function GlobalPlayerProgress() {
   const { duration, seek } = usePlayer();

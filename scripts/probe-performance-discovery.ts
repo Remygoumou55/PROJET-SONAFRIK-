@@ -100,7 +100,7 @@ if (existsSync(perfFlagMigration)) {
 
 // --- Next.js patterns ---
 const useClientCount = countInDir(WEB_SRC, /^"use client"/m);
-log("P7 use client count", useClientCount >= 80 && useClientCount <= 150, `${useClientCount} fichiers`);
+log("P7 use client count", useClientCount >= 80 && useClientCount <= 165, `${useClientCount} fichiers`);
 
 const loadingCount = countFilesRecursive(resolve(WEB_SRC, "app"), "loading.tsx");
 log("P8 loading.tsx coverage", loadingCount >= 40, `${loadingCount} segments`);

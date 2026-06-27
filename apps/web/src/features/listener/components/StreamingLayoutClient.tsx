@@ -5,7 +5,7 @@ import type { ListenerSidebarData } from "@sonafrik/types";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { PlayerProvider } from "../lib/playerContext";
-import { ListenerDesktopSidebar } from "./ListenerDesktopSidebar";
+import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
 
 const GlobalPlayer = dynamic(
@@ -18,7 +18,7 @@ interface StreamingLayoutClientProps {
   userId: string;
   initialUnreadCount: number;
   audioQualityPreference: import("@sonafrik/types").AudioQualityPreference;
-  sidebarData: ListenerSidebarData;
+  sidebarDataPromise: Promise<ListenerSidebarData>;
 }
 
 export function StreamingLayoutClient({
@@ -26,7 +26,7 @@ export function StreamingLayoutClient({
   userId,
   initialUnreadCount,
   audioQualityPreference,
-  sidebarData,
+  sidebarDataPromise,
 }: StreamingLayoutClientProps) {
   return (
     <QualityPreferenceProvider value={audioQualityPreference}>
@@ -36,10 +36,10 @@ export function StreamingLayoutClient({
           className="has-global-player md:flex md:h-screen md:overflow-hidden"
           style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
         >
-          <ListenerDesktopSidebar
+          <ListenerSidebarAsync
             userId={userId}
             initialUnreadCount={initialUnreadCount}
-            sidebarData={sidebarData}
+            sidebarDataPromise={sidebarDataPromise}
           />
           <main className="flex-1 overflow-y-auto pb-40 md:pb-[88px] md:min-h-screen">
             {children}

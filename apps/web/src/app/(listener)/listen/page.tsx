@@ -2,11 +2,9 @@ import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import type {
-  DiscoveryAlbum,
   DiscoveryArtist,
   DiscoveryTrack,
   ListenMusicCategory,
-  NewReleasesResult,
   TrendingTrack,
 } from "@sonafrik/types";
 import { createDiscoveryService } from "@sonafrik/api/discovery";
@@ -19,7 +17,6 @@ import {
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import {
-  filterValidAlbums,
   filterValidArtists,
   filterValidPlaylists,
   filterValidTracks,
@@ -53,29 +50,21 @@ function createHomepageLoader(category: ListenMusicCategory) {
 
         const [
           curated,
-          newTracksRaw,
           topGuineaRaw,
           discoveriesRaw,
           newReleasesResult,
           suggestedArtistsRaw,
         ] = await Promise.all([
           listener.getHomepageCurated(8).catch(() => ({ playlists: [], artists: [], genres: [] })),
-          listener.getLatestPublishedTracks(24).catch((): DiscoveryTrack[] => []),
           listener.getTopGuineaTracks(24).catch((): TrendingTrack[] => []),
           discovery.getDiscoveryFeed({ limit: 16 }).catch((): DiscoveryTrack[] => []),
           discovery
-            .getNewReleases({ type: "all", days: 365, limit: 16 })
-            .catch((): NewReleasesResult => ({ tracks: [], albums: [] as DiscoveryAlbum[], artists: [] })),
+            .getNewReleases({ type: "track", days: 365, limit: 30 })
+            .catch((): { tracks: DiscoveryTrack[] } => ({ tracks: [] })),
           discovery.getSuggestedArtists({ limit: 12 }).catch((): DiscoveryArtist[] => []),
         ]);
 
-        const mergedNewTracksRaw =
-          newTracksRaw.length > 0 ? newTracksRaw : (newReleasesResult.tracks ?? []);
-
-        const discoveryPoolRaw = dedupeDiscoveryTracks([
-          ...mergedNewTracksRaw,
-          ...(newReleasesResult.tracks ?? []),
-        ]);
+        const discoveryPoolRaw = dedupeDiscoveryTracks(newReleasesResult.tracks ?? []);
 
         let discoveryTracks = discoveryPoolRaw;
         let topGuineaTracks = topGuineaRaw;
@@ -128,7 +117,6 @@ function createHomepageLoader(category: ListenMusicCategory) {
           topGuineaTracks: filterValidTracks(topGuineaTracks).slice(0, 10),
           trending: filterValidTracks(topGuineaTracks).slice(0, 10),
           discoveries: filterValidTracks(discoveries).slice(0, 8),
-          newAlbums: filterValidAlbums(newReleasesResult.albums),
           suggestedArtists: filterValidArtists(suggestedArtists).slice(0, 8),
           hadError: false,
         };
@@ -141,13 +129,12 @@ function createHomepageLoader(category: ListenMusicCategory) {
           topGuineaTracks: [],
           trending: [],
           discoveries: [],
-          newAlbums: [],
           suggestedArtists: [],
           hadError: true,
         };
       }
     },
-    [`homepage-content-v6-${category}`],
+    [`homepage-content-v7-${category}`],
     { revalidate: 120, tags: ["homepage", "catalog-tracks"] },
   );
 }

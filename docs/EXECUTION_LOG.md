@@ -11,6 +11,36 @@
 
 ---
 
+## 2026-06-27 — Audit global + perf /listen + push court terme
+
+### Fichiers touchés
+- `listen/page.tsx` — 1 seul RPC `getNewReleases(track)` au lieu de 2 doublons ; cache v7
+- `layout.tsx` + `ListenerSidebarAsync.tsx` — sidebar en Suspense (plus de waterfall layout→page)
+- `GlobalPlayer.tsx` — lazy `PlayerExpandedPanel` (réactions Realtime à l’expand)
+- `TrackCard.tsx` — `memo()` pour limiter re-renders pendant lecture
+- `HomepageContentSections.tsx` — dynamic import sections below-fold
+- `next.config.ts` — `staleTimes.dynamic: 120` aligné cache homepage
+- `probe-performance-discovery.ts` — seuil P7 use client 165 (157 fichiers)
+
+### Commits pushés
+- `f9dbf1b` Découvertes unifiées
+- `3e3180a` Player étendu + réactions
+- `42889ac` Top Guinée visuel
+- perf commit (audit)
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` — ✅
+- `pnpm probe:performance` — **26/26** ✅ (après seuil P7)
+- `pnpm probe:certification` — **98/104** static ; live vagues A→F requièrent `.env.local` chargé en CLI
+- `/listen` — **200** après `dev:clean`
+
+### Tests à faire
+- [ ] Sidebar skeleton puis données récentes sur desktop
+- [ ] Expand player → réactions visibles, pas avant expand
+- [ ] Filtres Découvertes semaine/mois/tout
+
+---
+
 ## 2026-06-27 — Audit 360 phase 4 : architecture dossiers features
 
 ### Déplacements

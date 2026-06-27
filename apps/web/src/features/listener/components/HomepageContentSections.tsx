@@ -1,14 +1,43 @@
 import Link from "next/link";
-import type { DiscoveryAlbum, DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
+import dynamic from "next/dynamic";
+import type { DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
 import { CARD_GRADIENTS } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "./HomepageTrendingRow";
-import { HomepageDiscoverySection } from "./HomepageDiscoverySection";
 import { MediaCard } from "./HomepageMediaCard";
 import { DiscoveriesSection } from "./DiscoveriesSection";
-import { TopGuineaSection } from "./TopGuineaSection";
-import { ArtistsDiscoverSection } from "./ArtistsDiscoverSection";
-import { StartListeningBanner } from "./StartListeningBanner";
+
+const TopGuineaSection = dynamic(
+  () => import("./TopGuineaSection").then((m) => ({ default: m.TopGuineaSection })),
+  { loading: () => <SectionRowSkeleton /> },
+);
+
+const ArtistsDiscoverSection = dynamic(
+  () => import("./ArtistsDiscoverSection").then((m) => ({ default: m.ArtistsDiscoverSection })),
+  { loading: () => <SectionRowSkeleton /> },
+);
+
+const HomepageDiscoverySection = dynamic(
+  () => import("./HomepageDiscoverySection").then((m) => ({ default: m.HomepageDiscoverySection })),
+  { loading: () => <SectionRowSkeleton /> },
+);
+
+const StartListeningBanner = dynamic(
+  () => import("./StartListeningBanner").then((m) => ({ default: m.StartListeningBanner })),
+);
+
+function SectionRowSkeleton() {
+  return (
+    <div className="listen-page-section mt-8 px-6">
+      <div className="h-5 w-40 rounded animate-pulse mb-4" style={{ backgroundColor: "var(--color-card)" }} />
+      <div className="flex gap-3 overflow-hidden">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="w-32 h-32 rounded-2xl flex-shrink-0 animate-pulse" style={{ backgroundColor: "var(--color-card)" }} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function formatPlaylistTrackCount(count: number): string {
   return count <= 1 ? `${count} titre` : `${count} titres`;
@@ -31,7 +60,6 @@ export interface HomepageData {
   topGuineaTracks: TrendingTrack[];
   trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
-  newAlbums: DiscoveryAlbum[];
   suggestedArtists: DiscoveryArtist[];
   hadError: boolean;
 }
@@ -85,7 +113,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     topGuineaTracks,
     trending,
     discoveries,
-    newAlbums,
     suggestedArtists,
     hadError,
   } = content;
@@ -97,7 +124,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     playlists.length > 0 ||
     artists.length > 0 ||
     discoveries.length > 0 ||
-    newAlbums.length > 0 ||
     suggestedArtists.length > 0;
 
   const hasContent = hasMusicContent || genres.length > 0;
@@ -109,7 +135,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     playlists.length > 0,
     artists.length > 0,
     discoveries.length > 0,
-    newAlbums.length > 0,
     suggestedArtists.length > 0,
     genres.length > 0,
   ].filter(Boolean).length;

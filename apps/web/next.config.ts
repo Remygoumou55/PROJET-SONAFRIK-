@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
     // Next.js 15 : cache client-side router
     staleTimes: {
       static: 300,
-      dynamic: 30,
+      dynamic: 120,
     },
     // Tree-shaking — @sonafrik/ui/types/api/shared exclus : barrel optimizer casse les exports runtime en dev
     optimizePackageImports: [

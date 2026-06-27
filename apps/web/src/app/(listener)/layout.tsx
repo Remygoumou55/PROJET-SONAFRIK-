@@ -11,10 +11,8 @@ async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
   redirectIfOnboardingIncomplete(context.profile);
 
-  const [performanceFlags, sidebarData] = await Promise.all([
-    getCachedPerformanceFlags(),
-    getListenSidebarData(context.profile.id),
-  ]);
+  const performanceFlags = await getCachedPerformanceFlags();
+  const sidebarDataPromise = getListenSidebarData(context.profile.id);
 
   return (
     <PerformanceProvider flags={performanceFlags}>
@@ -22,7 +20,7 @@ async function StreamingGuard({ children }: { children: React.ReactNode }) {
         userId={context.profile.id}
         initialUnreadCount={context.unreadNotifications}
         audioQualityPreference={context.preferences.audio_quality}
-        sidebarData={sidebarData}
+        sidebarDataPromise={sidebarDataPromise}
       >
         {children}
       </StreamingLayoutClient>
