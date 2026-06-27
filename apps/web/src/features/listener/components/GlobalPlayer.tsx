@@ -1,11 +1,12 @@
 "use client";
 
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
 import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
+import { PlayerExpandedPanel } from "./PlayerExpandedPanel";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
 
@@ -64,6 +65,7 @@ function GlobalPlayerVolume() {
 export const GlobalPlayer = memo(function GlobalPlayer() {
   const { currentTrack, audioError, clearAudioError } = usePlayer();
   const { qualityLevel } = useStreamQuality();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.playerActive = currentTrack ? "true" : "false";
@@ -72,12 +74,21 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
     };
   }, [currentTrack]);
 
+  useEffect(() => {
+    if (!currentTrack) setIsExpanded(false);
+  }, [currentTrack]);
+
   if (!currentTrack) return null;
 
   const artistLabel = currentTrack.artist_name ?? currentTrack.title;
 
   return (
-    <div className="global-player" role="region" aria-label="Lecteur musical SONAFRIK">
+    <>
+      {isExpanded ? (
+        <PlayerExpandedPanel track={currentTrack} onClose={() => setIsExpanded(false)} />
+      ) : null}
+
+      <div className="global-player" role="region" aria-label="Lecteur musical SONAFRIK">
       <GlobalPlayerProgress />
 
       {audioError ? (
@@ -91,14 +102,21 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
 
       <div className="gp-body">
         <div className="gp-track-info">
-          <div className="gp-cover">
-            <CoverImage
-              coverPath={currentTrack.cover_url ?? null}
-              alt={currentTrack.title}
-              artistName={artistLabel}
-              imgSizes="48px"
-            />
-          </div>
+          <button
+            type="button"
+            className="gp-cover-btn"
+            onClick={() => setIsExpanded(true)}
+            aria-label="Ouvrir le lecteur étendu"
+          >
+            <div className="gp-cover">
+              <CoverImage
+                coverPath={currentTrack.cover_url ?? null}
+                alt={currentTrack.title}
+                artistName={artistLabel}
+                imgSizes="48px"
+              />
+            </div>
+          </button>
           <div className="gp-meta">
             <p className="gp-title">{currentTrack.title}</p>
             <p className="gp-artist">{currentTrack.artist_name ?? "Artiste"}</p>
@@ -120,6 +138,7 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
           <GlobalPlayerVolume />
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 });
