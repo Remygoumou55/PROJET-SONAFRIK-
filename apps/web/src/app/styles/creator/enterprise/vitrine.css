@@ -54,7 +54,7 @@
 
 .artist-hero--vitrine .artist-hero__cover-img,
 .artist-hero--vitrine .artist-hero__cover-slide img {
-  object-fit: cover !important;
+  object-fit: contain !important;
   object-position: center center;
 }
 
@@ -111,6 +111,14 @@
   flex: 1;
   min-width: 0;
   padding: 0;
+}
+
+.artist-hero--vitrine .artist-hero__greeting--vitrine {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .artist-hero--vitrine .artist-hero__name--vitrine {

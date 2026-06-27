@@ -56,7 +56,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
               path={activePath}
               assetKind="gallery"
               alt={`Couverture ${stageName}`}
-              fit="cover"
+              fit={isCompact ? "contain" : "cover"}
               layout="bounded"
               className="artist-hero__cover-img"
               priority

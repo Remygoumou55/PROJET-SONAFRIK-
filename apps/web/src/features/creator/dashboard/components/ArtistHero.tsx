@@ -11,7 +11,8 @@ import { ArtistProfilePhoto } from "./ArtistProfilePhoto";
 import {
   buildHeroVitrineBadges,
   resolveArtistTypeLabel,
-} from "@sonafrik/api/creator";
+} from "@sonafrik/api/creator/presentation";
+import { formatCreatorGreeting } from "@/features/creator/lib/greeting";
 
 interface ArtistHeroProps {
   hero: CreatorDashboardHero;
@@ -63,6 +64,9 @@ export const ArtistHero = memo(function ArtistHero({
         </div>
 
         <div className="artist-hero__identity-block artist-hero__identity-block--vitrine">
+          <p className="artist-hero__greeting artist-hero__greeting--vitrine">
+            {formatCreatorGreeting(artistProfile.stage_name)}
+          </p>
           <h2 className="artist-hero__name artist-hero__name--vitrine">
             {artistProfile.stage_name}
             <span className="artist-hero__note" aria-hidden="true">

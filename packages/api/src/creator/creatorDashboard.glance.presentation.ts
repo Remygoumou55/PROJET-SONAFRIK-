@@ -46,11 +46,11 @@ export function buildGlanceKpis(data: CreatorDashboardData): GlanceKpiView[] {
     const delta =
       followers.deltaPercent !== null
         ? `${followers.deltaPercent > 0 ? "+" : ""}${followers.deltaPercent} % cette semaine`
-        : "Fans engagés";
+        : "Followers engagés";
     views.push({
       id: "followers",
       icon: followers.icon,
-      label: "Fans",
+      label: "Followers",
       value: followers.numericValue.toLocaleString("fr-FR"),
       sublabel: delta,
       trend: followers.trend,

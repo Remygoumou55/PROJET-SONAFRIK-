@@ -181,15 +181,17 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.625rem 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  gap: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
+  margin-top: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-or-solaire) 15%, transparent);
+  background: color-mix(in srgb, var(--color-or-solaire) 6%, transparent);
 }
 
 .dash-conseil__icon {
-  font-size: 1rem;
+  font-size: 1.125rem;
+  flex-shrink: 0;
 }
 
 .dash-conseil__text {
@@ -197,25 +199,29 @@
   flex: 1;
   min-width: 12rem;
   font-size: 0.8125rem;
-  color: var(--color-texte-secondaire);
-  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
 }
 
 .dash-conseil__text strong {
-  color: var(--color-texte-principal);
+  color: var(--color-or-solaire);
+  font-weight: 600;
 }
 
 .dash-conseil__link {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-vert-energie);
   text-decoration: none;
   white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
 }
 
 .dash-conseil__link:hover,
 .dash-conseil__link:focus-visible {
-  text-decoration: underline;
+  opacity: 0.8;
+  text-decoration: none;
   outline: none;
 }
 
