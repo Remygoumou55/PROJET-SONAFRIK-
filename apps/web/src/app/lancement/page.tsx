@@ -4,6 +4,11 @@ import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
 import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
 import { getAvatarPalette } from "@/lib/landing/artistDisplay";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
+import { LancementHeroStats } from "@/components/lancement/LancementHeroStats";
+import { LancementProgressBar } from "@/components/lancement/LancementProgressBar";
+import { LancementHelpSection } from "@/components/lancement/LancementHelpSection";
+import { LancementBuildSection } from "@/components/lancement/LancementBuildSection";
+import "@/app/styles/lancement.css";
 
 export const revalidate = 60;
 
@@ -24,11 +29,8 @@ export default async function LancementPage() {
     getLandingArtistsSection(),
   ]);
 
-  const showStats =
-    progress !== null && (progress.artistCount > 0 || progress.trackCount > 0);
-
   return (
-    <div className="flex min-h-dvh flex-col bg-noir-profond text-texte-principal">
+    <div className="lancement-page">
       <header className="flex items-center justify-between px-6 py-5">
         <SonafrikLogo variant="nav" size="sm" href="/" />
         <Link
@@ -39,97 +41,52 @@ export default async function LancementPage() {
         </Link>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-        <div className="mb-10">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-or-solaire">
-            Écoute · Participe · Prospère
-          </p>
-          <h1 className="mb-4 text-4xl font-black leading-tight sm:text-5xl">
+      <main className="lancement-main">
+        <section className="lancement-hero" aria-labelledby="lancement-hero-title">
+          <p className="lancement-hero-tag">Écoute · Participe · Prospère</p>
+          <h1 id="lancement-hero-title" className="lancement-hero-title">
             La musique guinéenne
-            <br />
-            <span className="text-vert-energie">mérite sa plateforme</span>
+            <span className="lancement-hero-title-accent">mérite sa plateforme</span>
           </h1>
-          <p className="mx-auto max-w-md text-base leading-relaxed text-texte-subtil">
-            SONAFRIK rémunère directement les artistes. Chaque écoute compte.
-            Ensemble, nous débloquons le lancement.
+          <p className="lancement-hero-subtitle">
+            SONAFRIK rémunère directement les artistes. Chaque écoute compte. Ensemble, nous
+            débloquons le lancement.
           </p>
-        </div>
-
-        <div className="mb-10 w-full max-w-lg rounded-2xl border border-surface bg-noir-profond p-8">
-          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-texte-desactive">
-            Objectif de lancement — CDC Règle #7
-          </p>
-
           {progress ? (
-            <>
-              <div className="mb-4 flex items-end justify-between">
-                <div>
-                  <span className="text-6xl font-black tabular-nums leading-none text-vert-energie">
-                    {progress.current.toLocaleString("fr-FR")}
-                  </span>
-                  <span className="ml-2 text-2xl font-bold text-texte-desactive">
-                    /{progress.target.toLocaleString("fr-FR")}
-                  </span>
-                </div>
-                <span className="text-lg font-semibold text-vert-energie">
-                  {progress.percent.toFixed(1)} %
-                </span>
-              </div>
+            <LancementHeroStats
+              artistCount={progress.artistCount}
+              trackCount={progress.trackCount}
+            />
+          ) : null}
+        </section>
 
-              <div className="h-2 w-full overflow-hidden rounded border border-elevated bg-card">
-                <div
-                  className="h-full rounded bg-vert-energie transition-[width] duration-500 ease-out"
-                  style={{ width: `${progress.percent}%` }}
-                />
-              </div>
+        {progress ? (
+          <LancementProgressBar
+            current={progress.current}
+            target={progress.target}
+            percentage={progress.percent}
+            launched={progress.launched}
+          />
+        ) : (
+          <p className="lancement-progress-message mb-8">
+            Lancement en cours de préparation
+          </p>
+        )}
 
-              <p className="mt-3 text-center text-sm text-texte-desactive">
-                {progress.launched
-                  ? "Objectif atteint — SONAFRIK est lancé ! 🚀"
-                  : `Plus que ${(progress.target - progress.current).toLocaleString("fr-FR")} personnes pour le lancement officiel`}
-              </p>
-            </>
-          ) : (
-            <p className="text-center text-sm text-texte-secondaire">
-              Lancement en cours de préparation
-            </p>
-          )}
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link
-            href="/auth/connexion"
-            className="rounded-full bg-vert-energie px-8 py-3 text-sm font-bold text-noir-profond transition-opacity hover:opacity-90"
-          >
+        <div className="lancement-cta-row">
+          <Link href="/auth/connexion" className="lancement-cta-primary">
             Rejoindre SONAFRIK
           </Link>
-          <Link
-            href="/auth/connexion?role=listener"
-            className="rounded-full border border-elevated bg-surface px-8 py-3 text-sm font-medium text-texte-principal transition-opacity hover:opacity-80"
-          >
+          <Link href="/auth/connexion?role=listener" className="lancement-cta-secondary">
             Rejoindre comme auditeur
           </Link>
         </div>
 
-        <div className="mt-16 grid w-full max-w-2xl gap-4 text-left sm:grid-cols-3">
-          {[
-            { rule: "#3", label: "65% reversés aux artistes", icon: "🎵" },
-            { rule: "#4", label: "Beat Store à 0% de commission", icon: "🎹" },
-            { rule: "#5", label: "Pourboires directs aux artistes", icon: "💸" },
-          ].map(({ rule, label, icon }) => (
-            <div
-              key={rule}
-              className="rounded-xl border border-surface bg-noir-profond p-4"
-            >
-              <p className="mb-1 text-lg">{icon}</p>
-              <p className="mb-0.5 text-xs font-semibold text-or-solaire">Règle CDC {rule}</p>
-              <p className="text-sm text-texte-secondaire">{label}</p>
-            </div>
-          ))}
-        </div>
+        <LancementHelpSection />
+        <LancementBuildSection />
 
         {artistsSection.artists.length > 0 ? (
-          <div className="mb-8 mt-12 w-full max-w-2xl text-center">
+          <div className="lancement-artists text-center">
             <p className="mb-1 text-base font-bold text-texte-principal">
               Les artistes fondateurs
             </p>
@@ -161,17 +118,6 @@ export default async function LancementPage() {
                 );
               })}
             </div>
-
-            {showStats && progress ? (
-              <div className="mt-5 inline-block">
-                <span className="inline-block rounded-full border border-elevated bg-card px-4 py-1.5 text-xs text-texte-secondaire">
-                  🎵 {progress.artistCount.toLocaleString("fr-FR")} artiste
-                  {progress.artistCount > 1 ? "s" : ""} ·{" "}
-                  {progress.trackCount.toLocaleString("fr-FR")} morceau
-                  {progress.trackCount > 1 ? "x" : ""} · Guinée Conakry
-                </span>
-              </div>
-            ) : null}
           </div>
         ) : null}
       </main>
