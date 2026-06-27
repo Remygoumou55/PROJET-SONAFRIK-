@@ -14,8 +14,3 @@ export function isTopupEnabled(): boolean {
 export function isWithdrawalEnabled(): boolean {
   return process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true";
 }
-
-/** @deprecated Préférer isTopupEnabled / isWithdrawalEnabled — conservé pour compat. */
-export function isPaymentsEnabled(): boolean {
-  return isTopupEnabled();
-}

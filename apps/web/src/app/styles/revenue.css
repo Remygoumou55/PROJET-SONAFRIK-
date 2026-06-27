@@ -1,29 +1,24 @@
 /* ─── Revenue Destination Setup (référence unique) ───────────── */
-.revenue-destination,
-.mobile-money-setup {
+.revenue-destination {
   display: flex;
   flex-direction: column;
   gap: 1.125rem;
 }
 
-.revenue-destination__field,
-.mobile-money-setup__field {
+.revenue-destination__field {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
 
-.revenue-destination__label,
-.mobile-money-setup__label {
+.revenue-destination__label {
   font-size: 0.75rem;
   color: var(--color-texte-secondaire);
   letter-spacing: 0.03em;
 }
 
 .revenue-destination__select,
-.revenue-destination__input,
-.mobile-money-setup__select,
-.mobile-money-setup__phone-input {
+.revenue-destination__input {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -37,23 +32,19 @@
 }
 
 .revenue-destination__select:focus-visible,
-.revenue-destination__input:focus-visible,
-.mobile-money-setup__select:focus-visible,
-.mobile-money-setup__phone-input:focus-visible {
+.revenue-destination__input:focus-visible {
   border-color: rgba(0, 210, 106, 0.45);
   outline: 2px solid rgba(0, 210, 106, 0.2);
   outline-offset: 0;
 }
 
-.revenue-destination__phone-row,
-.mobile-money-setup__phone-row {
+.revenue-destination__phone-row {
   display: flex;
   gap: 0;
   align-items: stretch;
 }
 
-.revenue-destination__dial,
-.mobile-money-setup__dial {
+.revenue-destination__dial {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -69,35 +60,29 @@
   color: var(--color-texte-principal);
 }
 
-.revenue-destination__phone-input,
-.mobile-money-setup__phone-input {
+.revenue-destination__phone-input {
   border-radius: 0 0.625rem 0.625rem 0;
 }
 
-.revenue-destination__hint,
-.mobile-money-setup__hint {
+.revenue-destination__hint {
   margin: 0.375rem 0 0;
   font-size: 0.75rem;
   line-height: 1.4;
 }
 
-.revenue-destination__hint--hint,
-.mobile-money-setup__hint--hint {
+.revenue-destination__hint--hint {
   color: var(--color-texte-desactive);
 }
 
-.revenue-destination__hint--ok,
-.mobile-money-setup__hint--ok {
+.revenue-destination__hint--ok {
   color: var(--color-vert-energie);
 }
 
-.revenue-destination__hint--error,
-.mobile-money-setup__hint--error {
+.revenue-destination__hint--error {
   color: var(--color-erreur);
 }
 
-.revenue-destination__info,
-.mobile-money-setup__info {
+.revenue-destination__info {
   margin-top: 0.25rem;
   padding: 0.875rem 1rem;
   border-radius: 0.75rem;
@@ -105,19 +90,16 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.revenue-destination__info-title,
-.mobile-money-setup__info-title {
+.revenue-destination__info-title {
   margin: 0 0 0.375rem;
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-texte-principal);
 }
 
-.revenue-destination__info-text,
-.mobile-money-setup__info-text {
+.revenue-destination__info-text {
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.55;
   color: var(--color-texte-secondaire);
 }
-
