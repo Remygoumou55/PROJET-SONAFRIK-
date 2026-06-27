@@ -8,6 +8,8 @@ import { usePlayerPosition } from "../lib/playerContext";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { LiveReactions } from "./LiveReactions";
+import { ShareButton } from "./ShareButton";
+import { useListenFeatures } from "../lib/listenFeaturesContext";
 
 interface PlayerExpandedPanelProps {
   track: TrackWithMeta;
@@ -33,6 +35,7 @@ function ExpandedProgress() {
 
 export function PlayerExpandedPanel({ track, onClose }: PlayerExpandedPanelProps) {
   const artistLabel = track.artist_name ?? track.title;
+  const { whatsappShare } = useListenFeatures();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -71,6 +74,14 @@ export function PlayerExpandedPanel({ track, onClose }: PlayerExpandedPanelProps
         <div className="pep-meta">
           <h3 className="pep-title">{track.title}</h3>
           <p className="pep-artist">{track.artist_name ?? "Artiste"}</p>
+          {whatsappShare ? (
+            <ShareButton
+              trackId={track.id}
+              title={track.title}
+              artistName={artistLabel}
+              variant="full"
+            />
+          ) : null}
         </div>
 
         <ExpandedProgress />

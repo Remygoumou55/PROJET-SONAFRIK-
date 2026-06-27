@@ -4,15 +4,22 @@ import dynamic from "next/dynamic";
 import { memo, useEffect, useState } from "react";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
+import { useListenFeatures } from "../lib/listenFeaturesContext";
 import { useStreamQuality } from "../hooks/useStreamQuality";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
+import { ShareButton } from "./ShareButton";
 
 const PlayerExpandedPanel = dynamic(
   () => import("./PlayerExpandedPanel").then((m) => ({ default: m.PlayerExpandedPanel })),
   { ssr: false },
+);
+
+const FullScreenPlayer = dynamic(
+  () => import("./FullScreenPlayer").then((m) => ({ default: m.FullScreenPlayer })),
+  { ssr: false, loading: () => <div className="fs-loading">Chargement...</div> },
 );
 
 function GlobalPlayerProgress() {
@@ -70,7 +77,9 @@ function GlobalPlayerVolume() {
 export const GlobalPlayer = memo(function GlobalPlayer() {
   const { currentTrack, audioError, clearAudioError } = usePlayer();
   const { qualityLevel } = useStreamQuality();
+  const { fullscreenPlayer, whatsappShare } = useListenFeatures();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.playerActive = currentTrack ? "true" : "false";
@@ -80,7 +89,10 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
   }, [currentTrack]);
 
   useEffect(() => {
-    if (!currentTrack) setIsExpanded(false);
+    if (!currentTrack) {
+      setIsExpanded(false);
+      setIsFullScreen(false);
+    }
   }, [currentTrack]);
 
   if (!currentTrack) return null;
@@ -89,7 +101,11 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
 
   return (
     <>
-      {isExpanded ? (
+      {isFullScreen && fullscreenPlayer ? (
+        <FullScreenPlayer onClose={() => setIsFullScreen(false)} />
+      ) : null}
+
+      {isExpanded && !isFullScreen ? (
         <PlayerExpandedPanel track={currentTrack} onClose={() => setIsExpanded(false)} />
       ) : null}
 
@@ -127,9 +143,26 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
             <p className="gp-artist">{currentTrack.artist_name ?? "Artiste"}</p>
           </div>
           <LikeButton trackId={currentTrack.id} size="sm" />
+          {whatsappShare ? (
+            <ShareButton
+              trackId={currentTrack.id}
+              title={currentTrack.title}
+              artistName={artistLabel}
+            />
+          ) : null}
         </div>
 
         <div className="gp-controls">
+          {fullscreenPlayer ? (
+            <button
+              type="button"
+              className="gp-expand-btn"
+              onClick={() => setIsFullScreen(true)}
+              aria-label="Ouvrir le lecteur plein écran"
+            >
+              ↑
+            </button>
+          ) : null}
           <PlayerControls />
           <GlobalPlayerTime />
         </div>
