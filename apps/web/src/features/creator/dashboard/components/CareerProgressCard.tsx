@@ -10,6 +10,16 @@ export function CareerProgressCard({ steps }: { steps: CreatorDashboardCareerSte
         <h2 className="creator-widget__title">Votre carrière SONAFRIK</h2>
         <span className="creator-career__overall">{overall} %</span>
       </div>
+      <div
+        className="creator-career__overall-track"
+        role="progressbar"
+        aria-valuenow={overall}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Progression globale de carrière"
+      >
+        <div className="creator-career__overall-fill" style={{ width: `${overall}%` }} />
+      </div>
       <ul className="creator-career__list">
         {steps.map((step) => (
           <li key={step.id} className={`creator-career__step ${step.completed ? "creator-career__step--done" : ""}`}>

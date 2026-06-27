@@ -56,7 +56,9 @@ export function ActivityFeed({ activities }: { activities: CreatorDashboardActiv
                   </time>
                 ) : null}
               </div>
-              <p className="creator-activity__subtitle">{item.subtitle}</p>
+              <p className="creator-activity__subtitle">
+                {item.isFuture ? "À venir..." : item.subtitle}
+              </p>
               {item.actionHref && item.actionLabel && !item.isFuture ? (
                 <Link href={item.actionHref} className="creator-activity__action">
                   {item.actionLabel}
