@@ -1,5 +1,4 @@
-import { SidebarNav } from "@/components/SidebarNav";
-import type { SidebarNavItem } from "@/components/SidebarNav";
+import { SidebarNav, type SidebarNavEntry } from "@/components/SidebarNav";
 
 interface CreatorNavProps {
   activePath: string;
@@ -7,17 +6,19 @@ interface CreatorNavProps {
 }
 
 export function CreatorNav({ activePath, pendingVerifications = 0 }: CreatorNavProps) {
-  const items: SidebarNavItem[] = [
-    { href: "/creator", label: "Vue d'ensemble", exact: true },
-    { href: "/creator/analytics", label: "Mes statistiques", exact: true },
-    { href: "/creator/catalog", label: "Mon catalogue", exact: true },
-    { href: "/creator/catalog/releases", label: "Albums et morceaux seuls" },
-    { href: "/creator/catalog/tracks", label: "Morceaux" },
-    { href: "/creator/identity", label: "Identité artiste" },
-    { href: "/creator/verification", label: "Vérification", badge: pendingVerifications },
-    { href: "/creator/rights", label: "Droits et contrats" },
-    { href: "/creator/labels", label: "Labels" },
-    { href: "/creator/team", label: "Équipe" },
+  const items: SidebarNavEntry[] = [
+    { type: "section", label: "Espace artiste" },
+    { href: "/creator", label: "Vue d'ensemble", icon: "📊", exact: true },
+    { href: "/creator/analytics", label: "Mes statistiques", icon: "📈", exact: true },
+    { type: "section", label: "Mon catalogue" },
+    { href: "/creator/catalog", label: "Tout mon catalogue", icon: "💿", exact: true },
+    { href: "/creator/catalog/tracks", label: "Uploader un morceau", icon: "🎵" },
+    { type: "section", label: "Mon profil" },
+    { href: "/creator/identity", label: "Identité artiste", icon: "👤" },
+    { href: "/creator/verification", label: "Vérification", icon: "✓", badge: pendingVerifications },
+    { href: "/creator/rights", label: "Droits et contrats", icon: "⚖️" },
+    { href: "/creator/labels", label: "Labels", icon: "🏷" },
+    { href: "/creator/team", label: "Équipe", icon: "👥" },
   ];
 
   return (
@@ -27,6 +28,7 @@ export function CreatorNav({ activePath, pendingVerifications = 0 }: CreatorNavP
       activePath={activePath}
       backHref="/profile"
       backLabel="Retour au profil"
+      variant="creator"
     />
   );
 }

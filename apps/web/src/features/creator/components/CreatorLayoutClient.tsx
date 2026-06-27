@@ -13,11 +13,11 @@ export function CreatorLayoutClient({
 }) {
   const pathname = usePathname();
   const title = pathname.startsWith("/creator/catalog/tracks")
-    ? "Morceaux"
+    ? "Uploader un morceau"
     : pathname.startsWith("/creator/catalog/releases")
-      ? "Albums et morceaux seuls"
+      ? "Albums et morceaux"
       : pathname.startsWith("/creator/catalog")
-        ? "Mon catalogue"
+        ? "Tout mon catalogue"
         : pathname.startsWith("/creator/analytics")
           ? "Mes statistiques"
           : pathname.startsWith("/creator/identity")
@@ -34,23 +34,21 @@ export function CreatorLayoutClient({
 
   return (
     <div className="min-h-dvh bg-noir-profond">
-      <header className="border-b border-bordure px-6 py-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <header className="creator-header border-b border-bordure px-6 py-4">
+        <div className="creator-breadcrumb">
           <SonafrikLogo size="nav" />
-          <span
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: "var(--color-texte-secondaire)" }}
-          >
-            • Espace artiste
+          <span className="creator-breadcrumb__sep" aria-hidden="true">
+            ·
           </span>
+          <span className="creator-breadcrumb__section">Espace Artiste</span>
         </div>
-        <h1 className="text-texte-principal mt-3 text-2xl font-bold">{title}</h1>
-        <p className="text-texte-secondaire mt-1 text-sm">
+        <h1 className="creator-page-title">{title}</h1>
+        <p className="creator-page-sub">
           Publiez, suivez vos écoutes et développez votre carrière musicale.
         </p>
       </header>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 lg:flex-row">
-        <aside className="lg:w-56 lg:shrink-0">
+        <aside className="creator-sidebar lg:w-[200px] lg:shrink-0">
           <CreatorNav activePath={pathname} pendingVerifications={pendingVerifications} />
         </aside>
         <div className="min-w-0 flex-1">{children}</div>
