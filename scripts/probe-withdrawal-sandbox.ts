@@ -7,7 +7,15 @@
  * Exit code 1 si au moins un check échoue.
  */
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { createClient } from "@supabase/supabase-js";
+
+const envPath = resolve(__dirname, "../apps/web/.env.local");
+for (const line of readFileSync(envPath, "utf8").split("\n")) {
+  const m = line.match(/^([^#=]+)=(.*)$/);
+  if (m) process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -30,6 +38,15 @@ async function check(name: string, fn: () => Promise<unknown>): Promise<boolean>
   }
 }
 
+async function rpcExists(name: string, args: Record<string, unknown> = {}): Promise<void> {
+  const { error } = await supabase.rpc(name, args);
+  if (!error) return;
+  const msg = error.message.toLowerCase();
+  if (msg.includes("permission denied") || msg.includes("not authorized")) return;
+  if (msg.includes("does not exist")) throw new Error(`RPC absente : ${error.message}`);
+  throw new Error(error.message);
+}
+
 async function main() {
   console.log("🔍 Probe retrait sandbox — démarrage…\n");
   const results: boolean[] = [];
@@ -49,20 +66,13 @@ async function main() {
   );
 
   results.push(
-    await check("RPC get_payout_summary existe", async () => {
-      const { error } = await supabase.rpc("get_payout_summary");
-      if (error) throw new Error(error.message);
-    }),
+    await check("RPC get_payout_summary existe", () => rpcExists("get_payout_summary")),
   );
 
   results.push(
-    await check("RPC get_admin_payout_queue existe", async () => {
-      const { error } = await supabase.rpc("get_admin_payout_queue", {
-        p_status: "pending",
-        p_limit: 1,
-      });
-      if (error) throw new Error(error.message);
-    }),
+    await check("RPC get_admin_payout_queue existe", () =>
+      rpcExists("get_admin_payout_queue", { p_status: "pending", p_limit: 1 }),
+    ),
   );
 
   results.push(

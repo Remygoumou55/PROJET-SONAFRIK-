@@ -1,4 +1,4 @@
-/** Chemins publics des assets officiels SONAFRIK (source : LOGO/) */
+/** Chemins publics des assets officiels SONAFRIK (`public/brand/`) */
 
 export const BRAND_ASSETS = {
   /** Emblème vinyle SA — favicon, nav compact, app icon */

@@ -9,7 +9,26 @@
 
 ---
 
-## 2026-06-27 — CRITIQUE lancement : finance E2E + fix confirm_payment_intent
+## 2026-06-27 — Phase HAUTE audit v3 : CSS creator + dead code + probes
+
+### Fichiers touchés
+- `apps/web/src/app/styles/creator.css` — hub `@import` (4 modules)
+- `apps/web/src/app/styles/creator/{layout,hero,enterprise,mobile}.css` — split + purge CSS mort (~350 lignes orphelines)
+- `apps/web/scripts/split-creator-css.mjs` — script idempotent (mobile unique)
+- `scripts/probe-withdrawal-sandbox.ts` — charge `.env.local` ; RPC admin = « permission denied » OK
+- Supprimés : `StatusBadge.tsx`, `StatsOverviewGrid.tsx`, `useCountUp.ts` (0 imports)
+- `apps/web/src/lib/brand/assets.ts` — commentaire source `public/brand/`
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` — ✅
+- `pnpm probe:certification` — **130/130** ✅
+- `pnpm probe:withdrawal-sandbox` — **5/5** ✅
+
+### Items HAUTE restants (doc / Rémy)
+- [ ] E2E admin payout : approve → process → mark_paid (manuel Live Control)
+- [ ] CRITIQUE bloquant : secrets prod + Orange Money Phase 2 GN réel
+
+---
 
 ### Fichiers touchés
 - `supabase/migrations/20260627140000_fix_confirm_payment_intent_method_map.sql` — map `orange_money_gn` → `payment_method` + fix `log_audit_event`
