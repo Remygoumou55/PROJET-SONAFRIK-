@@ -9,6 +9,28 @@
 
 ---
 
+## 2026-06-27 — Audit complet + certification 130/130 + perf dashboard
+
+### Fichiers touchés
+- `supabase/migrations/20260627120000_certification_listener_admin_fix.sql` — retrait rôle admin du compte probe listener ; `assign_admin_role` réservé service_role
+- `apps/web/src/middleware.ts` — garde `is_admin` RPC sur `/admin/*` (repli timeout → layout requireAdmin)
+- `apps/web/src/features/creator/dashboard/components/ArtistHero.tsx` — `memo` + `StatusBadge` timestamp stable
+- `apps/web/src/app/globals.css` — cover slide 6s, `will-change`, `prefers-reduced-motion` status badge
+
+### Problème racine corrigé
+- `s13b-playwright-listener@sonafrik.test` avait le rôle `admin` en DB → probes A/C/D/F en échec (125/130)
+
+### Validation
+- `pnpm probe:certification` — **130/130** ✅
+- `pnpm probe:performance` — **30/30** ✅
+- `pnpm build` + `lint` + `typecheck` — ✅
+
+### Tests à faire
+- [ ] Live Control Rémy : `/creator` dashboard 390px + sidebar desktop
+- [ ] Accès `/admin` avec compte non-admin → redirect `/listen?error=admin_denied`
+
+---
+
 ## 2026-06-26 — Audio Pipeline Remediation Program
 
 ### Fichiers touchés

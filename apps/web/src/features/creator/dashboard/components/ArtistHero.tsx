@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { memo, useMemo, type CSSProperties } from "react";
 import type {
   ArtistProfile,
   Creator,
@@ -21,13 +21,14 @@ interface ArtistHeroProps {
   kpis: CreatorDashboardKpi[];
 }
 
-export function ArtistHero({
+export const ArtistHero = memo(function ArtistHero({
   hero,
   artistProfile,
   creator,
   profileCreatedAt,
   kpis,
 }: ArtistHeroProps) {
+  const statusUpdatedAt = useMemo(() => new Date(), []);
   const photoPath = artistProfile.profile_photo ?? artistProfile.cover_path;
   const coverImages =
     artistProfile.cover_images.length > 0
@@ -67,7 +68,7 @@ export function ArtistHero({
             <div className="artist-hero__identity">
               <p className="artist-hero__greeting">{hero.greeting}</p>
               <h1 className="artist-hero__name">{artistProfile.stage_name}</h1>
-              <StatusBadge />
+              <StatusBadge lastUpdated={statusUpdatedAt} />
               <p className="artist-hero__status">{accountStatusLabel(creator.status)}</p>
               <ul className="artist-hero__badges" aria-label="Informations du profil">
                 {badges.map((badge) => (
@@ -111,4 +112,4 @@ export function ArtistHero({
       </div>
     </section>
   );
-}
+});

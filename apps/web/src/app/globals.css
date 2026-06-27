@@ -842,11 +842,16 @@ html[data-perf-africa="true"] .artist-hero__cover-slide {
   .artist-hero__cover-slide {
     transition: opacity 0.2s ease;
     transform: none;
+    will-change: auto;
   }
 
   .artist-hero__progress-fill--animated {
     animation: none;
     width: var(--progress, 0%);
+  }
+
+  .status-badge__dot {
+    animation: none;
   }
 }
 
@@ -1617,12 +1622,13 @@ html[data-perf-africa="true"] .creator-hero__progress-fill--animated {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: scale(1.04);
+  transform: scale(1.02);
   transition:
     opacity 1.1s ease,
-    transform 8s ease;
+    transform 6s ease;
   pointer-events: none;
   background: var(--color-noir-profond);
+  will-change: opacity;
 }
 
 .artist-hero__cover-img {
