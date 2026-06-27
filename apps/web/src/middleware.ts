@@ -114,9 +114,22 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Routes admin : session requise — is_admin vérifié par requireAdmin() (layout SSR).
-  // Évite les faux refus quand le RPC Supabase dépasse le timeout middleware (cold start).
+  // Routes admin : session + is_admin (RPC). Repli layout requireAdmin() si timeout RPC.
   if (isAdminRoute) {
+    const isAdmin = await withTimeout(
+      Promise.resolve(
+        supabase.rpc("is_admin", { p_user_id: user.id }).then((r) => (r.error ? null : r.data === true)),
+      ),
+      4000,
+      null,
+    );
+
+    if (isAdmin === false) {
+      const dest = new URL("/listen", request.url);
+      dest.searchParams.set("error", "admin_denied");
+      return NextResponse.redirect(dest);
+    }
+
     return response;
   }
 
