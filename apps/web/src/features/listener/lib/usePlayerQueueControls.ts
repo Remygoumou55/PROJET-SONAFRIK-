@@ -9,6 +9,9 @@ import {
 
 type QueueControls = {
   setQueue: (tracks: TrackWithMeta[], startIndex?: number) => void;
+  addToQueue: (track: TrackWithMeta) => void;
+  removeFromQueue: (trackId: string) => void;
+  clearQueue: () => void;
   advanceQueue: () => TrackWithMeta | null;
   retreatQueue: () => TrackWithMeta | null;
   toggleShuffle: () => void;
@@ -26,6 +29,30 @@ export function usePlayerQueueControls(
       shuffledOrderRef.current = order;
       return { ...prev, queue: tracks, queueIndex: startIndex };
     });
+  }, [setQueueState, shuffledOrderRef]);
+
+  const addToQueue = useCallback((track: TrackWithMeta) => {
+    setQueueState((prev) => ({ ...prev, queue: [...prev.queue, track] }));
+  }, [setQueueState]);
+
+  const removeFromQueue = useCallback((trackId: string) => {
+    setQueueState((prev) => {
+      const removeIndex = prev.queue.findIndex((track) => track.id === trackId);
+      if (removeIndex < 0) return prev;
+      const queue = prev.queue.filter((track) => track.id !== trackId);
+      let queueIndex = prev.queueIndex;
+      if (removeIndex < prev.queueIndex) {
+        queueIndex -= 1;
+      } else if (removeIndex === prev.queueIndex) {
+        queueIndex = Math.min(queueIndex, queue.length - 1);
+      }
+      return { ...prev, queue, queueIndex };
+    });
+  }, [setQueueState]);
+
+  const clearQueue = useCallback(() => {
+    setQueueState((prev) => ({ ...prev, queue: [], queueIndex: -1 }));
+    shuffledOrderRef.current = [];
   }, [setQueueState, shuffledOrderRef]);
 
   const advanceQueue = useCallback((): TrackWithMeta | null => {
@@ -86,5 +113,5 @@ export function usePlayerQueueControls(
     });
   }, [setQueueState]);
 
-  return { setQueue, advanceQueue, retreatQueue, toggleShuffle, cycleRepeat };
+  return { setQueue, addToQueue, removeFromQueue, clearQueue, advanceQueue, retreatQueue, toggleShuffle, cycleRepeat };
 }

@@ -32,6 +32,9 @@ export interface PlayerActions {
   onError: (callback: (type: AudioErrorType, positionSeconds: number) => void) => void;
   clearAudioError: () => void;
   setQueue: (tracks: TrackWithMeta[], startIndex?: number) => void;
+  addToQueue: (track: TrackWithMeta) => void;
+  removeFromQueue: (trackId: string) => void;
+  clearQueue: () => void;
   advanceQueue: () => TrackWithMeta | null;
   retreatQueue: () => TrackWithMeta | null;
   toggleShuffle: () => void;

@@ -283,7 +283,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, audioError: null }));
   }, []);
 
-  const { setQueue, advanceQueue, retreatQueue, toggleShuffle, cycleRepeat } = usePlayerQueueControls(
+  const { setQueue, addToQueue, removeFromQueue, clearQueue, advanceQueue, retreatQueue, toggleShuffle, cycleRepeat } = usePlayerQueueControls(
     setQueueState,
     shuffledOrderRef,
     accumulatedListenSecondsRef,
@@ -318,6 +318,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onError,
         clearAudioError,
         setQueue,
+        addToQueue,
+        removeFromQueue,
+        clearQueue,
         advanceQueue,
         retreatQueue,
         toggleShuffle,
