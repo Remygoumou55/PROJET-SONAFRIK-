@@ -58,6 +58,8 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
                     path={path}
                     assetKind="gallery"
                     alt={`Couverture ${stageName}`}
+                    fit="contain"
+                    className="artist-hero__cover-img"
                     sizes="(max-width: 768px) 100vw, 66vw"
                     priority={index === 0}
                     fallback={<div className="artist-hero__cover-fallback" />}

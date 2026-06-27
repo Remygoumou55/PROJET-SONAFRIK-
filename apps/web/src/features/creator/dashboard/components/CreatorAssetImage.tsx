@@ -11,6 +11,7 @@ interface CreatorAssetImageProps {
   assetKind: CreatorAssetKind;
   alt: string;
   className?: string;
+  fit?: "cover" | "contain";
   priority?: boolean;
   sizes?: string;
   fallback?: React.ReactNode;
@@ -22,6 +23,7 @@ export const CreatorAssetImage = memo(function CreatorAssetImage({
   assetKind,
   alt,
   className = "",
+  fit = "cover",
   priority = false,
   sizes = "100vw",
   fallback = null,
@@ -32,12 +34,14 @@ export const CreatorAssetImage = memo(function CreatorAssetImage({
     return <>{fallback}</>;
   }
 
+  const objectClass = fit === "contain" ? "object-contain" : "object-cover";
+
   return (
     <Image
       src={url}
       alt={alt}
       fill
-      className={`object-cover ${className}`}
+      className={`${objectClass} ${className}`.trim()}
       sizes={sizes}
       priority={priority}
       loading={priority ? "eager" : "lazy"}

@@ -9,6 +9,14 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : "*.supabase.co";
 
+const supabaseStorageRemotePatterns = (
+  ["/storage/v1/object/public/**", "/storage/v1/object/sign/**"] as const
+).map((pathname) => ({
+  protocol: "https" as const,
+  hostname: supabaseHostname,
+  pathname,
+}));
+
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
@@ -29,13 +37,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 604800,
     deviceSizes: [390, 640, 768, 1080, 1280],
     imageSizes: [32, 40, 64, 96, 128],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: supabaseHostname,
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
+    remotePatterns: supabaseStorageRemotePatterns,
   },
   serverExternalPackages: ["@supabase/supabase-js", "@supabase/ssr"],
   experimental: {
