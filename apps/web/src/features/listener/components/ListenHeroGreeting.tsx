@@ -27,7 +27,6 @@ export function ListenHeroGreeting({
         style={{ background: `linear-gradient(90deg, ${headerAccent}, transparent)` }}
       >
         <div>
-          <p className="listen-greeting-label">SONAFRIK</p>
           <h1 className="listen-greeting-title">
             {greeting},<br />
             <span className="listen-greeting-name">

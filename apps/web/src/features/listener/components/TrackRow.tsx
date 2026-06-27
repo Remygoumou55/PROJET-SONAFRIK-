@@ -39,7 +39,13 @@ export function TrackRow({
         {position}
       </span>
       <div className="listen-track-row-cover">
-        <CoverImage coverPath={coverPath} alt={title} gradientSeed={gradientSeed} imgSizes="40px" />
+        <CoverImage
+          coverPath={coverPath}
+          alt={title}
+          artistName={artistName ?? title}
+          gradientSeed={gradientSeed}
+          imgSizes="40px"
+        />
       </div>
       <div className="listen-track-row-info">
         <p className={`listen-track-row-title${isActive ? " listen-track-row-title--active" : ""}`}>

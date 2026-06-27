@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useEffect } from "react";
-import dynamic from "next/dynamic";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
 import { useStreamQuality } from "../hooks/useStreamQuality";
@@ -9,11 +8,6 @@ import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
-
-const LiveReactions = dynamic(
-  () => import("./LiveReactions").then((m) => ({ default: m.LiveReactions })),
-  { ssr: false },
-);
 
 function GlobalPlayerProgress() {
   const { duration, seek } = usePlayer();
@@ -80,6 +74,8 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
 
   if (!currentTrack) return null;
 
+  const artistLabel = currentTrack.artist_name ?? currentTrack.title;
+
   return (
     <div className="global-player" role="region" aria-label="Lecteur musical SONAFRIK">
       <GlobalPlayerProgress />
@@ -96,7 +92,12 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
       <div className="gp-body">
         <div className="gp-track-info">
           <div className="gp-cover">
-            <CoverImage coverPath={currentTrack.cover_url ?? null} alt={currentTrack.title} imgSizes="48px" />
+            <CoverImage
+              coverPath={currentTrack.cover_url ?? null}
+              alt={currentTrack.title}
+              artistName={artistLabel}
+              imgSizes="48px"
+            />
           </div>
           <div className="gp-meta">
             <p className="gp-title">{currentTrack.title}</p>
@@ -118,10 +119,6 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
           ) : null}
           <GlobalPlayerVolume />
         </div>
-      </div>
-
-      <div className="gp-reactions-wrap hidden md:block">
-        <LiveReactions />
       </div>
     </div>
   );

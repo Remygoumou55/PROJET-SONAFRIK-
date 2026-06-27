@@ -8,6 +8,11 @@ import { MediaCard } from "./HomepageMediaCard";
 import { NewTracksSection } from "./NewTracksSection";
 import { TopGuineaSection } from "./TopGuineaSection";
 import { ArtistsDiscoverSection } from "./ArtistsDiscoverSection";
+import { StartListeningBanner } from "./StartListeningBanner";
+
+function formatPlaylistTrackCount(count: number): string {
+  return count <= 1 ? `${count} titre` : `${count} titres`;
+}
 
 const ARTIST_RING_COLORS = [
   { color: "var(--color-vert-energie)",  bg: "rgba(0, 210, 106, 0.14)",  glow: "rgba(0, 210, 106, 0.06)",  ring: "rgba(0, 210, 106, 0.31)",  inner: "rgba(0, 210, 106, 0.20)" },
@@ -205,7 +210,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
                 <MediaCard
                   key={pl.id}
                   title={pl.title}
-                  subtitle={pl.track_count > 0 ? `${pl.track_count} titre${pl.track_count > 1 ? "s" : ""}` : "Playlist"}
+                  subtitle={pl.track_count > 0 ? formatPlaylistTrackCount(pl.track_count) : "Playlist"}
                   gradient={grad}
                   href={`/library/playlist/${pl.id}`}
                 />
@@ -325,26 +330,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
         </section>
       )}
 
-      {/* CTA */}
-      <section className="mt-8 px-6">
-        <div className="rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden"
-          style={{ background: "linear-gradient(135deg, rgba(0, 210, 106, 0.10) 0%, rgba(255, 194, 14, 0.04) 100%)", border: "1px solid rgba(0, 210, 106, 0.15)" }}>
-          <div className="absolute right-0 top-0 w-32 h-32 rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(0,210,106,0.1) 0%, transparent 70%)", filter: "blur(20px)" }} />
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "var(--color-vert-energie)", boxShadow: "0 0 20px rgba(0,210,106,0.4)" }}>
-            <svg width={22} height={22} viewBox="0 0 24 24" fill="black"><path d="M8 5v14l11-7z" /></svg>
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-extrabold text-sm" style={{ color: "var(--color-texte-principal)" }}>Commencer l&apos;écoute</p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-subtil)" }}>Recherchez un morceau pour démarrer</p>
-          </div>
-          <Link href="/search" className="px-3.5 py-2 rounded-xl text-xs font-black flex-shrink-0"
-            style={{ background: "var(--color-vert-energie)", color: "black", boxShadow: "0 0 12px rgba(0,210,106,0.4)" }}>
-            Explorer
-          </Link>
-        </div>
-      </section>
+      <StartListeningBanner />
 
     </div>
   );

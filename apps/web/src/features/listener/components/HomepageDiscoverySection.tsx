@@ -79,7 +79,14 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                 className="aspect-square rounded-xl mb-2 relative overflow-hidden"
                 style={{ border: `1px solid ${isActive ? gradient.from : gradient.borderFaded}` }}
               >
-                <CoverImage coverPath={track.cover_path} alt={track.title} gradientSeed={i} priority={i === 0} imgSizes="128px" />
+                <CoverImage
+                  coverPath={track.cover_path}
+                  alt={track.title}
+                  artistName={track.artist_name ?? track.title}
+                  gradientSeed={i}
+                  priority={i === 0}
+                  imgSizes="128px"
+                />
                 {isActive && (
                   <div
                     className="absolute inset-0 flex items-center justify-center"

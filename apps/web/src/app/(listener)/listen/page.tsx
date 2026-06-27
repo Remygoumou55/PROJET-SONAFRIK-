@@ -18,6 +18,12 @@ import {
 } from "@sonafrik/api/listener";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
+import {
+  filterValidAlbums,
+  filterValidArtists,
+  filterValidPlaylists,
+  filterValidTracks,
+} from "@/lib/content-filter";
 import { HomepageHero } from "@/features/listener/components/HomepageHero";
 import { ListenStreamingHeader } from "@/features/listener/components/ListenStreamingHeader";
 import { HomepageContentSections, ContentSkeleton } from "@/features/listener/components/HomepageContentSections";
@@ -101,15 +107,15 @@ function createHomepageLoader(category: ListenMusicCategory) {
         }
 
         return {
-          playlists: curated.playlists,
-          artists: curated.artists,
+          playlists: filterValidPlaylists(curated.playlists),
+          artists: filterValidArtists(curated.artists),
           genres: curated.genres,
-          newTracks: newTracks.slice(0, 10),
-          topGuineaTracks: topGuineaTracks.slice(0, 10),
-          trending: topGuineaTracks.slice(0, 10),
-          discoveries: discoveries.slice(0, 8),
-          newAlbums: newReleasesResult.albums,
-          suggestedArtists: suggestedArtists.slice(0, 8),
+          newTracks: filterValidTracks(newTracks).slice(0, 10),
+          topGuineaTracks: filterValidTracks(topGuineaTracks).slice(0, 10),
+          trending: filterValidTracks(topGuineaTracks).slice(0, 10),
+          discoveries: filterValidTracks(discoveries).slice(0, 8),
+          newAlbums: filterValidAlbums(newReleasesResult.albums),
+          suggestedArtists: filterValidArtists(suggestedArtists).slice(0, 8),
           hadError: false,
         };
       } catch {
@@ -127,7 +133,7 @@ function createHomepageLoader(category: ListenMusicCategory) {
         };
       }
     },
-    [`homepage-content-v4-${category}`],
+    [`homepage-content-v5-${category}`],
     { revalidate: 120, tags: ["homepage", "catalog-tracks"] },
   );
 }

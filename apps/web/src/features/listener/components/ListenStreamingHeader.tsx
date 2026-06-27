@@ -17,13 +17,6 @@ export function ListenStreamingHeader({ fullName, unreadNotifications }: ListenS
 
   return (
     <header className="streaming-header">
-      <div className="header-left">
-        <span className="header-brand">
-          <span style={{ color: "var(--color-texte-principal)" }}>SONA</span>
-          <span style={{ color: "var(--color-vert-energie)" }}>FRIK</span>
-        </span>
-      </div>
-
       <Suspense fallback={<FiltersSkeleton />}>
         <HeaderFilters />
       </Suspense>

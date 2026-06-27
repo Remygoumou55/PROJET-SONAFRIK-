@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { CARD_GRADIENTS } from "@/lib/constants";
+import { getArtistGradientStyle, getCoverInitials } from "@/lib/cover-placeholder";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
 interface Props {
   coverPath: string | null | undefined;
   alt: string;
+  artistName?: string | null;
   gradientSeed?: number;
   size?: "sm" | "md" | "lg";
   priority?: boolean;
@@ -24,19 +25,31 @@ function buildSrc(path: string): string {
     : `${SUPABASE_URL}/storage/v1/object/public/catalog-visuals/${path}`;
 }
 
-function GradientPlaceholder({ seed }: { seed: number }) {
-  const g = CARD_GRADIENTS[seed % CARD_GRADIENTS.length]!;
+function GradientPlaceholder({
+  artistName,
+  gradientSeed,
+}: {
+  artistName: string;
+  gradientSeed: number;
+}) {
+  const initials = getCoverInitials(artistName);
+
   return (
     <div
-      className="w-full h-full flex items-center justify-center"
-      style={{ background: `linear-gradient(135deg, ${g.bgFrom}, ${g.bgTo})` }}
+      className="w-full h-full flex flex-col items-center justify-center gap-0.5"
+      style={{ background: getArtistGradientStyle(artistName, gradientSeed) }}
       aria-hidden="true"
     >
-      <svg width={16} height={16} viewBox="0 0 24 24" fill={g.from} aria-hidden="true">
-        <path d="M9 18V5l12-2v13" />
-        <circle cx="6" cy="18" r="3" fill={g.from} />
-        <circle cx="18" cy="16" r="3" fill={g.from} />
-      </svg>
+      <span
+        className="font-extrabold leading-none"
+        style={{
+          fontSize: "clamp(12px, 28%, 28px)",
+          color: "rgba(255,255,255,0.9)",
+          letterSpacing: "-0.5px",
+        }}
+      >
+        {initials}
+      </span>
     </div>
   );
 }
@@ -44,6 +57,7 @@ function GradientPlaceholder({ seed }: { seed: number }) {
 export function CoverImage({
   coverPath,
   alt,
+  artistName,
   gradientSeed = 0,
   size,
   priority = false,
@@ -52,6 +66,7 @@ export function CoverImage({
   const [error, setError] = useState(false);
   const sizeClass = size ? SIZE_MAP[size] : "w-full h-full";
   const resolvedSizes = imgSizes ?? (size ? DEFAULT_SIZES[size] : "100vw");
+  const label = artistName?.trim() || alt;
 
   return (
     <div className={`${sizeClass} relative overflow-hidden`}>
@@ -70,7 +85,7 @@ export function CoverImage({
           blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect fill='%23222222' width='40' height='40'/%3E%3C/svg%3E"
         />
       ) : (
-        <GradientPlaceholder seed={gradientSeed} />
+        <GradientPlaceholder artistName={label} gradientSeed={gradientSeed} />
       )}
     </div>
   );

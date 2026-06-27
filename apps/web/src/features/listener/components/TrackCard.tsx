@@ -33,6 +33,7 @@ export function TrackCard({
         <CoverImage
           coverPath={coverPath}
           alt={title}
+          artistName={artistName ?? title}
           gradientSeed={gradientSeed}
           imgSizes="160px"
         />
