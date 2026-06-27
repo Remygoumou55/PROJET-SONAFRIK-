@@ -2734,6 +2734,47 @@ export type Database = {
           },
         ]
       }
+      track_lyrics: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          lines: Json
+          status: string
+          submitted_by: string | null
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language?: string
+          lines?: Json
+          status?: string
+          submitted_by?: string | null
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          lines?: Json
+          status?: string
+          submitted_by?: string | null
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_lyrics_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           album_id: string | null

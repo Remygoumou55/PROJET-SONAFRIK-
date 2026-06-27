@@ -6,6 +6,7 @@ import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "./HomepageTrendingRow";
 import { MediaCard } from "./HomepageMediaCard";
 import { DiscoveriesSection } from "./DiscoveriesSection";
+import { ListenDiscoverModeSlot } from "./ListenDiscoverModeSlot";
 
 const TopGuineaSection = dynamic(
   () => import("./TopGuineaSection").then((m) => ({ default: m.TopGuineaSection })),
@@ -182,6 +183,8 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
       )}
 
       {discoveryTracks.length > 0 ? <DiscoveriesSection tracks={discoveryTracks} /> : null}
+
+      <ListenDiscoverModeSlot />
 
       {topGuineaTracks.length > 0 ? (
         <TopGuineaSection tracks={topGuineaTracks} />

@@ -52,6 +52,10 @@ export class ListenerService {
     return this.repository.getSidebarCounts(userId);
   }
 
+  getDiscoverModeTracks(userId: string, limit?: number) {
+    return this.repository.getDiscoverModeTracks(userId, limit);
+  }
+
   getPublishedAlbumMeta(albumId: string): Promise<ListenerAlbumMeta | null> {
     return this.repository.getPublishedAlbumMeta(albumId);
   }

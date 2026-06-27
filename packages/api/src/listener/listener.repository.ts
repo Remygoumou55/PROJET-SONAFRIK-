@@ -382,4 +382,44 @@ export class ListenerRepository {
       downloadsCount: 0,
     };
   }
+
+  async getDiscoverModeTracks(userId: string, limit = 20): Promise<DiscoveryTrack[]> {
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { data: sessions, error: sessionsError } = await this.client
+      .from("stream_sessions")
+      .select("track_id")
+      .eq("user_id", userId)
+      .eq("is_valid_listen", true)
+      .gte("started_at", since)
+      .limit(100);
+
+    if (sessionsError) throw sessionsError;
+
+    const listenedTrackIds = new Set((sessions ?? []).map((row) => row.track_id as string));
+
+    const { data, error } = await this.client.rpc("get_new_releases", {
+      p_type: "track",
+      p_days: 90,
+      p_limit: limit * 3,
+    });
+    if (error) throw error;
+
+    const payload = data as unknown as { tracks?: DiscoveryTrack[] } | null;
+    const candidates = payload?.tracks ?? [];
+
+    const daySeed =
+      new Date().getFullYear() * 10000 +
+      (new Date().getMonth() + 1) * 100 +
+      new Date().getDate();
+
+    return candidates
+      .filter((track) => !listenedTrackIds.has(track.track_id))
+      .sort((a, b) => {
+        const hashA = (a.track_id.charCodeAt(0) * daySeed) % 100;
+        const hashB = (b.track_id.charCodeAt(0) * daySeed) % 100;
+        return hashA - hashB;
+      })
+      .slice(0, limit);
+  }
 }

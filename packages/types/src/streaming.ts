@@ -359,6 +359,11 @@ export interface RecommendedTrack {
 
 // ─── Discovery ────────────────────────────────────────────────────────────────
 
+export interface LyricLine {
+  time: number;
+  text: string;
+}
+
 export interface DiscoveryTrack {
   track_id: string;
   title: string;
