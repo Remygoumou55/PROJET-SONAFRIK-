@@ -1,16 +1,20 @@
 import { Suspense } from "react";
 import { StreamingLayoutClient } from "@/features/listener/components/StreamingLayoutClient";
 import { requireIdentityContext, redirectIfOnboardingIncomplete } from "@/features/identity/lib/requireIdentity";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { PerformanceProvider, resolvePerformanceFlags } from "@/lib/performance";
+import { getListenSidebarData } from "@/features/listener/lib/getListenSidebarData";
+import { PerformanceProvider } from "@/lib/performance";
+import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import StreamingLoading from "./loading";
+import "@/app/styles/listen-home.css";
 
 async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
   redirectIfOnboardingIncomplete(context.profile);
 
-  const supabase = await getSupabaseServerClient();
-  const performanceFlags = await resolvePerformanceFlags(supabase);
+  const [performanceFlags, sidebarData] = await Promise.all([
+    getCachedPerformanceFlags(),
+    getListenSidebarData(context.profile.id),
+  ]);
 
   return (
     <PerformanceProvider flags={performanceFlags}>
@@ -18,6 +22,7 @@ async function StreamingGuard({ children }: { children: React.ReactNode }) {
         userId={context.profile.id}
         initialUnreadCount={context.unreadNotifications}
         audioQualityPreference={context.preferences.audio_quality}
+        sidebarData={sidebarData}
       >
         {children}
       </StreamingLayoutClient>

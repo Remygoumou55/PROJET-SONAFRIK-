@@ -5,6 +5,9 @@ import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "./HomepageTrendingRow";
 import { HomepageDiscoverySection } from "./HomepageDiscoverySection";
 import { MediaCard } from "./HomepageMediaCard";
+import { NewTracksSection } from "./NewTracksSection";
+import { TopGuineaSection } from "./TopGuineaSection";
+import { ArtistsDiscoverSection } from "./ArtistsDiscoverSection";
 
 const ARTIST_RING_COLORS = [
   { color: "var(--color-vert-energie)",  bg: "rgba(0, 210, 106, 0.14)",  glow: "rgba(0, 210, 106, 0.06)",  ring: "rgba(0, 210, 106, 0.31)",  inner: "rgba(0, 210, 106, 0.20)" },
@@ -19,6 +22,8 @@ export interface HomepageData {
   playlists: Array<{ id: string; title: string; track_count: number }>;
   artists: Array<{ creator_id: string; stage_name: string; genres: string[] }>;
   genres: Array<{ id: string; name: string }>;
+  newTracks: DiscoveryTrack[];
+  topGuineaTracks: TrendingTrack[];
   trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
   newAlbums: DiscoveryAlbum[];
@@ -67,17 +72,41 @@ function ContentSkeleton() {
 export { ContentSkeleton };
 
 export function HomepageContentSections({ content }: { content: HomepageData }) {
-  const { playlists, artists, genres, trending, discoveries, newAlbums, suggestedArtists, hadError } = content;
+  const {
+    playlists,
+    artists,
+    genres,
+    newTracks,
+    topGuineaTracks,
+    trending,
+    discoveries,
+    newAlbums,
+    suggestedArtists,
+    hadError,
+  } = content;
 
   const hasMusicContent =
-    trending.length > 0 || playlists.length > 0 || artists.length > 0 ||
-    discoveries.length > 0 || newAlbums.length > 0 || suggestedArtists.length > 0;
+    newTracks.length > 0 ||
+    topGuineaTracks.length > 0 ||
+    trending.length > 0 ||
+    playlists.length > 0 ||
+    artists.length > 0 ||
+    discoveries.length > 0 ||
+    newAlbums.length > 0 ||
+    suggestedArtists.length > 0;
 
   const hasContent = hasMusicContent || genres.length > 0;
 
   const filledCount = [
-    trending.length > 0, playlists.length > 0, artists.length > 0,
-    discoveries.length > 0, newAlbums.length > 0, suggestedArtists.length > 0, genres.length > 0,
+    newTracks.length > 0,
+    topGuineaTracks.length > 0,
+    trending.length > 0,
+    playlists.length > 0,
+    artists.length > 0,
+    discoveries.length > 0,
+    newAlbums.length > 0,
+    suggestedArtists.length > 0,
+    genres.length > 0,
   ].filter(Boolean).length;
   const showHints = filledCount < 2;
 
@@ -122,9 +151,17 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
         </div>
       )}
 
-      {/* TENDANCES */}
+      {newTracks.length > 0 ? <NewTracksSection tracks={newTracks} /> : null}
+
+      {topGuineaTracks.length > 0 ? (
+        <TopGuineaSection tracks={topGuineaTracks} />
+      ) : null}
+
+      <ArtistsDiscoverSection suggestedArtists={suggestedArtists} curatedArtists={artists} />
+
+      {/* TENDANCES (legacy — affiché si différent du top Guinée) */}
       {trending.length === 0 && hasContent && showHints && <SectionEmptyHint label="Tendances" />}
-      {trending.length > 0 && (
+      {trending.length > 0 && topGuineaTracks.length === 0 && (
         <section className="mt-8 mb-2">
           <div className="flex items-center justify-between px-6 mb-4">
             <div className="flex items-center gap-2">
@@ -236,7 +273,9 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
       )}
 
       {/* NOUVEAUTÉS */}
-      {newAlbums.length === 0 && hasContent && showHints && <SectionEmptyHint label="Nouveautés" />}
+      {newAlbums.length === 0 && hasContent && showHints && newTracks.length === 0 && (
+        <SectionEmptyHint label="Albums récents" />
+      )}
       {newAlbums.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
@@ -254,40 +293,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
             {newAlbums.map((album, i) => {
               const grad = CARD_GRADIENTS[i % CARD_GRADIENTS.length]!;
               return <MediaCard key={album.id} title={album.title} subtitle={(album as { artist_name?: string }).artist_name ?? undefined} gradient={grad} badge="NEW" href={`/listen/album/${album.id}`} />;
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* NOUVEAUX TALENTS */}
-      {suggestedArtists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Artistes à découvrir" />}
-      {suggestedArtists.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center justify-between px-6 mb-4">
-            <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🌟 Nouveaux talents</h2>
-          </div>
-          <div className="flex gap-5 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
-            {suggestedArtists.map((artist, i) => {
-              const c = ARTIST_RING_COLORS[i % ARTIST_RING_COLORS.length]!;
-              const genre = (artist.genres as string[])[0] ?? "Artiste";
-              return (
-                <Link key={artist.creator_id} href={`/listen/artist/${artist.creator_id}`} className="flex-shrink-0 flex flex-col items-center gap-2 w-20 group">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center font-black text-base relative transition-transform group-hover:scale-105"
-                    style={{ background: `linear-gradient(135deg, ${c.bg}, ${c.glow})`, border: `2.5px solid ${c.ring}`, color: c.color }}>
-                    {getInitials(artist.stage_name)}
-                    {artist.verified && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: "var(--color-or-solaire)", border: "2px solid var(--color-noir-profond)" }}>
-                        <svg width={9} height={9} viewBox="0 0 10 8" fill="none">
-                          <path d="M1 4L3.8 7L9 1" stroke="black" strokeWidth="1.8" strokeLinecap="round" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-center font-bold leading-tight" style={{ color: "var(--color-texte-principal)" }}>{artist.stage_name}</p>
-                  <p className="text-[9px] text-center" style={{ color: "var(--color-texte-desactive)" }}>{genre}</p>
-                </Link>
-              );
             })}
           </div>
         </section>

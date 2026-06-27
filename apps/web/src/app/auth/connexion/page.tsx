@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { AuthPageLoading } from "@/features/identity/auth/components/AuthPageLoading";
+import { isDevBypassActive } from "@/lib/auth/guards";
 import { ConnexionPageClient } from "./ConnexionPageClient";
 
 export const metadata = { title: "Créer votre compte — SONAFRIK" };
@@ -16,7 +17,7 @@ export default async function ConnexionPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const bypassAuth = process.env.BYPASS_AUTH === "true";
+  const bypassAuth = isDevBypassActive();
   const initialRole = roleFromParam(params.role);
 
   return (

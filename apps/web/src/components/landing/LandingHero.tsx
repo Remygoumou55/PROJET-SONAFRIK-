@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { BRAND_ASSETS } from "@/lib/brand";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 import { LandingSearchBar } from "./LandingSearchBar";
 
@@ -12,21 +10,9 @@ interface LandingHeroProps {
 export function LandingHero({ children }: LandingHeroProps) {
   return (
     <section className="landing-hero-brand" aria-labelledby="landing-hero-title">
-      <div className="landing-hero-brand__visual" aria-hidden="true">
-        <Image
-          src={BRAND_ASSETS.bannerHero}
-          alt=""
-          fill
-          className="landing-hero-brand__banner-img"
-          priority
-          sizes="100vw"
-        />
-        <div className="landing-hero-brand__scrim" />
-      </div>
-
       <div className="landing-hero-brand__content">
         <div className="landing-hero-brand__lockup">
-          <SonafrikLogo variant="hero" priority />
+          <SonafrikLogo variant="wordmark" size="lg" />
         </div>
 
         <div className="mb-7 inline-flex items-center gap-1.5 rounded-full border border-vert-energie/25 bg-vert-energie/10 px-3.5 py-1.5 text-xs text-vert-energie">

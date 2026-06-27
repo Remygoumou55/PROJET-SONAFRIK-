@@ -12,6 +12,27 @@ export type RecommendationWindow = "today" | "7d" | "30d";
 export type RecommendationReason = "genre_affinity" | "collaborative" | "new_release" | "trending";
 export type DiscoverySection   = "pour_vous" | "decouvertes" | "tendances" | "nouveautes" | "artistes" | "albums";
 export type NewReleasesType    = "track" | "album" | "artist" | "all";
+export type ListenMusicCategory = "all" | "guinee" | "afrique" | "diaspora";
+
+export interface RecentlyPlayedTrack {
+  trackId: string;
+  title: string;
+  artistName: string;
+  coverPath: string | null;
+  creatorId: string;
+  durationSeconds: number | null;
+}
+
+export interface ListenerSidebarCounts {
+  favoritesCount: number;
+  downloadsCount: number;
+}
+
+export interface ListenerSidebarData {
+  recentTracks: RecentlyPlayedTrack[];
+  favoritesCount: number;
+  downloadsCount: number;
+}
 
 export interface Playlist {
   id: string;

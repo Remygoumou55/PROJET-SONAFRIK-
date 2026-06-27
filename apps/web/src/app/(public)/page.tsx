@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createAuthService } from "@sonafrik/api/auth";
+import { isDevBypassActive } from "@/lib/auth/guards";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
 import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
@@ -60,7 +61,7 @@ export default async function LandingV5Page({
     redirect(`/auth/callback?${qs.toString()}`);
   }
 
-  const isBypass = process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1";
+  const isBypass = isDevBypassActive();
 
   const launchProgressPromise = getLaunchProgress();
   const artistsSectionPromise = getLandingArtistsSection();

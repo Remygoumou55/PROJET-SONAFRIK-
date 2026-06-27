@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import type { LaunchProgress } from "@sonafrik/types";
-import { getSupabasePublicClient } from "@/lib/supabase/server";
+import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { parseLaunchProgress } from "./parseLaunchProgress";
 
 async function fetchLaunchProgress(): Promise<LaunchProgress | null> {

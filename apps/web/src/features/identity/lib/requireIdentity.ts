@@ -103,6 +103,7 @@ export function redirectIfOnboardingIncomplete(profile: {
   onboarding_completed: boolean;
   account_type: string | null;
 }): void {
+  if (isDevBypassActive()) return;
   if (profile.onboarding_completed) return;
   if (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") {
     redirect("/onboarding/artist");

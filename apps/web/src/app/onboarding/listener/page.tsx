@@ -1,6 +1,7 @@
-import { ListenerOnboardingClient } from './ListenerOnboardingClient'
+import { isDevBypassActive } from "@/lib/auth/guards";
+import { ListenerOnboardingClient } from "./ListenerOnboardingClient";
 
 export default function ListenerOnboardingPage() {
-  const bypassAuth = process.env.BYPASS_AUTH === 'true'
-  return <ListenerOnboardingClient bypassAuth={bypassAuth} />
+  const bypassAuth = isDevBypassActive();
+  return <ListenerOnboardingClient bypassAuth={bypassAuth} />;
 }

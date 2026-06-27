@@ -3,7 +3,8 @@ import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayout
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { PerformanceProvider, resolvePerformanceFlags } from "@/lib/performance";
+import { PerformanceProvider } from "@/lib/performance";
+import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
 import CreatorLoading from "./loading";
 
@@ -13,7 +14,7 @@ async function CreatorGuard({ children }: { children: React.ReactNode }) {
   const notifications = createNotificationsService(supabase);
 
   const [performanceFlags, unreadCount] = await Promise.all([
-    resolvePerformanceFlags(supabase),
+    getCachedPerformanceFlags(),
     notifications.countUnread(context.creator.owner_id).catch(() => 0),
   ]);
 

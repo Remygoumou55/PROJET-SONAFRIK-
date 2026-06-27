@@ -1,6 +1,7 @@
-import { ArtistOnboardingClient } from './ArtistOnboardingClient'
+import { isDevBypassActive } from "@/lib/auth/guards";
+import { ArtistOnboardingClient } from "./ArtistOnboardingClient";
 
 export default function ArtistOnboardingPage() {
-  const bypassAuth = process.env.BYPASS_AUTH === 'true'
-  return <ArtistOnboardingClient bypassAuth={bypassAuth} />
+  const bypassAuth = isDevBypassActive();
+  return <ArtistOnboardingClient bypassAuth={bypassAuth} />;
 }

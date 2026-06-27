@@ -21,6 +21,10 @@
       "types": "./dist/creator/index.d.ts",
       "default": "./dist/creator/index.js"
     },
+    "./creator/presentation": {
+      "types": "./dist/creator/presentation/index.d.ts",
+      "default": "./dist/creator/presentation/index.js"
+    },
     "./catalog": {
       "types": "./dist/catalog/index.d.ts",
       "default": "./dist/catalog/index.js"

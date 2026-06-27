@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { getSupabasePublicClient } from "@/lib/supabase/public";
 import type { LandingPublicStats } from "./constants";
 import { ACTIVE_STREAM_HEARTBEAT_MINUTES } from "./constants";
 
@@ -12,19 +12,8 @@ const HIDDEN: LandingPublicStats = {
 
 /** Stats agrégées anonymisées pour la landing — aucune donnée personnelle. */
 export async function fetchLandingStats(): Promise<LandingPublicStats> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return HIDDEN;
-
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
-    const supabase = createClient(url, key, {
-      global: {
-        fetch: (input, init) =>
-          fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer)),
-      },
-    });
+    const supabase = getSupabasePublicClient();
 
     const heartbeatSince = new Date(
       Date.now() - ACTIVE_STREAM_HEARTBEAT_MINUTES * 60 * 1000,

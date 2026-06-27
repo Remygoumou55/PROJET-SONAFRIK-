@@ -1,54 +1,45 @@
 # SONAFRIK — Démarrer le Live Control MVP
 
-> Tout est déjà préparé en base et dans le code. **Une seule commande** à lancer.
+> Contrôle visuel de **chaque page indépendamment** — sans redirection, sans connexion.
 
-## 1. Lancer l'application
+## 1. Variables d'environnement
+
+Dans `apps/web/.env.local`, vérifier que ces 3 lignes sont à **`true`** :
+
+```env
+BYPASS_AUTH=true
+NEXT_PUBLIC_BYPASS_AUTH=true
+NEXT_PUBLIC_LOCAL_AUDIT_MODE=true
+```
+
+Sans ça, une session active redirige tout vers `/listen`.
+
+## 2. Lancer l'application
 
 ```bash
 cd "e:\PROJET SONAFRIK\apps\web"
-pnpm dev
+pnpm dev:clean
 ```
 
-## 2. Ouvrir le guide visuel
-
-Double-cliquer sur :
+## 3. Ouvrir le guide visuel
 
 ```
 docs/GUIDE_LIVE_CONTROL_REMY.html
 ```
 
-(ou l'ouvrir dans Chrome / Edge)
+## 4. Liste complète des liens
 
-## 3. Tableau de bord temps réel
+```
+docs/LOCAL_CONTROL_LINKS.md
+```
+
+Chaque URL reste sur sa page — pas de redirect, pas de login forcé.
+
+## 5. Tableau de bord temps réel
 
 ```
 http://localhost:3000/admin/live-control
 ```
-
-## 4. Connexion
-
-Utiliser **remygoumou55@gmail.com** ou **+2230546508020** (OTP).
-
-Votre compte a le rôle **admin** — accès `/admin/*` garanti.
-
-## Variables déjà configurées (`apps/web/.env.local`)
-
-| Variable | Valeur |
-|---|---|
-| `BYPASS_AUTH` | `false` |
-| `NEXT_PUBLIC_BYPASS_AUTH` | `false` |
-| `NEXT_PUBLIC_LOCAL_AUDIT_MODE` | `false` |
-| `NEXT_PUBLIC_PAYMENTS_ENABLED` | `true` |
-
-Si vous relancez depuis zéro, copier `.env.example` → `.env.local` et appliquer ces 4 valeurs.
-
-## Si quelque chose ne fonctionne pas
-
-Envoyer à l'IA :
-
-1. Capture d'écran de la page bloquante
-2. Message d'erreur exact
-3. Numéro d'étape du guide HTML
 
 ## Référence technique
 

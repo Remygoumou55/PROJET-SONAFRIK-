@@ -1,4 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import type { ListenMusicCategory } from "@sonafrik/types";
 import { AdminConfigRepository } from "../admin/admin.config.repository";
 import { ListenerRepository } from "./listener.repository";
 import type {
@@ -21,6 +22,34 @@ export class ListenerService {
 
   getHomepageCurated(limit?: number): Promise<ListenerHomepageCurated> {
     return this.repository.getHomepageCurated(limit);
+  }
+
+  getLatestPublishedTracks(limit?: number) {
+    return this.repository.getLatestPublishedTracks(limit);
+  }
+
+  getTopGuineaTracks(limit?: number) {
+    return this.repository.getTopGuineaTracks(limit);
+  }
+
+  filterDiscoveryByCategory(tracks: Parameters<ListenerRepository["filterDiscoveryByCategory"]>[0], category: ListenMusicCategory) {
+    return this.repository.filterDiscoveryByCategory(tracks, category);
+  }
+
+  filterTrendingByCategory(tracks: Parameters<ListenerRepository["filterTrendingByCategory"]>[0], category: ListenMusicCategory) {
+    return this.repository.filterTrendingByCategory(tracks, category);
+  }
+
+  getCreatorGeoMap(creatorIds: string[]) {
+    return this.repository.getCreatorGeoMap(creatorIds);
+  }
+
+  getRecentlyPlayed(userId: string, limit?: number) {
+    return this.repository.getRecentlyPlayed(userId, limit);
+  }
+
+  getSidebarCounts(userId: string) {
+    return this.repository.getSidebarCounts(userId);
   }
 
   getPublishedAlbumMeta(albumId: string): Promise<ListenerAlbumMeta | null> {

@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import type { LandingArtistsSection, LandingFounderArtist } from "@sonafrik/types";
-import { getSupabasePublicClient } from "@/lib/supabase/server";
+import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { getArtistInitials } from "./artistDisplay";
 
 const EMPTY: LandingArtistsSection = {

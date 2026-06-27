@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { AlbumWithMeta, LibraryItem, TrackWithMeta } from "@sonafrik/types";
 import { LibraryList } from "./LibraryList";
 import { CreatePlaylistModal } from "./CreatePlaylistModal";
@@ -10,9 +11,15 @@ import { useLibrary } from "../hooks/useLibrary";
 type Tab = "playlists" | "favoris";
 
 export function LibraryPage() {
-  const [tab, setTab] = useState<Tab>("playlists");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "favoris" ? "favoris" : "playlists";
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [modalOpen, setModalOpen] = useState(false);
   const { library, isLoading, error, createPlaylist } = useLibrary();
+
+  useEffect(() => {
+    setTab(searchParams.get("tab") === "favoris" ? "favoris" : "playlists");
+  }, [searchParams]);
 
   const favoriteTracks = library
     .filter((item): item is LibraryItem & { track: TrackWithMeta } =>

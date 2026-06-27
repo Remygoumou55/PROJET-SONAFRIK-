@@ -45,10 +45,6 @@ export const metadata: Metadata = {
     description: "Music Operating System Africain — Écouter, publier et monétiser la musique africaine.",
   },
   robots: { index: true, follow: true },
-  icons: {
-    icon: [{ url: "/brand/emblem-app-icon.jpg", type: "image/jpeg" }],
-    apple: [{ url: "/brand/emblem-app-icon.jpg", type: "image/jpeg" }],
-  },
 };
 
 export default function RootLayout({

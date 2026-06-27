@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { LibraryPage } from "@/features/listener/components/LibraryPage";
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Library() {
-  return <LibraryPage />;
+  return (
+    <Suspense fallback={null}>
+      <LibraryPage />
+    </Suspense>
+  );
 }

@@ -1,5 +1,10 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { TrackCredit, TrackWithMeta } from "@sonafrik/types";
+import type { DiscoveryTrack, ListenMusicCategory, RecentlyPlayedTrack, TrackCredit, TrackWithMeta, TrendingTrack } from "@sonafrik/types";
+import {
+  type CreatorGeoProfile,
+  filterDiscoveryTracksByCategory,
+  filterTrendingTracksByCategory,
+} from "./category-filter";
 import type {
   ListenerAlbumDetail,
   ListenerAlbumMeta,
@@ -11,6 +16,46 @@ import type {
 
 export class ListenerRepository {
   constructor(private readonly client: SonafrikSupabaseClient) {}
+
+  async getLatestPublishedTracks(limit = 10): Promise<DiscoveryTrack[]> {
+    const { data, error } = await this.client.rpc("get_new_releases", {
+      p_type: "track",
+      p_days: 3650,
+      p_limit: limit,
+    });
+    if (error) throw error;
+    const payload = data as unknown as { tracks?: DiscoveryTrack[] } | null;
+    return payload?.tracks ?? [];
+  }
+
+  async getTopGuineaTracks(limit = 10): Promise<TrendingTrack[]> {
+    const windows = ["7d", "30d"] as const;
+    for (const window of windows) {
+      const { data, error } = await this.client.rpc("get_trending_tracks", {
+        p_window: window,
+        p_limit: limit,
+      });
+      if (error) throw error;
+      const tracks = (data as unknown as TrendingTrack[] | null) ?? [];
+      if (tracks.length > 0) return tracks;
+    }
+
+    const latest = await this.getLatestPublishedTracks(limit);
+    return latest.map((track) => ({
+      track_id: track.track_id,
+      title: track.title,
+      slug: track.slug,
+      duration_seconds: track.duration_seconds,
+      artist_name: track.artist_name,
+      creator_id: track.creator_id,
+      album_id: track.album_id,
+      album_title: track.album_title,
+      cover_path: track.cover_path,
+      listen_count: track.stream_count,
+      unique_listeners: 0,
+      trending_score: 0,
+    }));
+  }
 
   async getHomepageCurated(limit = 8): Promise<ListenerHomepageCurated> {
     const [playlistsRes, artistsRes, genresRes] = await Promise.all([
@@ -199,5 +244,142 @@ export class ListenerRepository {
       .order("position");
     if (error) throw error;
     return (data ?? []) as unknown as ListenerPlaylistTrackRow[];
+  }
+
+  async getCreatorGeoMap(creatorIds: string[]): Promise<Map<string, CreatorGeoProfile>> {
+    const map = new Map<string, CreatorGeoProfile>();
+    if (creatorIds.length === 0) return map;
+
+    const { data: creators, error: creatorsError } = await this.client
+      .from("creators")
+      .select("id, owner_id")
+      .in("id", creatorIds);
+
+    if (creatorsError) throw creatorsError;
+    if (!creators?.length) return map;
+
+    const ownerIds = [...new Set(creators.map((c) => c.owner_id as string))];
+    const { data: profiles, error: profilesError } = await this.client
+      .from("profiles")
+      .select("id, country_code, origin_region")
+      .in("id", ownerIds);
+
+    if (profilesError) throw profilesError;
+
+    const geoByOwner = new Map(
+      (profiles ?? []).map((p) => [
+        p.id as string,
+        {
+          countryCode: (p.country_code as string | null) ?? null,
+          originRegion: (p.origin_region as string | null) ?? null,
+        },
+      ]),
+    );
+
+    for (const creator of creators) {
+      map.set(creator.id as string, geoByOwner.get(creator.owner_id as string) ?? {
+        countryCode: null,
+        originRegion: null,
+      });
+    }
+
+    return map;
+  }
+
+  async filterDiscoveryByCategory(
+    tracks: DiscoveryTrack[],
+    category: ListenMusicCategory,
+  ): Promise<DiscoveryTrack[]> {
+    const creatorIds = [...new Set(tracks.map((t) => t.creator_id))];
+    const geoMap = await this.getCreatorGeoMap(creatorIds);
+    return filterDiscoveryTracksByCategory(tracks, category, geoMap);
+  }
+
+  async filterTrendingByCategory(
+    tracks: TrendingTrack[],
+    category: ListenMusicCategory,
+  ): Promise<TrendingTrack[]> {
+    const creatorIds = [...new Set(tracks.map((t) => t.creator_id))];
+    const geoMap = await this.getCreatorGeoMap(creatorIds);
+    return filterTrendingTracksByCategory(tracks, category, geoMap);
+  }
+
+  async getRecentlyPlayed(userId: string, limit = 3): Promise<RecentlyPlayedTrack[]> {
+    const { data, error } = await this.client
+      .from("stream_sessions")
+      .select("track_id, started_at, tracks!inner(id, title, creator_id, duration_seconds, albums(cover_path))")
+      .eq("user_id", userId)
+      .eq("is_valid_listen", true)
+      .order("started_at", { ascending: false })
+      .limit(Math.max(limit * 4, 12));
+
+    if (error) throw error;
+
+    const seen = new Set<string>();
+    const rows: RecentlyPlayedTrack[] = [];
+
+    for (const session of data ?? []) {
+      const raw = session as unknown as {
+        track_id: string;
+        tracks: {
+          id: string;
+          title: string;
+          creator_id: string;
+          duration_seconds: number | null;
+          albums: { cover_path: string | null } | null;
+        };
+      };
+      if (seen.has(raw.track_id)) continue;
+      seen.add(raw.track_id);
+      rows.push({
+        trackId: raw.track_id,
+        title: raw.tracks.title,
+        artistName: "",
+        coverPath: raw.tracks.albums?.cover_path ?? null,
+        creatorId: raw.tracks.creator_id,
+        durationSeconds: raw.tracks.duration_seconds,
+      });
+      if (rows.length >= limit) break;
+    }
+
+    if (rows.length === 0) return [];
+
+    const creatorIds = [...new Set(rows.map((row) => row.creatorId))];
+
+    const { data: profiles } = await this.client
+      .from("artist_profiles")
+      .select("creator_id, stage_name")
+      .in("creator_id", creatorIds);
+
+    const nameByCreator = new Map(
+      (profiles ?? []).map((p) => [p.creator_id as string, p.stage_name as string]),
+    );
+
+    return rows.map((row) => ({
+      ...row,
+      artistName: nameByCreator.get(row.creatorId) ?? "Artiste",
+    }));
+  }
+
+  async getSidebarCounts(userId: string): Promise<{ favoritesCount: number; downloadsCount: number }> {
+    const [likesRes, favoritesRes] = await Promise.all([
+      this.client
+        .from("likes")
+        .select("track_id", { count: "exact", head: true })
+        .eq("user_id", userId),
+      this.client
+        .from("favorites")
+        .select("entity_id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("entity_type", "track"),
+    ]);
+
+    if (likesRes.error) throw likesRes.error;
+    if (favoritesRes.error) throw favoritesRes.error;
+
+    return {
+      favoritesCount: Math.max(likesRes.count ?? 0, favoritesRes.count ?? 0),
+      downloadsCount: 0,
+    };
   }
 }

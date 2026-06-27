@@ -5,7 +5,7 @@ import type { CreatorCareerOsState } from "@sonafrik/types";
 import {
   resolveCareerLevelNumber,
   resolveNextCareerLevel,
-} from "@sonafrik/api/creator";
+} from "@sonafrik/api/creator/presentation";
 
 interface CareerLevelCompactProps {
   careerOs: CreatorCareerOsState;

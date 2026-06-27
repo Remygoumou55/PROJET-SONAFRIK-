@@ -68,14 +68,8 @@ function isBypassActive(): boolean {
 
 const SUPABASE_FETCH_TIMEOUT_MS = 8000;
 
-// Client anon sans cookies — pour unstable_cache (données publiques, pas de session).
-export function getSupabasePublicClient(): SonafrikSupabaseClient {
-  const { url, anonKey } = getSupabaseEnv();
-  return createClient<Database>(url, anonKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: { fetch: isBypassActive() ? fetchBypassMode() : fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
-  }) as unknown as SonafrikSupabaseClient;
-}
+// Client anon — réexporté depuis public.ts (évite next/headers dans les imports cache).
+export { getSupabasePublicClient } from "./public";
 
 // Client service role — bypass RLS complet — réservé aux routes admin server-side.
 // Passer { adminVerified: true } uniquement après verifyAdminForAction() / requireAdmin().

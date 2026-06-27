@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import type { CreatorDashboardData } from "@sonafrik/types";
-import { buildGlanceKpis } from "@sonafrik/api/creator";
+import { buildGlanceKpis } from "@sonafrik/api/creator/presentation";
 
 function GlanceKpiGridView({ data }: { data: CreatorDashboardData }) {
   const items = buildGlanceKpis(data);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { isClientLocalControlMode } from "@sonafrik/shared/auth";
 import { AuthPageShell } from "@/features/identity/auth/components/AuthPageShell";
 import { GoogleAuthButton } from "@/features/identity/auth/components/GoogleAuthButton";
 import { LegalConsentCheckbox } from "@/features/identity/auth/components/LegalConsentCheckbox";
@@ -62,12 +63,13 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
   }, [searchParams]);
 
   useEffect(() => {
+    const localControl = bypassAuth || isClientLocalControlMode();
     if (searchParams.get("error") === "oauth") {
       setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
       setDetecting(false);
       return;
     }
-    if (bypassAuth) {
+    if (localControl) {
       setDetecting(false);
       return;
     }

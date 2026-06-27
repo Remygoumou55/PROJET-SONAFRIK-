@@ -8,9 +8,16 @@ interface HomepageHeroProps {
   greeting: string;
   proverb: { text: string; origin: string };
   unreadNotifications: number;
+  compactActions?: boolean;
 }
 
-export function HomepageHero({ fullName, greeting, proverb, unreadNotifications }: HomepageHeroProps) {
+export function HomepageHero({
+  fullName,
+  greeting,
+  proverb,
+  unreadNotifications,
+  compactActions = false,
+}: HomepageHeroProps) {
   const firstName = fullName?.split(" ")[0] ?? "là";
 
   return (
@@ -33,7 +40,7 @@ export function HomepageHero({ fullName, greeting, proverb, unreadNotifications 
         }}
       />
 
-      <div className="flex items-start justify-between mb-6 relative z-10">
+        <div className="flex items-start justify-between mb-6 relative z-10">
         <div>
           <p className="text-xs font-semibold mb-1 tracking-widest uppercase" style={{ color: "var(--color-vert-energie)" }}>
             SONAFRIK
@@ -52,6 +59,7 @@ export function HomepageHero({ fullName, greeting, proverb, unreadNotifications 
             </span>
           </p>
         </div>
+        {!compactActions ? (
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link
             href="/notifications"
@@ -84,6 +92,7 @@ export function HomepageHero({ fullName, greeting, proverb, unreadNotifications 
             </div>
           </Link>
         </div>
+        ) : null}
       </div>
 
       <Link

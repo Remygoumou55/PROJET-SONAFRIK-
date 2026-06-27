@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import { fetchLandingStats } from "@/lib/landing/fetchLandingStats";
+import { getCachedLandingStats } from "@/lib/landing/getCachedLandingStats";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function GET() {
-  const stats = await fetchLandingStats();
-  return NextResponse.json(stats);
+  const stats = await getCachedLandingStats();
+  return NextResponse.json(stats, {
+    headers: {
+      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+    },
+  });
 }

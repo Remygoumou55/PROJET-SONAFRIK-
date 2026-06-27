@@ -228,43 +228,6 @@ body {
   min-width: 0;
 }
 
-.brand-emblem {
-  display: block;
-  border-radius: 0.35rem;
-  flex-shrink: 0;
-}
-
-.brand-emblem--hero {
-  width: clamp(5rem, 18vw, 9rem) !important;
-  height: auto !important;
-}
-
-.brand-logo-primary {
-  display: block;
-  width: auto;
-  max-width: min(100%, 280px);
-  height: auto;
-  margin-inline: auto;
-}
-
-/** @deprecated — compatibilité legacy */
-.brand-logo-wordmark {
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  line-height: 1;
-}
-
-/** @deprecated — compatibilité legacy */
-.brand-logo-tagline {
-  margin-top: 0.25rem;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--color-or-solaire);
-}
-
 .gradient-brand {
   background: linear-gradient(135deg, var(--color-vert-energie) 0%, var(--color-or-solaire) 100%);
   -webkit-background-clip: text;

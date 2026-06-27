@@ -4,7 +4,7 @@ import { memo } from "react";
 import type { CreatorCareerOsState, CreatorDashboardKpi, StreamTimelineEntry } from "@sonafrik/types";
 import { SparklineChart } from "../SparklineChart";
 import { CareerLevelCompact } from "./CareerLevelCompact";
-import { buildStatCards } from "@sonafrik/api/creator";
+import { buildStatCards } from "@sonafrik/api/creator/presentation";
 
 interface StatsCareerSectionProps {
   kpis: CreatorDashboardKpi[];
