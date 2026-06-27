@@ -6,7 +6,7 @@ import { createListenerService } from "@sonafrik/api/listener";
 import { CoverImage } from "@/components/CoverImage";
 import { AlbumTracksClient } from "@/features/listener/components/AlbumTracksClient";
 import { AppearsOnSection } from "@/components/track/AppearsOnSection";
-import { FollowButton } from "@/features/social/components/FollowButton";
+import { FollowButton } from "@/features/shared/social/components/FollowButton";
 import { TipButton } from "@/features/shared/components/TipButton";
 import type { TrackWithMeta } from "@sonafrik/types";
 

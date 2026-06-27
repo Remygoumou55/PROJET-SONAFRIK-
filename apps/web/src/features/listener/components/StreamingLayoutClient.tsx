@@ -6,9 +6,9 @@ import { memo } from "react";
 import { usePathname } from "next/navigation";
 import { usePerformanceFlags } from "@/lib/performance";
 import { PlayerProvider } from "../lib/playerContext";
-import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import { NotificationBell } from "@/features/shared/notifications/components/NotificationBell";
 import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
-import { DevAuthBootstrap } from "@/features/auth/components/DevAuthBootstrap";
+import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import type { AudioQualityPreference } from "@sonafrik/types";
 
 const WebPlayer = dynamic(

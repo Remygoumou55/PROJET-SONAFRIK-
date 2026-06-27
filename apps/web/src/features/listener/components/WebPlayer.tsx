@@ -9,7 +9,7 @@ import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { TipPanel } from "./TipPanel";
 import { CoverImage } from "@/components/CoverImage";
-import { LikeButton } from "@/features/social/components/LikeButton";
+import { LikeButton } from "@/features/shared/social/components/LikeButton";
 import { TrackCredits } from "@/components/track/TrackCredits";
 
 export const WebPlayer = memo(function WebPlayer() {

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { createEmptyRevenueDestinationDraft, inferRevenueDestinationFromProfile } from '@sonafrik/shared'
-import { useAuthService } from '@/features/auth/hooks/useAuth'
+import { useAuthService } from '@/features/identity/auth/hooks/useAuth'
 import { useOnboardingWizard } from '@/components/onboarding/useOnboardingWizard'
 import { OnboardingProgressBadge } from '@/components/onboarding/OnboardingProgressBadge'
 import { Step1StageName } from './steps/Step1StageName'

@@ -121,7 +121,7 @@ function staticChecks() {
     "settings + /notifications",
   );
 
-  const bell = read("apps/web/src/features/notifications/components/NotificationBell.tsx");
+  const bell = read("apps/web/src/features/shared/notifications/components/NotificationBell.tsx");
   log("C8 NotificationBell", bell.includes("useNotificationsService"), "hook dédié");
 
   const auth = read("packages/api/src/auth/auth.service.ts");

@@ -1,7 +1,7 @@
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
-import { NotificationsList } from "@/features/notifications/components/NotificationsList";
+import { NotificationsList } from "@/features/shared/notifications/components/NotificationsList";
 
 export default async function SettingsNotificationsPage() {
   const context = await requireIdentityContext();

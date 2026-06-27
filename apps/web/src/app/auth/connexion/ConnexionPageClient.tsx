@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
-import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
-import { LegalConsentCheckbox } from "@/features/auth/components/LegalConsentCheckbox";
-import { OtpForm } from "@/features/auth/components/OtpForm";
-import { PhoneForm } from "@/features/auth/components/PhoneForm";
-import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { AuthPageShell } from "@/features/identity/auth/components/AuthPageShell";
+import { GoogleAuthButton } from "@/features/identity/auth/components/GoogleAuthButton";
+import { LegalConsentCheckbox } from "@/features/identity/auth/components/LegalConsentCheckbox";
+import { OtpForm } from "@/features/identity/auth/components/OtpForm";
+import { PhoneForm } from "@/features/identity/auth/components/PhoneForm";
+import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
 
 type Step = "phone" | "otp";
 type RoleParam = "artist" | "listener" | null;

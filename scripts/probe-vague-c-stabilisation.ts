@@ -66,7 +66,7 @@ function staticChecks() {
     "types DB likes + toggle_like",
   );
 
-  const likeButton = read("apps/web/src/features/social/components/LikeButton.tsx");
+  const likeButton = read("apps/web/src/features/shared/social/components/LikeButton.tsx");
   log(
     "C1-like-button-labels",
     likeButton.includes("Aimer ce morceau") && !likeButton.includes("favoris"),

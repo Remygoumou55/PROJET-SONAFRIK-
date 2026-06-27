@@ -11,7 +11,15 @@
 
 ---
 
-## 2026-06-27 — Audit 360 phase 3 : split CSS par domaine
+## 2026-06-27 — Audit 360 phase 4 : architecture dossiers features
+
+### Déplacements
+- `features/auth/` → `features/identity/auth/`
+- `features/social/` → `features/shared/social/`
+- `features/notifications/` → `features/shared/notifications/`
+- 21 fichiers imports/probes mis à jour
+
+---
 
 ### Fichiers touchés
 - `landing.css` → `identity.css` (shell profil + sidebar)

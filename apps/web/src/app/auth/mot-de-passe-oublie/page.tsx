@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
+import { AuthPageShell } from "@/features/identity/auth/components/AuthPageShell";
 
 export const metadata: Metadata = {
   title: "Accès à votre compte — SONAFRIK",

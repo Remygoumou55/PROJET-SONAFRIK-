@@ -15,7 +15,7 @@ const EDGE_FN = resolve(ROOT, "supabase/functions");
 
 const HEX_ALLOWLIST = new Set([
   "apps/web/src/app/globals.css",
-  "apps/web/src/features/auth/components/GoogleAuthButton.tsx",
+  "apps/web/src/features/identity/auth/components/GoogleAuthButton.tsx",
   "packages/ui/src/tokens/colors.ts",
 ]);
 const HEX_PATTERN = /#[0-9a-fA-F]{3,8}\b/g;

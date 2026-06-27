@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Badge, Button, Card, CardContent, Modal } from "@sonafrik/ui";
 import type { UserSession } from "@sonafrik/types";
 import { useIdentityService } from "../hooks/useIdentity";
-import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
 import { formatDateWithTime } from "@/lib/formatters";
 
 interface SessionListProps {

@@ -14,7 +14,7 @@ const WEB_SRC = resolve(ROOT, "apps/web/src");
 
 const ALLOWLIST = new Set([
   "apps/web/src/app/globals.css",
-  "apps/web/src/features/auth/components/GoogleAuthButton.tsx",
+  "apps/web/src/features/identity/auth/components/GoogleAuthButton.tsx",
 ]);
 
 const HEX_PATTERN = /#[0-9a-fA-F]{3,8}\b/g;

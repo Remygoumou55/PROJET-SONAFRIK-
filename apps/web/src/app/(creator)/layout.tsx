@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayoutClient";
-import { DevAuthBootstrap } from "@/features/auth/components/DevAuthBootstrap";
+import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { PerformanceProvider, resolvePerformanceFlags } from "@/lib/performance";

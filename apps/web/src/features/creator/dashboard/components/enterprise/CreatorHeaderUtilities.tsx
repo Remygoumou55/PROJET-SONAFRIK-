@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { memo } from "react";
-import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import { NotificationBell } from "@/features/shared/notifications/components/NotificationBell";
 import { CreatorAssetImage } from "../CreatorAssetImage";
 
 interface CreatorHeaderUtilitiesProps {

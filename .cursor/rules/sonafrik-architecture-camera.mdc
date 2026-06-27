@@ -13,8 +13,8 @@ apps/web/src/features/
   creator/      catalog/ analytics/ rights/
   admin/
   wallet/
-  identity/
-  shared/       social/ notifications/
+  identity/     auth/
+  shared/       social/ notifications/  (+ tips, revenue)
 ```
 
 **Règle absolue :** `listener/` ne peut jamais importer depuis `creator/` et vice-versa. Composant partagé → `shared/`.

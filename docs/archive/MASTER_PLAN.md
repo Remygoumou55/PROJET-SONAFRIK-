@@ -374,7 +374,7 @@ globals.css            ← seule source visuelle
 | Admin | `features/admin/` | ✅ | Self-contained |
 | Wallet | `features/wallet/` | ✅ | |
 | Identity | `features/identity/` | ⚠️ | → `creator/hooks` (BecomeArtistButton) |
-| Auth | `features/auth/` | ✅ | |
+| Auth | `features/identity/auth/` | ✅ | |
 | Marketplace | `features/marketplace/` | ✅ isolé POST-MVP | |
 
 **Verdict isolation : NON CONFORME** à la cible CLAUDE.md (`listener/` absent).
@@ -589,7 +589,7 @@ supabase/functions/payment-*/**
 ### Identity / Auth
 ```
 apps/web/src/features/identity/**
-apps/web/src/features/auth/**
+apps/web/src/features/identity/auth/**
 apps/web/src/middleware.ts
 apps/web/src/lib/auth/**
 packages/api/src/identity/**

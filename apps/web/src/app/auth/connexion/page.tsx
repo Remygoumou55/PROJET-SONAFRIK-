@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { AuthPageLoading } from "@/features/auth/components/AuthPageLoading";
+import { AuthPageLoading } from "@/features/identity/auth/components/AuthPageLoading";
 import { ConnexionPageClient } from "./ConnexionPageClient";
 
 export const metadata = { title: "Créer votre compte — SONAFRIK" };

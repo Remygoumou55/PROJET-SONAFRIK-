@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthService } from '@/features/auth/hooks/useAuth'
+import { useAuthService } from '@/features/identity/auth/hooks/useAuth'
 import { useIdentityService } from '@/features/identity/hooks/useIdentity'
 import { OnboardingRow } from '@/app/onboarding/shared/OnboardingRow'
 import { getRevenueDestinationRecapLabel, buildE164Phone } from '@sonafrik/shared'

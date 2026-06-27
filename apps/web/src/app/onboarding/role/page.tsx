@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { OnboardingPageShell } from "@/components/onboarding/OnboardingPageShell";
-import { useAuthService } from "@/features/auth/hooks/useAuth";
+import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
 import { ROLE_ICONS, RoleSelectionCard } from "./RoleSelectionCard";
 
 const ROLES = [
