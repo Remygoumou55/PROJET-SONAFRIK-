@@ -5,7 +5,7 @@ import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "./HomepageTrendingRow";
 import { HomepageDiscoverySection } from "./HomepageDiscoverySection";
 import { MediaCard } from "./HomepageMediaCard";
-import { NewTracksSection } from "./NewTracksSection";
+import { DiscoveriesSection } from "./DiscoveriesSection";
 import { TopGuineaSection } from "./TopGuineaSection";
 import { ArtistsDiscoverSection } from "./ArtistsDiscoverSection";
 import { StartListeningBanner } from "./StartListeningBanner";
@@ -27,7 +27,7 @@ export interface HomepageData {
   playlists: Array<{ id: string; title: string; track_count: number }>;
   artists: Array<{ creator_id: string; stage_name: string; genres: string[] }>;
   genres: Array<{ id: string; name: string }>;
-  newTracks: DiscoveryTrack[];
+  discoveryTracks: DiscoveryTrack[];
   topGuineaTracks: TrendingTrack[];
   trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
@@ -81,7 +81,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     playlists,
     artists,
     genres,
-    newTracks,
+    discoveryTracks,
     topGuineaTracks,
     trending,
     discoveries,
@@ -91,7 +91,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
   } = content;
 
   const hasMusicContent =
-    newTracks.length > 0 ||
+    discoveryTracks.length > 0 ||
     topGuineaTracks.length > 0 ||
     trending.length > 0 ||
     playlists.length > 0 ||
@@ -103,7 +103,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
   const hasContent = hasMusicContent || genres.length > 0;
 
   const filledCount = [
-    newTracks.length > 0,
+    discoveryTracks.length > 0,
     topGuineaTracks.length > 0,
     trending.length > 0,
     playlists.length > 0,
@@ -156,7 +156,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
         </div>
       )}
 
-      {newTracks.length > 0 ? <NewTracksSection tracks={newTracks} /> : null}
+      {discoveryTracks.length > 0 ? <DiscoveriesSection tracks={discoveryTracks} /> : null}
 
       {topGuineaTracks.length > 0 ? (
         <TopGuineaSection tracks={topGuineaTracks} />
@@ -277,31 +277,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
         </section>
       )}
 
-      {/* NOUVEAUTÉS */}
-      {newAlbums.length === 0 && hasContent && showHints && newTracks.length === 0 && (
-        <SectionEmptyHint label="Albums récents" />
-      )}
-      {newAlbums.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center justify-between px-6 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(249, 115, 22, 0.10)", border: "1px solid rgba(249, 115, 22, 0.20)" }}>
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-orange)" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                </svg>
-              </div>
-              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎵 Dernières sorties</h2>
-            </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(249, 115, 22, 0.10)", color: "var(--color-accent-orange)", border: "1px solid rgba(249, 115, 22, 0.20)" }}>60 derniers jours</span>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
-            {newAlbums.map((album, i) => {
-              const grad = CARD_GRADIENTS[i % CARD_GRADIENTS.length]!;
-              return <MediaCard key={album.id} title={album.title} subtitle={(album as { artist_name?: string }).artist_name ?? undefined} gradient={grad} badge="NEW" href={`/listen/album/${album.id}`} />;
-            })}
-          </div>
-        </section>
-      )}
+      {/* NOUVEAUTÉS — fusionnées dans Découvertes (DiscoveriesSection) */}
 
       {/* GENRES */}
       {genres.length === 0 && hasContent && showHints && <SectionEmptyHint label="Genres" />}

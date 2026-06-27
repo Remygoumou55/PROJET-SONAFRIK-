@@ -34,6 +34,15 @@ export const metadata: Metadata = {
   description: "Découvrez la musique africaine sur SONAFRIK.",
 };
 
+function dedupeDiscoveryTracks(tracks: DiscoveryTrack[]): DiscoveryTrack[] {
+  const seen = new Set<string>();
+  return tracks.filter((track) => {
+    if (seen.has(track.track_id)) return false;
+    seen.add(track.track_id);
+    return true;
+  });
+}
+
 function createHomepageLoader(category: ListenMusicCategory) {
   return unstable_cache(
     async function _getHomepageContent(): Promise<HomepageData> {
@@ -63,7 +72,12 @@ function createHomepageLoader(category: ListenMusicCategory) {
         const mergedNewTracksRaw =
           newTracksRaw.length > 0 ? newTracksRaw : (newReleasesResult.tracks ?? []);
 
-        let newTracks = mergedNewTracksRaw;
+        const discoveryPoolRaw = dedupeDiscoveryTracks([
+          ...mergedNewTracksRaw,
+          ...(newReleasesResult.tracks ?? []),
+        ]);
+
+        let discoveryTracks = discoveryPoolRaw;
         let topGuineaTracks = topGuineaRaw;
         let discoveries = discoveriesRaw;
         let suggestedArtists = suggestedArtistsRaw;
@@ -71,14 +85,14 @@ function createHomepageLoader(category: ListenMusicCategory) {
         if (category !== "all") {
           const creatorIds = [
             ...new Set([
-              ...mergedNewTracksRaw.map((t) => t.creator_id),
+              ...discoveryPoolRaw.map((t) => t.creator_id),
               ...topGuineaRaw.map((t) => t.creator_id),
               ...discoveriesRaw.map((t) => t.creator_id),
               ...suggestedArtistsRaw.map((a) => a.creator_id),
             ]),
           ];
           const geoMap = await listener.getCreatorGeoMap(creatorIds);
-          newTracks = filterDiscoveryTracksByCategory(mergedNewTracksRaw, category, geoMap);
+          discoveryTracks = filterDiscoveryTracksByCategory(discoveryPoolRaw, category, geoMap);
           topGuineaTracks = filterTrendingTracksByCategory(topGuineaRaw, category, geoMap);
           discoveries = filterDiscoveryTracksByCategory(discoveriesRaw, category, geoMap);
           suggestedArtists = suggestedArtistsRaw.filter((artist) =>
@@ -110,7 +124,7 @@ function createHomepageLoader(category: ListenMusicCategory) {
           playlists: filterValidPlaylists(curated.playlists),
           artists: filterValidArtists(curated.artists),
           genres: curated.genres,
-          newTracks: filterValidTracks(newTracks).slice(0, 10),
+          discoveryTracks: filterValidTracks(discoveryTracks).slice(0, 30),
           topGuineaTracks: filterValidTracks(topGuineaTracks).slice(0, 10),
           trending: filterValidTracks(topGuineaTracks).slice(0, 10),
           discoveries: filterValidTracks(discoveries).slice(0, 8),
@@ -123,7 +137,7 @@ function createHomepageLoader(category: ListenMusicCategory) {
           playlists: [],
           artists: [],
           genres: [],
-          newTracks: [],
+          discoveryTracks: [],
           topGuineaTracks: [],
           trending: [],
           discoveries: [],
@@ -133,7 +147,7 @@ function createHomepageLoader(category: ListenMusicCategory) {
         };
       }
     },
-    [`homepage-content-v5-${category}`],
+    [`homepage-content-v6-${category}`],
     { revalidate: 120, tags: ["homepage", "catalog-tracks"] },
   );
 }

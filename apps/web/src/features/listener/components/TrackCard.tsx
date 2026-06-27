@@ -10,6 +10,7 @@ interface TrackCardProps {
   durationSeconds: number | null;
   gradientSeed?: number;
   isActive?: boolean;
+  isNew?: boolean;
   onPlay?: () => void;
 }
 
@@ -20,6 +21,7 @@ export function TrackCard({
   durationSeconds,
   gradientSeed = 0,
   isActive = false,
+  isNew = false,
   onPlay,
 }: TrackCardProps) {
   return (
@@ -30,6 +32,7 @@ export function TrackCard({
       aria-label={`Lire ${title}${artistName ? ` — ${artistName}` : ""}`}
     >
       <div className="listen-track-card-cover">
+        {isNew ? <span className="discovery-new-badge">NEW</span> : null}
         <CoverImage
           coverPath={coverPath}
           alt={title}
