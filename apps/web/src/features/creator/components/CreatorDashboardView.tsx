@@ -7,12 +7,10 @@ import { KpiGrid } from "../dashboard/components/KpiCard";
 import { QuickActions } from "../dashboard/components/QuickActions";
 import { AssistantCard } from "../dashboard/components/AssistantCard";
 import { ActivityFeed } from "../dashboard/components/ActivityFeed";
-import { GoalsSection } from "../dashboard/components/GoalsSection";
-import { RevenueSection } from "../dashboard/components/RevenueSection";
 import { CareerProgressCard } from "../dashboard/components/CareerProgressCard";
 import { InspirationSection } from "../dashboard/components/InspirationSection";
+import { filterValidInspirationArtists } from "../dashboard/lib/inspirationArtists.presentation";
 import { WelcomeModal } from "../dashboard/components/WelcomeModal";
-import { DashboardGrid, WidgetContainer } from "../dashboard/components/DashboardGrid";
 
 export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
   const {
@@ -20,15 +18,11 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
     hero,
     kpis,
     activities,
-    goals,
     careerSteps,
     assistantTips,
     quickActions,
-    revenueStats,
     catalogCounts,
     inspirationArtists,
-    monthlyRevenue,
-    revenueProjectionGnf,
     profileSlug,
     profileCreatedAt,
   } = data;
@@ -39,7 +33,9 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
     setProfileUrl(`${window.location.origin}/listen/artist/${profileSlug}`);
   }, [profileSlug]);
 
-  const showInspiration = catalogCounts.tracksPublished === 0 && inspirationArtists.length > 0;
+  const validInspirationArtists = filterValidInspirationArtists(inspirationArtists);
+  const showInspiration =
+    catalogCounts.tracksPublished === 0 && validInspirationArtists.length > 0;
   const pulsePublish = catalogCounts.tracksPublished === 0;
 
   return (
@@ -51,7 +47,6 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
         artistProfile={context.artistProfile}
         creator={context.creator}
         profileCreatedAt={profileCreatedAt}
-        quickActions={quickActions}
         kpis={kpis}
       />
 
@@ -59,26 +54,15 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
 
       <QuickActions actions={quickActions} pulsePrimary={pulsePublish} />
 
-      <KpiGrid kpis={kpis} profileUrl={profileUrl} />
+      <div className="creator-two-col">
+        <KpiGrid kpis={kpis} profileUrl={profileUrl} />
+        <CareerProgressCard steps={careerSteps} />
+      </div>
 
-      <DashboardGrid>
-        <WidgetContainer>
-          <CareerProgressCard steps={careerSteps} />
-        </WidgetContainer>
-        <WidgetContainer>
-          <GoalsSection goals={goals} />
-        </WidgetContainer>
-      </DashboardGrid>
-
-      <RevenueSection
-        revenue={revenueStats}
-        monthlyRevenue={monthlyRevenue}
-        revenueProjectionGnf={revenueProjectionGnf}
-      />
-
-      <ActivityFeed activities={activities} />
-
-      {showInspiration ? <InspirationSection artists={inspirationArtists} /> : null}
+      <div className="creator-bottom-sections">
+        <ActivityFeed activities={activities} />
+        {showInspiration ? <InspirationSection artists={validInspirationArtists} /> : null}
+      </div>
     </div>
   );
 }

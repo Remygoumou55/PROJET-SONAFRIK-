@@ -1,12 +1,14 @@
 import Link from "next/link";
 import type { CreatorInspirationArtist } from "@sonafrik/types";
+import { filterValidInspirationArtists } from "../lib/inspirationArtists.presentation";
 
 interface InspirationSectionProps {
   artists: CreatorInspirationArtist[];
 }
 
 export function InspirationSection({ artists }: InspirationSectionProps) {
-  if (artists.length === 0) return null;
+  const validArtists = filterValidInspirationArtists(artists);
+  if (validArtists.length === 0) return null;
 
   return (
     <section className="creator-widget creator-inspiration" aria-label="Inspiration">
@@ -16,7 +18,7 @@ export function InspirationSection({ artists }: InspirationSectionProps) {
       </p>
 
       <div className="creator-inspiration__grid">
-        {artists.map((artist) => (
+        {validArtists.map((artist) => (
           <article key={artist.creatorId} className="creator-inspiration__card">
             <div className="creator-inspiration__avatar" aria-hidden="true">
               {artist.stageName.slice(0, 1).toUpperCase()}
