@@ -11,6 +11,103 @@
 
 ---
 
+## 2026-06-28 — Audit consolidé + push (Admin 1→2, perf batch)
+
+### Périmètre livré depuis début session (non pushé avant ce commit)
+- **Re-audit Admin 1** : KPI revenus crédits only, middleware fail-closed, badges sidebar, redirects alias, `AdminPageFrame`, dead code supprimé
+- **Sprint Admin 2** : modules `/admin/users` (129 auditeurs) + `/admin/artists` (61 artistes), 6 RPCs modération, self-protection compte admin
+- **Perf admin listes** : RPCs `admin_batch_user_list_stats` + `admin_batch_creator_catalog_stats` (50+ requêtes → 1 RPC/page)
+- **Perf déjà pushé** (`f98f454`) : homepage cache 300s, Top Guinée RPC, sidebar cache/user, Montserrat 4 weights
+
+### Validation pré-push
+- Migrations 20260628170000, 20260628180000, 20260628190000 appliquées live ✅
+- `pnpm build` + `lint` + `typecheck` ✅
+- `pnpm probe:certification` **130/130** ✅
+
+---
+
+### Livraisons
+- Composants partagés : `AdminTable`, `AdminStatusBadge`, `AdminSearchBar`, `AdminConfirmModal` + CSS admin
+- Module `/admin/users` : tableau auditeurs DB, filtres, recherche, fiche détaillée, warn/suspend/delete via server actions
+- Module `/admin/artists` : tableau artistes DB, tier inline, vérification ✅/❌, warn/suspend
+- Migration `20260628170000_admin_user_moderation_rpcs.sql` : colonnes modération profiles + 6 RPCs SECURITY DEFINER + audit_logs
+- API : `admin.users.repository.ts`, types `@sonafrik/types/admin`, `admin-moderation.actions.ts`
+
+### Validation
+- Migration appliquée live ✅
+- `pnpm build` + `lint` + `typecheck` ✅
+- `pnpm probe:certification` **130/130** ✅
+
+### Tests manuels
+- [ ] `/admin/users` : données réelles, filtres premium/suspendus/nouveaux
+- [ ] Action supprimer → saisie CONFIRMER obligatoire
+- [ ] `/admin/artists` : changement tier + validation artiste
+- [ ] Vérifier entrées `audit_logs` après chaque action admin
+
+---
+
+## 2026-06-28 — Re-audit Sprint Admin 2 : corrections filtres + UX + sécurité
+
+### Bugs corrigés
+| Sévérité | Problème | Correction |
+|---|---|---|
+| HAUTE | Filtres artistes appliqués après pagination → résultats/total faux | Filtres SQL avant `.range()` + total `count` exact |
+| HAUTE | Admin pouvait suspendre/supprimer son propre compte | Garde RPC + server actions |
+| MOYENNE | Fiche détaillée sous le tableau entier (pas sous la ligne) | `AdminTable` + `renderExpandedRow` inline |
+| MOYENNE | Recherche admin navigations redondantes | Skip si `q` inchangé dans `AdminSearchBar` |
+| BASSE | `note` verify artiste optionnel mal typé | Zod `.optional()` + fallback `""` |
+
+### Migration
+- `20260628180000_admin_self_protection.sql` — garde `auth.uid()` sur warn/suspend/delete/suspend_creator
+
+### Validation
+- `pnpm build` + `typecheck` ✅
+- `pnpm probe:certification` **130/130** ✅
+
+### Dette acceptée (post-beta)
+- Comptage sessions users : N requêtes par page (50 max) — optimiser via RPC agrégée
+- Tri artistes par écoutes : par page uniquement, pas global DB
+- Export CSV : bouton placeholder (Sprint Admin 6)
+
+---
+
+## 2026-06-28 — Re-audit Sprint Admin 1 : corrections bugs cockpit
+
+### Bugs corrigés
+| Sévérité | Problème | Correction |
+|---|---|---|
+| CRITIQUE | KPI revenus + graphique 12 mois sommaient tout `wallet_ledger` (débits inclus) | Filtre `entry_type = 'credit'` + utils `admin.dashboard.utils.ts` |
+| HAUTE | Middleware admin fail-open si RPC timeout (`null` passait) | `isAdmin !== true` → redirect deny (fail-closed) |
+| HAUTE | Alertes « signalements » = en réalité `rights_claims` | Renommage `pendingRightsClaims`, liens `/admin/rights`, `/admin/fraud` |
+| HAUTE | Flèches tendance KPI hardcodées « up » | Calcul réel vs période précédente (revenus, users, streams) |
+| HAUTE | Badges sidebar `!` décoratifs même count=0 | Badges uniquement si count > 0 |
+| HAUTE | Placeholders avec query params inutiles | Liens propres + redirects alias (`revenue`→finance, `content`→catalog, etc.) |
+| MOYENNE | Code mort `AdminDashboard.tsx`, `AdminNavLink.tsx` | Supprimés |
+| MOYENNE | Pages MVP hors shell admin | `AdminPageFrame` partagé (catalog, finance, fraud, rights, flags, settings, health, live-control) |
+| MOYENNE | `newUsersToday` sans filtre `deleted_at` | Filtre ajouté |
+| MOYENNE | Import type `AdminNavBadges` depuis sidebar | Import depuis `@sonafrik/api/admin` |
+
+### Fichiers touchés
+- `packages/api/src/admin/admin.dashboard.utils.ts` + test (5 tests)
+- `packages/api/src/admin/admin.dashboard.repository.ts`, `types.ts`
+- `apps/web/src/middleware.ts`, `requireAdmin.ts`
+- `AdminCockpitDashboard.tsx`, `AdminSidebar.tsx`, `AdminLayoutShell.tsx`, `AdminPageFrame.tsx`
+- Pages admin MVP + redirects alias + `(admin)/loading.tsx` skeleton
+- `scripts/probe-vague-b-stabilisation.ts`, `probe-war-plan.ts` (pattern `isAdmin !== true`)
+
+### Validation
+- `pnpm --filter @sonafrik/api test` — admin.dashboard.utils **5/5** ✅
+- `pnpm build` + `lint` + `typecheck` ✅
+- `pnpm probe:certification` **130/130** ✅
+
+### Tests manuels
+- [ ] Dashboard `/admin` : revenus = crédits wallet uniquement (pas débits)
+- [ ] Sidebar : badges visibles seulement si pending > 0
+- [ ] Non-admin + timeout RPC → refus (pas d'accès admin)
+- [ ] Redirects alias : `/admin/revenue` → finance, `/admin/moderation` → rights
+
+---
+
 ## 2026-06-28 — Sprint Admin 1 : cockpit + navigation back-office
 
 ### Livraisons

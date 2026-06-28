@@ -114,7 +114,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Routes admin : session + is_admin (RPC). Repli layout requireAdmin() si timeout RPC.
+  // Routes admin : session + is_admin (RPC). Fail-closed si RPC timeout/erreur.
   if (isAdminRoute) {
     const isAdmin = await withTimeout(
       Promise.resolve(
@@ -124,7 +124,7 @@ export async function middleware(request: NextRequest) {
       null,
     );
 
-    if (isAdmin === false) {
+    if (isAdmin !== true) {
       const dest = new URL("/listen", request.url);
       dest.searchParams.set("error", "admin_denied");
       return NextResponse.redirect(dest);

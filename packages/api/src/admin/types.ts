@@ -57,7 +57,8 @@ export type AdminHealthCheck = {
 
 export type AdminNavBadges = {
   content: number;
-  moderation: number;
+  pendingRightsClaims: number;
+  fraudSessions: number;
   withdrawals: number;
 };
 
@@ -81,17 +82,16 @@ export type AdminCockpitKpis = {
   premiumUsers: number;
   activeArtists: number;
   newArtistsThisWeek: number;
-  publishedTracks: number;
-  pendingTracks: number;
   revenueThisMonth: number;
   revenueLastMonth: number;
   revenueChange: string | null;
 };
 
 export type AdminCockpitAlerts = {
-  pendingSignalements: number;
+  pendingRightsClaims: number;
   pendingWithdrawals: number;
   pendingArtistVerif: number;
+  fraudSessions: number;
 };
 
 export type AdminMonthlyRevenue = {

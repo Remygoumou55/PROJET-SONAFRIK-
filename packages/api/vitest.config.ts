@@ -12,6 +12,7 @@ export default defineConfig({
       "src/payments/**/*.test.ts",
       "src/royalties/**/*.test.ts",
       "src/payout/**/*.test.ts",
+      "src/admin/**/*.test.ts",
       "src/social/**/*.test.ts",
     ],
     coverage: {

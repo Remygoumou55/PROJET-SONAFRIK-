@@ -12,7 +12,8 @@ async function AdminGuard({ children }: { children: React.ReactNode }) {
   const [navBadges, adminUser] = await Promise.all([
     admin.getNavBadges().catch(() => ({
       content: 0,
-      moderation: 0,
+      pendingRightsClaims: 0,
+      fraudSessions: 0,
       withdrawals: 0,
     })),
     getAdminSessionContext(),

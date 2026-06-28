@@ -1,5 +1,7 @@
 "use client";
 
+import { Fragment } from "react";
+
 interface Column<T> {
   key: keyof T | string;
   label: string;
@@ -13,6 +15,8 @@ interface AdminTableProps<T> {
   keyField: keyof T;
   emptyMessage?: string;
   isLoading?: boolean;
+  expandedRowKey?: string | null;
+  renderExpandedRow?: (row: T) => React.ReactNode;
 }
 
 export function AdminTable<T extends Record<string, unknown>>({
@@ -21,6 +25,8 @@ export function AdminTable<T extends Record<string, unknown>>({
   keyField,
   emptyMessage = "Aucune donnée",
   isLoading,
+  expandedRowKey,
+  renderExpandedRow,
 }: AdminTableProps<T>) {
   if (isLoading) {
     return <AdminTableSkeleton rows={5} cols={columns.length} />;
@@ -46,17 +52,30 @@ export function AdminTable<T extends Record<string, unknown>>({
               </td>
             </tr>
           ) : (
-            data.map((row) => (
-              <tr key={String(row[keyField])} className="admin-tr">
-                {columns.map((col) => (
-                  <td key={String(col.key)} className="admin-td">
-                    {col.render
-                      ? col.render(row)
-                      : String(row[col.key as keyof T] ?? "—")}
-                  </td>
-                ))}
-              </tr>
-            ))
+            data.map((row) => {
+              const rowKey = String(row[keyField]);
+              const isExpanded = expandedRowKey === rowKey;
+              return (
+                <Fragment key={rowKey}>
+                  <tr key={rowKey} className="admin-tr">
+                    {columns.map((col) => (
+                      <td key={String(col.key)} className="admin-td">
+                        {col.render
+                          ? col.render(row)
+                          : String(row[col.key as keyof T] ?? "—")}
+                      </td>
+                    ))}
+                  </tr>
+                  {isExpanded && renderExpandedRow ? (
+                    <tr key={`${rowKey}-detail`} className="admin-tr-expanded">
+                      <td colSpan={columns.length} className="admin-td-expanded">
+                        {renderExpandedRow(row)}
+                      </td>
+                    </tr>
+                  ) : null}
+                </Fragment>
+              );
+            })
           )}
         </tbody>
       </table>

@@ -1,4 +1,11 @@
 import { countQuery, type AdminRepoClient } from "./admin.shared";
+import {
+  bucketMonthlyWalletCredits,
+  buildMonthKeys,
+  computeRevenueChangePercent,
+  formatMonthKeyLabel,
+  sumWalletCreditGnf,
+} from "./admin.dashboard.utils";
 import type {
   AdminAlert,
   AdminCockpitData,
@@ -142,9 +149,18 @@ export class AdminDashboardRepository {
 
     return {
       content: pendingAlbums + pendingTracks,
-      moderation: pendingClaims + fraudSessions,
+      pendingRightsClaims: pendingClaims,
+      fraudSessions,
       withdrawals: pendingWithdrawals,
     };
+  }
+
+  private walletCreditsSince(iso: string) {
+    return this.client
+      .from("wallet_ledger")
+      .select("amount_gnf, created_at")
+      .eq("entry_type", "credit")
+      .gte("created_at", iso);
   }
 
   async getCockpitData(): Promise<AdminCockpitData> {
@@ -163,14 +179,12 @@ export class AdminDashboardRepository {
       premiumUsers,
       activeArtists,
       newArtistsThisWeek,
-      publishedTracks,
-      pendingTracks,
-      pendingAlbums,
       revenueThisMonthRes,
       revenueLastMonthRes,
-      pendingSignalements,
+      pendingRightsClaims,
       pendingWithdrawals,
       pendingArtistVerif,
+      fraudSessions,
       recentActivityRes,
       ledgerYearRes,
     ] = await Promise.all([
@@ -178,7 +192,11 @@ export class AdminDashboardRepository {
         this.client.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null),
       ),
       countQuery(
-        this.client.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", today),
+        this.client
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", today)
+          .is("deleted_at", null),
       ),
       countQuery(
         this.client
@@ -197,31 +215,15 @@ export class AdminDashboardRepository {
       countQuery(
         this.client.from("artist_profiles").select("*", { count: "exact", head: true }).gte("created_at", weekAgo),
       ),
-      countQuery(
-        this.client
-          .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "published")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("albums")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      this.client.from("wallet_ledger").select("amount_gnf").gte("created_at", startOfMonth),
       this.client
         .from("wallet_ledger")
         .select("amount_gnf")
+        .eq("entry_type", "credit")
+        .gte("created_at", startOfMonth),
+      this.client
+        .from("wallet_ledger")
+        .select("amount_gnf")
+        .eq("entry_type", "credit")
         .gte("created_at", startOfLastMonth)
         .lte("created_at", endOfLastMonth),
       countQuery(
@@ -242,15 +244,18 @@ export class AdminDashboardRepository {
           .select("*", { count: "exact", head: true })
           .eq("status", "pending"),
       ),
+      countQuery(
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .filter("fraud_flags", "neq", "{}"),
+      ),
       this.client
         .from("audit_logs")
         .select("id, action, created_at, metadata")
         .order("created_at", { ascending: false })
         .limit(10),
-      this.client
-        .from("wallet_ledger")
-        .select("amount_gnf, created_at")
-        .gte("created_at", twelveMonthsAgo),
+      this.walletCreditsSince(twelveMonthsAgo),
     ]);
 
     if (revenueThisMonthRes.error) throw revenueThisMonthRes.error;
@@ -258,38 +263,18 @@ export class AdminDashboardRepository {
     if (recentActivityRes.error) throw recentActivityRes.error;
     if (ledgerYearRes.error) throw ledgerYearRes.error;
 
-    const sumLedger = (rows: { amount_gnf: number }[]) =>
-      rows.reduce((sum, row) => sum + (row.amount_gnf ?? 0), 0);
+    const revenueThisMonth = sumWalletCreditGnf(revenueThisMonthRes.data ?? []);
+    const revenueLastMonth = sumWalletCreditGnf(revenueLastMonthRes.data ?? []);
+    const revenueChange = computeRevenueChangePercent(revenueThisMonth, revenueLastMonth);
 
-    const revenueThisMonth = sumLedger(revenueThisMonthRes.data ?? []);
-    const revenueLastMonth = sumLedger(revenueLastMonthRes.data ?? []);
-    const revenueChange =
-      revenueLastMonth > 0
-        ? (((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100).toFixed(1)
-        : null;
+    const monthKeys = buildMonthKeys(now);
+    const monthlyMap = bucketMonthlyWalletCredits(ledgerYearRes.data ?? [], monthKeys);
 
-    const monthlyMap = new Map<string, number>();
-    for (let i = 11; i >= 0; i -= 1) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      monthlyMap.set(key, 0);
-    }
-    for (const row of ledgerYearRes.data ?? []) {
-      const d = new Date(row.created_at);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      if (monthlyMap.has(key)) {
-        monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + (row.amount_gnf ?? 0));
-      }
-    }
-
-    const monthlyRevenue = [...monthlyMap.entries()].map(([monthKey, totalGnf]) => {
-      const [year, month] = monthKey.split("-");
-      const label = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("fr-FR", {
-        month: "short",
-        year: "2-digit",
-      });
-      return { monthKey, label, totalGnf };
-    });
+    const monthlyRevenue = monthKeys.map((monthKey) => ({
+      monthKey,
+      label: formatMonthKeyLabel(monthKey),
+      totalGnf: monthlyMap.get(monthKey) ?? 0,
+    }));
 
     const recentActivity = (recentActivityRes.data ?? []).map((row) => ({
       id: row.id as string,
@@ -305,16 +290,15 @@ export class AdminDashboardRepository {
         premiumUsers,
         activeArtists,
         newArtistsThisWeek,
-        publishedTracks,
-        pendingTracks: pendingTracks + pendingAlbums,
         revenueThisMonth,
         revenueLastMonth,
         revenueChange,
       },
       alerts: {
-        pendingSignalements,
+        pendingRightsClaims,
         pendingWithdrawals,
         pendingArtistVerif,
+        fraudSessions,
       },
       recentActivity,
       monthlyRevenue,

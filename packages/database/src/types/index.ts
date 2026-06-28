@@ -1848,6 +1848,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string
           account_type: string | null
           avatar_path: string | null
           avatar_url: string | null
@@ -1858,11 +1859,13 @@ export type Database = {
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          deletion_reason: string | null
           email: string | null
           fraud_score: number
           full_name: string | null
           id: string
           is_premium: boolean
+          last_warning_at: string | null
           locale: string
           main_genre: string | null
           mtn_money_number: string | null
@@ -1875,10 +1878,14 @@ export type Database = {
           role: string | null
           song_language: string | null
           stage_name: string | null
+          suspended_reason: string | null
+          suspended_until: string | null
           updated_at: string
           updated_by: string | null
+          warning_count: number
         }
         Insert: {
+          account_status?: string
           account_type?: string | null
           avatar_path?: string | null
           avatar_url?: string | null
@@ -1889,11 +1896,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          deletion_reason?: string | null
           email?: string | null
           fraud_score?: number
           full_name?: string | null
           id: string
           is_premium?: boolean
+          last_warning_at?: string | null
           locale?: string
           main_genre?: string | null
           mtn_money_number?: string | null
@@ -1906,10 +1915,14 @@ export type Database = {
           role?: string | null
           song_language?: string | null
           stage_name?: string | null
+          suspended_reason?: string | null
+          suspended_until?: string | null
           updated_at?: string
           updated_by?: string | null
+          warning_count?: number
         }
         Update: {
+          account_status?: string
           account_type?: string | null
           avatar_path?: string | null
           avatar_url?: string | null
@@ -1920,11 +1933,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          deletion_reason?: string | null
           email?: string | null
           fraud_score?: number
           full_name?: string | null
           id?: string
           is_premium?: boolean
+          last_warning_at?: string | null
           locale?: string
           main_genre?: string | null
           mtn_money_number?: string | null
@@ -1937,8 +1952,11 @@ export type Database = {
           role?: string | null
           song_language?: string | null
           stage_name?: string | null
+          suspended_reason?: string | null
+          suspended_until?: string | null
           updated_at?: string
           updated_by?: string | null
+          warning_count?: number
         }
         Relationships: []
       }
@@ -3351,6 +3369,46 @@ export type Database = {
       approve_payout_request: {
         Args: { p_withdrawal_id: string }
         Returns: Json
+      }
+      admin_batch_creator_catalog_stats: {
+        Args: { p_creator_ids: string[] }
+        Returns: {
+          creator_id: string
+          tracks_count: number
+          valid_streams: number
+        }[]
+      }
+      admin_batch_user_list_stats: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          last_seen_at: string | null
+          session_count: number
+          user_id: string
+        }[]
+      }
+      admin_change_artist_tier: {
+        Args: { p_creator_id: string; p_new_tier: string }
+        Returns: undefined
+      }
+      admin_delete_user: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_suspend_creator: {
+        Args: { p_creator_id: string; p_reason?: string }
+        Returns: undefined
+      }
+      admin_suspend_user: {
+        Args: { p_duration_days?: number; p_reason?: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_verify_artist: {
+        Args: { p_approved: boolean; p_creator_id: string; p_note?: string }
+        Returns: undefined
+      }
+      admin_warn_user: {
+        Args: { p_admin_note?: string; p_reason?: string; p_user_id: string }
+        Returns: undefined
       }
       assign_admin_role: { Args: { p_user_id: string }; Returns: undefined }
       assign_role_for_account_type: {

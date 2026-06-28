@@ -1,3 +1,5 @@
+import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
+
 interface AdminModulePlaceholderProps {
   title: string;
   sprintLabel: string;
@@ -10,17 +12,13 @@ export function AdminModulePlaceholder({
   icon = "🔧",
 }: AdminModulePlaceholderProps) {
   return (
-    <div className="admin-dashboard">
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">{title}</h1>
-        <p className="admin-page-sub">Module en cours de construction — {sprintLabel}</p>
-      </div>
+    <AdminPageFrame title={title} subtitle={`Module en cours de construction — ${sprintLabel}`}>
       <div className="admin-module-placeholder">
         <span className="admin-module-placeholder-icon" aria-hidden="true">
           {icon}
         </span>
         <p>Ce module sera disponible prochainement.</p>
       </div>
-    </div>
+    </AdminPageFrame>
   );
 }

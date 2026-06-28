@@ -30,7 +30,7 @@ log("A5", ci.includes("pnpm test"), "CI exécute vitest");
 log("B2", existsSync(resolve(ROOT, "packages/shared/src/auth/devBypass.ts")), "devBypass centralisé");
 log("B2b", existsSync(resolve(ROOT, "apps/web/src/lib/auth/guards.ts")), "guards web");
 const mw = readFileSync(resolve(ROOT, "apps/web/src/middleware.ts"), "utf8");
-log("B3", mw.includes("isAdminResult !== true"), "admin middleware fail-closed");
+log("B3", mw.includes("isAdmin !== true"), "admin middleware fail-closed");
 log("B5", existsSync(resolve(ROOT, "docs/MOBILE_WEB_PARITY.md")), "doc mobile/web");
 
 // C

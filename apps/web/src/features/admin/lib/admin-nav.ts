@@ -27,7 +27,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { href: "/admin/users", icon: "👥", label: "Utilisateurs", badge: null },
       { href: "/admin/artists", icon: "🎤", label: "Artistes", badge: null },
       { href: "/admin/catalog", icon: "🎵", label: "Contenus", badge: "pending" },
-      { href: "/admin/moderation", icon: "⚖️", label: "Modération", badge: "alert" },
+      { href: "/admin/rights", icon: "⚖️", label: "Modération", badge: "alert" },
     ],
   },
   {
@@ -69,7 +69,7 @@ export const ADMIN_MODULE_CARDS = [
   { href: "/admin/finance", icon: "💰", label: "Revenus", desc: "Historique financier complet" },
   { href: "/admin/catalog", icon: "🎵", label: "Contenus", desc: "Modérer le catalogue" },
   { href: "/admin/awards", icon: "🏆", label: "Awards", desc: "Programme récompenses" },
-  { href: "/admin/moderation", icon: "⚖️", label: "Modération", desc: "Signalements et litiges" },
+  { href: "/admin/rights", icon: "⚖️", label: "Modération", desc: "Réclamations droits et litiges" },
   { href: "/admin/withdrawals", icon: "💳", label: "Retraits", desc: "Traiter les demandes" },
   { href: "/admin/beatstore", icon: "🎹", label: "Beat Store", desc: "Gérer les beats" },
   { href: "/admin/analytics", icon: "📊", label: "Analytiques", desc: "Données temps réel" },
@@ -96,6 +96,6 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
   "/admin/health": "Santé système",
   "/admin/live-control": "Live Control",
   "/admin/fraud": "Fraude",
-  "/admin/rights": "Droits",
+  "/admin/rights": "Modération",
   "/admin/flags": "Flags",
 };

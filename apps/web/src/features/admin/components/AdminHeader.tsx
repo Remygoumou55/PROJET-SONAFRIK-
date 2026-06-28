@@ -49,7 +49,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           </span>
           <div>
             <p className="admin-user-name">{user.fullName}</p>
-            <p className="admin-user-role">Super Admin</p>
+            <p className="admin-user-role">Administrateur</p>
           </div>
         </div>
       </div>

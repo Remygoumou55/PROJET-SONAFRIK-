@@ -39,3 +39,72 @@ export const ADMIN_ERROR_MESSAGES: Record<string, string> = {
   update_failed:     "Impossible de mettre à jour.",
   unknown:           "Une erreur est survenue.",
 };
+
+/** Statut compte auditeur (colonne profiles.account_status) */
+export type AdminAccountStatus = "active" | "suspended" | "banned" | "deleted";
+
+/** Tier créateur (colonne creators.tier) */
+export type AdminCreatorTier = "emergent" | "croissance" | "etabli";
+
+export type AdminUserListItem = {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  email: string | null;
+  city: string | null;
+  country_code: string | null;
+  is_premium: boolean;
+  premium_expires_at: string | null;
+  account_status: AdminAccountStatus;
+  warning_count: number;
+  last_warning_at: string | null;
+  suspended_until: string | null;
+  suspended_reason: string | null;
+  fraud_score: number;
+  created_at: string;
+  last_seen_at: string | null;
+  stream_sessions_count: number;
+};
+
+export type AdminArtistListItem = {
+  creator_id: string;
+  artist_profile_id: string;
+  stage_name: string;
+  genres: string[];
+  profile_photo: string | null;
+  avatar_url: string | null;
+  city: string | null;
+  tier: AdminCreatorTier;
+  creator_status: string;
+  verified: boolean;
+  verification_status: "none" | "draft" | "pending" | "approved" | "rejected";
+  pending_verification_id: string | null;
+  owner_id: string;
+  owner_name: string | null;
+  owner_phone: string | null;
+  owner_email: string | null;
+  owner_account_status: AdminAccountStatus;
+  creator_score: number;
+  total_streams: number;
+  tracks_count: number;
+  albums_count: number;
+  created_at: string;
+};
+
+export type AdminUsersListResult = {
+  users: AdminUserListItem[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type AdminArtistsListResult = {
+  artists: AdminArtistListItem[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type AdminUsersFilter = "all" | "premium" | "suspended" | "new";
+
+export type AdminArtistsFilter = "all" | "pending" | "verified" | "tier_etabli" | "suspended";

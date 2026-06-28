@@ -2,17 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { AdminNavBadges } from "@sonafrik/api/admin";
 import {
   ADMIN_NAV_SECTIONS,
   type AdminNavBadgeKind,
   type AdminNavItem,
 } from "../lib/admin-nav";
-
-export interface AdminNavBadges {
-  content?: number;
-  moderation?: number;
-  withdrawals?: number;
-}
 
 interface AdminSidebarProps {
   badges?: AdminNavBadges;
@@ -27,26 +22,32 @@ function resolveBadge(
   item: AdminNavItem,
   badges: AdminNavBadges,
 ): { kind: AdminNavBadgeKind; label: string } | null {
-  if (item.href === "/admin/catalog" && badges.content && badges.content > 0) {
+  if (item.href === "/admin/catalog" && badges.content > 0) {
     return { kind: "pending", label: String(badges.content) };
   }
-  if (item.href === "/admin/moderation" && badges.moderation && badges.moderation > 0) {
-    return { kind: "alert", label: String(badges.moderation) };
+  if (item.href === "/admin/rights" && badges.pendingRightsClaims > 0) {
+    return { kind: "alert", label: String(badges.pendingRightsClaims) };
   }
-  if (item.href === "/admin/fraud" && badges.moderation && badges.moderation > 0) {
-    return { kind: "alert", label: String(badges.moderation) };
+  if (item.href === "/admin/fraud" && badges.fraudSessions > 0) {
+    return { kind: "alert", label: String(badges.fraudSessions) };
   }
-  if (item.href === "/admin/withdrawals" && badges.withdrawals && badges.withdrawals > 0) {
+  if (item.href === "/admin/finance" && badges.withdrawals > 0) {
     return { kind: "pending", label: String(badges.withdrawals) };
   }
-  if (item.badge === "live") return { kind: "live", label: "live" };
-  if (item.badge === "alert") return { kind: "alert", label: "!" };
-  if (item.badge === "pending") return { kind: "pending", label: "•" };
+  if (item.badge === "live") {
+    return { kind: "live", label: "live" };
+  }
   return null;
 }
 
-export function AdminSidebar({ badges = {} }: AdminSidebarProps) {
+export function AdminSidebar({ badges }: AdminSidebarProps) {
   const pathname = usePathname();
+  const resolvedBadges: AdminNavBadges = badges ?? {
+    content: 0,
+    pendingRightsClaims: 0,
+    fraudSessions: 0,
+    withdrawals: 0,
+  };
 
   return (
     <aside className="admin-sidebar" aria-label="Navigation admin">
@@ -54,7 +55,7 @@ export function AdminSidebar({ badges = {} }: AdminSidebarProps) {
         <p className="admin-logo-brand">
           SON<span className="admin-logo-accent">AFRIK</span>
         </p>
-        <span className="admin-logo-badge">Super Admin</span>
+        <span className="admin-logo-badge">Back-office</span>
       </div>
 
       <Link href="/listen" className="admin-sidebar-back">
@@ -66,7 +67,7 @@ export function AdminSidebar({ badges = {} }: AdminSidebarProps) {
           <span className="admin-nav-section-title">{section.title}</span>
           {section.items.map((item) => {
             const active = isNavActive(pathname, item.href);
-            const badge = resolveBadge(item, badges);
+            const badge = resolveBadge(item, resolvedBadges);
             return (
               <Link
                 key={item.href}

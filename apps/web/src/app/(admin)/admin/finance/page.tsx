@@ -1,16 +1,15 @@
-import { requireAdmin } from "@/features/admin/lib/requireAdmin";
+import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createPayoutService } from "@sonafrik/api/payout";
-import { createAdminService } from "@sonafrik/api/admin";
+import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
 import { AdminFinanceCenter } from "@/features/admin/components/AdminFinanceCenter";
 
-export const metadata = { title: "Finances — Admin SONAFRIK" };
+export const metadata = { title: "Revenus — Admin SONAFRIK" };
 
 export default async function AdminFinancePage() {
-  await requireAdmin();
+  const admin = await getAdminServiceForSession();
   const supabase = await getSupabaseServerClient();
   const payout = createPayoutService(supabase);
-  const admin = createAdminService(supabase);
   const [initialQueue, initialCycles, initialBatches] = await Promise.all([
     payout.getAdminPayoutQueue({ status: "pending", limit: 100 }).catch(() => []),
     admin.listRoyaltyCycles(12).catch(() => []),
@@ -18,10 +17,12 @@ export default async function AdminFinancePage() {
   ]);
 
   return (
-    <AdminFinanceCenter
-      initialQueue={initialQueue}
-      initialRoyaltyCycles={initialCycles}
-      initialBatches={initialBatches}
-    />
+    <AdminPageFrame title="Revenus" subtitle="Retraits, royalties et batches de payout">
+      <AdminFinanceCenter
+        initialQueue={initialQueue}
+        initialRoyaltyCycles={initialCycles}
+        initialBatches={initialBatches}
+      />
+    </AdminPageFrame>
   );
 }

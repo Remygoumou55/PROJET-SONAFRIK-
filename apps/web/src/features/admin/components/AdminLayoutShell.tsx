@@ -1,5 +1,6 @@
+import type { AdminNavBadges } from "@sonafrik/api/admin";
 import { AdminHeader, type AdminHeaderUser } from "./AdminHeader";
-import { AdminSidebar, type AdminNavBadges } from "./AdminSidebar";
+import { AdminSidebar } from "./AdminSidebar";
 
 interface AdminLayoutShellProps {
   children: React.ReactNode;

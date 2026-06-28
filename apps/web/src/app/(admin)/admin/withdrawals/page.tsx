@@ -1,13 +1,5 @@
-import { AdminModulePlaceholder } from "@/features/admin/components/AdminModulePlaceholder";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Retraits — Admin SONAFRIK" };
-
-export default function AdminWithdrawalsPage() {
-  return (
-    <AdminModulePlaceholder
-      title="Retraits"
-      sprintLabel="Sprint Admin 3 — file active sur /admin/finance"
-      icon="💳"
-    />
-  );
+export default function AdminWithdrawalsRedirectPage() {
+  redirect("/admin/finance");
 }

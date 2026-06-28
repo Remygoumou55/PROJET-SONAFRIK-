@@ -1,4 +1,5 @@
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
 
 export const dynamic = "force-dynamic";
 
@@ -61,14 +62,11 @@ export default async function AdminHealthPage() {
   const allOk = checks.every((r) => r.ok);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold" style={{ color: "var(--color-texte-principal)" }}>Santé du système</h1>
-          <p className="text-xs mt-1" style={{ color: "var(--color-texte-desactive)" }}>
-            Généré le {new Date().toLocaleString("fr-GN", { timeZone: "Africa/Conakry" })} (Conakry)
-          </p>
-        </div>
+    <AdminPageFrame
+      title="Santé système"
+      subtitle={`Généré le ${new Date().toLocaleString("fr-GN", { timeZone: "Africa/Conakry" })} (Conakry)`}
+    >
+      <div className="flex items-center justify-end mb-4">
         <span
           className="px-3 py-1.5 rounded-lg text-xs font-bold"
           style={{
@@ -81,6 +79,7 @@ export default async function AdminHealthPage() {
         </span>
       </div>
 
+      <div className="space-y-6">
       <div
         className="rounded-2xl p-5"
         style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-elevated)" }}
@@ -150,6 +149,7 @@ export default async function AdminHealthPage() {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </AdminPageFrame>
   );
 }

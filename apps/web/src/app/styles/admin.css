@@ -1088,8 +1088,17 @@
   background: var(--color-surface);
 }
 
+.admin-tr-expanded {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.admin-td-expanded {
+  padding: 0 16px 14px;
+  border-bottom: 1px solid var(--color-admin-border-subtle);
+}
+
 .admin-user-detail {
-  margin-top: 8px;
+  margin-top: 0;
   padding: 14px 16px;
   background: var(--color-admin-card-bg);
   border: 1px solid var(--color-admin-card-border);

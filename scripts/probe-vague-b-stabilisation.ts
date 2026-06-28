@@ -78,7 +78,7 @@ function staticChecks() {
 
   log(
     "B2-middleware-admin-fail-closed",
-    middleware.includes("isAdminResult !== true"),
+    middleware.includes("isAdmin !== true"),
     "admin timeout → refus (fail-closed War Plan B3)",
   );
 

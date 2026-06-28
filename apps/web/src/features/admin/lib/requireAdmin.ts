@@ -34,7 +34,7 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/connexion?next=/admin/live-control");
+    redirect("/auth/connexion?next=/admin");
   }
 
   const isAdmin = await resolveIsAdmin(user.id);

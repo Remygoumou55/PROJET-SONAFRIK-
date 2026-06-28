@@ -9,6 +9,25 @@ function fmtGnf(amount: number): string {
   return `${amount.toLocaleString("fr-FR")} GNF`;
 }
 
+function formatActivityTimestamp(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  const time = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  if (isToday) return time;
+
+  return date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 interface AdminKPICardProps {
   title: string;
   value: string;
@@ -44,7 +63,10 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
   const { kpis, alerts, recentActivity, monthlyRevenue } = data;
 
   const totalAlerts =
-    alerts.pendingSignalements + alerts.pendingWithdrawals + alerts.pendingArtistVerif;
+    alerts.pendingRightsClaims +
+    alerts.pendingWithdrawals +
+    alerts.pendingArtistVerif +
+    alerts.fraudSessions;
   const hasCriticalAlerts = totalAlerts > 0;
 
   const premiumRate =
@@ -52,6 +74,9 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
 
   const revenueTrend =
     kpis.revenueChange && parseFloat(kpis.revenueChange) >= 0 ? "up" : "down";
+
+  const usersTrend: "up" | "neutral" = kpis.newUsersToday > 0 ? "up" : "neutral";
+  const artistsTrend: "up" | "neutral" = kpis.newArtistsThisWeek > 0 ? "up" : "neutral";
 
   return (
     <div className="admin-dashboard">
@@ -69,18 +94,23 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
             {totalAlerts} élément{totalAlerts > 1 ? "s" : ""} nécessitant votre attention :
           </span>
           <div className="admin-alerts-items">
-            {alerts.pendingSignalements > 0 ? (
-              <Link href="/admin/moderation" className="admin-alert-chip admin-alert-chip--danger">
-                {alerts.pendingSignalements} signalement{alerts.pendingSignalements > 1 ? "s" : ""}
+            {alerts.pendingRightsClaims > 0 ? (
+              <Link href="/admin/rights" className="admin-alert-chip admin-alert-chip--danger">
+                {alerts.pendingRightsClaims} réclamation{alerts.pendingRightsClaims > 1 ? "s" : ""} droits
+              </Link>
+            ) : null}
+            {alerts.fraudSessions > 0 ? (
+              <Link href="/admin/fraud" className="admin-alert-chip admin-alert-chip--danger">
+                {alerts.fraudSessions} session{alerts.fraudSessions > 1 ? "s" : ""} fraude
               </Link>
             ) : null}
             {alerts.pendingWithdrawals > 0 ? (
-              <Link href="/admin/withdrawals" className="admin-alert-chip admin-alert-chip--warning">
+              <Link href="/admin/finance" className="admin-alert-chip admin-alert-chip--warning">
                 {alerts.pendingWithdrawals} retrait{alerts.pendingWithdrawals > 1 ? "s" : ""} en attente
               </Link>
             ) : null}
             {alerts.pendingArtistVerif > 0 ? (
-              <Link href="/admin/artists?filter=pending" className="admin-alert-chip admin-alert-chip--info">
+              <Link href="/admin/artists" className="admin-alert-chip admin-alert-chip--info">
                 {alerts.pendingArtistVerif} artiste{alerts.pendingArtistVerif > 1 ? "s" : ""} à vérifier
               </Link>
             ) : null}
@@ -92,9 +122,13 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
         <AdminKPICard
           title="Utilisateurs totaux"
           value={kpis.totalUsers.toLocaleString("fr-FR")}
-          sub={`+${kpis.newUsersToday} aujourd'hui`}
+          sub={
+            kpis.newUsersToday > 0
+              ? `+${kpis.newUsersToday} aujourd'hui`
+              : "Aucune inscription aujourd'hui"
+          }
           icon="👥"
-          trend="up"
+          trend={usersTrend}
           href="/admin/users"
         />
         <AdminKPICard
@@ -102,24 +136,28 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
           value={kpis.premiumUsers.toLocaleString("fr-FR")}
           sub={`${premiumRate}% des utilisateurs`}
           icon="💳"
-          trend="up"
-          href="/admin/users?filter=premium"
+          trend="neutral"
+          href="/admin/users"
         />
         <AdminKPICard
-          title="Artistes actifs"
+          title="Profils artistes publics"
           value={kpis.activeArtists.toLocaleString("fr-FR")}
-          sub={`+${kpis.newArtistsThisWeek} cette semaine`}
+          sub={
+            kpis.newArtistsThisWeek > 0
+              ? `+${kpis.newArtistsThisWeek} cette semaine`
+              : "Aucun nouveau profil cette semaine"
+          }
           icon="🎤"
-          trend="up"
+          trend={artistsTrend}
           href="/admin/artists"
         />
         <AdminKPICard
-          title="Revenus du mois"
+          title="Crédits wallet (mois)"
           value={fmtGnf(kpis.revenueThisMonth)}
           sub={
             kpis.revenueChange
               ? `${parseFloat(kpis.revenueChange) >= 0 ? "+" : ""}${kpis.revenueChange}% vs mois passé`
-              : "Premier mois"
+              : "Premier mois ou pas de base comparée"
           }
           icon="💰"
           trend={kpis.revenueChange ? revenueTrend : "neutral"}
@@ -128,7 +166,8 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
       </div>
 
       <section className="admin-chart-section">
-        <h2 className="admin-section-title">Revenus wallet — 12 derniers mois</h2>
+        <h2 className="admin-section-title">Crédits wallet — 12 derniers mois</h2>
+        <p className="admin-chart-caption">Somme des entrées credit (entry_type) dans wallet_ledger</p>
         <AdminRevenueChart data={monthlyRevenue} />
       </section>
 
@@ -167,12 +206,7 @@ export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
               <div key={item.id} className="admin-activity-item">
                 <span className="admin-activity-dot" aria-hidden="true" />
                 <span className="admin-activity-text">{item.action}</span>
-                <span className="admin-activity-time">
-                  {new Date(item.created_at).toLocaleTimeString("fr-FR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+                <span className="admin-activity-time">{formatActivityTimestamp(item.created_at)}</span>
               </div>
             ))}
           </div>

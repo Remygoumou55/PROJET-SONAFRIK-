@@ -1,13 +1,5 @@
-import { AdminModulePlaceholder } from "@/features/admin/components/AdminModulePlaceholder";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Modération — Admin SONAFRIK" };
-
-export default function AdminModerationPage() {
-  return (
-    <AdminModulePlaceholder
-      title="Modération"
-      sprintLabel="Sprint Admin 4 — fraude actuelle sur /admin/fraud"
-      icon="⚖️"
-    />
-  );
+export default function AdminModerationRedirectPage() {
+  redirect("/admin/rights");
 }

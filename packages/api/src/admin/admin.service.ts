@@ -2,6 +2,7 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { FeatureFlag, SystemSetting, RoyaltyCycle } from "@sonafrik/types";
 import { AdminError } from "./errors";
 import { AdminRepository } from "./admin.repository";
+import { AdminArtistsRepository, AdminUsersRepository } from "./admin.users.repository";
 import { createRoyaltyService, type RoyaltyService } from "../royalties/royalty.service";
 import { toggleFeatureFlagSchema, updateSystemSettingSchema, triggerRoyaltyCycleSchema } from "./schemas";
 import type { TriggerRoyaltyCycleInput } from "./schemas";
@@ -15,13 +16,24 @@ import type {
   LiveControlSnapshot,
   PendingCatalogItem,
 } from "./types";
+import type {
+  AdminArtistsFilter,
+  AdminArtistsListResult,
+  AdminCreatorTier,
+  AdminUsersFilter,
+  AdminUsersListResult,
+} from "@sonafrik/types";
 
 export class AdminService {
   private readonly repository: AdminRepository;
+  private readonly users: AdminUsersRepository;
+  private readonly artists: AdminArtistsRepository;
   private readonly royalty: RoyaltyService;
 
   constructor(private readonly client: SonafrikSupabaseClient) {
     this.repository = new AdminRepository(client);
+    this.users = new AdminUsersRepository(client);
+    this.artists = new AdminArtistsRepository(client);
     this.royalty = createRoyaltyService(client);
   }
 
@@ -123,6 +135,64 @@ export class AdminService {
     } catch {
       throw new AdminError("update_failed");
     }
+  }
+
+  async listUsers(params: {
+    q?: string;
+    filter?: AdminUsersFilter;
+    page?: number;
+  }): Promise<AdminUsersListResult> {
+    return this.users.listUsers(params);
+  }
+
+  async warnUser(userId: string, reason: string, adminNote: string): Promise<void> {
+    await this.users.warnUser(userId, reason, adminNote).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async suspendUser(userId: string, durationDays: number, reason: string): Promise<void> {
+    await this.users.suspendUser(userId, durationDays, reason).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async deleteUser(userId: string, reason: string): Promise<void> {
+    await this.users.deleteUser(userId, reason).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async listArtists(params: {
+    q?: string;
+    filter?: AdminArtistsFilter;
+    page?: number;
+  }): Promise<AdminArtistsListResult> {
+    return this.artists.listArtists(params);
+  }
+
+  async verifyArtist(creatorId: string, approved: boolean, note: string): Promise<void> {
+    await this.artists.verifyArtist(creatorId, approved, note).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async changeArtistTier(creatorId: string, newTier: AdminCreatorTier): Promise<void> {
+    await this.artists.changeArtistTier(creatorId, newTier).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async suspendCreator(creatorId: string, reason: string): Promise<void> {
+    await this.artists.suspendCreator(creatorId, reason).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async warnCreatorOwner(ownerId: string, reason: string, note: string): Promise<void> {
+    await this.artists.warnCreatorOwner(ownerId, reason, note).catch(() => {
+      throw new AdminError("update_failed");
+    });
   }
 }
 

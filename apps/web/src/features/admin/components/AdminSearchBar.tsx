@@ -23,8 +23,12 @@ export function AdminSearchBar({ placeholder = "Rechercher..." }: AdminSearchBar
       return;
     }
     const params = new URLSearchParams(searchParams.toString());
-    if (debouncedQuery.trim()) {
-      params.set("q", debouncedQuery.trim());
+    const nextQuery = debouncedQuery.trim();
+    const currentQuery = searchParams.get("q") ?? "";
+    if (nextQuery === currentQuery) return;
+
+    if (nextQuery) {
+      params.set("q", nextQuery);
     } else {
       params.delete("q");
     }
