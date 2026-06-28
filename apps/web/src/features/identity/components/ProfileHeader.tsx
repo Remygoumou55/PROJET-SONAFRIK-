@@ -3,7 +3,9 @@ import { BecomeArtistButton } from "./BecomeArtistButton";
 import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
 import { ProfileJourneySection } from "./ProfileJourneySection";
+import { ProfileMusicalIdentitySection } from "./ProfileMusicalIdentitySection";
 import { ProfileRewardsSection } from "./ProfileRewardsSection";
+import { buildMusicalIdentity } from "../lib/profileMusicalIdentity";
 import { isArtistAccount, type ProfileActivitySummary } from "../lib/profilePresentation";
 
 interface ProfileHeaderProps {
@@ -14,10 +16,13 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderProps) {
   const isArtist = isArtistAccount(context.profile.account_type);
+  const musicalIdentity = buildMusicalIdentity(context.profile, activity, isArtist);
 
   return (
     <div className="identity-profile">
       <ProfileHeroPassport context={context} avatarUrl={avatarUrl} />
+
+      <ProfileMusicalIdentitySection identity={musicalIdentity} />
 
       <ProfileJourneySection
         profile={context.profile}

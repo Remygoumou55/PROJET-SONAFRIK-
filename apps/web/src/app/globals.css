@@ -260,6 +260,7 @@ body {
 @import "./styles/identity-account.css";
 @import "./styles/identity-journey.css";
 @import "./styles/identity-rewards.css";
+@import "./styles/identity-musical.css";
 @import "./styles/revenue.css";
 @import "./styles/creator.css";
 @import "./styles/lancement.css";
