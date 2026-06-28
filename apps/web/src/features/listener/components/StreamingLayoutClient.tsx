@@ -8,6 +8,7 @@ import { QualityPreferenceProvider } from "@/lib/qualityPreferenceContext";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { ListenFeaturesProvider } from "../lib/listenFeaturesContext";
 import { PlayerProvider } from "../lib/playerContext";
+import { PlayerMuteProvider } from "../lib/playerMuteContext";
 import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
 
@@ -46,6 +47,7 @@ export function StreamingLayoutClient({
         {loadFutureStyles ? <ListenFutureStyles /> : null}
         <DevAuthBootstrap />
         <PlayerProvider>
+        <PlayerMuteProvider>
         <div
           className="has-global-player md:flex md:h-screen md:overflow-hidden"
           style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
@@ -61,6 +63,7 @@ export function StreamingLayoutClient({
         </div>
         <MobileBottomNav userId={userId} initialUnreadCount={initialUnreadCount} />
         <GlobalPlayer />
+        </PlayerMuteProvider>
         </PlayerProvider>
       </ListenFeaturesProvider>
     </QualityPreferenceProvider>

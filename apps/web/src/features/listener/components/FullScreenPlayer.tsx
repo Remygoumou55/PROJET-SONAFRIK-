@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CoverImage } from "@/components/CoverImage";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
+import { usePlayerMute, volumeIcon } from "../lib/playerMuteContext";
 import { useListenFeatures } from "../lib/listenFeaturesContext";
 import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
@@ -71,7 +72,8 @@ function AudioVisualizer({ active }: { active: boolean }) {
 
 export function FullScreenPlayer({ onClose }: FullScreenPlayerProps) {
   const { currentTrack, isPlaying } = usePlayer();
-  const { volume, setVolume } = usePlayerContext();
+  const { volume } = usePlayerContext();
+  const { isMuted, toggleMute, handleVolumeChange } = usePlayerMute();
   const currentPosition = usePlayerPosition();
   const features = useListenFeatures();
   const [activeTab, setActiveTab] = useState<FullScreenTab>("now-playing");
@@ -189,22 +191,25 @@ export function FullScreenPlayer({ onClose }: FullScreenPlayerProps) {
             </div>
 
             <div className="fs-volume">
-              <span className="fs-vol-icon" aria-hidden="true">
-                🔈
-              </span>
+              <button
+                type="button"
+                className={`fs-vol-mute${isMuted ? " muted" : ""}`}
+                onClick={toggleMute}
+                aria-label={isMuted ? "Activer le son" : "Couper le son"}
+                aria-pressed={isMuted}
+              >
+                {volumeIcon(isMuted, volume)}
+              </button>
               <input
                 type="range"
                 min={0}
                 max={1}
                 step={0.05}
-                value={volume}
-                onChange={(event) => setVolume(Number(event.target.value))}
+                value={isMuted ? 0 : volume}
+                onChange={(event) => handleVolumeChange(Number(event.target.value))}
                 className="fs-volume-slider"
                 aria-label="Volume"
               />
-              <span className="fs-vol-icon" aria-hidden="true">
-                🔊
-              </span>
             </div>
 
             <LiveReactions />

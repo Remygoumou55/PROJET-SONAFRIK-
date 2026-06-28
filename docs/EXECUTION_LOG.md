@@ -11,6 +11,28 @@
 
 ---
 
+## 2026-06-27 — Listen P4 : Player complet cliquable
+
+### Fichiers touchés
+- `GlobalPlayer.tsx` — zone cover+titre cliquable → `FullPlayerPanel` ; mute volume
+- `FullPlayerPanel.tsx` — bottom sheet : contrôles, onglets Actions/Réactions/Soutenir, file
+- `playerMuteContext.tsx` — état mute partagé barre + panel + fullscreen
+- `TipPanel.tsx` — variant `full` (5k/10k/20k GNF via `send_tip`, CDC #5)
+- `listen-home.css` — styles fpp/gp/tip ; hex sidebar → tokens CSS
+- `FullScreenPlayer.tsx` — mute synchronisé
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` — ✅
+- `pnpm probe:certification` — **130/130** ✅
+
+### Tests à faire
+- [ ] Clic barre gauche → panel ; contrôles centre ne l’ouvrent pas
+- [ ] Mute 🔊/🔇 synchronisé barre + panel
+- [ ] Onglet Soutenir : montants sans mention commission
+- [ ] Mobile 390px : panel lisible
+
+---
+
 ## 2026-06-27 — Audit global + perf /listen + push court terme
 
 ### Fichiers touchés
