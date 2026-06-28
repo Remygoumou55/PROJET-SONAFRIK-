@@ -3,6 +3,7 @@ import { BecomeArtistButton } from "./BecomeArtistButton";
 import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
 import { ProfileJourneySection } from "./ProfileJourneySection";
+import { ProfileRewardsSection } from "./ProfileRewardsSection";
 import { isArtistAccount, type ProfileActivitySummary } from "../lib/profilePresentation";
 
 interface ProfileHeaderProps {
@@ -25,6 +26,12 @@ export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderPro
       />
 
       <ProfileActivitySection activity={activity} isArtist={isArtist} />
+
+      <ProfileRewardsSection
+        profile={context.profile}
+        activity={activity}
+        isArtist={isArtist}
+      />
 
       {context.profile.account_type === "auditeur" ? (
         <aside className="identity-become-artist" aria-labelledby="become-artist-title">
