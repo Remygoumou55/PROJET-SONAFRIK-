@@ -8,6 +8,8 @@ export interface StreamCompletePayload {
   sessionId: string;
   positionSeconds: number;
   totalDurationSeconds: number;
+  /** true uniquement quand le morceau se termine naturellement (auto file d'attente). */
+  advanceQueue?: boolean;
 }
 
 export interface QueueState {
@@ -27,6 +29,7 @@ export interface PlayerActions {
   getPosition: () => number;
   getAccumulatedListenSeconds: () => number;
   restartCurrentTrack: () => void;
+  takeCompletePayload: (mode?: "natural" | "manual") => StreamCompletePayload | null;
   onHeartbeat: (callback: (positionSeconds: number) => void) => void;
   onComplete: (callback: (payload: StreamCompletePayload) => void) => void;
   onError: (callback: (type: AudioErrorType, positionSeconds: number) => void) => void;

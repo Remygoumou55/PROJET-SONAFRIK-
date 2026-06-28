@@ -11,6 +11,26 @@
 
 ---
 
+## 2026-06-28 — Phase A : comptage streaming fiable (web + RPC)
+
+### Corrections
+- `usePlayer.ts` — `completeActiveSession()` avant skip/next/load ; flush onglet (`pagehide` / `visibilitychange`)
+- `playerContext.tsx` — `takeCompletePayload()` ; fin naturelle vs manuelle ; `advanceQueue` uniquement on `onended`
+- `buildStreamCompletePayload.ts` — position = max(heartbeat, playhead) ; 90% min en fin naturelle
+- Heartbeat web — envoie `max(accumulated, playhead)` à `stream-progress`
+- Migration `20260628120000_complete_stream_session_heartbeat_max.sql` — RPC utilise max(client, heartbeats DB)
+
+### Validation
+- Migration DB appliquée ✅
+- `pnpm typecheck` + `lint` ✅
+
+### Tests à faire
+- [ ] Écouter 90%+ → `stream-complete` 200 → `is_valid_listen=true`
+- [ ] Skip morceau → `stream-complete` avant `stream-start` suivant
+- [ ] Fermer onglet mid-track → session complétée (pagehide)
+
+---
+
 ## 2026-06-27 — Profile Phase 9 : Musical DNA Engine
 
 ### Fichiers touchés

@@ -10,6 +10,7 @@ import type {
   QueueState,
   StreamCompletePayload,
 } from "./playerTypes";
+import { buildStreamCompletePayload, type StreamCompleteMode } from "./buildStreamCompletePayload";
 import { INITIAL_PLAYER_STATE, INITIAL_QUEUE_STATE } from "./playerTypes";
 import { usePlayerQueueControls } from "./usePlayerQueueControls";
 export type { AudioErrorType } from "./playerTypes";
@@ -68,6 +69,31 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       }
     }, STREAM_HEARTBEAT_INTERVAL_MS);
   }, [clearHeartbeat]);
+
+  const resolveDurationSeconds = useCallback((): number => {
+    const audio = audioRef.current;
+    const fromAudio =
+      audio && audio.duration > 0 && isFinite(audio.duration) ? audio.duration : 0;
+    return Math.max(fromAudio, activeDurationRef.current, 1);
+  }, []);
+
+  const takeCompletePayload = useCallback(
+    (mode: StreamCompleteMode = "manual"): StreamCompletePayload | null => {
+      const sessionId = activeSessionIdRef.current;
+      if (!sessionId) return null;
+
+      activeSessionIdRef.current = null;
+
+      return buildStreamCompletePayload({
+        sessionId,
+        positionSeconds: positionRef.current,
+        accumulatedSeconds: accumulatedListenSecondsRef.current,
+        durationSeconds: resolveDurationSeconds(),
+        mode,
+      });
+    },
+    [resolveDurationSeconds],
+  );
 
   const play = useCallback(
     (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number, autoPlay = false) => {
@@ -142,24 +168,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         if (generation !== loadGenerationRef.current) return;
         clearHeartbeat();
         setState((prev) => ({ ...prev, isPlaying: false }));
-        const audioDuration =
-          audio.duration > 0 && isFinite(audio.duration) ? audio.duration : activeDurationRef.current;
-        const finalPos = audioDuration || positionRef.current;
-        positionRef.current = finalPos;
-        setCurrentPosition(finalPos);
-        const sessionId = activeSessionIdRef.current;
-        if (!sessionId) return;
-        const totalDurationSeconds = Math.max(audioDuration, 1);
-        const positionSeconds = Math.max(
-          accumulatedListenSecondsRef.current,
-          finalPos,
-          totalDurationSeconds >= 1 ? totalDurationSeconds * 0.9 : 0,
-        );
-        onCompleteCallbackRef.current?.({
-          sessionId,
-          positionSeconds,
-          totalDurationSeconds,
-        });
+        const payload = takeCompletePayload("natural");
+        if (payload) {
+          onCompleteCallbackRef.current?.({ ...payload, advanceQueue: true });
+        }
       };
 
       audio.onerror = () => {
@@ -189,7 +201,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.src = signedUrl;
       audio.load();
     },
-    [clearHeartbeat, clearAudioElement, startHeartbeat],
+    [clearHeartbeat, clearAudioElement, startHeartbeat, takeCompletePayload],
   );
 
   const pause = useCallback(() => {
@@ -228,7 +240,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const stop = useCallback(() => {
     clearHeartbeat();
-    activeSessionIdRef.current = null;
+    const payload = takeCompletePayload("manual");
+    if (payload) {
+      onCompleteCallbackRef.current?.(payload);
+    }
     activeDurationRef.current = 0;
     if (audioRef.current) {
       audioRef.current.pause();
@@ -237,7 +252,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setState(INITIAL_PLAYER_STATE);
     positionRef.current = 0;
     setCurrentPosition(0);
-  }, [clearHeartbeat]);
+  }, [clearHeartbeat, takeCompletePayload]);
 
   const setVolume = useCallback((volume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, volume));
@@ -315,6 +330,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         getPosition,
         getAccumulatedListenSeconds,
         restartCurrentTrack,
+        takeCompletePayload,
         onHeartbeat,
         onComplete,
         onError,
