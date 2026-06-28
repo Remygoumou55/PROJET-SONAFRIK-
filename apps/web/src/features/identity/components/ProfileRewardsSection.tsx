@@ -20,7 +20,7 @@ export function ProfileRewardsSection({
   const upcomingAndProgress = [...engine.inProgress, ...engine.upcoming];
 
   return (
-    <section className="identity-rewards" aria-labelledby="profile-rewards-title">
+    <section id="profile-rewards" className="identity-rewards" aria-labelledby="profile-rewards-title">
       <header className="identity-rewards__header">
         <h2 id="profile-rewards-title" className="identity-rewards__title">
           Mes Récompenses SONAFRIK

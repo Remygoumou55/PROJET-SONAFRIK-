@@ -305,12 +305,6 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
                 <span className="fpp-action-label">File</span>
               </button>
             ) : null}
-            <button type="button" className="fpp-action-btn" aria-label="Écouter hors ligne" disabled>
-              <span className="fpp-action-icon" aria-hidden="true">
-                ⬇
-              </span>
-              <span className="fpp-action-label">Hors ligne</span>
-            </button>
             {synchronizedLyrics ? (
               <button
                 type="button"

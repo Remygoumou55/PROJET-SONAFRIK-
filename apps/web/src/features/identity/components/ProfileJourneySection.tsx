@@ -19,7 +19,7 @@ export function ProfileJourneySection({
   const journey = buildProfileJourney(profile, activity, isArtist);
 
   return (
-    <section className="identity-journey" aria-labelledby="profile-journey-title">
+    <section id="profile-journey" className="identity-journey" aria-labelledby="profile-journey-title">
       <header className="identity-journey__header">
         <h2 id="profile-journey-title" className="identity-journey__title">
           Mon Parcours SONAFRIK

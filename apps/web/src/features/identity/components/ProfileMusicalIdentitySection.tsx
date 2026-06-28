@@ -58,7 +58,7 @@ export function ProfileMusicalIdentitySection({
   const showEditCta = identity.completenessPercent < 100;
 
   return (
-    <section className="identity-musical" aria-labelledby="profile-musical-identity-title">
+    <section id="profile-musical-identity" className="identity-musical" aria-labelledby="profile-musical-identity-title">
       <header className="identity-musical__header">
         <h2 id="profile-musical-identity-title" className="identity-musical__title">
           Mon identité musicale

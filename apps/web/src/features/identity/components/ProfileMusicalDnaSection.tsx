@@ -18,7 +18,7 @@ export function ProfileMusicalDnaSection({
   const dna = buildMusicalDna(profile, activity, isArtist);
 
   return (
-    <section className="identity-dna" aria-labelledby="profile-musical-dna-title">
+    <section id="profile-musical-dna" className="identity-dna" aria-labelledby="profile-musical-dna-title">
       <header className="identity-dna__header">
         <h2 id="profile-musical-dna-title" className="identity-dna__title">
           Mon ADN Musical

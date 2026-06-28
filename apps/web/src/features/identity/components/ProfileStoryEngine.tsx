@@ -80,7 +80,7 @@ export function ProfileStoryEngine({
   const showEmptyReadState = mode === "read" && story.visibleSections.length === 0;
 
   return (
-    <section className="identity-story" aria-labelledby="profile-story-title">
+    <section id="profile-story" className="identity-story" aria-labelledby="profile-story-title">
       <header className="identity-story__header">
         <div className="identity-story__intro">
           <h2 id="profile-story-title" className="identity-story__title">

@@ -19,7 +19,7 @@ export function ProfileGoalsSection({
   const engine = buildSmartGoalsEngine(profile, activity, isArtist);
 
   return (
-    <section className="identity-goals" aria-labelledby="profile-goals-title">
+    <section id="profile-goals" className="identity-goals" aria-labelledby="profile-goals-title">
       <header className="identity-goals__header">
         <h2 id="profile-goals-title" className="identity-goals__title">
           Mes objectifs

@@ -19,6 +19,7 @@ export function buildCreatorNavEntries(pendingVerifications = 0): CreatorNavEntr
     { type: "section", label: "Mon catalogue" },
     { href: "/creator/catalog", label: "Tout mon catalogue", icon: "💿", exact: true },
     { href: "/creator/catalog/tracks", label: "Uploader un morceau", icon: "🎵" },
+    { href: "/creator/catalog/releases", label: "Mes sorties", icon: "📀" },
     { type: "section", label: "Mon profil" },
     { href: "/creator/identity", label: "Identité artiste", icon: "👤" },
     {

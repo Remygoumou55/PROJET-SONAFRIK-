@@ -11,7 +11,7 @@ export function ProfileActivitySection({ activity, isArtist }: ProfileActivitySe
   const cards = buildActivityCards(activity, isArtist);
 
   return (
-    <section className="identity-activity" aria-labelledby="profile-activity-title">
+    <section id="profile-activity" className="identity-activity" aria-labelledby="profile-activity-title">
       <div className="identity-activity__header">
         <h2 id="profile-activity-title" className="identity-activity__title">
           Mon activité

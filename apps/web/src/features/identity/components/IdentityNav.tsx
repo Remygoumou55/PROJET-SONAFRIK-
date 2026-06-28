@@ -9,6 +9,7 @@ interface IdentityNavProps {
 export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNavProps) {
   const items: SidebarNavItem[] = [
     { href: "/profile", label: "Mon profil", exact: true },
+    { href: "/profile/edit", label: "Modifier le profil" },
     { href: "/settings/account", label: "Mon compte" },
     { href: "/settings/sessions", label: "Sécurité" },
     { href: "/settings/notifications", label: "Notifications", badge: unreadNotifications },

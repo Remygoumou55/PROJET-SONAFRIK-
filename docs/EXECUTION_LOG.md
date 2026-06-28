@@ -38,6 +38,46 @@
 
 ---
 
+## 2026-06-28 — Audit global senior : wiring UI + flags + navigation
+
+### Diagnostic principal
+- **Code déjà pushé** sur `main` (sync avec `origin/main`) — pas de features « oubliées » en local.
+- **Cause #1 features /listen invisibles** : CSS `listen-future.css` chargé uniquement si flags actifs ; si timeout DB → flags `false` → CSS absent + boutons masqués.
+- **Cause #2 profil** : 7 sections (ADN, Story, Parcours, Objectifs, Récompenses…) existent mais nécessitent scroll — pas de navigation rapide.
+- **Cause #3 discoverability** : Wallet, Alertes desktop, `/profile/edit`, `/creator/catalog/releases` absents de la nav principale.
+- **DB prod** : 5/5 flags `listen_*` = `enabled:true` ✅ · `beat_store` = `false` (MVP scope lock).
+
+### Fichiers touchés
+- `listen-feature-flags.ts` — timeout 5s, fallback RPC `get_feature_flags`, cache v3
+- `(listener)/layout.tsx` — import permanent `listen-future.css`
+- `StreamingLayoutClient.tsx` — suppression chargement CSS conditionnel
+- `SidebarNavItem.tsx` + `ListenerMobileBottomNav.tsx` — Wallet + Alertes (desktop sidebar)
+- `IdentityNav.tsx` — lien « Modifier le profil »
+- `creatorNavConfig.ts` — « Mes sorties »
+- `ProfileSectionQuickNav.tsx` + ancres `#profile-*` — navigation sections profil
+- `identity.css` — styles quicknav responsive
+- `FullPlayerPanel.tsx` — retrait bouton « Hors ligne » disabled (UX trompeuse)
+- Supprimés : `PlayerExpandedPanel`, `NewTracksSection`, `TrackRow` (orphelins), `ListenFutureStyles`
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` — ✅
+- DB flags listen — ✅ 5/5 enabled
+
+### Tests à faire
+- [ ] `/listen` — lancer un morceau → clic cover → panel avec File, Paroles, Soutenir, plein écran
+- [ ] `/profile` — quicknav « ADN / Parcours / Objectifs » scroll vers sections
+- [ ] Sidebar desktop — Wallet + Alertes visibles
+- [ ] Mobile bottom nav — Wallet accessible
+- [ ] `/creator/catalog/releases` — lien dans nav créateur
+
+### Roadmap (hors scope MVP immédiat)
+- Mobile : phases profil + player complet (parité web)
+- `RecommendationService` — 0 consommateur UI
+- `beat_store` — flag off + pas de nav (décision MVP)
+- `NEXT_PUBLIC_PAYMENTS_ENABLED` — top-up/retrait staging only
+
+---
+
 ## 2026-06-28 — Listen P5 : Audit fonctionnalités futur + activation flags
 
 ### Cause racine

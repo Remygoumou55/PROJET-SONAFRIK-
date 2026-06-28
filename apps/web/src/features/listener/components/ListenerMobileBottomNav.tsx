@@ -4,13 +4,12 @@ import Link from "next/link";
 import { memo } from "react";
 import { usePathname } from "next/navigation";
 import { usePerformanceFlags } from "@/lib/performance/performance-context";
-import { NotificationBell } from "@/features/shared/notifications/components/NotificationBell";
 
 const NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" },
   { href: "/search", label: "Explorer", icon: "search" },
   { href: "/library", label: "Bibliothèque", icon: "library" },
-  { href: "/notifications", label: "Alertes", icon: "bell" },
+  { href: "/wallet", label: "Wallet", icon: "wallet" },
   { href: "/profile", label: "Profil", icon: "profile" },
 ] as const;
 
@@ -46,11 +45,12 @@ const NavIcon = memo(function NavIcon({ icon, size = 22 }: { icon: string; size?
       </svg>
     );
   }
-  if (icon === "bell") {
+  if (icon === "wallet") {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        <path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+        <path d="M3 7h18" />
+        <path d="M16 12h2a2 2 0 0 1 0 4h-2" />
       </svg>
     );
   }
@@ -65,13 +65,7 @@ const NavIcon = memo(function NavIcon({ icon, size = 22 }: { icon: string; size?
   return null;
 });
 
-export function MobileBottomNav({
-  userId,
-  initialUnreadCount,
-}: {
-  userId: string;
-  initialUnreadCount: number;
-}) {
+export function MobileBottomNav() {
   const pathname = usePathname();
   const { routePrefetchEnabled } = usePerformanceFlags();
 
@@ -86,22 +80,6 @@ export function MobileBottomNav({
     >
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(item.href, pathname);
-        if (item.icon === "bell") {
-          return (
-            <div
-              key={item.href}
-              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1"
-            >
-              <NotificationBell initialCount={initialUnreadCount} userId={userId} />
-              <span
-                className="text-[9px] font-semibold tracking-wide"
-                style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
-              >
-                Alertes
-              </span>
-            </div>
-          );
-        }
         return (
           <Link
             key={item.href}

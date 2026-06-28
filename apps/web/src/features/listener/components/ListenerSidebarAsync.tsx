@@ -12,7 +12,7 @@ function SidebarSkeleton() {
         <div className="h-2 w-24 rounded animate-pulse ls-skeleton mt-2" />
       </div>
       <div className="ls-nav">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <div key={i} className="h-10 rounded-lg animate-pulse ls-skeleton" />
         ))}
       </div>

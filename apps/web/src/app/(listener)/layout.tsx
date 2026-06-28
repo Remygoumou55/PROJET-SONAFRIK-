@@ -7,6 +7,7 @@ import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { getCachedListenFeatureFlags } from "@/lib/listen/get-cached-listen-feature-flags";
 import StreamingLoading from "./loading";
 import "@/app/styles/listen-home.css";
+import "@/app/styles/listen-future.css";
 
 async function StreamingGuard({ children }: { children: React.ReactNode }) {
   const context = await requireIdentityContext();
