@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ADMIN_PAGE_TITLES } from "../lib/admin-nav";
+import { useAdminLiveRefresh } from "../hooks/useAdminLiveRefresh";
 
 export interface AdminHeaderUser {
   fullName: string;
@@ -21,9 +22,24 @@ function resolvePageTitle(pathname: string): string {
   return match?.[1] ?? "Administration";
 }
 
+function liveIndicatorCopy(mode: ReturnType<typeof useAdminLiveRefresh>["mode"], liveTime: string | null): string {
+  if (mode === "connecting") return "Connexion…";
+  if (mode === "realtime") return liveTime ? `Live · ${liveTime}` : "Live";
+  return liveTime ? `Sync · ${liveTime}` : "Sync";
+}
+
+function liveIndicatorTitle(mode: ReturnType<typeof useAdminLiveRefresh>["mode"]): string {
+  if (mode === "realtime") {
+    return "Temps réel Supabase — mise à jour instantanée à chaque inscription ou activité";
+  }
+  if (mode === "connecting") return "Connexion au flux temps réel…";
+  return "Mode secours — actualisation automatique toutes les 60 s";
+}
+
 export function AdminHeader({ user }: AdminHeaderProps) {
   const pathname = usePathname();
   const pageTitle = resolvePageTitle(pathname);
+  const { liveTime, mode } = useAdminLiveRefresh();
 
   return (
     <header className="admin-header">
@@ -38,9 +54,12 @@ export function AdminHeader({ user }: AdminHeaderProps) {
       </div>
 
       <div className="admin-header-right">
-        <div className="admin-live-indicator">
+        <div
+          className={`admin-live-indicator${mode === "realtime" ? " admin-live-indicator--active" : ""}`}
+          title={liveIndicatorTitle(mode)}
+        >
           <span className="admin-live-dot" aria-hidden="true" />
-          <span>Temps réel</span>
+          <span suppressHydrationWarning>{liveIndicatorCopy(mode, liveTime)}</span>
         </div>
 
         <div className="admin-user-badge">

@@ -129,7 +129,10 @@ export class AdminUsersRepository {
     const { data, error } = await this.client.rpc("admin_batch_user_list_stats", {
       p_user_ids: userIds,
     });
-    if (error) throw error;
+    if (error) {
+      // Fallback silencieux — stats secondaires, la liste reste affichée
+      return map;
+    }
 
     for (const row of (data ?? []) as UserListStatsRow[]) {
       map.set(row.user_id, {
@@ -356,7 +359,9 @@ export class AdminArtistsRepository {
     const { data, error } = await this.client.rpc("admin_batch_creator_catalog_stats", {
       p_creator_ids: creatorIds,
     });
-    if (error) throw error;
+    if (error) {
+      return map;
+    }
 
     for (const row of (data ?? []) as CreatorCatalogStatsRow[]) {
       map.set(row.creator_id, {

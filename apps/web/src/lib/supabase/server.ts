@@ -80,9 +80,10 @@ export function getSupabaseAdminClient(options?: { adminVerified?: boolean }): S
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");
+  // Service role = toujours fetch réel (jamais fetchBypassMode) — back-office admin lit la vraie DB.
   return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false },
-    global: { fetch: isBypassActive() ? fetchBypassMode() : fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
+    global: { fetch: fetchWithTimeout(SUPABASE_FETCH_TIMEOUT_MS) },
   }) as unknown as SonafrikSupabaseClient;
 }
 

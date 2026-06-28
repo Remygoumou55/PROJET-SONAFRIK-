@@ -78,7 +78,7 @@ export const ADMIN_MODULE_CARDS = [
 
 /** Titres breadcrumb par segment de route. */
 export const ADMIN_PAGE_TITLES: Record<string, string> = {
-  "/admin": "Dashboard",
+  "/admin": "Centre de Commandement",
   "/admin/analytics": "Analytiques",
   "/admin/users": "Utilisateurs",
   "/admin/artists": "Artistes",

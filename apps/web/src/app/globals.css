@@ -6,6 +6,22 @@
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../../packages/shared/src/**/*.{ts,tsx}";
 
+@import "./styles/landing.css";
+@import "./styles/listen-home.css";
+@import "./styles/listen-future.css";
+@import "./styles/identity.css";
+@import "./styles/performance.css";
+@import "./styles/identity-account.css";
+@import "./styles/identity-journey.css";
+@import "./styles/identity-goals.css";
+@import "./styles/identity-rewards.css";
+@import "./styles/identity-musical.css";
+@import "./styles/identity-musical-dna.css";
+@import "./styles/identity-story.css";
+@import "./styles/revenue.css";
+@import "./styles/creator.css";
+@import "./styles/lancement.css";
+
 @theme {
   --color-vert-energie: #00d26a;
   --color-vert-profond: #009b3a;
@@ -262,20 +278,3 @@ body {
 .landing-pulse-dot {
   animation: landing-pulse 2s ease-in-out infinite;
 }
-
-
-@import "./styles/landing.css";
-@import "./styles/listen-home.css";
-@import "./styles/listen-future.css";
-@import "./styles/identity.css";
-@import "./styles/performance.css";
-@import "./styles/identity-account.css";
-@import "./styles/identity-journey.css";
-@import "./styles/identity-goals.css";
-@import "./styles/identity-rewards.css";
-@import "./styles/identity-musical.css";
-@import "./styles/identity-musical-dna.css";
-@import "./styles/identity-story.css";
-@import "./styles/revenue.css";
-@import "./styles/creator.css";
-@import "./styles/lancement.css";

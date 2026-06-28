@@ -1,217 +1,83 @@
-import Link from "next/link";
-import type { AdminCockpitData } from "@sonafrik/api/admin";
-import { ADMIN_MODULE_CARDS } from "../lib/admin-nav";
-import { AdminRevenueChart } from "./AdminRevenueChart";
+import type {
+  AdminCockpitData,
+  AdminDashboardKpis,
+  AdminHealthSnapshot,
+  LiveControlSnapshot,
+} from "@sonafrik/api/admin";
+import type { AdminSessionContext } from "../lib/getAdminSessionContext";
+import { buildAdminDashboardView } from "../lib/buildAdminDashboardView";
+import { AdminCommandHero } from "./dashboard/AdminCommandHero";
+import { AdminPremiumKpiGrid } from "./dashboard/AdminPremiumKpiGrid";
+import { AdminLiveTimeline, AdminPriorityCenter } from "./dashboard/AdminLiveTimeline";
+import { AdminCoachCard, AdminPlatformHealthCard } from "./dashboard/AdminCoachHealth";
+import {
+  AdminModulesHumanGrid,
+  AdminStoryChartsSection,
+  AdminMusicalTodaySection,
+  AdminBusinessSection,
+  AdminGovernanceSection,
+} from "./dashboard/AdminDashboardSections";
 
-function fmtGnf(amount: number): string {
-  if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(1)}M GNF`;
-  if (amount >= 1_000) return `${(amount / 1_000).toFixed(0)}k GNF`;
-  return `${amount.toLocaleString("fr-FR")} GNF`;
+const EMPTY_LIVE: LiveControlSnapshot = {
+  totalUsers: 0,
+  publishedTracks: 0,
+  validListens: 0,
+  royaltyCycles: 0,
+  ledgerEntries: 0,
+  recentTracks: [],
+  recentListens: [],
+  recentCycles: [],
+  recentLedger: [],
+};
+
+const EMPTY_HEALTH: AdminHealthSnapshot = { checks: [], alerts: [] };
+
+export interface AdminCockpitDashboardProps {
+  cockpit: AdminCockpitData;
+  extendedKpis: AdminDashboardKpis;
+  health: AdminHealthSnapshot | null;
+  live: LiveControlSnapshot | null;
+  adminUser: AdminSessionContext;
 }
 
-function formatActivityTimestamp(iso: string): string {
-  const date = new Date(iso);
-  const now = new Date();
-  const isToday =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-
-  const time = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  if (isToday) return time;
-
-  return date.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
+export function AdminCockpitDashboard({
+  cockpit,
+  extendedKpis,
+  health,
+  live,
+  adminUser,
+}: AdminCockpitDashboardProps) {
+  const view = buildAdminDashboardView({
+    adminName: adminUser.fullName,
+    cockpit,
+    extended: extendedKpis,
+    health: health ?? EMPTY_HEALTH,
+    live: live ?? EMPTY_LIVE,
   });
-}
-
-interface AdminKPICardProps {
-  title: string;
-  value: string;
-  sub: string;
-  icon: string;
-  trend: "up" | "down" | "neutral";
-  href: string;
-}
-
-function AdminKPICard({ title, value, sub, icon, trend, href }: AdminKPICardProps) {
-  return (
-    <Link href={href} className="admin-kpi-card">
-      <div className="admin-kpi-header">
-        <span className="admin-kpi-icon" aria-hidden="true">
-          {icon}
-        </span>
-        <span className={`admin-kpi-trend admin-kpi-trend--${trend}`}>
-          {trend === "up" ? "↑" : trend === "down" ? "↓" : "—"}
-        </span>
-      </div>
-      <p className="admin-kpi-value">{value}</p>
-      <p className="admin-kpi-title">{title}</p>
-      <p className="admin-kpi-sub">{sub}</p>
-    </Link>
-  );
-}
-
-interface AdminCockpitDashboardProps {
-  data: AdminCockpitData;
-}
-
-export function AdminCockpitDashboard({ data }: AdminCockpitDashboardProps) {
-  const { kpis, alerts, recentActivity, monthlyRevenue } = data;
-
-  const totalAlerts =
-    alerts.pendingRightsClaims +
-    alerts.pendingWithdrawals +
-    alerts.pendingArtistVerif +
-    alerts.fraudSessions;
-  const hasCriticalAlerts = totalAlerts > 0;
-
-  const premiumRate =
-    kpis.totalUsers > 0 ? ((kpis.premiumUsers / kpis.totalUsers) * 100).toFixed(1) : "0.0";
-
-  const revenueTrend =
-    kpis.revenueChange && parseFloat(kpis.revenueChange) >= 0 ? "up" : "down";
-
-  const usersTrend: "up" | "neutral" = kpis.newUsersToday > 0 ? "up" : "neutral";
-  const artistsTrend: "up" | "neutral" = kpis.newArtistsThisWeek > 0 ? "up" : "neutral";
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">Dashboard</h1>
-        <p className="admin-page-sub">Vue d&apos;ensemble de la plateforme SONAFRIK</p>
+    <div className="admin-dashboard admin-dashboard--human">
+      <AdminCommandHero hero={view.hero} />
+      <AdminPremiumKpiGrid kpis={view.kpis} />
+
+      <div className="admin-human-command-grid">
+        <div className="admin-human-command-grid__main">
+          <AdminPriorityCenter items={view.priorities} />
+          <AdminStoryChartsSection
+            monthlyRevenue={view.monthlyRevenue}
+            narrative={view.business.narrative}
+          />
+          <AdminMusicalTodaySection musical={view.musical} />
+          <AdminBusinessSection business={view.business} />
+          <AdminGovernanceSection governance={view.governance} />
+          <AdminModulesHumanGrid modules={view.modules} />
+        </div>
+        <aside className="admin-human-command-grid__aside">
+          <AdminLiveTimeline items={view.timeline} />
+          <AdminCoachCard tips={view.coachTips} />
+          <AdminPlatformHealthCard services={view.healthServices} />
+        </aside>
       </div>
-
-      {hasCriticalAlerts ? (
-        <div className="admin-alerts-bar" role="alert">
-          <span className="admin-alerts-icon" aria-hidden="true">
-            🔴
-          </span>
-          <span className="admin-alerts-text">
-            {totalAlerts} élément{totalAlerts > 1 ? "s" : ""} nécessitant votre attention :
-          </span>
-          <div className="admin-alerts-items">
-            {alerts.pendingRightsClaims > 0 ? (
-              <Link href="/admin/rights" className="admin-alert-chip admin-alert-chip--danger">
-                {alerts.pendingRightsClaims} réclamation{alerts.pendingRightsClaims > 1 ? "s" : ""} droits
-              </Link>
-            ) : null}
-            {alerts.fraudSessions > 0 ? (
-              <Link href="/admin/fraud" className="admin-alert-chip admin-alert-chip--danger">
-                {alerts.fraudSessions} session{alerts.fraudSessions > 1 ? "s" : ""} fraude
-              </Link>
-            ) : null}
-            {alerts.pendingWithdrawals > 0 ? (
-              <Link href="/admin/finance" className="admin-alert-chip admin-alert-chip--warning">
-                {alerts.pendingWithdrawals} retrait{alerts.pendingWithdrawals > 1 ? "s" : ""} en attente
-              </Link>
-            ) : null}
-            {alerts.pendingArtistVerif > 0 ? (
-              <Link href="/admin/artists" className="admin-alert-chip admin-alert-chip--info">
-                {alerts.pendingArtistVerif} artiste{alerts.pendingArtistVerif > 1 ? "s" : ""} à vérifier
-              </Link>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      <div className="admin-kpis-grid">
-        <AdminKPICard
-          title="Utilisateurs totaux"
-          value={kpis.totalUsers.toLocaleString("fr-FR")}
-          sub={
-            kpis.newUsersToday > 0
-              ? `+${kpis.newUsersToday} aujourd'hui`
-              : "Aucune inscription aujourd'hui"
-          }
-          icon="👥"
-          trend={usersTrend}
-          href="/admin/users"
-        />
-        <AdminKPICard
-          title="Abonnements payants"
-          value={kpis.premiumUsers.toLocaleString("fr-FR")}
-          sub={`${premiumRate}% des utilisateurs`}
-          icon="💳"
-          trend="neutral"
-          href="/admin/users"
-        />
-        <AdminKPICard
-          title="Profils artistes publics"
-          value={kpis.activeArtists.toLocaleString("fr-FR")}
-          sub={
-            kpis.newArtistsThisWeek > 0
-              ? `+${kpis.newArtistsThisWeek} cette semaine`
-              : "Aucun nouveau profil cette semaine"
-          }
-          icon="🎤"
-          trend={artistsTrend}
-          href="/admin/artists"
-        />
-        <AdminKPICard
-          title="Crédits wallet (mois)"
-          value={fmtGnf(kpis.revenueThisMonth)}
-          sub={
-            kpis.revenueChange
-              ? `${parseFloat(kpis.revenueChange) >= 0 ? "+" : ""}${kpis.revenueChange}% vs mois passé`
-              : "Premier mois ou pas de base comparée"
-          }
-          icon="💰"
-          trend={kpis.revenueChange ? revenueTrend : "neutral"}
-          href="/admin/finance"
-        />
-      </div>
-
-      <section className="admin-chart-section">
-        <h2 className="admin-section-title">Crédits wallet — 12 derniers mois</h2>
-        <p className="admin-chart-caption">Somme des entrées credit (entry_type) dans wallet_ledger</p>
-        <AdminRevenueChart data={monthlyRevenue} />
-      </section>
-
-      <section className="admin-modules-section">
-        <h2 className="admin-section-title">Modules de gestion</h2>
-        <div className="admin-modules-grid">
-          {ADMIN_MODULE_CARDS.map((mod) => (
-            <Link key={mod.href} href={mod.href} className="admin-module-card">
-              <span className="admin-module-icon" aria-hidden="true">
-                {mod.icon}
-              </span>
-              <div className="admin-module-info">
-                <p className="admin-module-name">{mod.label}</p>
-                <p className="admin-module-desc">{mod.desc}</p>
-              </div>
-              <span className="admin-module-arrow" aria-hidden="true">
-                →
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="admin-activity-section">
-        <div className="admin-section-header">
-          <h2 className="admin-section-title">Activité récente</h2>
-          <Link href="/admin/audit" className="admin-section-link">
-            Voir tout →
-          </Link>
-        </div>
-        {recentActivity.length === 0 ? (
-          <p className="admin-empty">Aucune activité récente.</p>
-        ) : (
-          <div className="admin-activity-list">
-            {recentActivity.map((item) => (
-              <div key={item.id} className="admin-activity-item">
-                <span className="admin-activity-dot" aria-hidden="true" />
-                <span className="admin-activity-text">{item.action}</span>
-                <span className="admin-activity-time">{formatActivityTimestamp(item.created_at)}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }

@@ -260,7 +260,6 @@ export class AdminDashboardRepository {
 
     if (revenueThisMonthRes.error) throw revenueThisMonthRes.error;
     if (revenueLastMonthRes.error) throw revenueLastMonthRes.error;
-    if (recentActivityRes.error) throw recentActivityRes.error;
     if (ledgerYearRes.error) throw ledgerYearRes.error;
 
     const revenueThisMonth = sumWalletCreditGnf(revenueThisMonthRes.data ?? []);
@@ -276,12 +275,14 @@ export class AdminDashboardRepository {
       totalGnf: monthlyMap.get(monthKey) ?? 0,
     }));
 
-    const recentActivity = (recentActivityRes.data ?? []).map((row) => ({
-      id: row.id as string,
-      action: row.action as string,
-      created_at: row.created_at as string,
-      metadata: (row.metadata as Record<string, unknown> | null) ?? null,
-    }));
+    const recentActivity = recentActivityRes.error
+      ? []
+      : (recentActivityRes.data ?? []).map((row) => ({
+          id: row.id as string,
+          action: row.action as string,
+          created_at: row.created_at as string,
+          metadata: (row.metadata as Record<string, unknown> | null) ?? null,
+        }));
 
     return {
       kpis: {

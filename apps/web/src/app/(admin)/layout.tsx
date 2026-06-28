@@ -5,6 +5,9 @@ import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
 import AdminLoading from "./loading";
 import "@/app/styles/admin.css";
+import "@/app/styles/admin-dashboard-human.css";
+
+export const dynamic = "force-dynamic";
 
 async function AdminGuard({ children }: { children: React.ReactNode }) {
   await requireAdmin();

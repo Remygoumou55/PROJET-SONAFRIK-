@@ -11,6 +11,35 @@
 
 ---
 
+## 2026-06-28 — Sprint Humanization 1 : Centre de Commandement Admin
+
+### Fichiers touchés
+- `apps/web/src/features/admin/lib/buildAdminDashboardView.ts` — view model hero, KPIs, timeline, coach, santé, sections musique/business/gouvernance
+- `apps/web/src/features/admin/lib/humanizeAuditAction.ts` — audit_logs en langage métier
+- `apps/web/src/features/admin/components/dashboard/*` — AdminCommandHero, AdminPremiumKpiGrid, AdminLiveTimeline, AdminCoachHealth, AdminDashboardSections
+- `apps/web/src/features/admin/components/AdminCockpitDashboard.tsx` — composition des 14 phases UX
+- `apps/web/src/features/admin/hooks/useAdminLiveRefresh.ts` — Realtime 11 tables, debounce 300 ms
+- `apps/web/src/app/styles/admin-dashboard-human.css` — styles premium cockpit
+- `apps/web/src/app/(admin)/layout.tsx` — import CSS + `force-dynamic` global admin
+- `apps/web/src/features/admin/lib/getAdminService.ts` — stratégie hybride session/service_role
+- Migrations : `20260628200000`, `20260628210000`, `20260628220000` (GRANTs cockpit, RPCs batch, Realtime)
+
+### Dette technique acceptée
+- Coach = règles métier déterministes (pas LLM)
+- Graphiques multi-séries limités au revenu 12 mois (autres KPIs = sparklines)
+- Top genre/ville/monde partiel (Guinée prioritaire, pas de RPC trending admin dédiée)
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` ✅
+- `pnpm test` **306/306** ✅
+
+### Tests manuels
+- [ ] `/admin` : hero personnalisé, KPIs ~190 users, badge Live Realtime
+- [ ] Priorités + timeline affichent activité récente
+- [ ] Responsive desktop / tablet / mobile
+
+---
+
 ## 2026-06-28 — Audit consolidé + push (Admin 1→2, perf batch)
 
 ### Périmètre livré depuis début session (non pushé avant ce commit)
