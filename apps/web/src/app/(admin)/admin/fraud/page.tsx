@@ -6,11 +6,17 @@ export const metadata = { title: "Fraude — Admin SONAFRIK" };
 
 export default async function AdminFraudPage() {
   const admin = await getAdminServiceForSession();
-  const sessions = await admin.listFraudSessions();
+  const [initialPage, stats] = await Promise.all([
+    admin.listFraudIncidentsPage(200, 0),
+    admin.getFraudSupervisionStats(),
+  ]);
 
   return (
-    <AdminPageFrame title="Fraude streaming" subtitle="Sessions avec fraud_flags actifs">
-      <AdminFraudCenter sessions={sessions} />
+    <AdminPageFrame
+      title="Supervision fraude"
+      subtitle="Centre de supervision humain — écoutes et incidents en temps réel"
+    >
+      <AdminFraudCenter initialPage={initialPage} stats={stats} />
     </AdminPageFrame>
   );
 }

@@ -3,12 +3,16 @@ import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
 import { AdminConfigRepository } from "./admin.config.repository";
 import { AdminDashboardRepository } from "./admin.dashboard.repository";
 import { AdminFinancialRepository } from "./admin.financial.repository";
+import { AdminFraudRepository } from "./admin.fraud.repository";
 import { AdminModerationRepository } from "./admin.moderation.repository";
 import type {
   AdminAlert,
   AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudSession,
+  AdminFraudIncidentsPage,
+  AdminFraudStreamEvent,
+  AdminFraudSupervisionStats,
   AdminHealthSnapshot,
   AdminNavBadges,
   AdminRevenueDashboardData,
@@ -23,12 +27,14 @@ export class AdminRepository {
   private readonly moderation: AdminModerationRepository;
   private readonly dashboard: AdminDashboardRepository;
   private readonly financial: AdminFinancialRepository;
+  private readonly fraud: AdminFraudRepository;
 
   constructor(client: SonafrikSupabaseClient) {
     this.config = new AdminConfigRepository(client);
     this.moderation = new AdminModerationRepository(client);
     this.dashboard = new AdminDashboardRepository(client);
     this.financial = new AdminFinancialRepository(client);
+    this.fraud = new AdminFraudRepository(client);
   }
 
   listFeatureFlags(): Promise<FeatureFlag[]> {
@@ -74,6 +80,18 @@ export class AdminRepository {
 
   listFraudSessions(limit = 50): Promise<AdminFraudSession[]> {
     return this.moderation.listFraudSessions(limit);
+  }
+
+  listFraudIncidentsPage(limit = 200, offset = 0): Promise<AdminFraudIncidentsPage> {
+    return this.fraud.listFraudIncidentsPage(limit, offset);
+  }
+
+  getFraudSupervisionStats(): Promise<AdminFraudSupervisionStats> {
+    return this.fraud.getFraudSupervisionStats();
+  }
+
+  listFraudSessionEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
+    return this.fraud.listSessionStreamEvents(sessionId, limit);
   }
 
   getDashboardKpis(): Promise<AdminDashboardKpis> {

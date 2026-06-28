@@ -1,0 +1,237 @@
+import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import type {
+  AdminFraudIncident,
+  AdminFraudIncidentsPage,
+  AdminFraudStreamEvent,
+  AdminFraudSupervisionStats,
+} from "./types";
+
+const SESSION_SELECT =
+  "id, user_id, track_id, platform, started_at, completed_at, last_heartbeat_at, total_listened_seconds, total_duration_seconds, listen_percentage, fraud_flags, is_valid_listen, ip_address, user_agent";
+
+type SessionRow = {
+  id: string;
+  user_id: string;
+  track_id: string;
+  platform: string;
+  started_at: string;
+  completed_at: string | null;
+  last_heartbeat_at: string;
+  total_listened_seconds: number;
+  total_duration_seconds: number;
+  listen_percentage: number;
+  fraud_flags: string[];
+  is_valid_listen: boolean;
+  ip_address: string | null;
+  user_agent: string | null;
+};
+
+function startOfTodayIso(): string {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+function isCritical(flags: string[]): boolean {
+  return flags.some((f) =>
+    ["multi_session_start", "bot_pattern", "duplicate_session"].includes(f),
+  );
+}
+
+export class AdminFraudRepository {
+  constructor(private readonly client: SonafrikSupabaseClient) {}
+
+  async listFraudIncidentsPage(limit = 200, offset = 0): Promise<AdminFraudIncidentsPage> {
+    const { count, error: countError } = await this.client
+      .from("stream_sessions")
+      .select("*", { count: "exact", head: true })
+      .filter("fraud_flags", "neq", "{}");
+
+    if (countError) throw countError;
+
+    const { data, error } = await this.client
+      .from("stream_sessions")
+      .select(SESSION_SELECT)
+      .filter("fraud_flags", "neq", "{}")
+      .order("started_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+
+    const rows = (data ?? []) as unknown as SessionRow[];
+    const items = await this.enrichSessions(rows);
+
+    return {
+      items,
+      total: count ?? items.length,
+      limit,
+      offset,
+    };
+  }
+
+  async getFraudSupervisionStats(): Promise<AdminFraudSupervisionStats> {
+    const todayStart = startOfTodayIso();
+
+    const [todayRes, flaggedTodayRes, criticalRes, validTodayRes, rejectedTodayRes, activeRes] =
+      await Promise.all([
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .gte("started_at", todayStart),
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .gte("started_at", todayStart)
+          .filter("fraud_flags", "neq", "{}"),
+        this.client
+          .from("stream_sessions")
+          .select("fraud_flags")
+          .gte("started_at", todayStart)
+          .filter("fraud_flags", "neq", "{}")
+          .limit(500),
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .gte("started_at", todayStart)
+          .eq("is_valid_listen", true)
+          .filter("fraud_flags", "eq", "{}"),
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .gte("started_at", todayStart)
+          .eq("is_valid_listen", false),
+        this.client
+          .from("stream_sessions")
+          .select("*", { count: "exact", head: true })
+          .is("completed_at", null)
+          .gte("last_heartbeat_at", new Date(Date.now() - 5 * 60 * 1000).toISOString()),
+      ]);
+
+    const criticalRows = (criticalRes.data ?? []) as { fraud_flags: string[] }[];
+    const criticalIncidents = criticalRows.filter((r) => isCritical(r.fraud_flags)).length;
+
+    const { count: suspendedHint } = await this.client
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .gte("fraud_score", 70);
+
+    return {
+      todayTotal: todayRes.count ?? 0,
+      activeSessions: activeRes.count ?? 0,
+      fraudDetectedToday: flaggedTodayRes.count ?? 0,
+      criticalIncidents,
+      normalSessionsToday: validTodayRes.count ?? 0,
+      suspendedAccountsHint: suspendedHint ?? 0,
+      validListensToday: validTodayRes.count ?? 0,
+      rejectedListensToday: rejectedTodayRes.count ?? 0,
+    };
+  }
+
+  async listSessionStreamEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
+    const { data, error } = await this.client
+      .from("stream_events")
+      .select("id, event_type, position_seconds, metadata, created_at")
+      .eq("session_id", sessionId)
+      .order("created_at", { ascending: true })
+      .limit(limit);
+
+    if (error) throw error;
+
+    return (data ?? []).map((row) => ({
+      id: row.id as string,
+      event_type: row.event_type as string,
+      position_seconds: row.position_seconds as number,
+      metadata: (row.metadata as Record<string, unknown> | null) ?? null,
+      created_at: row.created_at as string,
+    }));
+  }
+
+  private async enrichSessions(rows: SessionRow[]): Promise<AdminFraudIncident[]> {
+    if (rows.length === 0) return [];
+
+    const userIds = [...new Set(rows.map((r) => r.user_id))];
+    const trackIds = [...new Set(rows.map((r) => r.track_id))];
+
+    const [profilesRes, tracksRes] = await Promise.all([
+      this.client.from("profiles").select("id, full_name, country_code").in("id", userIds),
+      this.client
+        .from("tracks")
+        .select("id, title, creator_id, albums(title)")
+        .in("id", trackIds),
+    ]);
+
+    if (profilesRes.error) throw profilesRes.error;
+    if (tracksRes.error) throw tracksRes.error;
+
+    type TrackRow = {
+      id: string;
+      title: string;
+      creator_id: string;
+      albums: { title: string } | null;
+    };
+
+    const profileMap = new Map(
+      (profilesRes.data ?? []).map((p) => [
+        p.id as string,
+        { name: p.full_name as string | null, country: p.country_code as string | null },
+      ]),
+    );
+
+    const trackMap = new Map(
+      ((tracksRes.data ?? []) as unknown as TrackRow[]).map((t) => [
+        t.id,
+        {
+          title: t.title,
+          albumTitle: t.albums?.title ?? null,
+          creatorId: t.creator_id,
+        },
+      ]),
+    );
+
+    const creatorIds = [
+      ...new Set(
+        ((tracksRes.data ?? []) as unknown as TrackRow[]).map((t) => t.creator_id).filter(Boolean),
+      ),
+    ];
+
+    let artistMap = new Map<string, string>();
+    if (creatorIds.length > 0) {
+      const artistsRes = await this.client
+        .from("artist_profiles")
+        .select("creator_id, stage_name")
+        .in("creator_id", creatorIds);
+      if (artistsRes.error) throw artistsRes.error;
+      artistMap = new Map(
+        (artistsRes.data ?? []).map((a) => [a.creator_id as string, a.stage_name as string]),
+      );
+    }
+
+    return rows.map((row) => {
+      const profile = profileMap.get(row.user_id);
+      const track = trackMap.get(row.track_id);
+      const creatorId = track?.creatorId ?? null;
+      return {
+        id: row.id,
+        user_id: row.user_id,
+        track_id: row.track_id,
+        platform: row.platform,
+        started_at: row.started_at,
+        completed_at: row.completed_at,
+        last_heartbeat_at: row.last_heartbeat_at,
+        total_listened_seconds: row.total_listened_seconds,
+        total_duration_seconds: row.total_duration_seconds,
+        listen_percentage: row.listen_percentage,
+        fraud_flags: row.fraud_flags,
+        is_valid_listen: row.is_valid_listen,
+        ip_address: row.ip_address ? String(row.ip_address) : null,
+        user_agent: row.user_agent,
+        user_name: profile?.name ?? null,
+        user_country: profile?.country ?? null,
+        track_title: track?.title ?? null,
+        album_title: track?.albumTitle ?? null,
+        artist_name: creatorId ? (artistMap.get(creatorId) ?? null) : null,
+        artist_creator_id: creatorId,
+      };
+    });
+  }
+}

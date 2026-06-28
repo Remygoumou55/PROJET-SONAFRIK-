@@ -10,6 +10,9 @@ import type {
   AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudSession,
+  AdminFraudIncidentsPage,
+  AdminFraudStreamEvent,
+  AdminFraudSupervisionStats,
   AdminHealthSnapshot,
   AdminNavBadges,
   AdminRevenueDashboardData,
@@ -95,6 +98,18 @@ export class AdminService {
 
   async listFraudSessions(limit = 50): Promise<AdminFraudSession[]> {
     return this.repository.listFraudSessions(limit);
+  }
+
+  async listFraudIncidentsPage(limit = 200, offset = 0): Promise<AdminFraudIncidentsPage> {
+    return this.repository.listFraudIncidentsPage(limit, offset);
+  }
+
+  async getFraudSupervisionStats(): Promise<AdminFraudSupervisionStats> {
+    return this.repository.getFraudSupervisionStats();
+  }
+
+  async listFraudSessionEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
+    return this.repository.listFraudSessionEvents(sessionId, limit);
   }
 
   async getDashboardKpis(): Promise<AdminDashboardKpis> {

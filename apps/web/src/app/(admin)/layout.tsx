@@ -5,6 +5,11 @@ import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { isDevBypassActive } from "@/lib/auth/guards";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
 import AdminLoading from "./loading";
+/* Charge admin CSS sur la route — globals.css seul ne suffit pas en dev (HMR / nested @import). */
+import "@/app/styles/admin.css";
+import "@/app/styles/admin-dashboard-human.css";
+import "@/app/styles/admin-responsive.css";
+import "@/app/styles/admin-fraud-human.css";
 
 export const dynamic = "force-dynamic";
 

@@ -11,6 +11,24 @@
 
 ---
 
+## 2026-06-28 — Back Office Humanization : Supervision Fraude (Phases 1–12)
+
+### Fichiers touchés
+- `packages/api/src/admin/admin.fraud.repository.ts` — incidents enrichis, stats, events (nouvelles méthodes)
+- `apps/web/src/features/admin/lib/fraud/*` — humanisation, filtres, store local évolutif
+- `apps/web/src/features/admin/components/fraud/*` — dashboard, toolbar, cards, drawer, timeline, bulk
+- `apps/web/src/features/admin/components/AdminFraudCenter.tsx` — orchestrateur cockpit
+- `apps/web/src/app/styles/admin-fraud-human.css` — design centre de supervision
+
+### Dette technique
+- Actions admin (traité/archivé/masqué) = localStorage navigateur — migration table `admin_fraud_reviews` Phase 2
+- Pas de write API (respect contrainte APIs existantes)
+
+### Validation
+- `pnpm typecheck` + `pnpm build` web ✅
+
+---
+
 ## 2026-06-28 — MRCDOP Phases 2–4 + fix actions admin
 
 ### Fichiers touchés

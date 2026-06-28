@@ -26,7 +26,10 @@
 @import "./styles/lancement.css";
 @import "./styles/responsive-system.css";
 @import "./styles/wallet.css";
-@import "./styles/admin-bundle.css";
+@import "./styles/admin.css";
+@import "./styles/admin-dashboard-human.css";
+@import "./styles/admin-responsive.css";
+@import "./styles/admin-fraud-human.css";
 
 @theme {
   --color-vert-energie: #00d26a;

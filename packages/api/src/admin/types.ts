@@ -36,6 +36,45 @@ export type AdminFraudSession = {
   ip_address: string | null;
 };
 
+/** Incident enrichi pour le centre de supervision fraude (lecture seule + métadonnées jointes). */
+export type AdminFraudIncident = AdminFraudSession & {
+  user_name: string | null;
+  user_country: string | null;
+  track_title: string | null;
+  album_title: string | null;
+  artist_name: string | null;
+  artist_creator_id: string | null;
+  user_agent: string | null;
+  completed_at: string | null;
+  last_heartbeat_at: string | null;
+};
+
+export type AdminFraudIncidentsPage = {
+  items: AdminFraudIncident[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+export type AdminFraudStreamEvent = {
+  id: string;
+  event_type: string;
+  position_seconds: number;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+};
+
+export type AdminFraudSupervisionStats = {
+  todayTotal: number;
+  activeSessions: number;
+  fraudDetectedToday: number;
+  criticalIncidents: number;
+  normalSessionsToday: number;
+  suspendedAccountsHint: number;
+  validListensToday: number;
+  rejectedListensToday: number;
+};
+
 export type AdminDashboardKpis = {
   totalUsers: number;
   premiumUsers: number;
