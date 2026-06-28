@@ -48,6 +48,16 @@
 
   --color-pending: #f5a623;
 
+  /* Admin back-office */
+  --color-admin-sidebar: #0a0a0a;
+  --color-admin-warning: #ff8c00;
+  --color-admin-card-bg: rgba(255, 255, 255, 0.03);
+  --color-admin-card-border: rgba(255, 255, 255, 0.08);
+  --color-admin-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-admin-text-muted: rgba(255, 255, 255, 0.45);
+  --color-admin-text-soft: rgba(255, 255, 255, 0.4);
+  --color-admin-section-gold: rgba(255, 194, 14, 0.55);
+
   /* Google Sign-In brand (guidelines officielles — usage SVG auth uniquement) */
   --color-google-blue: #4285f4;
   --color-google-green: #34a853;

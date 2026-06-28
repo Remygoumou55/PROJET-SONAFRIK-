@@ -6,9 +6,11 @@ import { createRoyaltyService, type RoyaltyService } from "../royalties/royalty.
 import { toggleFeatureFlagSchema, updateSystemSettingSchema, triggerRoyaltyCycleSchema } from "./schemas";
 import type { TriggerRoyaltyCycleInput } from "./schemas";
 import type {
+  AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudSession,
   AdminHealthSnapshot,
+  AdminNavBadges,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,
@@ -93,6 +95,14 @@ export class AdminService {
     return this.repository.getDashboardKpis();
   }
 
+  async getNavBadges(): Promise<AdminNavBadges> {
+    return this.repository.getNavBadges();
+  }
+
+  async getCockpitData(): Promise<AdminCockpitData> {
+    return this.repository.getCockpitData();
+  }
+
   async getHealthSnapshot(): Promise<AdminHealthSnapshot> {
     return this.repository.getHealthSnapshot();
   }
@@ -121,9 +131,11 @@ export function createAdminService(client: SonafrikSupabaseClient): AdminService
 }
 
 export type {
+  AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudSession,
   AdminHealthSnapshot,
+  AdminNavBadges,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,

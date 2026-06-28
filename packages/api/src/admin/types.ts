@@ -55,11 +55,56 @@ export type AdminHealthCheck = {
   detail?: string;
 };
 
+export type AdminNavBadges = {
+  content: number;
+  moderation: number;
+  withdrawals: number;
+};
+
+export type AdminAuditActivityItem = {
+  id: string;
+  action: string;
+  created_at: string;
+  metadata: Record<string, unknown> | null;
+};
+
 export type AdminAlert = {
   id: string;
   type: string;
   message: string;
   created_at: string;
+};
+
+export type AdminCockpitKpis = {
+  totalUsers: number;
+  newUsersToday: number;
+  premiumUsers: number;
+  activeArtists: number;
+  newArtistsThisWeek: number;
+  publishedTracks: number;
+  pendingTracks: number;
+  revenueThisMonth: number;
+  revenueLastMonth: number;
+  revenueChange: string | null;
+};
+
+export type AdminCockpitAlerts = {
+  pendingSignalements: number;
+  pendingWithdrawals: number;
+  pendingArtistVerif: number;
+};
+
+export type AdminMonthlyRevenue = {
+  monthKey: string;
+  label: string;
+  totalGnf: number;
+};
+
+export type AdminCockpitData = {
+  kpis: AdminCockpitKpis;
+  alerts: AdminCockpitAlerts;
+  recentActivity: AdminAuditActivityItem[];
+  monthlyRevenue: AdminMonthlyRevenue[];
 };
 
 export type AdminHealthSnapshot = {

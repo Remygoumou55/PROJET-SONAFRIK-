@@ -5,9 +5,11 @@ import { AdminDashboardRepository } from "./admin.dashboard.repository";
 import { AdminModerationRepository } from "./admin.moderation.repository";
 import type {
   AdminAlert,
+  AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudSession,
   AdminHealthSnapshot,
+  AdminNavBadges,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,
@@ -71,6 +73,14 @@ export class AdminRepository {
 
   getDashboardKpis(): Promise<AdminDashboardKpis> {
     return this.dashboard.getDashboardKpis();
+  }
+
+  getNavBadges(): Promise<AdminNavBadges> {
+    return this.dashboard.getNavBadges();
+  }
+
+  getCockpitData(): Promise<AdminCockpitData> {
+    return this.dashboard.getCockpitData();
   }
 
   listUnreadAdminAlerts(limit = 10): Promise<AdminAlert[]> {
