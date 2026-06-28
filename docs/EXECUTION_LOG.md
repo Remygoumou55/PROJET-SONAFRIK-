@@ -11,6 +11,25 @@
 
 ---
 
+## 2026-06-27 — Profile Phase 7 : Smart Goals Engine
+
+### Fichiers touchés
+- `lib/profileGoals/` — types, registry, adapters, buildSmartGoals (moteur data-driven)
+- `ProfileGoalsSection.tsx` + PrimaryCard, SecondaryList, ProgressSummary
+- `identity-goals.css` — carte premium « Mes objectifs »
+- `ProfileHeader.tsx` — insertion après Mon Parcours (seul fichier profil modifié)
+
+### Validation
+- `pnpm lint` + `typecheck` + `build` — ✅
+- Aucune API/DB touchée
+
+### Tests à faire
+- [ ] Auditeur : objectif principal profil + secondaires découverte
+- [ ] Artiste : objectifs création/catalogue
+- [ ] Mobile 390px : pas de débordement
+
+---
+
 ## 2026-06-27 — Listen P4 : Player complet cliquable
 
 ### Fichiers touchés

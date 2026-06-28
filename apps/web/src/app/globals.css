@@ -259,6 +259,7 @@ body {
 @import "./styles/performance.css";
 @import "./styles/identity-account.css";
 @import "./styles/identity-journey.css";
+@import "./styles/identity-goals.css";
 @import "./styles/identity-rewards.css";
 @import "./styles/identity-musical.css";
 @import "./styles/identity-story.css";

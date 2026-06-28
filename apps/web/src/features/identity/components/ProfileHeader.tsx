@@ -2,6 +2,7 @@ import type { IdentityContext } from "@sonafrik/types";
 import { BecomeArtistButton } from "./BecomeArtistButton";
 import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
+import { ProfileGoalsSection } from "./ProfileGoalsSection";
 import { ProfileJourneySection } from "./ProfileJourneySection";
 import { ProfileMusicalIdentitySection } from "./ProfileMusicalIdentitySection";
 import { ProfileRewardsSection } from "./ProfileRewardsSection";
@@ -32,6 +33,12 @@ export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderPro
       />
 
       <ProfileJourneySection
+        profile={context.profile}
+        activity={activity}
+        isArtist={isArtist}
+      />
+
+      <ProfileGoalsSection
         profile={context.profile}
         activity={activity}
         isArtist={isArtist}
