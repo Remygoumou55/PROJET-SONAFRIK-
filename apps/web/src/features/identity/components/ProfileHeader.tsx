@@ -2,6 +2,7 @@ import type { IdentityContext } from "@sonafrik/types";
 import { BecomeArtistButton } from "./BecomeArtistButton";
 import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
+import { ProfileJourneySection } from "./ProfileJourneySection";
 import { isArtistAccount, type ProfileActivitySummary } from "../lib/profilePresentation";
 
 interface ProfileHeaderProps {
@@ -16,6 +17,12 @@ export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderPro
   return (
     <div className="identity-profile">
       <ProfileHeroPassport context={context} avatarUrl={avatarUrl} />
+
+      <ProfileJourneySection
+        profile={context.profile}
+        activity={activity}
+        isArtist={isArtist}
+      />
 
       <ProfileActivitySection activity={activity} isArtist={isArtist} />
 

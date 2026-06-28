@@ -1,0 +1,452 @@
+/* ── Mon Parcours SONAFRIK — Phase 3 ── */
+
+.identity-journey {
+  margin-top: 1.25rem;
+  border: 1px solid var(--color-bordure);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 0% 0%, rgb(255 193 7 / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 100%, rgb(0 210 106 / 0.06) 0%, transparent 55%),
+    var(--color-surface);
+  padding: 1.5rem;
+}
+
+.identity-journey__header {
+  margin-bottom: 1.25rem;
+}
+
+.identity-journey__title {
+  color: var(--color-texte-principal);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.identity-journey__motivation {
+  color: var(--color-or-solaire);
+  margin-top: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ── Progress bar premium ── */
+
+.identity-journey-progress {
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.02);
+  padding: 1.125rem 1rem;
+}
+
+.identity-journey-progress__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.identity-journey-progress__percent {
+  display: block;
+  color: var(--color-vert-energie);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.identity-journey-progress__label {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.identity-journey-progress__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem 1rem;
+}
+
+.identity-journey-progress__count {
+  color: var(--color-texte-secondaire);
+  font-size: 0.8125rem;
+}
+
+.identity-journey-progress__count strong {
+  color: var(--color-texte-principal);
+  font-weight: 700;
+}
+
+.identity-journey-progress__count--done strong {
+  color: var(--color-vert-energie);
+}
+
+.identity-journey-progress__track {
+  position: relative;
+  height: 0.625rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.identity-journey-progress__fill {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-vert-energie), var(--color-or-solaire));
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.identity-journey-progress__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgb(0 210 106 / 0.35), rgb(255 193 7 / 0.25));
+  filter: blur(6px);
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.identity-journey-progress__steps-meta {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 640px) {
+  .identity-journey-progress__steps-meta {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+.identity-journey-progress__step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.identity-journey-progress__step-label {
+  color: var(--color-texte-secondaire);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.identity-journey-progress__step-value {
+  color: var(--color-texte-principal);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.identity-journey-progress__step--current .identity-journey-progress__step-value {
+  color: var(--color-vert-energie);
+}
+
+.identity-journey-progress__step--next .identity-journey-progress__step-value {
+  color: var(--color-or-solaire);
+}
+
+/* ── Layout goal + timeline ── */
+
+.identity-journey__layout {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .identity-journey__layout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: start;
+  }
+}
+
+/* ── Next goal card ── */
+
+.identity-journey-goal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid rgb(0 210 106 / 0.18);
+  border-radius: 1rem;
+  background: linear-gradient(
+    160deg,
+    rgb(0 210 106 / 0.08) 0%,
+    rgb(255 255 255 / 0.02) 100%
+  );
+  padding: 1.25rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.identity-journey-goal:hover,
+.identity-journey-goal:focus-within {
+  border-color: rgb(0 210 106 / 0.32);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.22);
+}
+
+.identity-journey-goal--complete {
+  border-color: rgb(255 193 7 / 0.25);
+  background: linear-gradient(
+    160deg,
+    rgb(255 193 7 / 0.1) 0%,
+    rgb(255 255 255 / 0.02) 100%
+  );
+}
+
+.identity-journey-goal__eyebrow {
+  color: var(--color-or-solaire);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.identity-journey-goal__badge {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.identity-journey-goal__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-texte-principal);
+  margin-top: 0.35rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.identity-journey-goal__icon {
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.identity-journey-goal__block {
+  margin-top: 1rem;
+}
+
+.identity-journey-goal__block-label {
+  color: var(--color-or-solaire);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.identity-journey-goal__why {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.identity-journey-goal__benefits {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.875rem;
+  padding-left: 1.125rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  list-style: disc;
+}
+
+.identity-journey-goal__benefits li + li {
+  margin-top: 0.25rem;
+}
+
+.identity-journey-goal__cta {
+  margin-top: auto;
+  padding-top: 1.125rem;
+  align-self: flex-start;
+}
+
+/* ── Timeline ── */
+
+.identity-journey-timeline {
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.02);
+  padding: 1.125rem 1rem;
+  max-height: 28rem;
+  overflow-y: auto;
+}
+
+.identity-journey-timeline__title {
+  color: var(--color-texte-principal);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.identity-journey-timeline__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.identity-journey-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  padding: 0.625rem 0.5rem;
+  border-radius: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.identity-journey-step:hover {
+  background: rgb(255 255 255 / 0.03);
+}
+
+.identity-journey-step__connector {
+  position: absolute;
+  top: 2.5rem;
+  left: 1.375rem;
+  width: 2px;
+  height: calc(100% - 1.25rem);
+  background: rgb(255 255 255 / 0.08);
+  transform: translateX(-50%);
+}
+
+.identity-journey-step--completed .identity-journey-step__connector {
+  background: linear-gradient(
+    180deg,
+    var(--color-vert-energie),
+    rgb(255 255 255 / 0.08)
+  );
+}
+
+.identity-journey-step__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: var(--color-noir-profond);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.identity-journey-step--current .identity-journey-step__marker {
+  border-color: var(--color-vert-energie);
+  box-shadow: 0 0 0 3px rgb(0 210 106 / 0.15);
+  transform: scale(1.05);
+}
+
+.identity-journey-step--completed .identity-journey-step__marker {
+  border-color: var(--color-vert-energie);
+  background: rgb(0 210 106 / 0.12);
+}
+
+.identity-journey-step--locked .identity-journey-step__marker {
+  opacity: 0.45;
+}
+
+.identity-journey-step__check {
+  color: var(--color-vert-energie);
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.identity-journey-step__lock {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.identity-journey-step__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.identity-journey-step__body {
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.identity-journey-step__title {
+  color: var(--color-texte-principal);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.identity-journey-step--completed .identity-journey-step__title {
+  color: var(--color-texte-secondaire);
+}
+
+.identity-journey-step--current .identity-journey-step__title {
+  color: var(--color-texte-principal);
+  font-weight: 700;
+}
+
+.identity-journey-step--locked .identity-journey-step__title {
+  color: var(--color-texte-secondaire);
+  opacity: 0.65;
+}
+
+.identity-journey-step__status {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+}
+
+.identity-journey-step--current .identity-journey-step__status {
+  color: var(--color-vert-energie);
+  font-weight: 600;
+}
+
+.identity-journey-step__sr-index {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.identity-journey-step:focus-within {
+  outline: 2px solid var(--color-vert-energie);
+  outline-offset: 2px;
+}
+
+@media (max-width: 639px) {
+  .identity-journey {
+    padding: 1.125rem;
+  }
+
+  .identity-journey-progress__percent {
+    font-size: 1.625rem;
+  }
+
+  .identity-journey-timeline {
+    max-height: none;
+  }
+}

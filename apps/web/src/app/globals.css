@@ -258,6 +258,7 @@ body {
 @import "./styles/identity.css";
 @import "./styles/performance.css";
 @import "./styles/identity-account.css";
+@import "./styles/identity-journey.css";
 @import "./styles/revenue.css";
 @import "./styles/creator.css";
 @import "./styles/lancement.css";
