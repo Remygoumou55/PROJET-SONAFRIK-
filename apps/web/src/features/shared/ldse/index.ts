@@ -22,5 +22,15 @@ export {
   useAdminLdse,
   useAdminNavBadges,
   useAdminFraudMetrics,
+  useAdminModerationMetrics,
+  useAdminUserMetrics,
   publishAdminLdseEvent,
 } from "./admin/AdminLdseProvider";
+export {
+  NOTIFICATIONS_LDSE_EVENTS,
+  NOTIFICATIONS_LDSE_KEYS,
+} from "./notifications/notifications-ldse-config";
+export {
+  useNotificationsLdseCount,
+  publishNotificationLdseEvent,
+} from "./notifications/useNotificationsLdseCount";

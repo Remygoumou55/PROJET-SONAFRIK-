@@ -5,6 +5,10 @@ import type { Notification, NotificationType } from "@sonafrik/types";
 import { NOTIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { formatDateTime } from "@/lib/formatters";
 import { useNotificationsService } from "../hooks/useNotificationsService";
+import {
+  publishNotificationLdseEvent,
+} from "@/features/shared/ldse/notifications/useNotificationsLdseCount";
+import { NOTIFICATIONS_LDSE_EVENTS } from "@/features/shared/ldse/notifications/notifications-ldse-config";
 
 const TYPE_STYLE: Record<NotificationType, { bg: string; text: string }> = {
   stream_milestone:     { bg: "rgba(59,130,246,0.13)",  text: "var(--color-accent-bleu-clair)" },
@@ -32,8 +36,9 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
         prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)),
       );
       await service.markRead({ notificationId: id }).catch(() => {});
+      publishNotificationLdseEvent(NOTIFICATIONS_LDSE_EVENTS.read, userId, { notificationId: id });
     },
-    [service],
+    [service, userId],
   );
 
   const markAllRead = useCallback(async () => {
@@ -41,6 +46,7 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
     const now = new Date().toISOString();
     setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? now })));
     await service.markAllRead(userId).catch(() => {});
+    publishNotificationLdseEvent(NOTIFICATIONS_LDSE_EVENTS.readAll, userId);
     setMarkingAll(false);
   }, [service, userId]);
 

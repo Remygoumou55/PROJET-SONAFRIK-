@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { AdminLiveSnapshot } from "@sonafrik/api/admin";
-import { LdseProvider, LdseDevPanel } from "@/features/shared/ldse";
 import { AdminLdseProvider } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { AdminHeader, type AdminHeaderUser } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
@@ -42,10 +41,8 @@ export function AdminLayoutClient({
   }, [navOpen]);
 
   return (
-    <LdseProvider>
-      <AdminLdseProvider initialSnapshot={liveSnapshot}>
-        <LdseDevPanel />
-        <div className={`admin-layout${navOpen ? " admin-layout--nav-open" : ""}`}>
+    <AdminLdseProvider initialSnapshot={liveSnapshot}>
+      <div className={`admin-layout${navOpen ? " admin-layout--nav-open" : ""}`}>
           <button
             type="button"
             className="admin-sidebar-backdrop"
@@ -64,7 +61,6 @@ export function AdminLayoutClient({
             <div className="admin-content">{children}</div>
           </div>
         </div>
-      </AdminLdseProvider>
-    </LdseProvider>
+    </AdminLdseProvider>
   );
 }

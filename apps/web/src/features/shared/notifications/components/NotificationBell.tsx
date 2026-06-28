@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useNotificationsService } from "../hooks/useNotificationsService";
-import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
+import { useNotificationsLdseCount } from "@/features/shared/ldse/notifications/useNotificationsLdseCount";
 
 interface Props {
   initialCount: number;
@@ -11,29 +9,7 @@ interface Props {
 }
 
 export function NotificationBell({ initialCount, userId }: Props) {
-  const [count, setCount] = useState(initialCount);
-  const notifications = useNotificationsService();
-
-  useRealtimeChannel(
-    `notif_bell_${userId}`,
-    [
-      {
-        event: "INSERT",
-        table: "notifications",
-        filter: `user_id=eq.${userId}`,
-        onEvent: () => setCount((prev) => prev + 1),
-      },
-      {
-        event: "UPDATE",
-        table: "notifications",
-        filter: `user_id=eq.${userId}`,
-        onEvent: () => {
-          void notifications.countUnread(userId).then((c) => setCount(c));
-        },
-      },
-    ],
-    !!userId,
-  );
+  const { count } = useNotificationsLdseCount(userId, initialCount);
 
   return (
     <Link

@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import { SONAFRIK_BRAND } from "@sonafrik/types";
+import { RootLdseShell } from "@/features/shared/ldse/RootLdseShell";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -65,7 +66,9 @@ export default function RootLayout({
         <link rel="prefetch" href="/listen" as="document" />
         <link rel="prefetch" href="/auth/connexion" as="document" />
       </head>
-      <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-noir-profond text-texte-principal`}>{children}</body>
+      <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-noir-profond text-texte-principal`}>
+        <RootLdseShell>{children}</RootLdseShell>
+      </body>
     </html>
   );
 }

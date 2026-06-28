@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import { formatDateTime } from "@/lib/formatters";
 import { adminReviewCatalogAction } from "../actions/admin-moderation.actions";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { useAdminModerationMetrics } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { AdminModerationActions } from "./AdminModerationActions";
 import { AdminReasonModal } from "./AdminReasonModal";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
@@ -22,6 +24,7 @@ const RELEASE_TYPE_LABELS: Record<string, string> = {
 
 export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
   const { error, setError, isPending, run } = useAdminActionRunner();
+  const moderationMetrics = useAdminModerationMetrics();
   const [items, setItems] = useState<PendingCatalogItem[]>(initialItems);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const displayError = error ?? loadError;
@@ -44,6 +47,7 @@ export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
       const ok = await run(
         () => adminReviewCatalogAction({ id, entityType, action, reason }),
         {
+          ldseEvent: { type: ADMIN_LDSE_EVENTS.catalogUpdated, payload: { id, entityType, action } },
           onSuccess: () => {
             setItems((prev) => prev.filter((item) => item.id !== id));
           },
@@ -65,7 +69,11 @@ export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
   return (
     <div className="admin-catalog-center space-y-4">
       <p className="admin-page-sub">
-        {items.length} élément{items.length !== 1 ? "s" : ""} en attente d&apos;approbation
+        {moderationMetrics.pendingCatalog} élément{moderationMetrics.pendingCatalog !== 1 ? "s" : ""} en
+        attente d&apos;approbation
+        {items.length !== moderationMetrics.pendingCatalog
+          ? ` · ${items.length} chargé${items.length !== 1 ? "s" : ""} localement`
+          : ""}
       </p>
 
       {displayError ? (

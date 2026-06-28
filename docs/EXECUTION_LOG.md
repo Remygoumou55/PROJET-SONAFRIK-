@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-06-28 — LDSE v2 : moderation + users SSOT + notifications
+
+### Fichiers touchés
+- `packages/api/src/admin/admin.metrics.repository.ts` — `getModerationMetrics()`, `getUserMetrics()`, `buildNavBadges()`
+- `packages/api/src/admin/admin.dashboard.repository.ts` — refactor complet sur metrics SSOT
+- `apps/web/src/features/shared/ldse/**` — hooks moderation/user, notifications LDSE, RootLdseShell
+- `apps/web/src/features/admin/hooks/useAdminActionRunner.ts` — option `ldseEvent`
+- Catalog / Rights / Finance / Withdrawals centers — publish LDSE après mutation
+- `NotificationBell` + `NotificationsList` — sync compteur via Event Bus
+
+### Validation
+- `pnpm typecheck` + `pnpm lint` + `pnpm build` ✅
+
+---
+
 ## 2026-06-28 — LDSE v1.0 : Live Data Synchronization Engine (Admin)
 
 ### Fichiers touchés

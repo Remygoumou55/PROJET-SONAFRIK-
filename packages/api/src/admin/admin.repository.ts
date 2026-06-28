@@ -17,7 +17,9 @@ import type {
   AdminFraudSupervisionStats,
   AdminHealthSnapshot,
   AdminLiveSnapshot,
+  AdminModerationMetrics,
   AdminNavBadges,
+  AdminUserMetrics,
   AdminRevenueDashboardData,
   AdminWithdrawalsDashboardMeta,
   AdminRightsClaim,
@@ -103,14 +105,25 @@ export class AdminRepository {
     return this.metrics.getFraudMetrics();
   }
 
+  getModerationMetrics(): Promise<AdminModerationMetrics> {
+    return this.metrics.getModerationMetrics();
+  }
+
+  getUserMetrics(): Promise<AdminUserMetrics> {
+    return this.metrics.getUserMetrics();
+  }
+
   async getAdminLiveSnapshot(): Promise<AdminLiveSnapshot> {
-    const [navBadges, fraudMetrics] = await Promise.all([
-      this.getNavBadges(),
-      this.getFraudMetrics(),
+    const [fraudMetrics, moderationMetrics, userMetrics] = await Promise.all([
+      this.metrics.getFraudMetrics(),
+      this.metrics.getModerationMetrics(),
+      this.metrics.getUserMetrics(),
     ]);
     return {
-      navBadges,
+      navBadges: this.metrics.buildNavBadges(fraudMetrics, moderationMetrics),
       fraudMetrics,
+      moderationMetrics,
+      userMetrics,
       fetchedAt: new Date().toISOString(),
     };
   }

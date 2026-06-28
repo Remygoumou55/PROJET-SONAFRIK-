@@ -3,6 +3,7 @@
 import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ADMIN_ACTION_FALLBACK_ERROR } from "../lib/adminActionShared";
+import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
 
 type ActionFn<T extends Record<string, unknown> = Record<string, unknown>> = () => Promise<
   { error?: string } & T
@@ -11,6 +12,11 @@ type ActionFn<T extends Record<string, unknown> = Record<string, unknown>> = () 
 interface RunOptions<T> {
   refresh?: boolean;
   onSuccess?: (result: { error?: string } & T) => void;
+  /** Publie un événement LDSE après succès (sync sidebar / dashboard sans F5). */
+  ldseEvent?: {
+    type: Parameters<typeof publishAdminLdseEvent>[0];
+    payload?: Record<string, unknown>;
+  };
 }
 
 /**
@@ -35,6 +41,9 @@ export function useAdminActionRunner() {
           return result;
         }
         options?.onSuccess?.(result);
+        if (options?.ldseEvent) {
+          publishAdminLdseEvent(options.ldseEvent.type, options.ldseEvent.payload);
+        }
         if (options?.refresh !== false) {
           startTransition(() => router.refresh());
         }

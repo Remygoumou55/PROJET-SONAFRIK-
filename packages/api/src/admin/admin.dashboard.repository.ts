@@ -26,57 +26,20 @@ export class AdminDashboardRepository {
   async getDashboardKpis(): Promise<AdminDashboardKpis> {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
-    const nowIso = new Date().toISOString();
 
-    const [
-      totalUsers,
-      premiumUsers,
-      streamsToday,
-      streamsTotal,
-      pendingAlbums,
-      pendingTracks,
-      fraudMetrics,
-      pendingWithdrawals,
-    ] = await Promise.all([
-      countQuery(
-        this.client.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("is_premium", true)
-          .gt("premium_expires_at", nowIso),
-      ),
-      countQuery(
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .gte("started_at", today.toISOString()),
-      ),
-      countQuery(this.client.from("stream_sessions").select("*", { count: "exact", head: true })),
-      countQuery(
-        this.client
-          .from("albums")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      this.metrics.getFraudMetrics(),
-      countQuery(
-        this.client
-          .from("withdrawals")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
-    ]);
+    const [userMetrics, streamsToday, streamsTotal, moderationMetrics, fraudMetrics] =
+      await Promise.all([
+        this.metrics.getUserMetrics(),
+        countQuery(
+          this.client
+            .from("stream_sessions")
+            .select("*", { count: "exact", head: true })
+            .gte("started_at", today.toISOString()),
+        ),
+        countQuery(this.client.from("stream_sessions").select("*", { count: "exact", head: true })),
+        this.metrics.getModerationMetrics(),
+        this.metrics.getFraudMetrics(),
+      ]);
 
     let launchCurrent = 0;
     let launchTarget = 2000;
@@ -92,12 +55,12 @@ export class AdminDashboardRepository {
     }
 
     return {
-      totalUsers,
-      premiumUsers,
+      totalUsers: userMetrics.totalUsers,
+      premiumUsers: userMetrics.premiumUsers,
       streamsToday,
       streamsTotal,
-      pendingCatalog: pendingAlbums + pendingTracks,
-      pendingWithdrawals,
+      pendingCatalog: moderationMetrics.pendingCatalog,
+      pendingWithdrawals: moderationMetrics.pendingWithdrawals,
       fraudSessions: fraudMetrics.totalFlagged,
       launchCurrent,
       launchTarget,
@@ -105,48 +68,11 @@ export class AdminDashboardRepository {
   }
 
   async getNavBadges(): Promise<AdminNavBadges> {
-    const [
-      pendingAlbums,
-      pendingTracks,
-      pendingWithdrawals,
-      pendingClaims,
-      fraudMetrics,
-    ] = await Promise.all([
-      countQuery(
-        this.client
-          .from("albums")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("withdrawals")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
-      countQuery(
-        this.client
-          .from("rights_claims")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
+    const [fraudMetrics, moderationMetrics] = await Promise.all([
       this.metrics.getFraudMetrics(),
+      this.metrics.getModerationMetrics(),
     ]);
-
-    return {
-      content: pendingAlbums + pendingTracks,
-      pendingRightsClaims: pendingClaims,
-      fraudSessions: fraudMetrics.totalFlagged,
-      withdrawals: pendingWithdrawals,
-    };
+    return this.metrics.buildNavBadges(fraudMetrics, moderationMetrics);
   }
 
   private walletCreditsSince(iso: string) {
@@ -162,55 +88,20 @@ export class AdminDashboardRepository {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999).toISOString();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
-    const nowIso = now.toISOString();
 
     const [
-      totalUsers,
-      newUsersToday,
-      premiumUsers,
-      activeArtists,
-      newArtistsThisWeek,
+      userMetrics,
+      moderationMetrics,
+      fraudMetrics,
       revenueThisMonthRes,
       revenueLastMonthRes,
-      pendingRightsClaims,
-      pendingWithdrawals,
-      pendingArtistVerif,
-      pendingAlbums,
-      pendingTracks,
-      fraudMetrics,
       recentActivityRes,
       ledgerYearRes,
     ] = await Promise.all([
-      countQuery(
-        this.client.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", today)
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("is_premium", true)
-          .gt("premium_expires_at", nowIso)
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("artist_profiles")
-          .select("*", { count: "exact", head: true })
-          .eq("is_public", true),
-      ),
-      countQuery(
-        this.client.from("artist_profiles").select("*", { count: "exact", head: true }).gte("created_at", weekAgo),
-      ),
+      this.metrics.getUserMetrics(),
+      this.metrics.getModerationMetrics(),
+      this.metrics.getFraudMetrics(),
       this.client
         .from("wallet_ledger")
         .select("amount_gnf")
@@ -222,39 +113,6 @@ export class AdminDashboardRepository {
         .eq("entry_type", "credit")
         .gte("created_at", startOfLastMonth)
         .lte("created_at", endOfLastMonth),
-      countQuery(
-        this.client
-          .from("rights_claims")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
-      countQuery(
-        this.client
-          .from("withdrawals")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
-      countQuery(
-        this.client
-          .from("creator_verifications")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending"),
-      ),
-      countQuery(
-        this.client
-          .from("albums")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      countQuery(
-        this.client
-          .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "pending_review")
-          .is("deleted_at", null),
-      ),
-      this.metrics.getFraudMetrics(),
       this.client
         .from("audit_logs")
         .select("id, action, created_at, metadata, entity_type")
@@ -297,20 +155,20 @@ export class AdminDashboardRepository {
 
     return {
       kpis: {
-        totalUsers,
-        newUsersToday,
-        premiumUsers,
-        activeArtists,
-        newArtistsThisWeek,
+        totalUsers: userMetrics.totalUsers,
+        newUsersToday: userMetrics.newUsersToday,
+        premiumUsers: userMetrics.premiumUsers,
+        activeArtists: userMetrics.activeArtists,
+        newArtistsThisWeek: userMetrics.newArtistsThisWeek,
         revenueThisMonth,
         revenueLastMonth,
         revenueChange,
       },
       alerts: {
-        pendingRightsClaims,
-        pendingWithdrawals,
-        pendingArtistVerif,
-        pendingCatalog: pendingAlbums + pendingTracks,
+        pendingRightsClaims: moderationMetrics.pendingRightsClaims,
+        pendingWithdrawals: moderationMetrics.pendingWithdrawals,
+        pendingArtistVerif: moderationMetrics.pendingArtistVerifications,
+        pendingCatalog: moderationMetrics.pendingCatalog,
         fraudSessions: fraudMetrics.flaggedThisMonth,
       },
       recentActivity,
@@ -399,57 +257,46 @@ export class AdminDashboardRepository {
   }
 
   async getLiveControlSnapshot(): Promise<LiveControlSnapshot> {
-    const [
-      totalUsers,
-      publishedTracks,
-      validListens,
-      royaltyCycles,
-      ledgerEntries,
-      recentTracksRes,
-      recentListensRes,
-      recentCyclesRes,
-      recentLedgerRes,
-    ] = await Promise.all([
-      countQuery(
-        this.client.from("profiles").select("*", { count: "exact", head: true }).is("deleted_at", null),
-      ),
-      countQuery(
+    const [userMetrics, publishedTracks, validListens, royaltyCycles, ledgerEntries, recentTracksRes, recentListensRes, recentCyclesRes, recentLedgerRes] =
+      await Promise.all([
+        this.metrics.getUserMetrics(),
+        countQuery(
+          this.client
+            .from("tracks")
+            .select("*", { count: "exact", head: true })
+            .eq("publication_status", "published"),
+        ),
+        countQuery(
+          this.client
+            .from("stream_sessions")
+            .select("*", { count: "exact", head: true })
+            .eq("is_valid_listen", true),
+        ),
+        countQuery(this.client.from("royalty_cycles").select("*", { count: "exact", head: true })),
+        countQuery(this.client.from("wallet_ledger").select("*", { count: "exact", head: true })),
         this.client
           .from("tracks")
-          .select("*", { count: "exact", head: true })
-          .eq("publication_status", "published"),
-      ),
-      countQuery(
+          .select("id, title, publication_status, created_at")
+          .eq("publication_status", "published")
+          .order("created_at", { ascending: false })
+          .limit(5),
         this.client
           .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .eq("is_valid_listen", true),
-      ),
-      countQuery(this.client.from("royalty_cycles").select("*", { count: "exact", head: true })),
-      countQuery(this.client.from("wallet_ledger").select("*", { count: "exact", head: true })),
-      this.client
-        .from("tracks")
-        .select("id, title, publication_status, created_at")
-        .eq("publication_status", "published")
-        .order("created_at", { ascending: false })
-        .limit(5),
-      this.client
-        .from("stream_sessions")
-        .select("id, is_valid_listen, created_at")
-        .eq("is_valid_listen", true)
-        .order("created_at", { ascending: false })
-        .limit(5),
-      this.client
-        .from("royalty_cycles")
-        .select("id, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(3),
-      this.client
-        .from("wallet_ledger")
-        .select("id, amount_gnf, entry_type, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5),
-    ]);
+          .select("id, is_valid_listen, created_at")
+          .eq("is_valid_listen", true)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        this.client
+          .from("royalty_cycles")
+          .select("id, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(3),
+        this.client
+          .from("wallet_ledger")
+          .select("id, amount_gnf, entry_type, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
 
     if (recentTracksRes.error) throw recentTracksRes.error;
     if (recentListensRes.error) throw recentListensRes.error;
@@ -457,7 +304,7 @@ export class AdminDashboardRepository {
     if (recentLedgerRes.error) throw recentLedgerRes.error;
 
     return {
-      totalUsers,
+      totalUsers: userMetrics.totalUsers,
       publishedTracks,
       validListens,
       royaltyCycles,

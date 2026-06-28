@@ -81,6 +81,8 @@ export type AdminFraudSupervisionStats = {
 export type AdminLiveSnapshot = {
   navBadges: AdminNavBadges;
   fraudMetrics: AdminFraudMetrics;
+  moderationMetrics: AdminModerationMetrics;
+  userMetrics: AdminUserMetrics;
   fetchedAt: string;
 };
 
@@ -88,6 +90,25 @@ export type AdminFraudMetrics = {
   totalFlagged: number;
   flaggedThisMonth: number;
   flaggedToday: number;
+};
+
+/** Comptages modération — SSOT catalog / droits / retraits / vérif artistes */
+export type AdminModerationMetrics = {
+  pendingAlbums: number;
+  pendingTracks: number;
+  pendingCatalog: number;
+  pendingWithdrawals: number;
+  pendingRightsClaims: number;
+  pendingArtistVerifications: number;
+};
+
+/** Comptages utilisateurs / artistes — SSOT dashboard + cockpit */
+export type AdminUserMetrics = {
+  totalUsers: number;
+  premiumUsers: number;
+  newUsersToday: number;
+  activeArtists: number;
+  newArtistsThisWeek: number;
 };
 
 export type AdminDashboardKpis = {

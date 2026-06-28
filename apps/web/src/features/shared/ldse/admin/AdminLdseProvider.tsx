@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { AdminLiveSnapshot, AdminNavBadges, AdminFraudMetrics } from "@sonafrik/api/admin";
+import type { AdminLiveSnapshot, AdminNavBadges, AdminFraudMetrics, AdminModerationMetrics, AdminUserMetrics } from "@sonafrik/api/admin";
 import { refreshAdminLiveSnapshotAction } from "@/features/admin/actions/admin-ldse.actions";
 import { ldseCache } from "@/features/shared/ldse/cache";
 import { ldseEventBus } from "@/features/shared/ldse/event-bus";
@@ -32,10 +32,29 @@ const EMPTY_FRAUD: AdminFraudMetrics = {
   flaggedToday: 0,
 };
 
+const EMPTY_MODERATION: AdminModerationMetrics = {
+  pendingAlbums: 0,
+  pendingTracks: 0,
+  pendingCatalog: 0,
+  pendingWithdrawals: 0,
+  pendingRightsClaims: 0,
+  pendingArtistVerifications: 0,
+};
+
+const EMPTY_USER: AdminUserMetrics = {
+  totalUsers: 0,
+  premiumUsers: 0,
+  newUsersToday: 0,
+  activeArtists: 0,
+  newArtistsThisWeek: 0,
+};
+
 type AdminLdseContextValue = {
   snapshot: AdminLiveSnapshot;
   navBadges: AdminNavBadges;
   fraudMetrics: AdminFraudMetrics;
+  moderationMetrics: AdminModerationMetrics;
+  userMetrics: AdminUserMetrics;
   refreshSnapshot: () => Promise<void>;
   isRefreshing: boolean;
 };
@@ -49,11 +68,33 @@ function ensureInvalidationRules(): void {
   invalidationRulesRegistered = true;
   registerLdseInvalidationRule({
     event: ADMIN_LDSE_EVENTS.snapshotInvalidate,
-    keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.navBadges, ADMIN_LDSE_KEYS.fraudMetrics],
+    keys: [
+      ADMIN_LDSE_KEYS.liveSnapshot,
+      ADMIN_LDSE_KEYS.navBadges,
+      ADMIN_LDSE_KEYS.fraudMetrics,
+      ADMIN_LDSE_KEYS.moderationMetrics,
+      ADMIN_LDSE_KEYS.userMetrics,
+    ],
   });
   registerLdseInvalidationRule({
     event: ADMIN_LDSE_EVENTS.fraudUpdated,
     keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.fraudMetrics],
+  });
+  registerLdseInvalidationRule({
+    event: ADMIN_LDSE_EVENTS.catalogUpdated,
+    keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.navBadges, ADMIN_LDSE_KEYS.moderationMetrics],
+  });
+  registerLdseInvalidationRule({
+    event: ADMIN_LDSE_EVENTS.withdrawalUpdated,
+    keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.navBadges, ADMIN_LDSE_KEYS.moderationMetrics],
+  });
+  registerLdseInvalidationRule({
+    event: ADMIN_LDSE_EVENTS.rightsUpdated,
+    keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.navBadges, ADMIN_LDSE_KEYS.moderationMetrics],
+  });
+  registerLdseInvalidationRule({
+    event: ADMIN_LDSE_EVENTS.userUpdated,
+    keys: [ADMIN_LDSE_KEYS.liveSnapshot, ADMIN_LDSE_KEYS.userMetrics],
   });
 }
 
@@ -69,6 +110,8 @@ export function AdminLdseProvider({ initialSnapshot, children }: Props) {
     ldseCache.set(ADMIN_LDSE_KEYS.liveSnapshot, initialSnapshot, 60_000);
     ldseCache.set(ADMIN_LDSE_KEYS.navBadges, initialSnapshot.navBadges, 60_000);
     ldseCache.set(ADMIN_LDSE_KEYS.fraudMetrics, initialSnapshot.fraudMetrics, 60_000);
+    ldseCache.set(ADMIN_LDSE_KEYS.moderationMetrics, initialSnapshot.moderationMetrics, 60_000);
+    ldseCache.set(ADMIN_LDSE_KEYS.userMetrics, initialSnapshot.userMetrics, 60_000);
     return initialSnapshot;
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -80,6 +123,8 @@ export function AdminLdseProvider({ initialSnapshot, children }: Props) {
       ldseCache.set(ADMIN_LDSE_KEYS.liveSnapshot, next, 60_000);
       ldseCache.set(ADMIN_LDSE_KEYS.navBadges, next.navBadges, 60_000);
       ldseCache.set(ADMIN_LDSE_KEYS.fraudMetrics, next.fraudMetrics, 60_000);
+      ldseCache.set(ADMIN_LDSE_KEYS.moderationMetrics, next.moderationMetrics, 60_000);
+      ldseCache.set(ADMIN_LDSE_KEYS.userMetrics, next.userMetrics, 60_000);
       setSnapshot(next);
       ldseEventBus.publish(ADMIN_LDSE_EVENTS.snapshotRefreshed, { fetchedAt: next.fetchedAt });
     } finally {
@@ -98,6 +143,8 @@ export function AdminLdseProvider({ initialSnapshot, children }: Props) {
       snapshot,
       navBadges: snapshot.navBadges ?? EMPTY_BADGES,
       fraudMetrics: snapshot.fraudMetrics ?? EMPTY_FRAUD,
+      moderationMetrics: snapshot.moderationMetrics ?? EMPTY_MODERATION,
+      userMetrics: snapshot.userMetrics ?? EMPTY_USER,
       refreshSnapshot,
       isRefreshing,
     }),
@@ -126,6 +173,18 @@ export function useAdminFraudMetrics(fallback?: AdminFraudMetrics): AdminFraudMe
   const ctx = useContext(AdminLdseContext);
   if (ctx) return ctx.fraudMetrics;
   return fallback ?? EMPTY_FRAUD;
+}
+
+export function useAdminModerationMetrics(fallback?: AdminModerationMetrics): AdminModerationMetrics {
+  const ctx = useContext(AdminLdseContext);
+  if (ctx) return ctx.moderationMetrics;
+  return fallback ?? EMPTY_MODERATION;
+}
+
+export function useAdminUserMetrics(fallback?: AdminUserMetrics): AdminUserMetrics {
+  const ctx = useContext(AdminLdseContext);
+  if (ctx) return ctx.userMetrics;
+  return fallback ?? EMPTY_USER;
 }
 
 /** Publie un événement admin après une action optimiste locale */

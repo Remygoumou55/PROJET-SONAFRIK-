@@ -17,6 +17,8 @@ import {
   adminApproveWithdrawalAction,
   adminRejectWithdrawalAction,
 } from "../actions/admin-financial.actions";
+import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 
 type WithdrawalFilter = WithdrawalStatus | "all";
 
@@ -72,6 +74,7 @@ export function AdminWithdrawalsClient({
       setActionError(result.error);
       return;
     }
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.withdrawalUpdated, { withdrawalId: selected.id, action: "approve" });
     setSelected(null);
     startTransition(() => router.refresh());
   };
@@ -84,6 +87,7 @@ export function AdminWithdrawalsClient({
       setActionError(result.error);
       return;
     }
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.withdrawalUpdated, { withdrawalId: selected.id, action: "reject" });
     setSelected(null);
     setRejectReason("");
     startTransition(() => router.refresh());

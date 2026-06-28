@@ -16,7 +16,9 @@ import type {
   AdminFraudSupervisionStats,
   AdminHealthSnapshot,
   AdminLiveSnapshot,
+  AdminModerationMetrics,
   AdminNavBadges,
+  AdminUserMetrics,
   AdminRevenueDashboardData,
   AdminWithdrawalsDashboardMeta,
   AdminRightsClaim,
@@ -116,6 +118,14 @@ export class AdminService {
 
   async getFraudMetrics(): Promise<AdminFraudMetrics> {
     return this.repository.getFraudMetrics();
+  }
+
+  async getModerationMetrics(): Promise<AdminModerationMetrics> {
+    return this.repository.getModerationMetrics();
+  }
+
+  async getUserMetrics(): Promise<AdminUserMetrics> {
+    return this.repository.getUserMetrics();
   }
 
   async getAdminLiveSnapshot(): Promise<AdminLiveSnapshot> {
@@ -242,7 +252,9 @@ export type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminLiveSnapshot,
+  AdminModerationMetrics,
   AdminNavBadges,
+  AdminUserMetrics,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,

@@ -3,6 +3,8 @@ export const ADMIN_LDSE_KEYS = {
   liveSnapshot: "admin:live-snapshot",
   navBadges: "admin:nav-badges",
   fraudMetrics: "admin:fraud-metrics",
+  moderationMetrics: "admin:moderation-metrics",
+  userMetrics: "admin:user-metrics",
 } as const;
 
 /** Événements métier admin — Event Bus LDSE */

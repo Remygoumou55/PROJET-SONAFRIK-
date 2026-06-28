@@ -116,6 +116,15 @@ window.__SONAFRIK_LDSE__() // cache hits, events, subscriptions Realtime
 4. ✅ Enregistrer règle d'invalidation si nouvelle clé cache.
 5. ❌ Ne pas modifier Session Engine (`packages/api/src/streaming/session/` — LOCKED).
 
+## LDSE v2 (28 juin 2026)
+
+- `AdminModerationMetrics` + `AdminUserMetrics` — SSOT catalog / retraits / droits / users
+- `getAdminLiveSnapshot()` inclut moderation + user metrics
+- Invalidation ciblée catalog / withdrawals / rights / users
+- `useAdminActionRunner({ ldseEvent })` — sync après mutations admin
+- `useNotificationsLdseCount` — cloche + liste notifications
+- `RootLdseShell` — provider global Event Bus + cache
+
 ## Migration progressive
 
 1. Admin (v1 — fait)

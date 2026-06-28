@@ -13,6 +13,7 @@ import {
   adminProcessWithdrawalAction,
   adminRejectWithdrawalAction,
 } from "../actions/admin-financial.actions";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
@@ -76,6 +77,7 @@ export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initial
     async (withdrawalId: string, fn: () => Promise<{ error?: string }>) => {
       setActionState((prev) => ({ ...prev, [withdrawalId]: true }));
       await run(fn, {
+        ldseEvent: { type: ADMIN_LDSE_EVENTS.withdrawalUpdated, payload: { withdrawalId } },
         onSuccess: () => {
           void fetchQueue(statusFilter);
         },

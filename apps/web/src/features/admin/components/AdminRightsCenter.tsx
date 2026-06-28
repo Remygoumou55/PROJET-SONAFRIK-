@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { formatDateTime } from "@/lib/formatters";
 import { adminUpdateRightsClaimAction } from "../actions/admin-rights.actions";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 import type { AdminRightsClaim } from "@sonafrik/api/admin";
 import {
@@ -64,6 +65,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       await run(
         () => adminUpdateRightsClaimAction({ claimId, status, notes }),
         {
+          ldseEvent: { type: ADMIN_LDSE_EVENTS.rightsUpdated, payload: { claimId, status } },
           onSuccess: () => {
             setClaims((prev) =>
               prev.map((c) => (c.id === claimId ? { ...c, status } : c)),
