@@ -5,10 +5,11 @@ import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "700", "800"],
   variable: "--font-montserrat",
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
 });
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonafrik.vercel.app";

@@ -51,6 +51,10 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       "@sentry/nextjs",
       "@sonafrik/shared",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-toast",
     ],
   },
   async redirects() {

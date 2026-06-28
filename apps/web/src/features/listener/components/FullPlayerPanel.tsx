@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
 import { usePlayer } from "../hooks/usePlayer";
+import { useTrackListenCounts } from "../hooks/useTrackListenCounts";
 import { usePlayerContext, usePlayerPosition } from "../lib/playerContext";
 import { usePlayerMute, volumeIcon } from "../lib/playerMuteContext";
 import { useListenFeatures } from "../lib/listenFeaturesContext";
@@ -32,6 +33,37 @@ const ShareButton = dynamic(
   () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
   { ssr: false },
 );
+
+function formatListenCount(value: number): string {
+  return value.toLocaleString("fr-FR");
+}
+
+function TrackListenStats({ trackId }: { trackId: string }) {
+  const counts = useTrackListenCounts(trackId);
+
+  if (!counts || counts.all_time <= 0) return null;
+
+  const periodParts: string[] = [];
+  if (counts.window_7d > 0) {
+    periodParts.push(`${formatListenCount(counts.window_7d)} sur 7 j`);
+  }
+  if (counts.window_30d > 0 && counts.window_30d !== counts.window_7d) {
+    periodParts.push(`${formatListenCount(counts.window_30d)} sur 30 j`);
+  }
+
+  return (
+    <p className="fpp-listen-stats" aria-label="Statistiques d'écoutes valides">
+      <span className="fpp-listen-stats-total">
+        {formatListenCount(counts.all_time)}{" "}
+        {counts.all_time > 1 ? "écoutes valides" : "écoute valide"}
+      </span>
+      {periodParts.length > 0 ? (
+        <span className="fpp-listen-stats-period">{periodParts.join(" · ")}</span>
+      ) : null}
+    </p>
+  );
+}
+
 
 type FullPlayerTab = "main" | "reactions" | "soutenir";
 
@@ -218,6 +250,7 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
           <div className="fpp-track-meta">
             <h2 className="fpp-title">{currentTrack.title}</h2>
             <p className="fpp-artist">{artistLabel}</p>
+            <TrackListenStats trackId={currentTrack.id} />
           </div>
           <LikeButton trackId={currentTrack.id} size="md" />
         </div>

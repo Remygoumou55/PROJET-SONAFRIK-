@@ -2185,6 +2185,25 @@ html[data-player-active="true"] .has-global-player main {
   color: var(--color-texte-secondaire);
 }
 
+.fpp-listen-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.fpp-listen-stats-total {
+  color: var(--color-vert-energie);
+  font-weight: 600;
+}
+
+.fpp-listen-stats-period {
+  opacity: 0.85;
+}
+
 .fpp-progress-section {
   width: 100%;
   margin-bottom: 20px;

@@ -12,4 +12,6 @@ export type {
   ListenerArtistRelease,
   ListenerHomepageCurated,
   ListenerPlaylistTrackRow,
+  TopGuineaFeed,
+  TopGuineaPeriod,
 } from "./types";

@@ -11,6 +11,44 @@
 
 ---
 
+## 2026-06-28 — Corrections audit backend (trending, mobile, UI compteurs)
+
+### Livraisons
+- Migration `20260628150000_audit_corrections_trending_analytics.sql`
+  - `get_trending_tracks` — exclusion `fraud_flags`, fenêtre `p_window = 'all'`
+  - `get_creator_stream_analytics` — exclusion sessions frauduleuses
+- `listener.repository.ts` — `getTopGuineaTracks()` fallback 7j → 30j → all → nouveautés ; type `TopGuineaFeed`
+- `TopGuineaSection.tsx` / `listen/page.tsx` — libellé période dynamique
+- `useTrackListenCounts.ts` + `FullPlayerPanel.tsx` — compteurs all-time / 7j / 30j dans le lecteur plein écran
+- `apps/mobile/features/streaming/usePlayer.ts` — Phase A mobile : `completeActiveSession` avant changement de morceau, fin naturelle, stop, unmount ; fix ordre stop (complete avant unload)
+
+### Validation DB
+- `get_trending_tracks('all', 5)` → 5 morceaux ; `7d` → 4 ✅
+- Migration appliquée ✅
+- `pnpm build` + `lint` + `typecheck` ✅
+
+### Tests à faire
+- [ ] Mobile : skip morceau → session complétée côté edge avant nouveau `stream-start`
+- [ ] Homepage Top Guinée affiche « 30 derniers jours » ou « Toutes périodes » si 7j vide
+- [ ] Lecteur plein écran : compteurs visibles après écoute validée (event `sonafrik:valid-listen`)
+
+---
+
+## 2026-06-28 — Perf : homepage + sidebar + bundle
+
+### Livraisons
+- Migration `20260628160000_get_top_guinea_feed.sql` — 1 RPC au lieu de 3 séquentielles pour Top Guinée
+- `getListenSidebarData.ts` — cache `unstable_cache` **par userId** (fix fuite données + clé v2)
+- `listen/page.tsx` — cache homepage 300s (v8), limites discovery réduites, suppression duplicate trending
+- `layout.tsx` — Montserrat 4 graisses (400/500/700/800) au lieu de 6
+- `next.config.ts` — `optimizePackageImports` Radix UI
+
+### Validation
+- `get_top_guinea_feed(5)` → period 7d, 4 tracks ✅
+- `pnpm build` + `lint` + `typecheck` ✅
+
+---
+
 ## 2026-06-28 — Phase D : chaîne finance (tests + probes + santé admin)
 
 ### Livraisons

@@ -5,7 +5,6 @@ import type {
   DiscoveryArtist,
   DiscoveryTrack,
   ListenMusicCategory,
-  TrendingTrack,
 } from "@sonafrik/types";
 import { createDiscoveryService } from "@sonafrik/api/discovery";
 import {
@@ -13,6 +12,7 @@ import {
   filterDiscoveryTracksByCategory,
   filterTrendingTracksByCategory,
   parseListenMusicCategory,
+  type TopGuineaFeed,
 } from "@sonafrik/api/listener";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
@@ -56,18 +56,23 @@ function createHomepageLoader(category: ListenMusicCategory) {
           suggestedArtistsRaw,
         ] = await Promise.all([
           listener.getHomepageCurated(8).catch(() => ({ playlists: [], artists: [], genres: [] })),
-          listener.getTopGuineaTracks(24).catch((): TrendingTrack[] => []),
-          discovery.getDiscoveryFeed({ limit: 16 }).catch((): DiscoveryTrack[] => []),
+          listener.getTopGuineaTracks(24).catch((): TopGuineaFeed => ({
+            tracks: [],
+            period: "7d",
+            periodLabel: "7 derniers jours",
+          })),
+          discovery.getDiscoveryFeed({ limit: 10 }).catch((): DiscoveryTrack[] => []),
           discovery
-            .getNewReleases({ type: "track", days: 365, limit: 30 })
+            .getNewReleases({ type: "track", days: 365, limit: 20 })
             .catch((): { tracks: DiscoveryTrack[] } => ({ tracks: [] })),
-          discovery.getSuggestedArtists({ limit: 12 }).catch((): DiscoveryArtist[] => []),
+          discovery.getSuggestedArtists({ limit: 8 }).catch((): DiscoveryArtist[] => []),
         ]);
 
         const discoveryPoolRaw = dedupeDiscoveryTracks(newReleasesResult.tracks ?? []);
 
         let discoveryTracks = discoveryPoolRaw;
-        let topGuineaTracks = topGuineaRaw;
+        const topGuineaFeed = topGuineaRaw;
+        let topGuineaTracks = topGuineaRaw.tracks;
         let discoveries = discoveriesRaw;
         let suggestedArtists = suggestedArtistsRaw;
 
@@ -75,14 +80,14 @@ function createHomepageLoader(category: ListenMusicCategory) {
           const creatorIds = [
             ...new Set([
               ...discoveryPoolRaw.map((t) => t.creator_id),
-              ...topGuineaRaw.map((t) => t.creator_id),
+              ...topGuineaRaw.tracks.map((t) => t.creator_id),
               ...discoveriesRaw.map((t) => t.creator_id),
               ...suggestedArtistsRaw.map((a) => a.creator_id),
             ]),
           ];
           const geoMap = await listener.getCreatorGeoMap(creatorIds);
           discoveryTracks = filterDiscoveryTracksByCategory(discoveryPoolRaw, category, geoMap);
-          topGuineaTracks = filterTrendingTracksByCategory(topGuineaRaw, category, geoMap);
+          topGuineaTracks = filterTrendingTracksByCategory(topGuineaRaw.tracks, category, geoMap);
           discoveries = filterDiscoveryTracksByCategory(discoveriesRaw, category, geoMap);
           suggestedArtists = suggestedArtistsRaw.filter((artist) =>
             filterDiscoveryTracksByCategory(
@@ -113,9 +118,10 @@ function createHomepageLoader(category: ListenMusicCategory) {
           playlists: filterValidPlaylists(curated.playlists),
           artists: filterValidArtists(curated.artists),
           genres: curated.genres,
-          discoveryTracks: filterValidTracks(discoveryTracks).slice(0, 30),
+          discoveryTracks: filterValidTracks(discoveryTracks).slice(0, 20),
           topGuineaTracks: filterValidTracks(topGuineaTracks).slice(0, 10),
-          trending: filterValidTracks(topGuineaTracks).slice(0, 10),
+          topGuineaPeriodLabel: topGuineaFeed.periodLabel,
+          trending: [],
           discoveries: filterValidTracks(discoveries).slice(0, 8),
           suggestedArtists: filterValidArtists(suggestedArtists).slice(0, 8),
           hadError: false,
@@ -134,8 +140,8 @@ function createHomepageLoader(category: ListenMusicCategory) {
         };
       }
     },
-    [`homepage-content-v7-${category}`],
-    { revalidate: 120, tags: ["homepage", "catalog-tracks", "stream-listen-counts"] },
+    [`homepage-content-v8-${category}`],
+    { revalidate: 300, tags: ["homepage", "catalog-tracks", "stream-listen-counts"] },
   );
 }
 

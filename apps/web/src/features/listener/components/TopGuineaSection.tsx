@@ -44,9 +44,10 @@ function getPositionLabel(position: number): string {
 
 interface TopGuineaSectionProps {
   tracks: TrendingTrack[];
+  periodLabel?: string;
 }
 
-export function TopGuineaSection({ tracks }: TopGuineaSectionProps) {
+export function TopGuineaSection({ tracks, periodLabel = "7 derniers jours" }: TopGuineaSectionProps) {
   const { loadQueueAndPlay, currentTrack, isPlaying } = usePlayer();
   const [playError, setPlayError] = useState<string | null>(null);
 
@@ -81,9 +82,9 @@ export function TopGuineaSection({ tracks }: TopGuineaSectionProps) {
           <h2 id="listen-top-guinea-title" className="listen-section-title">
             Top Guinée
           </h2>
-          <span className="section-subtitle">cette semaine</span>
+          <span className="section-subtitle">écoutes valides</span>
         </div>
-        <span className="section-period">7 derniers jours</span>
+        <span className="section-period">{periodLabel}</span>
       </div>
 
       {playError ? (

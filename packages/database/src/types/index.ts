@@ -3519,6 +3519,10 @@ export type Database = {
         Args: { p_limit?: number; p_window?: string }
         Returns: Json
       }
+      get_top_guinea_feed: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       get_track_listen_counts: {
         Args: { p_track_id: string }
         Returns: Json

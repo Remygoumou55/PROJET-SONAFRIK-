@@ -1,3 +1,13 @@
+import type { TrendingTrack } from "@sonafrik/types";
+
+export type TopGuineaPeriod = "7d" | "30d" | "all";
+
+export interface TopGuineaFeed {
+  tracks: TrendingTrack[];
+  period: TopGuineaPeriod;
+  periodLabel: string;
+}
+
 export interface ListenerHomepageCurated {
   playlists: Array<{ id: string; title: string; track_count: number }>;
   artists: Array<{ creator_id: string; stage_name: string; genres: string[] }>;

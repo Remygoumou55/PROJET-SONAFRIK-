@@ -12,6 +12,8 @@ import type {
   ListenerArtistRelease,
   ListenerHomepageCurated,
   ListenerPlaylistTrackRow,
+  TopGuineaFeed,
+  TopGuineaPeriod,
 } from "./types";
 
 export class ListenerRepository {
@@ -28,33 +30,46 @@ export class ListenerRepository {
     return payload?.tracks ?? [];
   }
 
-  async getTopGuineaTracks(limit = 10): Promise<TrendingTrack[]> {
-    const windows = ["7d", "30d"] as const;
-    for (const window of windows) {
-      const { data, error } = await this.client.rpc("get_trending_tracks", {
-        p_window: window,
-        p_limit: limit,
-      });
-      if (error) throw error;
-      const tracks = (data as unknown as TrendingTrack[] | null) ?? [];
-      if (tracks.length > 0) return tracks;
+  async getTopGuineaTracks(limit = 10): Promise<TopGuineaFeed> {
+    const { data, error } = await this.client.rpc("get_top_guinea_feed", {
+      p_limit: limit,
+    });
+    if (error) throw error;
+
+    const payload = data as {
+      period?: TopGuineaPeriod;
+      period_label?: string;
+      tracks?: TrendingTrack[];
+    } | null;
+
+    const tracks = (payload?.tracks ?? []) as TrendingTrack[];
+    if (tracks.length > 0) {
+      return {
+        tracks,
+        period: payload?.period ?? "all",
+        periodLabel: payload?.period_label ?? "Toutes périodes",
+      };
     }
 
     const latest = await this.getLatestPublishedTracks(limit);
-    return latest.map((track) => ({
-      track_id: track.track_id,
-      title: track.title,
-      slug: track.slug,
-      duration_seconds: track.duration_seconds,
-      artist_name: track.artist_name,
-      creator_id: track.creator_id,
-      album_id: track.album_id,
-      album_title: track.album_title,
-      cover_path: track.cover_path,
-      listen_count: track.stream_count,
-      unique_listeners: 0,
-      trending_score: 0,
-    }));
+    return {
+      period: "all",
+      periodLabel: "Nouveautés",
+      tracks: latest.map((track) => ({
+        track_id: track.track_id,
+        title: track.title,
+        slug: track.slug,
+        duration_seconds: track.duration_seconds,
+        artist_name: track.artist_name,
+        creator_id: track.creator_id,
+        album_id: track.album_id,
+        album_title: track.album_title,
+        cover_path: track.cover_path,
+        listen_count: track.stream_count ?? 0,
+        unique_listeners: 0,
+        trending_score: 0,
+      })),
+    };
   }
 
   async getTrackListenCounts(trackId: string): Promise<TrackListenCounts> {

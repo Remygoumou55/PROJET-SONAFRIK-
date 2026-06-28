@@ -30,12 +30,10 @@ async function fetchListenSidebarData(userId: string): Promise<ListenerSidebarDa
 }
 
 /** Données sidebar auditeur — cache 60s par utilisateur. */
-export async function getListenSidebarData(userId: string): Promise<ListenerSidebarData> {
-  return getCachedListenSidebarData(userId);
+export function getListenSidebarData(userId: string): Promise<ListenerSidebarData> {
+  return unstable_cache(
+    () => fetchListenSidebarData(userId),
+    ["listen-sidebar-data-v2", userId],
+    { revalidate: 60, tags: ["listen-sidebar", `listen-sidebar-${userId}`] },
+  )();
 }
-
-const getCachedListenSidebarData = unstable_cache(
-  fetchListenSidebarData,
-  ["listen-sidebar-data-v1"],
-  { revalidate: 60, tags: ["listen-sidebar"] },
-);

@@ -59,6 +59,7 @@ export interface HomepageData {
   genres: Array<{ id: string; name: string }>;
   discoveryTracks: DiscoveryTrack[];
   topGuineaTracks: TrendingTrack[];
+  topGuineaPeriodLabel?: string;
   trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
   suggestedArtists: DiscoveryArtist[];
@@ -187,7 +188,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
       <ListenDiscoverModeSlot />
 
       {topGuineaTracks.length > 0 ? (
-        <TopGuineaSection tracks={topGuineaTracks} />
+        <TopGuineaSection tracks={topGuineaTracks} periodLabel={content.topGuineaPeriodLabel} />
       ) : null}
 
       <ArtistsDiscoverSection suggestedArtists={suggestedArtists} curatedArtists={artists} />
