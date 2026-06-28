@@ -11,6 +11,36 @@
 
 ---
 
+## 2026-06-28 — Phase C : sécurité streaming + fraude + royalties
+
+### Livraisons
+- Migration `20260628140000_phase_c_streaming_security_royalties.sql`
+  - `start_stream_session` — vérifie `has_streaming_permission` (premium ou essai 7j)
+  - `complete_stream_session` — `is_valid_listen = false` si `fraud_flags` non vides
+  - `get_track_listen_counts` — exclut sessions frauduleuses
+  - `calculate_royalties` — join `artist_profiles` + exclusion fraude
+  - Backfill : 55 écoutes « valides » avec fraud_flags → invalidées
+- `stream-start/index.ts` — RPC `has_streaming_permission` avant session (403 `no_streaming_permission`)
+- `streaming.service.ts` — parse erreur 403 edge function → message utilisateur
+
+### Validation DB
+- `fraud_valid` après backfill : **0** (était 55)
+- Migration appliquée ✅
+- `pnpm lint` + `typecheck` + `web build` ✅
+
+### Déploiement
+- `supabase functions deploy stream-start` ✅
+
+### Tests à faire
+- [ ] Compte hors essai/premium → `stream-start` 403 + message « Abonnement requis »
+- [ ] Heartbeat avec `fast_forward_detected` → complete → `is_valid_listen=false`
+- [ ] Admin finance → recalcul cycle royalties (artist_profiles join)
+
+### Prochaine étape — Phase D (finance)
+- Credentials paiements prod, Vitest wallet/royalties, E2E chaîne financière
+
+---
+
 ## 2026-06-28 — Phase B : visibilité compteurs écoutes (RPC + revalidation + toast)
 
 ### Livraisons

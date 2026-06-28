@@ -28,6 +28,18 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const { data: canStream, error: permissionError } = await supabase.rpc(
+      "has_streaming_permission",
+      { p_user_id: user.id },
+    );
+
+    if (permissionError || !canStream) {
+      return new Response(JSON.stringify({ error: "no_streaming_permission" }), {
+        status: 403,
+        headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
+      });
+    }
+
     const body = await req.json();
     const { trackId, platform = "web", qualityKbps, deviceId } = body as {
       trackId: string;
@@ -157,6 +169,13 @@ Deno.serve(async (req: Request) => {
     });
 
     if (sessionError) {
+      const reason = sessionError.message ?? "";
+      if (reason.includes("no_streaming_permission")) {
+        return new Response(JSON.stringify({ error: "no_streaming_permission" }), {
+          status: 403,
+          headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),
+        });
+      }
       return new Response(JSON.stringify({ error: "stream_start_failed" }), {
         status: 500,
         headers: buildCorsHeaders(req, { "Content-Type": "application/json" }),

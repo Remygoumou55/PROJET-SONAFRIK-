@@ -10,6 +10,7 @@ import type {
   StreamSession,
   StreamStartResult,
 } from "@sonafrik/types";
+import { STREAMING_ERROR_MESSAGES } from "@sonafrik/types";
 import { createSocialService } from "../social/social.service";
 import { StreamingError } from "./errors";
 import { mapFunctionInvokeError } from "./invoke-errors";
@@ -80,7 +81,24 @@ export class StreamingService {
     });
 
     if (error || !data?.sessionId) {
-      throw new StreamingError(mapFunctionInvokeError("start", error));
+      let code = mapFunctionInvokeError("start", error);
+      const payload = data as { error?: string } | null;
+      if (payload?.error && payload.error in STREAMING_ERROR_MESSAGES) {
+        code = payload.error as typeof code;
+      } else if (error) {
+        const ctx = (error as { context?: Response }).context;
+        if (ctx) {
+          try {
+            const body = (await ctx.json()) as { error?: string };
+            if (body.error && body.error in STREAMING_ERROR_MESSAGES) {
+              code = body.error as typeof code;
+            }
+          } catch {
+            /* ignore parse */
+          }
+        }
+      }
+      throw new StreamingError(code);
     }
 
     try {
