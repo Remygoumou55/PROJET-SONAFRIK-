@@ -10,6 +10,8 @@ export default defineConfig({
       "src/streaming/**/*.test.ts",
       "src/wallet/**/*.test.ts",
       "src/payments/**/*.test.ts",
+      "src/royalties/**/*.test.ts",
+      "src/payout/**/*.test.ts",
       "src/social/**/*.test.ts",
     ],
     coverage: {

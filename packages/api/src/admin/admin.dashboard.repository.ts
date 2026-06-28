@@ -126,7 +126,7 @@ export class AdminDashboardRepository {
   }
 
   async getHealthSnapshot(): Promise<AdminHealthSnapshot> {
-    const [db, storage, wallets, payments, alerts] = await Promise.all([
+    const [db, storage, wallets, payments, royalties, alerts] = await Promise.all([
       this.runHealthCheck("Base de données", async () => {
         const { count, error } = await this.client
           .from("tracks")
@@ -154,11 +154,24 @@ export class AdminDashboardRepository {
         if (error) throw error;
         return { detail: `${count ?? 0} total` };
       }),
+      this.runHealthCheck("Chaîne royalties", async () => {
+        const [cyclesRes, ledgerRes, plansRes] = await Promise.all([
+          this.client.from("royalty_cycles").select("*", { count: "exact", head: true }),
+          this.client.from("wallet_ledger").select("*", { count: "exact", head: true }),
+          this.client.from("subscription_plans").select("*", { count: "exact", head: true }).eq("is_active", true),
+        ]);
+        if (cyclesRes.error) throw cyclesRes.error;
+        if (ledgerRes.error) throw ledgerRes.error;
+        if (plansRes.error) throw plansRes.error;
+        return {
+          detail: `${cyclesRes.count ?? 0} cycles · ${ledgerRes.count ?? 0} ledger · ${plansRes.count ?? 0} plans actifs`,
+        };
+      }),
       this.listUnreadAdminAlerts(10).catch(() => [] as AdminAlert[]),
     ]);
 
     return {
-      checks: [db, storage, wallets, payments],
+      checks: [db, storage, wallets, payments, royalties],
       alerts,
     };
   }

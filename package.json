@@ -34,6 +34,7 @@
     "probe:war-plan": "npx tsx scripts/probe-war-plan.ts",
     "probe:withdrawal-sandbox": "npx tsx scripts/probe-withdrawal-sandbox.ts",
     "probe:payment-credentials": "npx tsx scripts/probe-payment-credentials.ts",
+    "probe:finance-chain": "npx tsx scripts/probe-finance-chain.ts",
     "run:finance-sandbox-e2e": "npx tsx scripts/run-finance-sandbox-e2e.ts",
     "test:cors": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.cors.config.ts",
     "test:audio-pipeline": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.audio-pipeline.config.ts",

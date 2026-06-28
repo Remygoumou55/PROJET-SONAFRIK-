@@ -11,6 +11,35 @@
 
 ---
 
+## 2026-06-28 — Phase D : chaîne finance (tests + probes + santé admin)
+
+### Livraisons
+- `royalty.service.test.ts` — 9 tests (open/calculate/distribute/trigger/history)
+- `payout.service.test.ts` — 6 tests (approve/reject/markPaid/queue/batch)
+- `wallet.service.test.ts` — +3 tests (getWalletContext, getBalance, requestWithdrawal)
+- `packages/shared/payment/provider-health.ts` — détection sandbox vs prod (4 opérateurs GN)
+- `vitest.config.ts` — include `royalties/**` + `payout/**`
+- `admin.dashboard.repository.ts` — check santé « Chaîne royalties » (cycles, ledger, plans)
+- `scripts/probe-finance-chain.ts` + `pnpm probe:finance-chain`
+- `apps/web/tests/e2e/finance-chain.spec.ts` — E2E wallet → royalties → payout
+
+### Validation
+- `@sonafrik/api` Vitest **301/301** ✅
+- `@sonafrik/shared` Vitest **13/13** ✅
+- `pnpm lint` + `typecheck` ✅
+- `pnpm probe:finance-chain` ✅ (sandbox payment-initiate attendu sans credentials prod)
+
+### Dette / blocage prod (inchangé)
+- Credentials opérateurs prod à injecter via Supabase Secrets (voir `probe:payment-credentials`)
+- Retrait réel E2E non automatisé (sandbox only)
+
+### Tests manuels
+- [ ] `pnpm probe:payment-credentials` — 4 providers sandbox OK
+- [ ] Admin `/admin/health` — ligne « Chaîne royalties »
+- [ ] Playwright `finance-chain.spec.ts`
+
+---
+
 ## 2026-06-28 — Phase C : sécurité streaming + fraude + royalties
 
 ### Livraisons

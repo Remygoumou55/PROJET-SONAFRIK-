@@ -159,4 +159,52 @@ describe("WalletService", () => {
       paymentReference: "ref-1",
     })).rejects.toMatchObject({ code: "TOPUP_FAILED" });
   });
+
+  it("getWalletContext agrège wallet, premium et retraits", async () => {
+    const service = new WalletService(createMockClient({
+      profile: {
+        is_premium: true,
+        premium_expires_at: "2030-01-01T00:00:00Z",
+        created_at: new Date().toISOString(),
+      },
+      wallet: {
+        id: "w1",
+        user_id: "u1",
+        balance_gnf: 250_000,
+        currency: "GNF",
+        total_credited_gnf: 300_000,
+        total_debited_gnf: 50_000,
+        created_at: "",
+        updated_at: "",
+      },
+      withdrawals: [{ status: "pending" }, { status: "completed" }],
+    }));
+
+    const ctx = await service.getWalletContext();
+    expect(ctx.wallet.balance_gnf).toBe(250_000);
+    expect(ctx.isPremium).toBe(true);
+    expect(ctx.pendingWithdrawals).toBe(1);
+  });
+
+  it("getBalance délègue get_wallet_balance", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: 42_000, error: null });
+    const service = new WalletService(createMockClient({ rpc }));
+
+    const balance = await service.getBalance();
+    expect(balance).toBe(42_000);
+    expect(rpc).toHaveBeenCalledWith("get_wallet_balance", { p_user_id: "u1" });
+  });
+
+  it("requestWithdrawal traduit insufficient_balance", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: null,
+      error: { message: "insufficient_balance" },
+    });
+    const service = new WalletService(createMockClient({ rpc }));
+
+    await expect(service.requestWithdrawal({
+      payoutAccountId: "44444444-4444-4444-8444-444444444444",
+      amountGnf: 10_000,
+    })).rejects.toMatchObject({ code: "INSUFFICIENT_BALANCE" });
+  });
 });
