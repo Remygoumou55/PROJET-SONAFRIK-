@@ -80,7 +80,9 @@ export function AdminMusicalTodaySection({
         </article>
         <article className="admin-human-musical__card">
           <span className="admin-human-musical__label">🎵 Morceau récent</span>
-          <p className="admin-human-musical__value">{musical.topTrack ?? "—"}</p>
+          <p className="admin-human-musical__value">
+            {musical.topTrack ?? "Aucun morceau valide récent"}
+          </p>
           <p className="admin-human-musical__hint">Dernière publication catalogue</p>
         </article>
         <article className="admin-human-musical__card">
@@ -102,8 +104,9 @@ export function AdminBusinessSection({
   business,
 }: {
   business: {
-    revenueMonth: string;
     revenueChange: string | null;
+    revenuePerUser: string;
+    sonafrikShare: string;
     pendingWithdrawals: number;
     ledgerEntries: number;
     narrative: string;
@@ -117,20 +120,24 @@ export function AdminBusinessSection({
       <p className="admin-human-section-sub">{business.narrative}</p>
       <div className="admin-human-business__grid">
         <div className="admin-human-business__metric">
-          <span>Revenus du mois</span>
-          <strong>{business.revenueMonth}</strong>
+          <span>Évolution revenus</span>
+          <strong>
+            {business.revenueChange
+              ? `${parseFloat(business.revenueChange) >= 0 ? "+" : ""}${business.revenueChange}%`
+              : "—"}
+          </strong>
         </div>
         <div className="admin-human-business__metric">
-          <span>Évolution</span>
-          <strong>{business.revenueChange ? `${business.revenueChange}%` : "—"}</strong>
+          <span>Revenu / auditeur</span>
+          <strong>{business.revenuePerUser}</strong>
+        </div>
+        <div className="admin-human-business__metric">
+          <span>Part SONAFRIK</span>
+          <strong>{business.sonafrikShare}</strong>
         </div>
         <div className="admin-human-business__metric">
           <span>Retraits en attente</span>
           <strong>{business.pendingWithdrawals}</strong>
-        </div>
-        <div className="admin-human-business__metric">
-          <span>Mouvements wallet</span>
-          <strong>{business.ledgerEntries.toLocaleString("fr-FR")}</strong>
         </div>
       </div>
     </section>

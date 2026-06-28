@@ -184,6 +184,8 @@ export class AdminDashboardRepository {
       pendingRightsClaims,
       pendingWithdrawals,
       pendingArtistVerif,
+      pendingAlbums,
+      pendingTracks,
       fraudSessions,
       recentActivityRes,
       ledgerYearRes,
@@ -246,15 +248,36 @@ export class AdminDashboardRepository {
       ),
       countQuery(
         this.client
+          .from("albums")
+          .select("*", { count: "exact", head: true })
+          .eq("publication_status", "pending_review")
+          .is("deleted_at", null),
+      ),
+      countQuery(
+        this.client
+          .from("tracks")
+          .select("*", { count: "exact", head: true })
+          .eq("publication_status", "pending_review")
+          .is("deleted_at", null),
+      ),
+      countQuery(
+        this.client
           .from("stream_sessions")
           .select("*", { count: "exact", head: true })
-          .filter("fraud_flags", "neq", "{}"),
+          .filter("fraud_flags", "neq", "{}")
+          .gte("started_at", startOfMonth),
       ),
       this.client
         .from("audit_logs")
-        .select("id, action, created_at, metadata")
+        .select("id, action, created_at, metadata, entity_type")
+        .not("action", "ilike", "Identity.%")
+        .not("action", "ilike", "GoTrue%")
+        .not("action", "ilike", "auth.%")
+        .not("action", "ilike", "system.%")
+        .not("action", "ilike", "%Read All%")
+        .not("action", "ilike", "%Notifications.Read%")
         .order("created_at", { ascending: false })
-        .limit(10),
+        .limit(25),
       this.walletCreditsSince(twelveMonthsAgo),
     ]);
 
@@ -299,6 +322,7 @@ export class AdminDashboardRepository {
         pendingRightsClaims,
         pendingWithdrawals,
         pendingArtistVerif,
+        pendingCatalog: pendingAlbums + pendingTracks,
         fraudSessions,
       },
       recentActivity,

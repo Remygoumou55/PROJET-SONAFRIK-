@@ -11,7 +11,16 @@ export function AdminCoachCard({ tips }: { tips: AdminCoachTip[] }) {
       <ul className="admin-human-coach__list">
         {tips.map((tip) => (
           <li key={tip.id} className="admin-human-coach__tip">
-            {tip.text}
+            <span className="admin-human-coach__tip-text">{tip.text}</span>
+            {tip.href && tip.cta ? (
+              <a
+                href={tip.href}
+                className="coach-insight-cta"
+                style={{ color: tip.color, borderColor: `${tip.color}40` }}
+              >
+                {tip.cta}
+              </a>
+            ) : null}
           </li>
         ))}
       </ul>

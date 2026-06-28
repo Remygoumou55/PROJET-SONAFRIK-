@@ -8,7 +8,9 @@ import type { AdminSessionContext } from "../lib/getAdminSessionContext";
 import { buildAdminDashboardView } from "../lib/buildAdminDashboardView";
 import { AdminCommandHero } from "./dashboard/AdminCommandHero";
 import { AdminPremiumKpiGrid } from "./dashboard/AdminPremiumKpiGrid";
-import { AdminLiveTimeline, AdminPriorityCenter } from "./dashboard/AdminLiveTimeline";
+import { AdminLiveTimeline } from "./dashboard/AdminLiveTimeline";
+import { AdminCategorizedAlerts } from "./dashboard/AdminCategorizedAlerts";
+import { AdminLaunchProgress } from "./dashboard/AdminLaunchProgress";
 import { AdminCoachCard, AdminPlatformHealthCard } from "./dashboard/AdminCoachHealth";
 import {
   AdminModulesHumanGrid,
@@ -58,11 +60,12 @@ export function AdminCockpitDashboard({
   return (
     <div className="admin-dashboard admin-dashboard--human">
       <AdminCommandHero hero={view.hero} />
+      <AdminLaunchProgress targets={view.launchTargets} />
       <AdminPremiumKpiGrid kpis={view.kpis} />
 
       <div className="admin-human-command-grid">
         <div className="admin-human-command-grid__main">
-          <AdminPriorityCenter items={view.priorities} />
+          <AdminCategorizedAlerts alerts={view.categorizedAlerts} />
           <AdminStoryChartsSection
             monthlyRevenue={view.monthlyRevenue}
             narrative={view.business.narrative}

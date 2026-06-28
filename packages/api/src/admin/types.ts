@@ -91,6 +91,7 @@ export type AdminCockpitAlerts = {
   pendingRightsClaims: number;
   pendingWithdrawals: number;
   pendingArtistVerif: number;
+  pendingCatalog: number;
   fraudSessions: number;
 };
 

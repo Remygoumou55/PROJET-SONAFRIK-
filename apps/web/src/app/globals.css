@@ -67,6 +67,7 @@
   /* Admin back-office */
   --color-admin-sidebar: #0a0a0a;
   --color-admin-warning: #ff8c00;
+  --color-admin-info: #378add;
   --color-admin-card-bg: rgba(255, 255, 255, 0.03);
   --color-admin-card-border: rgba(255, 255, 255, 0.08);
   --color-admin-border-subtle: rgba(255, 255, 255, 0.06);

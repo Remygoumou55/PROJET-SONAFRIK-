@@ -27,7 +27,7 @@ export function AdminCommandHero({ hero }: { hero: AdminDashboardViewModel["hero
           </span>
         </div>
         <div className="admin-human-hero__stat">
-          <span className="admin-human-hero__stat-label">Alertes critiques</span>
+          <span className="admin-human-hero__stat-label">Catégories alertes</span>
           <span className="admin-human-hero__stat-value">{hero.criticalAlerts}</span>
         </div>
         <div className="admin-human-hero__stat">

@@ -6,7 +6,14 @@ import type {
   AdminHealthSnapshot,
   LiveControlSnapshot,
 } from "@sonafrik/api/admin";
+import { isValidContentName } from "@/lib/content-filter";
+import { filterAuditActivity } from "./filterAuditActivity";
 import { humanizeAuditAction } from "./humanizeAuditAction";
+import {
+  LAUNCH_ARTIST_TARGET,
+  LAUNCH_LISTENER_TARGET,
+  LAUNCH_TRACK_TARGET,
+} from "./launchTargets";
 
 export type AdminDashboardTrend = "up" | "down" | "neutral";
 
@@ -21,6 +28,9 @@ export interface AdminPremiumKpiView {
   humanInsight: string;
   trend: AdminDashboardTrend;
   sparkline: number[];
+  alert?: boolean;
+  alertMessage?: string;
+  actionLabel?: string;
 }
 
 export interface AdminPriorityItem {
@@ -42,6 +52,28 @@ export interface AdminTimelineItem {
 export interface AdminCoachTip {
   id: string;
   text: string;
+  cta: string;
+  href: string;
+  color: string;
+}
+
+export interface AdminCategorizedAlert {
+  id: string;
+  count: number;
+  label: string;
+  icon: string;
+  severity: "danger" | "warning" | "info" | "neutral";
+  href: string;
+  cta: string;
+}
+
+export interface AdminLaunchTargetView {
+  label: string;
+  current: number;
+  target: number;
+  unit: string;
+  icon: string;
+  href: string;
 }
 
 export interface AdminHealthServiceView {
@@ -73,6 +105,8 @@ export interface AdminDashboardViewModel {
     healthSummary: string;
   };
   kpis: AdminPremiumKpiView[];
+  categorizedAlerts: AdminCategorizedAlert[];
+  launchTargets: AdminLaunchTargetView[];
   priorities: AdminPriorityItem[];
   coachTips: AdminCoachTip[];
   timeline: AdminTimelineItem[];
@@ -86,8 +120,9 @@ export interface AdminDashboardViewModel {
     narrative: string;
   };
   business: {
-    revenueMonth: string;
     revenueChange: string | null;
+    revenuePerUser: string;
+    sonafrikShare: string;
     pendingWithdrawals: number;
     ledgerEntries: number;
     narrative: string;
@@ -133,43 +168,121 @@ function buildCoachTips(kpis: AdminCockpitKpis, alerts: AdminCockpitAlerts): Adm
   if (kpis.newUsersToday > 0) {
     tips.push({
       id: "users",
-      text: `Les inscriptions avancent bien — ${kpis.newUsersToday} nouvel${kpis.newUsersToday > 1 ? "s" : ""} auditeur${kpis.newUsersToday > 1 ? "s" : ""} aujourd'hui.`,
+      text: `${kpis.newUsersToday} nouveau${kpis.newUsersToday > 1 ? "x" : ""} auditeur${kpis.newUsersToday > 1 ? "s" : ""} aujourd'hui`,
+      cta: "Voir les inscriptions →",
+      href: "/admin/users?filter=new",
+      color: "var(--color-vert-energie)",
     });
   }
   if (alerts.pendingWithdrawals > 0) {
     tips.push({
       id: "withdrawals",
-      text: `${alerts.pendingWithdrawals} demande${alerts.pendingWithdrawals > 1 ? "s" : ""} de retrait attend${alerts.pendingWithdrawals > 1 ? "ent" : ""} votre validation.`,
+      text: `${alerts.pendingWithdrawals} retrait${alerts.pendingWithdrawals > 1 ? "s" : ""} en attente de validation`,
+      cta: "Traiter maintenant →",
+      href: "/admin/finance?filter=pending",
+      color: "var(--color-admin-warning)",
     });
   }
   if (alerts.pendingArtistVerif > 0) {
     tips.push({
       id: "verif",
-      text: `${alerts.pendingArtistVerif} artiste${alerts.pendingArtistVerif > 1 ? "s" : ""} attend${alerts.pendingArtistVerif > 1 ? "ent" : ""} une vérification d'identité.`,
+      text: `${alerts.pendingArtistVerif} artiste${alerts.pendingArtistVerif > 1 ? "s" : ""} attend${alerts.pendingArtistVerif > 1 ? "ent" : ""} une vérification d'identité`,
+      cta: "Vérifier les profils →",
+      href: "/admin/artists?filter=pending",
+      color: "var(--color-admin-info)",
     });
   }
   if (kpis.revenueChange && parseFloat(kpis.revenueChange) > 0) {
     tips.push({
       id: "revenue",
-      text: `Les revenus du mois progressent de ${kpis.revenueChange}% par rapport au mois dernier.`,
+      text: `Les revenus du mois progressent de ${kpis.revenueChange}% par rapport au mois dernier`,
+      cta: "Voir les finances →",
+      href: "/admin/finance",
+      color: "var(--color-vert-energie)",
     });
   }
   if (alerts.fraudSessions > 0) {
     tips.push({
       id: "fraud",
-      text: `${alerts.fraudSessions} écoute${alerts.fraudSessions > 1 ? "s" : ""} suspecte${alerts.fraudSessions > 1 ? "s" : ""} — un coup d'œil sur la fraude est recommandé.`,
+      text: `${alerts.fraudSessions} écoute${alerts.fraudSessions > 1 ? "s" : ""} suspecte${alerts.fraudSessions > 1 ? "s" : ""} ce mois — score fraude élevé`,
+      cta: "Analyser →",
+      href: "/admin/fraud?filter=fraud",
+      color: "var(--color-rouge-alerte)",
+    });
+  }
+  if (kpis.premiumUsers === 0) {
+    tips.push({
+      id: "premium",
+      text: "Aucun abonnement Premium actif — pensez à communiquer sur les offres",
+      cta: "Config tarifs →",
+      href: "/admin/settings",
+      color: "var(--color-or-solaire)",
     });
   }
   if (tips.length === 0) {
     tips.push({
       id: "calm",
-      text: "La plateforme respire calmement. C'est le bon moment pour valider le catalogue et accompagner les nouveaux artistes.",
+      text: "✅ Tout est en ordre. Bonne journée !",
+      cta: "",
+      href: "",
+      color: "var(--color-vert-energie)",
     });
   }
-  return tips.slice(0, 4);
+  return tips.slice(0, 5);
 }
 
-function buildPriorities(alerts: AdminCockpitAlerts, extended: AdminDashboardKpis): AdminPriorityItem[] {
+function buildCategorizedAlerts(alerts: AdminCockpitAlerts): AdminCategorizedAlert[] {
+  const rows: AdminCategorizedAlert[] = [];
+
+  if (alerts.fraudSessions > 0) {
+    rows.push({
+      id: "fraud",
+      count: alerts.fraudSessions,
+      label: "écoutes suspectes",
+      icon: "🔴",
+      severity: "danger",
+      href: "/admin/fraud?filter=fraud",
+      cta: "Analyser la fraude →",
+    });
+  }
+  if (alerts.pendingWithdrawals > 0) {
+    rows.push({
+      id: "withdrawals",
+      count: alerts.pendingWithdrawals,
+      label: `retrait${alerts.pendingWithdrawals > 1 ? "s" : ""} en attente`,
+      icon: "🟠",
+      severity: "warning",
+      href: "/admin/finance?filter=pending",
+      cta: "Traiter les retraits →",
+    });
+  }
+  if (alerts.pendingCatalog > 0) {
+    rows.push({
+      id: "catalog",
+      count: alerts.pendingCatalog,
+      label: `contenu${alerts.pendingCatalog > 1 ? "s" : ""} à modérer`,
+      icon: "🟡",
+      severity: "info",
+      href: "/admin/catalog?filter=pending",
+      cta: "Modérer le catalogue →",
+    });
+  }
+  if (alerts.pendingArtistVerif > 0) {
+    rows.push({
+      id: "verif",
+      count: alerts.pendingArtistVerif,
+      label: `artiste${alerts.pendingArtistVerif > 1 ? "s" : ""} à vérifier`,
+      icon: "🔵",
+      severity: "neutral",
+      href: "/admin/artists?filter=pending",
+      cta: "Vérifier les artistes →",
+    });
+  }
+
+  return rows;
+}
+
+function buildPriorities(alerts: AdminCockpitAlerts): AdminPriorityItem[] {
   const items: AdminPriorityItem[] = [];
   if (alerts.pendingWithdrawals > 0) {
     items.push({
@@ -191,11 +304,11 @@ function buildPriorities(alerts: AdminCockpitAlerts, extended: AdminDashboardKpi
       actionLabel: "Examiner les réclamations",
     });
   }
-  if (extended.pendingCatalog > 0) {
+  if (alerts.pendingCatalog > 0) {
     items.push({
       id: "catalog",
       label: "Contenus en attente",
-      count: extended.pendingCatalog,
+      count: alerts.pendingCatalog,
       urgency: "warning",
       href: "/admin/catalog",
       actionLabel: "Modérer le catalogue",
@@ -230,8 +343,9 @@ function synthesizeTimeline(
   live: LiveControlSnapshot | null,
 ): AdminTimelineItem[] {
   const items: AdminTimelineItem[] = [];
+  const cleanActivity = filterAuditActivity(cockpit.recentActivity);
 
-  for (const row of cockpit.recentActivity.slice(0, 6)) {
+  for (const row of cleanActivity.slice(0, 6)) {
     items.push({
       id: row.id,
       label: humanizeAuditAction(row.action, row.metadata),
@@ -240,20 +354,21 @@ function synthesizeTimeline(
     });
   }
 
+  const recentTrack = live?.recentTracks.find((track) => isValidContentName(track.title));
+  if (recentTrack && items.length < 8) {
+    items.unshift({
+      id: `track-${recentTrack.id}`,
+      label: `Nouveau morceau publié : « ${recentTrack.title} »`,
+      time: recentTrack.created_at,
+      tone: "success",
+    });
+  }
   if (alerts.pendingWithdrawals > 0 && items.length < 8) {
     items.unshift({
       id: "syn-withdraw",
       label: `${alerts.pendingWithdrawals} retrait(s) en attente de validation`,
       time: new Date().toISOString(),
       tone: "warning",
-    });
-  }
-  if (live?.recentTracks[0] && items.length < 8) {
-    items.unshift({
-      id: `track-${live.recentTracks[0].id}`,
-      label: `Nouveau morceau publié : « ${live.recentTracks[0].title} »`,
-      time: live.recentTracks[0].created_at,
-      tone: "success",
     });
   }
   if (alerts.fraudSessions > 0 && items.length < 8) {
@@ -312,12 +427,12 @@ export function buildAdminDashboardView(input: {
   const { kpis, alerts } = cockpit;
   const first = firstName(input.adminName);
 
-  const criticalAlerts =
-    alerts.pendingRightsClaims + alerts.fraudSessions;
+  const categorizedAlerts = buildCategorizedAlerts(alerts);
+  const criticalAlerts = categorizedAlerts.length;
   const actionsRequired =
     alerts.pendingWithdrawals +
     alerts.pendingArtistVerif +
-    extended.pendingCatalog +
+    alerts.pendingCatalog +
     alerts.pendingRightsClaims;
 
   const platformStatus: AdminDashboardViewModel["hero"]["platformStatus"] =
@@ -374,10 +489,10 @@ export function buildAdminDashboardView(input: {
       value: (live?.publishedTracks ?? 0).toLocaleString("fr-FR"),
       icon: "🎵",
       href: "/admin/catalog",
-      todayLabel: extended.pendingCatalog > 0 ? `${extended.pendingCatalog} en modération` : "Catalogue à jour",
+      todayLabel: alerts.pendingCatalog > 0 ? `${alerts.pendingCatalog} en modération` : "Catalogue à jour",
       periodLabel: "Morceaux disponibles à l'écoute",
-      humanInsight: extended.pendingCatalog > 0 ? "Des publications attendent votre feu vert" : "La musique circule",
-      trend: extended.pendingCatalog > 0 ? "neutral" : "up",
+      humanInsight: alerts.pendingCatalog > 0 ? "Des publications attendent votre feu vert" : "La musique circule",
+      trend: alerts.pendingCatalog > 0 ? "neutral" : "up",
       sparkline: normalizeSparkline([live?.publishedTracks ?? 0]),
     },
     {
@@ -386,10 +501,10 @@ export function buildAdminDashboardView(input: {
       value: fmtGnf(kpis.revenueThisMonth),
       icon: "💰",
       href: "/admin/finance",
-      todayLabel: fmtGnf(kpis.revenueThisMonth),
-      periodLabel: kpis.revenueChange
+      todayLabel: kpis.revenueChange
         ? `${parseFloat(kpis.revenueChange) >= 0 ? "+" : ""}${kpis.revenueChange}% vs mois dernier`
         : "Premier mois de référence",
+      periodLabel: "Crédits artistes ce mois",
       humanInsight:
         kpis.revenueChange && parseFloat(kpis.revenueChange) >= 0
           ? "L'économie musicale progresse"
@@ -438,12 +553,23 @@ export function buildAdminDashboardView(input: {
       title: "Abonnements Premium",
       value: kpis.premiumUsers.toLocaleString("fr-FR"),
       icon: "⭐",
-      href: "/admin/users",
-      todayLabel: `${premiumRate}% des auditeurs`,
+      href: "/admin/settings",
+      todayLabel:
+        kpis.premiumUsers === 0
+          ? "⚠️ Aucun abonnement actif"
+          : `${premiumRate}% des auditeurs`,
       periodLabel: "Membres payants actifs",
-      humanInsight: parseFloat(premiumRate) > 5 ? "Base premium solide" : "Potentiel de conversion",
-      trend: parseFloat(premiumRate) > 0 ? "up" : "neutral",
+      humanInsight:
+        kpis.premiumUsers === 0
+          ? "Alerte business — configurez et communiquez les offres"
+          : parseFloat(premiumRate) > 5
+            ? "Base premium solide"
+            : "Potentiel de conversion",
+      trend: kpis.premiumUsers === 0 ? "down" : parseFloat(premiumRate) > 0 ? "up" : "neutral",
       sparkline: normalizeSparkline([kpis.premiumUsers]),
+      alert: kpis.premiumUsers === 0,
+      alertMessage: "⚠️ Aucun abonnement actif",
+      actionLabel: "Configurer les tarifs →",
     },
   ];
 
@@ -472,16 +598,19 @@ export function buildAdminDashboardView(input: {
       label: "Catalogue",
       desc: "Albums, singles et modération",
       stat: `${(live?.publishedTracks ?? 0).toLocaleString("fr-FR")} morceaux`,
-      activity: extended.pendingCatalog > 0 ? `${extended.pendingCatalog} en attente` : "Publié",
-      status: extended.pendingCatalog > 0 ? "attention" : "ok",
+      activity: alerts.pendingCatalog > 0 ? `${alerts.pendingCatalog} en attente` : "Publié",
+      status: alerts.pendingCatalog > 0 ? "attention" : "ok",
     },
     {
       href: "/admin/finance",
       icon: "💰",
       label: "Finances",
       desc: "Revenus, wallet et retraits",
-      stat: fmtGnf(kpis.revenueThisMonth),
-      activity: alerts.pendingWithdrawals > 0 ? `${alerts.pendingWithdrawals} retrait(s)` : "Flux normal",
+      stat:
+        alerts.pendingWithdrawals > 0
+          ? `${alerts.pendingWithdrawals} retrait(s) en attente`
+          : `${live?.royaltyCycles ?? 0} cycle(s) royalties`,
+      activity: alerts.pendingWithdrawals > 0 ? "Action requise" : "Flux normal",
       status: alerts.pendingWithdrawals > 0 ? "attention" : "ok",
     },
     {
@@ -522,6 +651,36 @@ export function buildAdminDashboardView(input: {
     },
   ];
 
+  const listenerTarget = extended.launchTarget > 0 ? extended.launchTarget : LAUNCH_LISTENER_TARGET;
+  const validRecentTrack = live?.recentTracks.find((track) => isValidContentName(track.title)) ?? null;
+
+  const launchTargets: AdminLaunchTargetView[] = [
+    {
+      label: "Auditeurs inscrits",
+      current: kpis.totalUsers,
+      target: listenerTarget,
+      unit: "auditeurs",
+      icon: "👥",
+      href: "/admin/users",
+    },
+    {
+      label: "Artistes actifs",
+      current: kpis.activeArtists,
+      target: LAUNCH_ARTIST_TARGET,
+      unit: "artistes",
+      icon: "🎤",
+      href: "/admin/artists",
+    },
+    {
+      label: "Morceaux publiés",
+      current: live?.publishedTracks ?? 0,
+      target: LAUNCH_TRACK_TARGET,
+      unit: "morceaux",
+      icon: "🎵",
+      href: "/admin/catalog",
+    },
+  ];
+
   return {
     hero: {
       greeting: `${greetingForHour()} ${first}.`,
@@ -538,24 +697,29 @@ export function buildAdminDashboardView(input: {
       healthSummary: `${healthOk}/${healthTotal} services opérationnels`,
     },
     kpis: kpisView,
-    priorities: buildPriorities(alerts, extended),
+    categorizedAlerts,
+    launchTargets,
+    priorities: buildPriorities(alerts),
     coachTips: buildCoachTips(kpis, alerts),
     timeline: synthesizeTimeline(cockpit, alerts, live),
     healthServices: mapHealthServices(health),
     modules,
     musical: {
-      topTrack: live?.recentTracks[0]?.title ?? null,
+      topTrack: validRecentTrack?.title ?? null,
       publishedCount: live?.publishedTracks ?? 0,
       validListens: live?.validListens ?? 0,
       dominantRegion: "Guinée · Conakry",
-      narrative:
-        live?.recentTracks[0]
-          ? `« ${live.recentTracks[0].title} » vient d'entrer dans le catalogue. La scène locale pulse.`
-          : "La scène guinéenne s'apprête à briller — publiez, écoutez, partagez.",
+      narrative: validRecentTrack
+        ? `« ${validRecentTrack.title} » vient d'entrer dans le catalogue. La scène locale pulse.`
+        : "Aucun morceau valide récent — la scène guinéenne s'apprête à briller.",
     },
     business: {
-      revenueMonth: fmtGnf(kpis.revenueThisMonth),
       revenueChange: kpis.revenueChange,
+      revenuePerUser:
+        kpis.totalUsers > 0
+          ? `${Math.floor(kpis.revenueThisMonth / kpis.totalUsers).toLocaleString("fr-FR")} GNF`
+          : "—",
+      sonafrikShare: `${Math.floor(kpis.revenueThisMonth * 0.3).toLocaleString("fr-FR")} GNF`,
       pendingWithdrawals: alerts.pendingWithdrawals,
       ledgerEntries: live?.ledgerEntries ?? 0,
       narrative:
@@ -567,7 +731,7 @@ export function buildAdminDashboardView(input: {
       fraudSessions: alerts.fraudSessions,
       pendingClaims: alerts.pendingRightsClaims,
       pendingVerif: alerts.pendingArtistVerif,
-      pendingCatalog: extended.pendingCatalog,
+      pendingCatalog: alerts.pendingCatalog,
       narrative:
         criticalAlerts > 0
           ? "La gouvernance est active : traitez les signaux avant qu'ils n'impactent la confiance."
