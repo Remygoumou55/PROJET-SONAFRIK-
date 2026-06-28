@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient, isLocalAuditMode } from "@/lib/supabase/client";
+import { ldseEventBus } from "@/features/shared/ldse/event-bus";
+import {
+  ADMIN_LDSE_EVENTS,
+  mapAdminRealtimeTableToEvents,
+} from "@/features/shared/ldse/admin/admin-ldse-config";
+import { ldseObservability } from "@/features/shared/ldse/observability";
 
 /** Tables qui impactent KPIs, badges sidebar ou activité admin. */
 export const ADMIN_REALTIME_TABLES = [
@@ -61,9 +67,20 @@ export function useAdminLiveRefresh(options?: Options) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       debounceRef.current = null;
+      ldseEventBus.publish(ADMIN_LDSE_EVENTS.snapshotInvalidate);
       refresh();
     }, DEBOUNCE_MS);
   }, [refresh]);
+
+  const onRealtimeChange = useCallback(
+    (table: (typeof ADMIN_REALTIME_TABLES)[number]) => {
+      for (const eventType of mapAdminRealtimeTableToEvents(table)) {
+        ldseEventBus.publish(eventType, { table });
+      }
+      scheduleRefresh();
+    },
+    [scheduleRefresh],
+  );
 
   useEffect(() => {
     if (disableRealtime) {
@@ -82,7 +99,7 @@ export function useAdminLiveRefresh(options?: Options) {
         channel = channel.on(
           "postgres_changes",
           { event: "*", schema: "public", table },
-          scheduleRefresh,
+          () => onRealtimeChange(table),
         );
       }
 
@@ -90,6 +107,7 @@ export function useAdminLiveRefresh(options?: Options) {
         if (cancelled) return;
         if (status === "SUBSCRIBED") {
           setMode("realtime");
+          ldseObservability.setActiveRealtimeChannels(1);
           refresh();
         } else if (
           status === "CHANNEL_ERROR" ||
@@ -97,19 +115,21 @@ export function useAdminLiveRefresh(options?: Options) {
           status === "CLOSED"
         ) {
           setMode("polling");
+          ldseObservability.setActiveRealtimeChannels(0);
         }
       });
 
       return () => {
         cancelled = true;
         if (debounceRef.current) clearTimeout(debounceRef.current);
+        ldseObservability.setActiveRealtimeChannels(0);
         void supabase.removeChannel(channel);
       };
     } catch {
       setMode("polling");
       return undefined;
     }
-  }, [disableRealtime, refresh, scheduleRefresh]);
+  }, [disableRealtime, refresh, onRealtimeChange]);
 
   useEffect(() => {
     if (mode !== "polling") return;

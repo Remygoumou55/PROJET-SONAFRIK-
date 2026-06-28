@@ -11,7 +11,30 @@
 
 ---
 
-## 2026-06-28 — Back Office Humanization : Supervision Fraude (Phases 1–12)
+## 2026-06-28 — LDSE v1.0 : Live Data Synchronization Engine (Admin)
+
+### Fichiers touchés
+- `packages/api/src/admin/admin.metrics.repository.ts` — SSOT comptages fraude (`totalFlagged`, `flaggedThisMonth`, `flaggedToday`)
+- `packages/api/src/admin/admin.dashboard.repository.ts` — KPI/nav/cockpit via metrics (plus de requêtes ad hoc fraude)
+- `packages/api/src/admin/admin.fraud.repository.ts` — stats + liste alignées SSOT
+- `packages/api/src/admin/admin.repository.ts` — `getAdminLiveSnapshot()`, wiring metrics
+- `apps/web/src/features/shared/ldse/**` — Event Bus, cache, providers, observabilité dev
+- `apps/web/src/features/admin/hooks/useAdminLiveRefresh.ts` — Realtime → événements LDSE
+- `apps/web/src/features/admin/components/AdminLayoutClient.tsx` — LdseProvider + AdminLdseProvider
+- `docs/LDSE.md`, `docs/LDSE_AUDIT.md` — architecture + audit Phase 1
+
+### Problème corrigé
+- Sidebar / dashboard / page fraude affichaient des totaux différents (all-time vs mois vs count séparé)
+
+### Dette technique
+- Catalog pending, withdrawals, users : comptages encore dupliqués entre dashboard methods — migration LDSE v2
+- Modules listener/creator/wallet/notifications : non migrés LDSE
+
+### Validation
+- `pnpm typecheck` + `pnpm lint` + `pnpm build` ✅
+
+---
+
 
 ### Fichiers touchés
 - `packages/api/src/admin/admin.fraud.repository.ts` — incidents enrichis, stats, events (nouvelles méthodes)

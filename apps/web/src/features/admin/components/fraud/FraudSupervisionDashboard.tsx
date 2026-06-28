@@ -24,6 +24,7 @@ function FraudSupervisionDashboardView({ stats }: Props) {
         <p className="fraud-supervision-dashboard__sub">Vue d&apos;ensemble — aujourd&apos;hui</p>
       </header>
       <div className="fraud-supervision-dashboard__grid">
+        <StatCell label="Total signalées (SSOT)" value={stats.totalFlagged} tone="fraud-kpi--warn" />
         <StatCell label="Sessions aujourd'hui" value={stats.todayTotal} />
         <StatCell label="Sessions actives" value={stats.activeSessions} tone="fraud-kpi--live" />
         <StatCell label="Fraudes détectées" value={stats.fraudDetectedToday} tone="fraud-kpi--warn" />

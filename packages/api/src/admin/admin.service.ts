@@ -9,11 +9,13 @@ import type { TriggerRoyaltyCycleInput } from "./schemas";
 import type {
   AdminCockpitData,
   AdminDashboardKpis,
+  AdminFraudMetrics,
   AdminFraudSession,
   AdminFraudIncidentsPage,
   AdminFraudStreamEvent,
   AdminFraudSupervisionStats,
   AdminHealthSnapshot,
+  AdminLiveSnapshot,
   AdminNavBadges,
   AdminRevenueDashboardData,
   AdminWithdrawalsDashboardMeta,
@@ -110,6 +112,14 @@ export class AdminService {
 
   async listFraudSessionEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
     return this.repository.listFraudSessionEvents(sessionId, limit);
+  }
+
+  async getFraudMetrics(): Promise<AdminFraudMetrics> {
+    return this.repository.getFraudMetrics();
+  }
+
+  async getAdminLiveSnapshot(): Promise<AdminLiveSnapshot> {
+    return this.repository.getAdminLiveSnapshot();
   }
 
   async getDashboardKpis(): Promise<AdminDashboardKpis> {
@@ -228,8 +238,10 @@ export function createAdminService(client: SonafrikSupabaseClient): AdminService
 export type {
   AdminCockpitData,
   AdminDashboardKpis,
+  AdminFraudMetrics,
   AdminFraudSession,
   AdminHealthSnapshot,
+  AdminLiveSnapshot,
   AdminNavBadges,
   AdminRightsClaim,
   LiveControlSnapshot,

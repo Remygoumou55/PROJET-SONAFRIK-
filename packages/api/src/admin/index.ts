@@ -1,3 +1,4 @@
+export * from "./admin.metrics.repository";
 export * from "./errors";
 export * from "./schemas";
 export * from "./types";

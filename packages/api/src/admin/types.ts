@@ -73,6 +73,21 @@ export type AdminFraudSupervisionStats = {
   suspendedAccountsHint: number;
   validListensToday: number;
   rejectedListensToday: number;
+  /** SSOT — aligné sidebar / dashboard / liste fraude */
+  totalFlagged: number;
+};
+
+/** Snapshot admin synchronisé (LDSE) — badges + métriques canoniques */
+export type AdminLiveSnapshot = {
+  navBadges: AdminNavBadges;
+  fraudMetrics: AdminFraudMetrics;
+  fetchedAt: string;
+};
+
+export type AdminFraudMetrics = {
+  totalFlagged: number;
+  flaggedThisMonth: number;
+  flaggedToday: number;
 };
 
 export type AdminDashboardKpis = {

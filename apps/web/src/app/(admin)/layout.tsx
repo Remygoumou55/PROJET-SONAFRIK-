@@ -5,7 +5,6 @@ import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { isDevBypassActive } from "@/lib/auth/guards";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
 import AdminLoading from "./loading";
-/* Charge admin CSS sur la route — globals.css seul ne suffit pas en dev (HMR / nested @import). */
 import "@/app/styles/admin.css";
 import "@/app/styles/admin-dashboard-human.css";
 import "@/app/styles/admin-responsive.css";
@@ -16,19 +15,27 @@ export const dynamic = "force-dynamic";
 async function AdminGuard({ children }: { children: React.ReactNode }) {
   await requireAdmin();
   const admin = await getAdminServiceForSession();
-  const [navBadges, adminUser] = await Promise.all([
-    admin.getNavBadges().catch(() => ({
-      content: 0,
-      pendingRightsClaims: 0,
-      fraudSessions: 0,
-      withdrawals: 0,
+  const [liveSnapshot, adminUser] = await Promise.all([
+    admin.getAdminLiveSnapshot().catch(() => ({
+      navBadges: {
+        content: 0,
+        pendingRightsClaims: 0,
+        fraudSessions: 0,
+        withdrawals: 0,
+      },
+      fraudMetrics: {
+        totalFlagged: 0,
+        flaggedThisMonth: 0,
+        flaggedToday: 0,
+      },
+      fetchedAt: new Date().toISOString(),
     })),
     getAdminSessionContext(),
   ]);
 
   return (
     <AdminLayoutShell
-      navBadges={navBadges}
+      liveSnapshot={liveSnapshot}
       adminUser={adminUser}
       disableLiveRealtime={isDevBypassActive()}
     >

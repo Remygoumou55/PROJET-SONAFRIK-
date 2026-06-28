@@ -1,4 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import type { AdminMetricsRepository } from "./admin.metrics.repository";
 import type {
   AdminFraudIncident,
   AdminFraudIncidentsPage,
@@ -39,31 +40,30 @@ function isCritical(flags: string[]): boolean {
 }
 
 export class AdminFraudRepository {
-  constructor(private readonly client: SonafrikSupabaseClient) {}
+  constructor(
+    private readonly client: SonafrikSupabaseClient,
+    private readonly metrics: AdminMetricsRepository,
+  ) {}
 
   async listFraudIncidentsPage(limit = 200, offset = 0): Promise<AdminFraudIncidentsPage> {
-    const { count, error: countError } = await this.client
-      .from("stream_sessions")
-      .select("*", { count: "exact", head: true })
-      .filter("fraud_flags", "neq", "{}");
+    const [{ totalFlagged }, dataRes] = await Promise.all([
+      this.metrics.getFraudMetrics(),
+      this.client
+        .from("stream_sessions")
+        .select(SESSION_SELECT)
+        .filter("fraud_flags", "neq", "{}")
+        .order("started_at", { ascending: false })
+        .range(offset, offset + limit - 1),
+    ]);
 
-    if (countError) throw countError;
+    if (dataRes.error) throw dataRes.error;
 
-    const { data, error } = await this.client
-      .from("stream_sessions")
-      .select(SESSION_SELECT)
-      .filter("fraud_flags", "neq", "{}")
-      .order("started_at", { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (error) throw error;
-
-    const rows = (data ?? []) as unknown as SessionRow[];
+    const rows = (dataRes.data ?? []) as unknown as SessionRow[];
     const items = await this.enrichSessions(rows);
 
     return {
       items,
-      total: count ?? items.length,
+      total: totalFlagged,
       limit,
       offset,
     };
@@ -72,17 +72,13 @@ export class AdminFraudRepository {
   async getFraudSupervisionStats(): Promise<AdminFraudSupervisionStats> {
     const todayStart = startOfTodayIso();
 
-    const [todayRes, flaggedTodayRes, criticalRes, validTodayRes, rejectedTodayRes, activeRes] =
+    const [fraudMetrics, todayRes, criticalRes, validTodayRes, rejectedTodayRes, activeRes] =
       await Promise.all([
+        this.metrics.getFraudMetrics(),
         this.client
           .from("stream_sessions")
           .select("*", { count: "exact", head: true })
           .gte("started_at", todayStart),
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .gte("started_at", todayStart)
-          .filter("fraud_flags", "neq", "{}"),
         this.client
           .from("stream_sessions")
           .select("fraud_flags")
@@ -118,12 +114,13 @@ export class AdminFraudRepository {
     return {
       todayTotal: todayRes.count ?? 0,
       activeSessions: activeRes.count ?? 0,
-      fraudDetectedToday: flaggedTodayRes.count ?? 0,
+      fraudDetectedToday: fraudMetrics.flaggedToday,
       criticalIncidents,
       normalSessionsToday: validTodayRes.count ?? 0,
       suspendedAccountsHint: suspendedHint ?? 0,
       validListensToday: validTodayRes.count ?? 0,
       rejectedListensToday: rejectedTodayRes.count ?? 0,
+      totalFlagged: fraudMetrics.totalFlagged,
     };
   }
 

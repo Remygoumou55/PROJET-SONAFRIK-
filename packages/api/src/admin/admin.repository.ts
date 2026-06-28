@@ -4,16 +4,19 @@ import { AdminConfigRepository } from "./admin.config.repository";
 import { AdminDashboardRepository } from "./admin.dashboard.repository";
 import { AdminFinancialRepository } from "./admin.financial.repository";
 import { AdminFraudRepository } from "./admin.fraud.repository";
+import { AdminMetricsRepository } from "./admin.metrics.repository";
 import { AdminModerationRepository } from "./admin.moderation.repository";
 import type {
   AdminAlert,
   AdminCockpitData,
   AdminDashboardKpis,
+  AdminFraudMetrics,
   AdminFraudSession,
   AdminFraudIncidentsPage,
   AdminFraudStreamEvent,
   AdminFraudSupervisionStats,
   AdminHealthSnapshot,
+  AdminLiveSnapshot,
   AdminNavBadges,
   AdminRevenueDashboardData,
   AdminWithdrawalsDashboardMeta,
@@ -25,6 +28,7 @@ import type {
 export class AdminRepository {
   private readonly config: AdminConfigRepository;
   private readonly moderation: AdminModerationRepository;
+  private readonly metrics: AdminMetricsRepository;
   private readonly dashboard: AdminDashboardRepository;
   private readonly financial: AdminFinancialRepository;
   private readonly fraud: AdminFraudRepository;
@@ -32,9 +36,10 @@ export class AdminRepository {
   constructor(client: SonafrikSupabaseClient) {
     this.config = new AdminConfigRepository(client);
     this.moderation = new AdminModerationRepository(client);
-    this.dashboard = new AdminDashboardRepository(client);
+    this.metrics = new AdminMetricsRepository(client);
+    this.dashboard = new AdminDashboardRepository(client, this.metrics);
     this.financial = new AdminFinancialRepository(client);
-    this.fraud = new AdminFraudRepository(client);
+    this.fraud = new AdminFraudRepository(client, this.metrics);
   }
 
   listFeatureFlags(): Promise<FeatureFlag[]> {
@@ -92,6 +97,22 @@ export class AdminRepository {
 
   listFraudSessionEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
     return this.fraud.listSessionStreamEvents(sessionId, limit);
+  }
+
+  getFraudMetrics(): Promise<AdminFraudMetrics> {
+    return this.metrics.getFraudMetrics();
+  }
+
+  async getAdminLiveSnapshot(): Promise<AdminLiveSnapshot> {
+    const [navBadges, fraudMetrics] = await Promise.all([
+      this.getNavBadges(),
+      this.getFraudMetrics(),
+    ]);
+    return {
+      navBadges,
+      fraudMetrics,
+      fetchedAt: new Date().toISOString(),
+    };
   }
 
   getDashboardKpis(): Promise<AdminDashboardKpis> {

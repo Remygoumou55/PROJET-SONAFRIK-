@@ -1,4 +1,5 @@
 import { countQuery, type AdminRepoClient } from "./admin.shared";
+import type { AdminMetricsRepository } from "./admin.metrics.repository";
 import {
   bucketMonthlyWalletCredits,
   buildMonthKeys,
@@ -17,7 +18,10 @@ import type {
 } from "./types";
 
 export class AdminDashboardRepository {
-  constructor(private readonly client: AdminRepoClient) {}
+  constructor(
+    private readonly client: AdminRepoClient,
+    private readonly metrics: AdminMetricsRepository,
+  ) {}
 
   async getDashboardKpis(): Promise<AdminDashboardKpis> {
     const today = new Date();
@@ -31,7 +35,7 @@ export class AdminDashboardRepository {
       streamsTotal,
       pendingAlbums,
       pendingTracks,
-      fraudSessions,
+      fraudMetrics,
       pendingWithdrawals,
     ] = await Promise.all([
       countQuery(
@@ -65,12 +69,7 @@ export class AdminDashboardRepository {
           .eq("publication_status", "pending_review")
           .is("deleted_at", null),
       ),
-      countQuery(
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .filter("fraud_flags", "neq", "{}"),
-      ),
+      this.metrics.getFraudMetrics(),
       countQuery(
         this.client
           .from("withdrawals")
@@ -99,7 +98,7 @@ export class AdminDashboardRepository {
       streamsTotal,
       pendingCatalog: pendingAlbums + pendingTracks,
       pendingWithdrawals,
-      fraudSessions,
+      fraudSessions: fraudMetrics.totalFlagged,
       launchCurrent,
       launchTarget,
     };
@@ -111,7 +110,7 @@ export class AdminDashboardRepository {
       pendingTracks,
       pendingWithdrawals,
       pendingClaims,
-      fraudSessions,
+      fraudMetrics,
     ] = await Promise.all([
       countQuery(
         this.client
@@ -139,18 +138,13 @@ export class AdminDashboardRepository {
           .select("*", { count: "exact", head: true })
           .eq("status", "pending"),
       ),
-      countQuery(
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .filter("fraud_flags", "neq", "{}"),
-      ),
+      this.metrics.getFraudMetrics(),
     ]);
 
     return {
       content: pendingAlbums + pendingTracks,
       pendingRightsClaims: pendingClaims,
-      fraudSessions,
+      fraudSessions: fraudMetrics.totalFlagged,
       withdrawals: pendingWithdrawals,
     };
   }
@@ -186,7 +180,7 @@ export class AdminDashboardRepository {
       pendingArtistVerif,
       pendingAlbums,
       pendingTracks,
-      fraudSessions,
+      fraudMetrics,
       recentActivityRes,
       ledgerYearRes,
     ] = await Promise.all([
@@ -260,13 +254,7 @@ export class AdminDashboardRepository {
           .eq("publication_status", "pending_review")
           .is("deleted_at", null),
       ),
-      countQuery(
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .filter("fraud_flags", "neq", "{}")
-          .gte("started_at", startOfMonth),
-      ),
+      this.metrics.getFraudMetrics(),
       this.client
         .from("audit_logs")
         .select("id, action, created_at, metadata, entity_type")
@@ -323,7 +311,7 @@ export class AdminDashboardRepository {
         pendingWithdrawals,
         pendingArtistVerif,
         pendingCatalog: pendingAlbums + pendingTracks,
-        fraudSessions,
+        fraudSessions: fraudMetrics.flaggedThisMonth,
       },
       recentActivity,
       monthlyRevenue,

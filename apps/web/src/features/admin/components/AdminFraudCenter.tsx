@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   AdminFraudIncident,
   AdminFraudIncidentsPage,
   AdminFraudSupervisionStats,
 } from "@sonafrik/api/admin";
+import { useAdminFraudMetrics } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { loadFraudIncidentsPageAction } from "../actions/admin-fraud.actions";
 import {
   addFraudIncidentNote,
@@ -37,6 +40,7 @@ interface Props {
 }
 
 export function AdminFraudCenter({ initialPage, stats }: Props) {
+  const liveFraudMetrics = useAdminFraudMetrics({ totalFlagged: stats.totalFlagged, flaggedThisMonth: 0, flaggedToday: stats.fraudDetectedToday });
   const [incidents, setIncidents] = useState<AdminFraudIncident[]>(initialPage.items);
   const [totalRemote, setTotalRemote] = useState(initialPage.total);
   const [remoteOffset, setRemoteOffset] = useState(initialPage.items.length);
@@ -49,6 +53,27 @@ export function AdminFraudCenter({ initialPage, stats }: Props) {
     typeof window !== "undefined" ? loadAllFraudIncidentStates() : {},
   );
   const [drawerIncident, setDrawerIncident] = useState<AdminFraudIncident | null>(null);
+
+  useEffect(() => {
+    setTotalRemote(liveFraudMetrics.totalFlagged);
+  }, [liveFraudMetrics.totalFlagged]);
+
+  useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, () => {
+    void loadFraudIncidentsPageAction(0, SERVER_PAGE).then((page) => {
+      setIncidents(page.items);
+      setRemoteOffset(page.items.length);
+      setTotalRemote(page.total);
+    });
+  });
+
+  const mergedStats = useMemo(
+    () => ({
+      ...stats,
+      totalFlagged: liveFraudMetrics.totalFlagged,
+      fraudDetectedToday: liveFraudMetrics.flaggedToday || stats.fraudDetectedToday,
+    }),
+    [stats, liveFraudMetrics.totalFlagged, liveFraudMetrics.flaggedToday],
+  );
 
   const filtered = useFraudIncidentFilters(incidents, filters, adminStates);
   const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
@@ -169,7 +194,7 @@ export function AdminFraudCenter({ initialPage, stats }: Props) {
 
   return (
     <div className="fraud-supervision">
-      <FraudSupervisionDashboard stats={stats} />
+      <FraudSupervisionDashboard stats={mergedStats} />
 
       <FraudIncidentToolbar
         filters={filters}

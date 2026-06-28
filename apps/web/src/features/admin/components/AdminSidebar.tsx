@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { AdminNavBadges } from "@sonafrik/api/admin";
+import { useAdminNavBadges } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import {
   ADMIN_NAV_SECTIONS,
   type AdminNavBadgeKind,
@@ -43,12 +44,8 @@ function resolveBadge(
 
 export function AdminSidebar({ badges, onNavigate }: AdminSidebarProps) {
   const pathname = usePathname();
-  const resolvedBadges: AdminNavBadges = badges ?? {
-    content: 0,
-    pendingRightsClaims: 0,
-    fraudSessions: 0,
-    withdrawals: 0,
-  };
+  const liveBadges = useAdminNavBadges(badges);
+  const resolvedBadges = liveBadges;
 
   return (
     <aside id="admin-sidebar-nav" className="admin-sidebar" aria-label="Navigation admin">

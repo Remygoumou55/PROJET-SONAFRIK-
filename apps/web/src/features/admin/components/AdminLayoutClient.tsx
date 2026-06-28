@@ -1,20 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { AdminNavBadges } from "@sonafrik/api/admin";
+import type { AdminLiveSnapshot } from "@sonafrik/api/admin";
+import { LdseProvider, LdseDevPanel } from "@/features/shared/ldse";
+import { AdminLdseProvider } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { AdminHeader, type AdminHeaderUser } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
 
 interface Props {
   children: React.ReactNode;
-  navBadges?: AdminNavBadges;
+  liveSnapshot: AdminLiveSnapshot;
   adminUser: AdminHeaderUser;
   disableLiveRealtime?: boolean;
 }
 
 export function AdminLayoutClient({
   children,
-  navBadges,
+  liveSnapshot,
   adminUser,
   disableLiveRealtime = false,
 }: Props) {
@@ -40,24 +42,29 @@ export function AdminLayoutClient({
   }, [navOpen]);
 
   return (
-    <div className={`admin-layout${navOpen ? " admin-layout--nav-open" : ""}`}>
-      <button
-        type="button"
-        className="admin-sidebar-backdrop"
-        aria-label="Fermer le menu"
-        onClick={closeNav}
-        tabIndex={navOpen ? 0 : -1}
-      />
-      <AdminSidebar badges={navBadges} onNavigate={closeNav} />
-      <div className="admin-main">
-        <AdminHeader
-          user={adminUser}
-          disableLiveRealtime={disableLiveRealtime}
-          menuOpen={navOpen}
-          onMenuToggle={toggleNav}
-        />
-        <div className="admin-content">{children}</div>
-      </div>
-    </div>
+    <LdseProvider>
+      <AdminLdseProvider initialSnapshot={liveSnapshot}>
+        <LdseDevPanel />
+        <div className={`admin-layout${navOpen ? " admin-layout--nav-open" : ""}`}>
+          <button
+            type="button"
+            className="admin-sidebar-backdrop"
+            aria-label="Fermer le menu"
+            onClick={closeNav}
+            tabIndex={navOpen ? 0 : -1}
+          />
+          <AdminSidebar onNavigate={closeNav} />
+          <div className="admin-main">
+            <AdminHeader
+              user={adminUser}
+              disableLiveRealtime={disableLiveRealtime}
+              menuOpen={navOpen}
+              onMenuToggle={toggleNav}
+            />
+            <div className="admin-content">{children}</div>
+          </div>
+        </div>
+      </AdminLdseProvider>
+    </LdseProvider>
   );
 }
