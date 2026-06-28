@@ -174,7 +174,7 @@ body {
   margin: 0.15rem 0 0;
   font-size: 0.5625rem;
   letter-spacing: 0.2em;
-  text-align: left;
+    text-align: left;
 }
 
 .brand-tagline::before,
@@ -206,7 +206,7 @@ body {
 }
 
 .brand-lockup--nav {
-  flex-direction: row;
+    flex-direction: row;
   align-items: center;
   gap: 0.5rem;
 }
@@ -261,6 +261,7 @@ body {
 @import "./styles/identity-journey.css";
 @import "./styles/identity-rewards.css";
 @import "./styles/identity-musical.css";
+@import "./styles/identity-story.css";
 @import "./styles/revenue.css";
 @import "./styles/creator.css";
 @import "./styles/lancement.css";
