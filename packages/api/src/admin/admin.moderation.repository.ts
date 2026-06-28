@@ -1,4 +1,5 @@
-import { getStageName, type AdminRepoClient } from "./admin.shared";
+import { type AdminRepoClient } from "./admin.shared";
+import { fetchStageNamesByCreatorIds } from "../common/stage-name.helpers";
 import type { AdminFraudSession, AdminRightsClaim, PendingCatalogItem } from "./types";
 
 export class AdminModerationRepository {
@@ -50,14 +51,14 @@ export class AdminModerationRepository {
     const [albumsRes, tracksRes] = await Promise.all([
       this.client
         .from("albums")
-        .select("id, title, release_type, submitted_at, creator_id, artist_profiles(stage_name)")
+        .select("id, title, release_type, submitted_at, creator_id")
         .eq("publication_status", "pending_review")
         .is("deleted_at", null)
         .order("submitted_at", { ascending: true })
         .limit(limit),
       this.client
         .from("tracks")
-        .select("id, title, submitted_at, creator_id, artist_profiles(stage_name)")
+        .select("id, title, submitted_at, creator_id")
         .eq("publication_status", "pending_review")
         .is("deleted_at", null)
         .order("submitted_at", { ascending: true })
@@ -72,29 +73,36 @@ export class AdminModerationRepository {
       title: string;
       release_type: string | null;
       submitted_at: string | null;
-      artist_profiles: { stage_name: string } | { stage_name: string }[] | null;
+      creator_id: string;
     };
     type TrackRow = {
       id: string;
       title: string;
       submitted_at: string | null;
-      artist_profiles: { stage_name: string } | { stage_name: string }[] | null;
+      creator_id: string;
     };
 
-    const pendingAlbums = ((albumsRes.data ?? []) as unknown as AlbumRow[]).map((a) => ({
+    const albumRows = (albumsRes.data ?? []) as unknown as AlbumRow[];
+    const trackRows = (tracksRes.data ?? []) as unknown as TrackRow[];
+    const stageNames = await fetchStageNamesByCreatorIds(this.client, [
+      ...albumRows.map((row) => row.creator_id),
+      ...trackRows.map((row) => row.creator_id),
+    ]);
+
+    const pendingAlbums = albumRows.map((a) => ({
       id: a.id,
       type: "album" as const,
       title: a.title,
-      creator_name: getStageName(a.artist_profiles),
+      creator_name: stageNames.get(a.creator_id) ?? null,
       submitted_at: a.submitted_at,
       release_type: a.release_type ?? "album",
     }));
 
-    const pendingTracks = ((tracksRes.data ?? []) as unknown as TrackRow[]).map((t) => ({
+    const pendingTracks = trackRows.map((t) => ({
       id: t.id,
       type: "track" as const,
       title: t.title,
-      creator_name: getStageName(t.artist_profiles),
+      creator_name: stageNames.get(t.creator_id) ?? null,
       submitted_at: t.submitted_at,
     }));
 

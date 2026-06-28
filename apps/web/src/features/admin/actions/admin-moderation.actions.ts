@@ -192,3 +192,37 @@ export async function adminWarnCreatorAction(input: {
     return { error: "Impossible d'envoyer l'avertissement." };
   }
 }
+
+export async function adminReviewCatalogAction(input: {
+  id: string;
+  entityType: "album" | "track";
+  action: "published" | "rejected";
+  reason?: string;
+}): Promise<{ error?: string }> {
+  if (!input.id || (input.entityType !== "album" && input.entityType !== "track")) {
+    return { error: "Données invalides." };
+  }
+  if (input.action !== "published" && input.action !== "rejected") {
+    return { error: "Action invalide." };
+  }
+  if (input.action === "rejected" && !input.reason?.trim()) {
+    return { error: "Motif de rejet requis." };
+  }
+
+  const { error, service } = await getModerationService();
+  if (error || !service) return { error: error ?? "Accès refusé." };
+
+  try {
+    await service.reviewCatalogItem(
+      input.id,
+      input.entityType,
+      input.action,
+      input.reason?.trim(),
+    );
+    revalidatePath("/admin/catalog");
+    revalidatePath("/admin");
+    return {};
+  } catch {
+    return { error: "Impossible de traiter la soumission." };
+  }
+}

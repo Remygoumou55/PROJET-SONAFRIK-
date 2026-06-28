@@ -1,4 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import { fetchStageNamesByCreatorIds } from "../common/stage-name.helpers";
 import type { DiscoveryTrack, ListenMusicCategory, RecentlyPlayedTrack, TrackCredit, TrackListenCounts, TrackWithMeta, TrendingTrack } from "@sonafrik/types";
 import {
   type CreatorGeoProfile,
@@ -125,19 +126,20 @@ export class ListenerRepository {
   async getPublishedAlbumMeta(albumId: string): Promise<ListenerAlbumMeta | null> {
     const { data, error } = await this.client
       .from("albums")
-      .select("title, artist_profiles(stage_name)")
+      .select("title, creator_id")
       .eq("id", albumId)
       .maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    const row = data as unknown as { title: string; artist_profiles: { stage_name: string } | null };
-    return { title: row.title, artistName: row.artist_profiles?.stage_name ?? null };
+    const row = data as { title: string; creator_id: string };
+    const stageNames = await fetchStageNamesByCreatorIds(this.client, [row.creator_id]);
+    return { title: row.title, artistName: stageNames.get(row.creator_id) ?? null };
   }
 
   async getPublishedAlbumDetail(albumId: string): Promise<ListenerAlbumDetail | null> {
     const { data, error } = await this.client
       .from("albums")
-      .select("id, title, description, cover_path, release_type, release_date, creator_id, artist_profiles(stage_name, creator_id)")
+      .select("id, title, description, cover_path, release_type, release_date, creator_id")
       .eq("id", albumId)
       .eq("publication_status", "published")
       .is("deleted_at", null)
@@ -145,18 +147,28 @@ export class ListenerRepository {
     if (error) throw error;
     if (!data) return null;
 
-    const raw = data as unknown as Record<string, unknown>;
-    const ap = raw.artist_profiles as { stage_name?: string; creator_id?: string } | null;
+    const raw = data as {
+      id: string;
+      title: string;
+      description: string | null;
+      cover_path: string | null;
+      release_type: string;
+      release_date: string | null;
+      creator_id: string;
+    };
+    const stageNames = await fetchStageNamesByCreatorIds(this.client, [raw.creator_id]);
+    const artistName = stageNames.get(raw.creator_id) ?? null;
+
     return {
-      id: String(raw.id ?? ""),
-      title: String(raw.title ?? ""),
-      description: (raw.description as string | null) ?? null,
-      cover_url: (raw.cover_path as string | null) ?? null,
-      release_type: String(raw.release_type ?? "album"),
-      release_date: (raw.release_date as string | null) ?? null,
-      creator_id: String(raw.creator_id ?? ""),
-      artist_name: ap?.stage_name ?? null,
-      artist_creator_id: ap?.creator_id ?? String(raw.creator_id ?? ""),
+      id: raw.id,
+      title: raw.title,
+      description: raw.description,
+      cover_url: raw.cover_path,
+      release_type: raw.release_type ?? "album",
+      release_date: raw.release_date,
+      creator_id: raw.creator_id,
+      artist_name: artistName,
+      artist_creator_id: raw.creator_id,
     };
   }
 
