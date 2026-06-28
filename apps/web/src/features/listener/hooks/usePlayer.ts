@@ -6,29 +6,42 @@ import type { StreamCompletePayload } from "../lib/playerTypes";
 import { usePlayerContext } from "../lib/playerContext";
 import { useStreamingPlaybackBridge } from "../integration/useStreamingPlaybackBridge";
 import { useStreamQuality } from "./useStreamQuality";
+import { useListenPageRefresh } from "./useListenPageRefresh";
 
 export function usePlayer() {
   const player = usePlayerContext();
   const { bridge: streaming } = useStreamingPlaybackBridge();
   const { bitrate } = useStreamQuality();
+  const refreshAfterValidListen = useListenPageRefresh();
   const retryAttemptRef = useRef(false);
   const completingRef = useRef(false);
 
-  const completeActiveSession = useCallback(async (): Promise<boolean> => {
-    if (completingRef.current) return false;
-    const payload = player.takeCompletePayload("manual");
-    if (!payload) return false;
+  const finalizeSession = useCallback(
+    async (payload: StreamCompletePayload | null, trackId: string | null): Promise<boolean> => {
+      if (!payload || completingRef.current) return false;
 
-    completingRef.current = true;
-    try {
-      return await streaming.completeStream(payload);
-    } catch (err) {
-      console.warn("[Player] Complétion session échouée", err);
-      return false;
-    } finally {
-      completingRef.current = false;
-    }
-  }, [player, streaming]);
+      completingRef.current = true;
+      try {
+        const isValid = await streaming.completeStream(payload);
+        if (isValid && trackId) {
+          await refreshAfterValidListen(trackId);
+        }
+        return isValid;
+      } catch (err) {
+        console.warn("[Player] Complétion session échouée", err);
+        return false;
+      } finally {
+        completingRef.current = false;
+      }
+    },
+    [streaming, refreshAfterValidListen],
+  );
+
+  const completeActiveSession = useCallback(async (): Promise<boolean> => {
+    const trackId = player.currentTrack?.id ?? null;
+    const payload = player.takeCompletePayload("manual");
+    return finalizeSession(payload, trackId);
+  }, [player, finalizeSession]);
 
   const completeActiveSessionRef = useRef(completeActiveSession);
   completeActiveSessionRef.current = completeActiveSession;
@@ -49,16 +62,9 @@ export function usePlayer() {
     });
 
     player.onComplete(async (payload: StreamCompletePayload) => {
-      if (completingRef.current) return;
-      completingRef.current = true;
       retryAttemptRef.current = false;
-      try {
-        await streaming.completeStream(payload);
-      } catch (err) {
-        console.warn("[Player] Complétion de session ignorée", err);
-      } finally {
-        completingRef.current = false;
-      }
+      const trackId = player.currentTrack?.id ?? null;
+      await finalizeSession(payload, trackId);
 
       if (!payload.advanceQueue) return;
 
@@ -108,7 +114,7 @@ export function usePlayer() {
         retryAttemptRef.current = false;
       }
     });
-  }, [player, streaming, bitrate]);
+  }, [player, streaming, bitrate, finalizeSession]);
 
   useEffect(() => {
     const flushSession = () => {

@@ -28,6 +28,10 @@
     "./audio": {
       "types": "./dist/audio/audio-integrity.d.ts",
       "default": "./dist/audio/audio-integrity.js"
+    },
+    "./streaming": {
+      "types": "./dist/streaming/buildStreamCompletePayload.d.ts",
+      "default": "./dist/streaming/buildStreamCompletePayload.js"
     }
   },
   "scripts": {

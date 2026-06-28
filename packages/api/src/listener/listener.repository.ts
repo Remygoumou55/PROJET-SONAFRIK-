@@ -1,5 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { DiscoveryTrack, ListenMusicCategory, RecentlyPlayedTrack, TrackCredit, TrackWithMeta, TrendingTrack } from "@sonafrik/types";
+import type { DiscoveryTrack, ListenMusicCategory, RecentlyPlayedTrack, TrackCredit, TrackListenCounts, TrackWithMeta, TrendingTrack } from "@sonafrik/types";
 import {
   type CreatorGeoProfile,
   filterDiscoveryTracksByCategory,
@@ -55,6 +55,21 @@ export class ListenerRepository {
       unique_listeners: 0,
       trending_score: 0,
     }));
+  }
+
+  async getTrackListenCounts(trackId: string): Promise<TrackListenCounts> {
+    const { data, error } = await this.client.rpc("get_track_listen_counts", {
+      p_track_id: trackId,
+    });
+    if (error) throw error;
+    const row = data as Record<string, unknown> | null;
+    return {
+      track_id: String(row?.track_id ?? trackId),
+      all_time: Number(row?.all_time ?? 0),
+      window_7d: Number(row?.window_7d ?? 0),
+      window_30d: Number(row?.window_30d ?? 0),
+      unique_listeners_all_time: Number(row?.unique_listeners_all_time ?? 0),
+    };
   }
 
   async getHomepageCurated(limit = 8): Promise<ListenerHomepageCurated> {

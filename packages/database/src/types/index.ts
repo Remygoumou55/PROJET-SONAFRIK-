@@ -3519,6 +3519,10 @@ export type Database = {
         Args: { p_limit?: number; p_window?: string }
         Returns: Json
       }
+      get_track_listen_counts: {
+        Args: { p_track_id: string }
+        Returns: Json
+      }
       get_user_payouts: { Args: { p_limit?: number }; Returns: Json }
       get_wallet_balance: { Args: { p_user_id?: string }; Returns: number }
       has_permission: {

@@ -10,7 +10,7 @@ import type {
   QueueState,
   StreamCompletePayload,
 } from "./playerTypes";
-import { buildStreamCompletePayload, type StreamCompleteMode } from "./buildStreamCompletePayload";
+import { buildStreamCompletePayload, type StreamCompleteMode } from "@sonafrik/shared/streaming";
 import { INITIAL_PLAYER_STATE, INITIAL_QUEUE_STATE } from "./playerTypes";
 import { usePlayerQueueControls } from "./usePlayerQueueControls";
 export type { AudioErrorType } from "./playerTypes";

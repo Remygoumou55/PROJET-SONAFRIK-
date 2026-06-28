@@ -135,7 +135,7 @@ function createHomepageLoader(category: ListenMusicCategory) {
       }
     },
     [`homepage-content-v7-${category}`],
-    { revalidate: 120, tags: ["homepage", "catalog-tracks"] },
+    { revalidate: 120, tags: ["homepage", "catalog-tracks", "stream-listen-counts"] },
   );
 }
 

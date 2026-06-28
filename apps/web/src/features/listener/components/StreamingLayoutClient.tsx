@@ -10,6 +10,7 @@ import { PlayerProvider } from "../lib/playerContext";
 import { PlayerMuteProvider } from "../lib/playerMuteContext";
 import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
+import { ValidListenToast } from "./ValidListenToast";
 
 const GlobalPlayer = dynamic(
   () => import("./GlobalPlayer").then((m) => ({ default: m.GlobalPlayer })),
@@ -54,6 +55,7 @@ export function StreamingLayoutClient({
         </div>
         <MobileBottomNav />
         <GlobalPlayer />
+        <ValidListenToast />
         </PlayerMuteProvider>
         </PlayerProvider>
       </ListenFeaturesProvider>

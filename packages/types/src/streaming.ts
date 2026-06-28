@@ -329,6 +329,15 @@ export interface TrendingTrack {
   trending_score: number;
 }
 
+/** Compteur d'écoutes valides (Real Listen) pour un morceau — RPC get_track_listen_counts. */
+export interface TrackListenCounts {
+  track_id: string;
+  all_time: number;
+  window_7d: number;
+  window_30d: number;
+  unique_listeners_all_time: number;
+}
+
 export interface SimilarTrack {
   track_id: string;
   title: string;

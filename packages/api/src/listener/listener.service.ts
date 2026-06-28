@@ -32,6 +32,10 @@ export class ListenerService {
     return this.repository.getTopGuineaTracks(limit);
   }
 
+  getTrackListenCounts(trackId: string) {
+    return this.repository.getTrackListenCounts(trackId);
+  }
+
   filterDiscoveryByCategory(tracks: Parameters<ListenerRepository["filterDiscoveryByCategory"]>[0], category: ListenMusicCategory) {
     return this.repository.filterDiscoveryByCategory(tracks, category);
   }

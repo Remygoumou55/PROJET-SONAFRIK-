@@ -11,6 +11,36 @@
 
 ---
 
+## 2026-06-28 — Phase B : visibilité compteurs écoutes (RPC + revalidation + toast)
+
+### Livraisons
+- Migration `20260628130000_get_track_listen_counts.sql` — RPC `get_track_listen_counts` (all-time, 7j, 30j, auditeurs uniques)
+- `listener.repository.ts` / `listener.service.ts` — `getTrackListenCounts()`
+- `GET /api/listener/track/[id]/listen-count` — endpoint REST authentifié
+- `POST /api/listener/revalidate-home` — invalidation tags `homepage`, `catalog-tracks`, `stream-listen-counts`
+- `useListenPageRefresh.ts` — refresh homepage après écoute validée
+- `usePlayer.ts` — appelle refresh après `stream-complete` valide
+- `listen/page.tsx` — tag cache `stream-listen-counts` sur loader homepage
+- `ValidListenToast.tsx` + `validListenFeedback.ts` + CSS — toast « Écoute validée »
+- `buildStreamCompletePayload` déplacé vers `@sonafrik/shared/streaming` + 2 tests Vitest
+
+### Validation
+- Migration DB appliquée ✅ (ex. track test : all_time=350, window_30d=227)
+- `pnpm build` + `lint` + `typecheck` ✅
+- `packages/shared` Vitest 9/9 ✅
+
+### Tests à faire
+- [ ] Écouter ≥90% → toast « Écoute validée » + POST `revalidate-home` 200
+- [ ] Top Guinée — compteur mis à jour après `router.refresh()`
+- [ ] `GET /api/listener/track/{id}/listen-count` retourne JSON cohérent
+
+### Prochaine étape recommandée — Phase C
+- `has_streaming_permission` dans `stream-start`
+- Invalidation listens si `fraud_flags`
+- Royalties join `artist_profiles` (pas seulement `creators`)
+
+---
+
 ## 2026-06-28 — Phase A : comptage streaming fiable (web + RPC)
 
 ### Corrections
