@@ -11,6 +11,26 @@
 
 ---
 
+## 2026-06-28 — Sprint Admin 1 : cockpit + navigation back-office
+
+### Livraisons
+- Sidebar 12 modules + section MVP existante (live-control, fraud, rights, flags)
+- Header admin : breadcrumb, indicateur temps réel, badge Super Admin (profil DB)
+- Dashboard `/admin` : 4 KPIs DB, alertes critiques, graphique 12 mois wallet, 10 modules, activité audit_logs
+- Pages placeholder : users, artists, revenue, content, awards, moderation, withdrawals, beatstore, analytics, config, audit
+- API `getCockpitData()` + `getNavBadges()` dans `admin.dashboard.repository.ts`
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` ✅
+- `pnpm probe:certification` **130/130** ✅
+
+### Tests manuels
+- [ ] Connexion super admin → sidebar + KPIs réels
+- [ ] Navigation 0×404 sur tous les liens sidebar
+- [ ] Non-admin → redirect `/listen?error=admin_denied`
+
+---
+
 ## 2026-06-28 — Corrections audit backend (trending, mobile, UI compteurs)
 
 ### Livraisons
