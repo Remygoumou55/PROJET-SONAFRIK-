@@ -1215,3 +1215,394 @@
   background: rgba(255, 194, 14, 0.12);
   color: var(--color-or-solaire);
 }
+
+/* ===== Page skeleton unifié ===== */
+.admin-page-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: admin-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes admin-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.admin-page-skeleton__title {
+  height: 32px;
+  width: 160px;
+}
+
+.admin-page-skeleton__toolbar {
+  height: 40px;
+  width: 100%;
+}
+
+.admin-page-skeleton__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .admin-page-skeleton__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-page-skeleton__card {
+  height: 96px;
+}
+
+.admin-page-skeleton__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .admin-page-skeleton__cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.admin-page-skeleton__metric {
+  height: 112px;
+}
+
+.admin-page-skeleton__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-page-skeleton__row {
+  height: 56px;
+  width: 100%;
+}
+
+/* ===== Modération catalogue ===== */
+.admin-catalog-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
+}
+
+.admin-catalog-item__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.admin-catalog-item__artist,
+.admin-catalog-item__date {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-catalog-item__date {
+  color: var(--color-texte-desactive);
+}
+
+.admin-catalog-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-moderation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge-gold {
+  background: rgba(255, 194, 14, 0.13);
+  color: var(--color-or-solaire);
+}
+
+.badge-info {
+  background: rgba(96, 165, 250, 0.13);
+  color: var(--color-accent-bleu-clair);
+}
+
+.admin-empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  border-radius: 14px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
+}
+
+.admin-empty-state__icon {
+  margin: 0;
+  font-size: 28px;
+}
+
+.admin-empty-state__text {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-inline-alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.admin-inline-alert--error {
+  background: rgba(255, 68, 68, 0.13);
+  color: var(--color-rouge-alerte);
+}
+
+.admin-inline-alert--success {
+  background: rgba(0, 210, 106, 0.13);
+  color: var(--color-vert-energie);
+}
+
+/* ===== Module Revenus / Retraits ===== */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-tab:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-texte-principal);
+  font-weight: 600;
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.admin-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-texte-principal);
+  margin: 0 0 20px;
+}
+
+.admin-card-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-card-header-row .admin-card-title {
+  margin-bottom: 0;
+}
+
+.admin-kpis-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.admin-kpi-card--warning {
+  border-color: rgba(255, 140, 0, 0.3);
+}
+
+.admin-kpi-value--warning {
+  color: var(--color-avertissement);
+}
+
+.admin-alerts-bar--warning {
+  border-color: rgba(255, 140, 0, 0.3);
+  background: rgba(255, 140, 0, 0.06);
+}
+
+.admin-alerts-bar--danger {
+  border-color: rgba(255, 68, 68, 0.3);
+  background: rgba(255, 68, 68, 0.06);
+}
+
+.admin-alerts-action {
+  margin-left: auto;
+}
+
+.admin-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-td-strong {
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.admin-td-success {
+  color: var(--color-vert-energie);
+  font-weight: 600;
+}
+
+.admin-td-warning {
+  color: var(--color-avertissement);
+}
+
+.admin-td-warning-sm {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: var(--color-avertissement);
+}
+
+.admin-td-muted {
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-td-muted-sm {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-mono {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-rank-medal {
+  font-weight: 700;
+}
+
+.admin-rank-num {
+  font-weight: 700;
+  color: var(--color-texte-desactive);
+}
+
+.revenue-types-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.revenue-type-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.revenue-type-info {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.revenue-type-label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+}
+
+.revenue-type-amount {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-vert-energie);
+}
+
+.revenue-type-amount--commission {
+  color: var(--color-or-solaire);
+}
+
+.revenue-type-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.revenue-type-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.revenue-type-fill {
+  height: 100%;
+  background: var(--color-vert-energie);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.revenue-type-pct {
+  width: 40px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-revenue-table-wrap {
+  margin-top: 20px;
+}
+
+@media print {
+  .admin-sidebar,
+  .admin-topbar,
+  .admin-tabs,
+  .admin-btn,
+  .admin-moderation-actions,
+  .admin-filters,
+  .admin-pagination {
+    display: none !important;
+  }
+
+  .admin-main {
+    margin: 0;
+  }
+
+  .admin-card {
+    break-inside: avoid;
+  }
+}

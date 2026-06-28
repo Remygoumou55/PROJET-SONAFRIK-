@@ -1,4 +1,4 @@
-import type { RightsClaimStatus, RightsClaimType } from "@sonafrik/types";
+import type { RightsClaimStatus, RightsClaimType, RoyaltyCycle } from "@sonafrik/types";
 
 export type PendingCatalogItem = {
   id: string;
@@ -149,4 +149,45 @@ export type LiveControlSnapshot = {
   recentListens: LiveControlRecentListen[];
   recentCycles: LiveControlRecentCycle[];
   recentLedger: LiveControlRecentLedger[];
+};
+
+export type AdminRevenueArtistRow = {
+  userId: string;
+  artistName: string;
+  totalEarnedGnf: number;
+  balanceGnf: number;
+};
+
+export type AdminRevenueDashboardData = {
+  monthlyRevenue: AdminMonthlyRevenue[];
+  thisMonthTotal: number;
+  lastMonthTotal: number;
+  revenueChange: string | null;
+  revenueByType: Record<string, number>;
+  topArtists: AdminRevenueArtistRow[];
+  royaltyCycles: RoyaltyCycle[];
+  lastCycle: RoyaltyCycle | null;
+  alerts: {
+    cycleOverdue: boolean;
+    daysSinceLastCycle: number;
+    negativeBalanceCount: number;
+  };
+};
+
+export type AdminWithdrawalAlertRow = {
+  id: string;
+  amountGnf: number;
+  artistLabel: string;
+};
+
+export type AdminWithdrawalsDashboardMeta = {
+  currentFilter: string;
+  page: number;
+  limit: number;
+  total: number;
+  alerts: {
+    largeWithdrawals: AdminWithdrawalAlertRow[];
+    overdueCount: number;
+    totalPendingAmount: number;
+  };
 };

@@ -33,7 +33,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     title: "FINANCIER",
     items: [
-      { href: "/admin/finance", icon: "💰", label: "Revenus", badge: null },
+      { href: "/admin/revenue", icon: "💰", label: "Revenus", badge: null },
       { href: "/admin/withdrawals", icon: "💳", label: "Retraits", badge: "pending" },
       { href: "/admin/beatstore", icon: "🎹", label: "Beat Store", badge: null },
     ],
@@ -66,7 +66,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
 export const ADMIN_MODULE_CARDS = [
   { href: "/admin/users", icon: "👥", label: "Utilisateurs", desc: "Gérer les comptes auditeurs" },
   { href: "/admin/artists", icon: "🎤", label: "Artistes", desc: "Gérer les artistes inscrits" },
-  { href: "/admin/finance", icon: "💰", label: "Revenus", desc: "Historique financier complet" },
+  { href: "/admin/revenue", icon: "💰", label: "Revenus", desc: "Historique financier complet" },
   { href: "/admin/catalog", icon: "🎵", label: "Contenus", desc: "Modérer le catalogue" },
   { href: "/admin/awards", icon: "🏆", label: "Awards", desc: "Programme récompenses" },
   { href: "/admin/rights", icon: "⚖️", label: "Modération", desc: "Réclamations droits et litiges" },

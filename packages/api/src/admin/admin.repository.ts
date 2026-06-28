@@ -2,6 +2,7 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
 import { AdminConfigRepository } from "./admin.config.repository";
 import { AdminDashboardRepository } from "./admin.dashboard.repository";
+import { AdminFinancialRepository } from "./admin.financial.repository";
 import { AdminModerationRepository } from "./admin.moderation.repository";
 import type {
   AdminAlert,
@@ -10,6 +11,8 @@ import type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminNavBadges,
+  AdminRevenueDashboardData,
+  AdminWithdrawalsDashboardMeta,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,
@@ -19,11 +22,13 @@ export class AdminRepository {
   private readonly config: AdminConfigRepository;
   private readonly moderation: AdminModerationRepository;
   private readonly dashboard: AdminDashboardRepository;
+  private readonly financial: AdminFinancialRepository;
 
   constructor(client: SonafrikSupabaseClient) {
     this.config = new AdminConfigRepository(client);
     this.moderation = new AdminModerationRepository(client);
     this.dashboard = new AdminDashboardRepository(client);
+    this.financial = new AdminFinancialRepository(client);
   }
 
   listFeatureFlags(): Promise<FeatureFlag[]> {
@@ -93,5 +98,21 @@ export class AdminRepository {
 
   getLiveControlSnapshot(): Promise<LiveControlSnapshot> {
     return this.dashboard.getLiveControlSnapshot();
+  }
+
+  getRevenueDashboardData(): Promise<AdminRevenueDashboardData> {
+    return this.financial.getRevenueDashboardData();
+  }
+
+  getWithdrawalsDashboardMeta(
+    filter: string,
+    page: number,
+    limit: number,
+  ): Promise<AdminWithdrawalsDashboardMeta> {
+    return this.financial.getWithdrawalsDashboardMeta(filter, page, limit);
+  }
+
+  getWalletBalancesByUserIds(userIds: string[]): Promise<Record<string, number>> {
+    return this.financial.getWalletBalancesByUserIds(userIds);
   }
 }

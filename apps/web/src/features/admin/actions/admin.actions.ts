@@ -54,6 +54,7 @@ export async function triggerRoyaltyCycleAction(
       revenuePoolPercent: input.revenuePoolPercent ?? 65,
     });
     revalidatePath("/admin/finance");
+    revalidatePath("/admin/revenue");
     return {
       cycleId: result.cycleId,
       artistCount: result.calculation.artist_count,

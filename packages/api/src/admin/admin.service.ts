@@ -12,6 +12,8 @@ import type {
   AdminFraudSession,
   AdminHealthSnapshot,
   AdminNavBadges,
+  AdminRevenueDashboardData,
+  AdminWithdrawalsDashboardMeta,
   AdminRightsClaim,
   LiveControlSnapshot,
   PendingCatalogItem,
@@ -113,6 +115,22 @@ export class AdminService {
 
   async getCockpitData(): Promise<AdminCockpitData> {
     return this.repository.getCockpitData();
+  }
+
+  async getRevenueDashboardData(): Promise<AdminRevenueDashboardData> {
+    return this.repository.getRevenueDashboardData();
+  }
+
+  async getWithdrawalsDashboardMeta(
+    filter: string,
+    page: number,
+    limit: number,
+  ): Promise<AdminWithdrawalsDashboardMeta> {
+    return this.repository.getWithdrawalsDashboardMeta(filter, page, limit);
+  }
+
+  async getWalletBalancesByUserIds(userIds: string[]): Promise<Record<string, number>> {
+    return this.repository.getWalletBalancesByUserIds(userIds);
   }
 
   async getHealthSnapshot(): Promise<AdminHealthSnapshot> {
