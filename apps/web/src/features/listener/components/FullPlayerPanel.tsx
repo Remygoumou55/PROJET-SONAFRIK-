@@ -23,6 +23,11 @@ const QueuePanel = dynamic(
   { ssr: false },
 );
 
+const LyricsPanel = dynamic(
+  () => import("./LyricsPanel").then((m) => ({ default: m.LyricsPanel })),
+  { ssr: false },
+);
+
 const ShareButton = dynamic(
   () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
   { ssr: false },
@@ -93,6 +98,49 @@ function QueueOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 }
 
+function LyricsOverlay({
+  isOpen,
+  onClose,
+  trackId,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  trackId: string;
+}) {
+  const currentPosition = usePlayerPosition();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fpp-queue-overlay" onClick={onClose} role="presentation">
+      <div
+        className="fpp-lyrics-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Paroles synchronisées"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="fpp-queue-header">
+          <h3>Paroles</h3>
+          <button type="button" className="fpp-close" onClick={onClose} aria-label="Fermer les paroles">
+            ✕
+          </button>
+        </div>
+        <LyricsPanel trackId={trackId} currentTime={currentPosition} />
+      </div>
+    </div>
+  );
+}
+
 export const FullPlayerPanel = memo(function FullPlayerPanel({
   isOpen,
   onClose,
@@ -100,9 +148,10 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
   const { currentTrack, isPlaying, pauseAndSave, resume } = usePlayer();
   const { volume } = usePlayerContext();
   const { isMuted, toggleMute, handleVolumeChange } = usePlayerMute();
-  const { whatsappShare } = useListenFeatures();
+  const { whatsappShare, queuePanel, synchronizedLyrics } = useListenFeatures();
   const [activeTab, setActiveTab] = useState<FullPlayerTab>("main");
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [isLyricsOpen, setIsLyricsOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -125,6 +174,7 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
   useEffect(() => {
     if (!isOpen) {
       setIsQueueOpen(false);
+      setIsLyricsOpen(false);
       setActiveTab("main");
     }
   }, [isOpen]);
@@ -242,29 +292,45 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
                 />
               </div>
             ) : null}
-            <button
-              type="button"
-              className="fpp-action-btn"
-              onClick={() => setIsQueueOpen(true)}
-              aria-label="File d'attente"
-            >
-              <span className="fpp-action-icon" aria-hidden="true">
-                ☰
-              </span>
-              <span className="fpp-action-label">File</span>
-            </button>
+            {queuePanel ? (
+              <button
+                type="button"
+                className="fpp-action-btn"
+                onClick={() => setIsQueueOpen(true)}
+                aria-label="File d'attente"
+              >
+                <span className="fpp-action-icon" aria-hidden="true">
+                  ☰
+                </span>
+                <span className="fpp-action-label">File</span>
+              </button>
+            ) : null}
             <button type="button" className="fpp-action-btn" aria-label="Écouter hors ligne" disabled>
               <span className="fpp-action-icon" aria-hidden="true">
                 ⬇
               </span>
               <span className="fpp-action-label">Hors ligne</span>
             </button>
-            <button type="button" className="fpp-action-btn" aria-label="Voir les paroles" disabled>
-              <span className="fpp-action-icon" aria-hidden="true">
-                📝
-              </span>
-              <span className="fpp-action-label">Paroles</span>
-            </button>
+            {synchronizedLyrics ? (
+              <button
+                type="button"
+                className="fpp-action-btn"
+                onClick={() => setIsLyricsOpen(true)}
+                aria-label="Voir les paroles"
+              >
+                <span className="fpp-action-icon" aria-hidden="true">
+                  📝
+                </span>
+                <span className="fpp-action-label">Paroles</span>
+              </button>
+            ) : (
+              <button type="button" className="fpp-action-btn" aria-label="Paroles non disponibles" disabled>
+                <span className="fpp-action-icon" aria-hidden="true">
+                  📝
+                </span>
+                <span className="fpp-action-label">Paroles</span>
+              </button>
+            )}
           </div>
         ) : null}
 
@@ -288,7 +354,13 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
         ) : null}
       </div>
 
-      <QueueOverlay isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
+      <QueueOverlay isOpen={isQueueOpen && queuePanel} onClose={() => setIsQueueOpen(false)} />
+
+      <LyricsOverlay
+        isOpen={isLyricsOpen && synchronizedLyrics}
+        onClose={() => setIsLyricsOpen(false)}
+        trackId={currentTrack.id}
+      />
     </>
   );
 });

@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-06-28 — Listen P5 : Audit fonctionnalités futur + activation flags
+
+### Cause racine
+- 5 composants Sprint 1–3 existants mais masqués par `feature_flags` à `false` en DB.
+
+### Fichiers touchés
+- `20260628100000_listen_future_flags_enable.sql` — activation des 5 flags listen_*
+- `FullPlayerPanel.tsx` — paroles (LyricsPanel), file/queue respectent les flags
+- `get-cached-listen-feature-flags.ts` — cache v2
+- `listen-home.css` — sheet paroles
+
+### Validation
+- DB : 5/5 flags `enabled=true` ✅
+- build + lint + typecheck ✅
+
+---
+
 ## 2026-06-27 — Profile Phase 7 : Smart Goals Engine
 
 ### Fichiers touchés

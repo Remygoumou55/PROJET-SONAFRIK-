@@ -6,7 +6,7 @@ import {
   type ListenFeatureFlags,
 } from "./listen-feature-flags";
 
-const CACHE_KEY = "listen-feature-flags-v1";
+const CACHE_KEY = "listen-feature-flags-v2";
 const REVALIDATE_SECONDS = 120;
 
 /** Flags /listen — cache 120s, évite 1 requête DB par layout listener. */
