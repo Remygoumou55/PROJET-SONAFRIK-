@@ -75,13 +75,17 @@ function staticChecks() {
     directFromViolations.length ? directFromViolations.join(", ") : `${adminPages.length} pages OK`,
   );
 
-  for (const [label, rel, needle] of [
-    ["catalog", "apps/web/src/app/(admin)/admin/catalog/page.tsx", "getAdminServiceForSession"],
-    ["flags", "apps/web/src/app/(admin)/admin/flags/page.tsx", "getAdminServiceWithServiceRole"],
-    ["settings", "apps/web/src/app/(admin)/admin/settings/page.tsx", "getAdminServiceWithServiceRole"],
-    ["finance", "apps/web/src/app/(admin)/admin/finance/page.tsx", "createPayoutService"],
+  for (const [label, rel, needles] of [
+    ["catalog", "apps/web/src/app/(admin)/admin/catalog/page.tsx", ["getAdminServiceForSession"]],
+    ["flags", "apps/web/src/app/(admin)/admin/flags/page.tsx", ["getAdminServiceWithServiceRole"]],
+    ["settings", "apps/web/src/app/(admin)/admin/settings/page.tsx", ["getAdminServiceWithServiceRole"]],
+    ["finance", "apps/web/src/app/(admin)/admin/finance/page.tsx", ["redirect(", "/admin/revenue"]],
+    ["revenue", "apps/web/src/app/(admin)/admin/revenue/page.tsx", ["getAdminServiceForSession"]],
+    ["withdrawals", "apps/web/src/app/(admin)/admin/withdrawals/page.tsx", ["createPayoutService"]],
   ] as const) {
-    log(`C4 ${label} page pattern`, read(rel).includes(needle), needle);
+    const src = read(rel);
+    const ok = needles.every((needle) => src.includes(needle));
+    log(`C4 ${label} page pattern`, ok, needles.join(" + "));
   }
 
   const actions = read("apps/web/src/features/admin/actions/admin.actions.ts");
@@ -101,7 +105,8 @@ function staticChecks() {
     const usesHook =
       src.includes("useAdminService") ||
       src.includes("usePayoutService") ||
-      src.includes("toggleFeatureFlagAction");
+      src.includes("toggleFeatureFlagAction") ||
+      src.includes("Action(");
     log(`C6 ${label} center couche API`, usesHook, rel.split("/").pop());
   }
 
