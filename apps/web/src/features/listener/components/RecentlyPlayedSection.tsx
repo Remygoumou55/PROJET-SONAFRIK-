@@ -42,21 +42,21 @@ export function RecentlyPlayedSection({ tracks }: RecentlyPlayedSectionProps) {
   if (tracks.length === 0) return null;
 
   return (
-    <div className="sidebar-recently">
-      <p className="sidebar-section-label">Récemment écouté</p>
+    <div className="ls-recently">
+      <p className="ls-section-label">En écoute</p>
       {tracks.map((track, index) => (
         <button
           key={track.trackId}
           type="button"
-          className="sidebar-recent-item"
+          className="ls-recently-item"
           onClick={() => void loadAndPlay(toTrackWithMeta(track))}
         >
-          <div className="sidebar-recent-cover">
+          <div className="ls-recently-cover">
             <CoverImage coverPath={track.coverPath} alt={track.title} gradientSeed={index} imgSizes="36px" />
           </div>
-          <div className="sidebar-recent-info">
-            <p className="sidebar-recent-title">{track.title}</p>
-            <p className="sidebar-recent-artist">{track.artistName}</p>
+          <div className="ls-recently-info">
+            <p className="ls-recently-title">{track.title}</p>
+            <p className="ls-recently-artist">{track.artistName}</p>
           </div>
         </button>
       ))}

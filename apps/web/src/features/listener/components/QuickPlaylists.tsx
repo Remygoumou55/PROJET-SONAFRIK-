@@ -10,28 +10,28 @@ export function QuickPlaylists({ favoritesCount, downloadsCount }: QuickPlaylist
     {
       href: "/library?tab=favoris",
       icon: "❤️",
-      label: "Mes favoris",
+      label: "Favoris",
       count: favoritesCount,
     },
     {
       href: "/library",
       icon: "📥",
-      label: "Téléchargements",
+      label: "Téléchargés",
       count: downloadsCount,
     },
   ];
 
   return (
-    <div className="sidebar-playlists">
-      <p className="sidebar-section-label">Mes playlists</p>
+    <div className="ls-playlists">
+      <p className="ls-section-label">Mes playlists</p>
       {playlists.map((playlist) => (
-        <Link key={playlist.href} href={playlist.href} className="sidebar-playlist-item">
-          <span className="sidebar-playlist-icon" aria-hidden="true">
+        <Link key={playlist.href} href={playlist.href} className="ls-playlist-item">
+          <span className="ls-playlist-icon" aria-hidden="true">
             {playlist.icon}
           </span>
-          <span className="sidebar-playlist-label">{playlist.label}</span>
+          <span className="ls-playlist-label">{playlist.label}</span>
           {playlist.count > 0 ? (
-            <span className="sidebar-playlist-count">{playlist.count}</span>
+            <span className="ls-playlist-count">{playlist.count}</span>
           ) : null}
         </Link>
       ))}
