@@ -1,0 +1,122 @@
+/* MRCDOP Phase 2 — Wallet responsive */
+
+.wallet-shell {
+  min-height: 100dvh;
+  background-color: var(--color-noir-profond);
+}
+
+.wallet-shell__inner {
+  width: 100%;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: var(--page-pad-y) max(var(--page-pad-x), var(--safe-left)) var(--page-pad-y)
+    max(var(--page-pad-x), var(--safe-right));
+  box-sizing: border-box;
+}
+
+.wallet-shell__title {
+  margin: 0 0 1.5rem;
+  font-size: var(--text-fluid-xl);
+  font-weight: 700;
+  color: var(--color-texte-principal);
+}
+
+.wallet-nav {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.wallet-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.wallet-nav__link {
+  flex: 1 1 auto;
+  min-width: max(5.5rem, 28%);
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.35rem;
+  border-radius: 0.5rem;
+  font-size: var(--text-fluid-sm);
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-texte-secondaire);
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.wallet-nav__link--active {
+  background: var(--color-elevated);
+  color: var(--color-texte-principal);
+}
+
+.wallet-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 360px) {
+  .wallet-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .wallet-stat-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wallet-stat-card {
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  text-align: center;
+  background: var(--color-card);
+}
+
+.wallet-balance-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 390px) {
+  .wallet-balance-actions {
+    flex-direction: row;
+  }
+}
+
+.wallet-balance-actions > * {
+  flex: 1;
+  min-height: var(--touch-target-min);
+}
+
+.wallet-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 390px) {
+  .wallet-chip-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wallet-mono-field {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

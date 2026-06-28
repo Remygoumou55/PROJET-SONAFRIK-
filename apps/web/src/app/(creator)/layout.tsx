@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import "@/app/styles/creator.css";
-import "@/app/styles/identity.css";
 import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayoutClient";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";

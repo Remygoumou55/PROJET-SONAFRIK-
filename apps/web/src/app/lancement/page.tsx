@@ -8,7 +8,6 @@ import { LancementHeroStats } from "@/components/lancement/LancementHeroStats";
 import { LancementProgressBar } from "@/components/lancement/LancementProgressBar";
 import { LancementHelpSection } from "@/components/lancement/LancementHelpSection";
 import { LancementBuildSection } from "@/components/lancement/LancementBuildSection";
-import "@/app/styles/lancement.css";
 
 export const revalidate = 60;
 

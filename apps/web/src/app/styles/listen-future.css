@@ -515,3 +515,20 @@
     font-size: 20px;
   }
 }
+
+@media (max-width: 320px) {
+  .fs-cover-wrap,
+  .fs-cover-img {
+    width: min(200px, 62vw);
+    height: min(200px, 62vw);
+  }
+
+  .fs-title {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+
+  .fs-artist {
+    font-size: 13px;
+  }
+}

@@ -71,11 +71,13 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-1 py-2"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-1 safe-px"
       style={{
         backgroundColor: "var(--color-surface)",
         borderTop: "1px solid var(--color-elevated)",
-        height: "64px",
+        minHeight: "var(--listener-bottom-nav-h)",
+        paddingBottom: "var(--safe-bottom)",
+        paddingTop: "0.5rem",
       }}
     >
       {NAV_ITEMS.map((item) => {

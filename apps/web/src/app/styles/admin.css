@@ -195,6 +195,13 @@
   border-bottom: 1px solid var(--color-admin-border-subtle);
 }
 
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
 .admin-breadcrumb {
   display: flex;
   align-items: center;
@@ -709,34 +716,7 @@
   border-radius: 16px;
 }
 
-@media (max-width: 900px) {
-  .admin-sidebar {
-    width: 72px;
-  }
-
-  .admin-nav-item {
-    font-size: 0;
-    justify-content: center;
-    padding-inline: 10px;
-  }
-
-  .admin-nav-item .admin-nav-icon {
-    font-size: 18px;
-  }
-
-  .admin-nav-badge,
-  .admin-nav-section-title,
-  .admin-sidebar-back,
-  .admin-logo-badge,
-  .admin-sidebar-footer {
-    display: none;
-  }
-
-  .admin-logo-brand {
-    font-size: 11px;
-    letter-spacing: 1px;
-  }
-}
+/* Sidebar mobile/tablette : voir admin-responsive.css (MRCDOP) */
 
 /* ===== COMPOSANTS PARTAGÉS ADMIN (Sprint Admin 2) ===== */
 
@@ -868,8 +848,15 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  min-width: 280px;
+  min-width: 0;
+  max-width: 100%;
   transition: all 0.15s;
+}
+
+@media (min-width: 768px) {
+  .admin-search-wrap {
+    min-width: 280px;
+  }
 }
 
 .admin-search-wrap:focus-within {
@@ -1419,6 +1406,8 @@
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 20px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
 }
 
 .admin-card-title {

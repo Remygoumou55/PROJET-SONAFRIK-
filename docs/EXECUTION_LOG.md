@@ -11,6 +11,33 @@
 
 ---
 
+## 2026-06-28 — MRCDOP Phases 2–4 + fix actions admin
+
+### Fichiers touchés
+- `apps/web/src/app/styles/wallet.css`, `identity.css`, `admin-responsive.css`, `responsive-system.css` — responsive domaines + table cards mobile
+- `apps/web/src/features/identity/components/IdentityMobileNav.tsx`, `identityNavConfig.ts` — nav pills mobile profil/settings
+- `apps/web/src/features/wallet/components/WalletLayoutClient.tsx`, `WalletDashboard.tsx`, `TopupModal.tsx` — shell wallet responsive
+- `apps/web/src/features/admin/components/AdminTable.tsx` — vue cartes < 768px
+- `apps/web/src/features/admin/lib/getAdminActionContext.ts`, `useAdminActionRunner.ts`, `adminActionShared.ts` — mutations admin service_role corrigées
+- `apps/web/tests/e2e/responsive-mrcdop.spec.ts` — matrix viewports 320–430px
+- `apps/mobile/app/_layout.tsx`, `(tabs)/_layout.tsx` — SafeAreaProvider + insets tab bar / mini player
+- `docs/MRCDOP_AUDIT.md` — rapport phases 1–4
+- Migrations : `20260628230000`, `20260628240000` — RPC admin privilégiées
+
+### Dette technique
+- `AdminRevenueClient` : tables HTML brutes (scroll OK, pas cards)
+- Certification Enterprise 100% : device lab manuel requis
+
+### Validation
+- `pnpm build` + `lint` + `typecheck` ✅
+
+### Tests manuels
+- [ ] Admin : approuver/rejeter catalogue, droits, retraits sans « Impossible de mettre à jour »
+- [ ] Wallet / profil @ 320px sans scroll horizontal
+- [ ] Mobile Expo : tab bar + home indicator
+
+---
+
 ## 2026-06-28 — Sprint Humanization 1 : Centre de Commandement Admin
 
 ### Fichiers touchés

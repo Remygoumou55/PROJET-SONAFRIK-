@@ -1,21 +1,27 @@
 import type { AdminNavBadges } from "@sonafrik/api/admin";
-import { AdminHeader, type AdminHeaderUser } from "./AdminHeader";
-import { AdminSidebar } from "./AdminSidebar";
+import { AdminLayoutClient } from "./AdminLayoutClient";
+import type { AdminHeaderUser } from "./AdminHeader";
 
 interface AdminLayoutShellProps {
   children: React.ReactNode;
   navBadges?: AdminNavBadges;
   adminUser: AdminHeaderUser;
+  disableLiveRealtime?: boolean;
 }
 
-export function AdminLayoutShell({ children, navBadges, adminUser }: AdminLayoutShellProps) {
+export function AdminLayoutShell({
+  children,
+  navBadges,
+  adminUser,
+  disableLiveRealtime = false,
+}: AdminLayoutShellProps) {
   return (
-    <div className="admin-layout">
-      <AdminSidebar badges={navBadges} />
-      <div className="admin-main">
-        <AdminHeader user={adminUser} />
-        <div className="admin-content">{children}</div>
-      </div>
-    </div>
+    <AdminLayoutClient
+      navBadges={navBadges}
+      adminUser={adminUser}
+      disableLiveRealtime={disableLiveRealtime}
+    >
+      {children}
+    </AdminLayoutClient>
   );
 }

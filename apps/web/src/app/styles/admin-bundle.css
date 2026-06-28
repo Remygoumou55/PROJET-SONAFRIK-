@@ -1,0 +1,4 @@
+/* Barrel admin — importé une seule fois via globals.css (source de vérité domaines). */
+@import "./admin.css";
+@import "./admin-dashboard-human.css";
+@import "./admin-responsive.css";

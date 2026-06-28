@@ -11,6 +11,9 @@ export interface AdminHeaderUser {
 
 interface AdminHeaderProps {
   user: AdminHeaderUser;
+  disableLiveRealtime?: boolean;
+  menuOpen?: boolean;
+  onMenuToggle?: () => void;
 }
 
 function resolvePageTitle(pathname: string): string {
@@ -36,14 +39,29 @@ function liveIndicatorTitle(mode: ReturnType<typeof useAdminLiveRefresh>["mode"]
   return "Mode secours — actualisation automatique toutes les 60 s";
 }
 
-export function AdminHeader({ user }: AdminHeaderProps) {
+export function AdminHeader({
+  user,
+  disableLiveRealtime = false,
+  menuOpen = false,
+  onMenuToggle,
+}: AdminHeaderProps) {
   const pathname = usePathname();
   const pageTitle = resolvePageTitle(pathname);
-  const { liveTime, mode } = useAdminLiveRefresh();
+  const { liveTime, mode } = useAdminLiveRefresh({ disableRealtime: disableLiveRealtime });
 
   return (
     <header className="admin-header">
       <div className="admin-header-left">
+        <button
+          type="button"
+          className="admin-header-menu-btn touch-target"
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={menuOpen}
+          aria-controls="admin-sidebar-nav"
+          onClick={() => onMenuToggle?.()}
+        >
+          <span aria-hidden="true">{menuOpen ? "✕" : "☰"}</span>
+        </button>
         <nav className="admin-breadcrumb" aria-label="Fil d'Ariane">
           <span>Admin</span>
           <span className="admin-breadcrumb-sep" aria-hidden="true">

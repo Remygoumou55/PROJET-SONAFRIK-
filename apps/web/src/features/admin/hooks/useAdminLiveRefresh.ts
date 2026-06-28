@@ -32,19 +32,29 @@ function formatLiveTime(date: Date): string {
 
 export type AdminLiveMode = "connecting" | "realtime" | "polling";
 
+interface Options {
+  /** Forcé côté serveur quand BYPASS_AUTH (pas de JWT navigateur pour Realtime). */
+  disableRealtime?: boolean;
+}
+
 /**
  * Rafraîchit les RSC admin à chaque changement DB (< 1 s via Supabase Realtime).
  * Repli polling 60 s si Realtime indisponible (audit local, erreur channel).
  */
-export function useAdminLiveRefresh() {
+export function useAdminLiveRefresh(options?: Options) {
   const router = useRouter();
   const [liveTime, setLiveTime] = useState<string | null>(null);
   const [mode, setMode] = useState<AdminLiveMode>("connecting");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const disableRealtime = options?.disableRealtime === true || isLocalAuditMode();
 
   const refresh = useCallback(() => {
-    router.refresh();
-    setLiveTime(formatLiveTime(new Date()));
+    try {
+      router.refresh();
+      setLiveTime(formatLiveTime(new Date()));
+    } catch {
+      setMode("polling");
+    }
   }, [router]);
 
   const scheduleRefresh = useCallback(() => {
@@ -56,41 +66,50 @@ export function useAdminLiveRefresh() {
   }, [refresh]);
 
   useEffect(() => {
-    if (isLocalAuditMode()) {
+    if (disableRealtime) {
       setMode("polling");
       return;
     }
 
-    const supabase = getSupabaseBrowserClient();
-    const channelName = `admin_live_${Date.now()}`;
+    let cancelled = false;
 
-    let channel = supabase.channel(channelName);
-    for (const table of ADMIN_REALTIME_TABLES) {
-      channel = channel.on(
-        "postgres_changes",
-        { event: "*", schema: "public", table },
-        scheduleRefresh,
-      );
-    }
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const channelName = `admin_live_${Date.now()}`;
 
-    channel.subscribe((status) => {
-      if (status === "SUBSCRIBED") {
-        setMode("realtime");
-        refresh();
-      } else if (
-        status === "CHANNEL_ERROR" ||
-        status === "TIMED_OUT" ||
-        status === "CLOSED"
-      ) {
-        setMode("polling");
+      let channel = supabase.channel(channelName);
+      for (const table of ADMIN_REALTIME_TABLES) {
+        channel = channel.on(
+          "postgres_changes",
+          { event: "*", schema: "public", table },
+          scheduleRefresh,
+        );
       }
-    });
 
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      void supabase.removeChannel(channel);
-    };
-  }, [refresh, scheduleRefresh]);
+      channel.subscribe((status) => {
+        if (cancelled) return;
+        if (status === "SUBSCRIBED") {
+          setMode("realtime");
+          refresh();
+        } else if (
+          status === "CHANNEL_ERROR" ||
+          status === "TIMED_OUT" ||
+          status === "CLOSED"
+        ) {
+          setMode("polling");
+        }
+      });
+
+      return () => {
+        cancelled = true;
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        void supabase.removeChannel(channel);
+      };
+    } catch {
+      setMode("polling");
+      return undefined;
+    }
+  }, [disableRealtime, refresh, scheduleRefresh]);
 
   useEffect(() => {
     if (mode !== "polling") return;

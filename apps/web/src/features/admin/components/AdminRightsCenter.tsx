@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useAdminService } from "../hooks/useAdminService";
 import { formatDateTime } from "@/lib/formatters";
+import { adminUpdateRightsClaimAction } from "../actions/admin-rights.actions";
+import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 import type { AdminRightsClaim } from "@sonafrik/api/admin";
 import {
   RIGHTS_CLAIM_TYPE_LABELS,
@@ -41,11 +42,10 @@ const TYPE_COLORS: Record<RightsClaimType, { color: string; bg: string }> = {
 };
 
 export function AdminRightsCenter({ initialClaims }: Props) {
-  const admin = useAdminService();
+  const { error, isPending, run } = useAdminActionRunner();
   const [claims, setClaims] = useState<AdminRightsClaim[]>(initialClaims);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
-  const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<{ claimId: string; reason: string } | null>(null);
 
   const cardBg   = "var(--color-card)";
@@ -61,19 +61,19 @@ export function AdminRightsCenter({ initialClaims }: Props) {
   const runUpdate = useCallback(
     async (claimId: string, status: RightsClaimStatus, notes?: string) => {
       setActionState((prev) => ({ ...prev, [claimId]: true }));
-      setError(null);
-      try {
-        await admin.updateRightsClaim(claimId, status, notes);
-        setClaims((prev) =>
-          prev.map((c) => (c.id === claimId ? { ...c, status } : c)),
-        );
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-      } finally {
-        setActionState((prev) => ({ ...prev, [claimId]: false }));
-      }
+      await run(
+        () => adminUpdateRightsClaimAction({ claimId, status, notes }),
+        {
+          onSuccess: () => {
+            setClaims((prev) =>
+              prev.map((c) => (c.id === claimId ? { ...c, status } : c)),
+            );
+          },
+        },
+      );
+      setActionState((prev) => ({ ...prev, [claimId]: false }));
     },
-    [admin],
+    [run],
   );
 
   const handleAccept = (id: string) => void runUpdate(id, "accepted");
@@ -197,7 +197,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                   {(claim.status === "pending" || claim.status === "escalated") && (
                     <div className="flex flex-wrap gap-2 shrink-0">
                       <button
-                        disabled={busy}
+                        disabled={busy || isPending}
                         onClick={() => handleAccept(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
                         style={{ backgroundColor: "rgba(0,210,106,0.13)", color: "var(--color-vert-energie)" }}
@@ -206,7 +206,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                       </button>
                       {claim.status === "pending" && (
                         <button
-                          disabled={busy}
+                          disabled={busy || isPending}
                           onClick={() => handleEscalate(claim.id)}
                           className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
                           style={{ backgroundColor: "rgba(168,85,247,0.13)", color: "var(--color-accent-violet-clair)" }}
@@ -215,7 +215,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         </button>
                       )}
                       <button
-                        disabled={busy}
+                        disabled={busy || isPending}
                         onClick={() => handleReject(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
                         style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}

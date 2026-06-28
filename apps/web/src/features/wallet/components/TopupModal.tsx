@@ -187,7 +187,7 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
 
             <div className="space-y-2">
               <p className="text-xs font-medium" style={{ color: "var(--color-texte-secondaire)" }}>Montant (GNF)</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="wallet-chip-grid">
                 {AMOUNTS.map((a) => (
                   <button
                     key={a}

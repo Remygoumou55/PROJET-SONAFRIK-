@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { IdentityNav } from "./IdentityNav";
+import { IdentityMobileNav } from "./IdentityMobileNav";
 
 interface IdentityShellProps {
   activePath: string;
@@ -25,6 +26,8 @@ export function IdentityShell({
           <p className="identity-shell__description">{description}</p>
         ) : null}
       </header>
+
+      <IdentityMobileNav activePath={activePath} unreadNotifications={unreadNotifications} />
 
       <div className="identity-shell__layout">
         <aside className="identity-shell__aside" aria-label="Navigation du profil">

@@ -49,7 +49,12 @@ export function StreamingLayoutClient({
             initialUnreadCount={initialUnreadCount}
             sidebarDataPromise={sidebarDataPromise}
           />
-          <main className="flex-1 overflow-y-auto pb-40 md:pb-[88px] md:min-h-screen">
+          <main
+            className="flex-1 overflow-y-auto md:pb-[88px] md:min-h-screen"
+            style={{
+              paddingBottom: "var(--listener-player-offset)",
+            }}
+          >
             {children}
           </main>
         </div>

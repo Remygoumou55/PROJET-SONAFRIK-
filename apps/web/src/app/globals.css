@@ -6,6 +6,9 @@
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../../packages/shared/src/**/*.{ts,tsx}";
 
+/* REGISTRE DOMAINES CSS — source de vérité unique.
+ * Tout CSS de route-group : @import ici (ou via *-bundle.css).
+ * Ne pas compter uniquement sur layout.tsx (fragile en dev/HMR). */
 @import "./styles/landing.css";
 @import "./styles/listen-home.css";
 @import "./styles/listen-future.css";
@@ -21,6 +24,9 @@
 @import "./styles/revenue.css";
 @import "./styles/creator.css";
 @import "./styles/lancement.css";
+@import "./styles/responsive-system.css";
+@import "./styles/wallet.css";
+@import "./styles/admin-bundle.css";
 
 @theme {
   --color-vert-energie: #00d26a;

@@ -1018,6 +1018,23 @@ html[data-player-active="true"] .has-global-player main {
   }
 }
 
+@media (max-width: 320px) {
+  .gp-body {
+    padding: 0 12px;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  .gp-cover {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gp-track-title {
+    font-size: 12px;
+  }
+}
+
 /* ===== PROVERBE DU JOUR (Sprint 3) ===== */
 .proverbe-jour {
   display: flex;
@@ -1817,7 +1834,10 @@ html[data-player-active="true"] .has-global-player main {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 340px;
+  right: 0;
+  width: max(100%, min(340px, calc(100vw - 2rem)));
+  max-width: calc(100vw - 2rem);
+  min-width: 0;
   background: var(--color-surface);
   border: 1px solid rgb(255 255 255 / 0.09);
   border-radius: 16px;

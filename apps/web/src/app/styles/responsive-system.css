@@ -1,0 +1,140 @@
+/**
+ * SONAFRIK MRCDOP — Responsive Enterprise System v1.0
+ * Mobile First · largeurs de référence : 320–430px
+ * Source unique tokens layout / safe areas / touch / typo fluide
+ */
+
+:root {
+  /* Largeurs de référence (certification matrix) */
+  --mrcdop-ref-xs: 320px;
+  --mrcdop-ref-sm: 360px;
+  --mrcdop-ref-md: 375px;
+  --mrcdop-ref-lg: 390px;
+  --mrcdop-ref-xl: 412px;
+  --mrcdop-ref-2xl: 430px;
+
+  /* Safe areas iOS / Android encoche / Dynamic Island / home indicator */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Touch CDC + Apple HIG */
+  --touch-target-min: 44px;
+
+  /* Espacements fluides page */
+  --page-pad-x: clamp(0.75rem, 3.5vw, 1.75rem);
+  --page-pad-y: clamp(1rem, 2.5vw, 1.75rem);
+  --stack-gap: clamp(0.75rem, 2vw, 1.25rem);
+
+  /* Typographie fluide */
+  --text-fluid-xs: clamp(0.6875rem, 0.65rem + 0.15vw, 0.75rem);
+  --text-fluid-sm: clamp(0.8125rem, 0.78rem + 0.2vw, 0.875rem);
+  --text-fluid-base: clamp(0.9375rem, 0.88rem + 0.25vw, 1rem);
+  --text-fluid-lg: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
+  --text-fluid-xl: clamp(1.25rem, 1.05rem + 0.9vw, 1.625rem);
+  --text-fluid-2xl: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
+
+  /* Bottom nav + mini player stack (listener) */
+  --listener-bottom-nav-h: calc(64px + var(--safe-bottom));
+  --listener-player-offset: calc(var(--listener-bottom-nav-h) + 8px);
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Conteneur page standard */
+.container-responsive {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: var(--page-pad-x);
+  box-sizing: border-box;
+}
+
+/* Zone tactile minimum 44×44 */
+.touch-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* Texte dans cartes flex — évite débordement */
+.text-truncate-safe {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.text-balance-safe {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Stack vertical responsive */
+.stack-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+}
+
+/* Safe area helpers */
+.safe-pb {
+  padding-bottom: var(--safe-bottom);
+}
+
+.safe-pt {
+  padding-top: var(--safe-top);
+}
+
+.safe-px {
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+/* Scroll horizontal contrôlé (carrousels, tableaux) */
+.scroll-x-controlled {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.scroll-x-controlled::-webkit-scrollbar {
+  display: none;
+}
+
+/* Formulaires — évite zoom iOS sur focus (< 16px) */
+@media (max-width: 430px) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Performance — sections hors viewport (MRCDOP Phase 4 perf) */
+.perf-defer-paint {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}

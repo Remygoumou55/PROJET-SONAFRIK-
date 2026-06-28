@@ -69,7 +69,7 @@ export const WalletDashboard = memo(function WalletDashboard({
         <p className="text-3xl font-bold tracking-tight" style={{ color: "var(--color-texte-principal)" }}>
           {formatGnf(wallet.balance_gnf)}
         </p>
-        <div className="flex items-center gap-2 mt-4">
+        <div className="wallet-balance-actions">
           <button
             type="button"
             onClick={topupEnabled ? onTopup : undefined}
@@ -141,13 +141,13 @@ export const WalletDashboard = memo(function WalletDashboard({
       </div>
 
       {/* Stats rapides */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="wallet-stat-grid">
         {[
           { label: "Total rechargé", value: formatGnf(wallet.total_credited_gnf) },
           { label: "Total dépensé", value: formatGnf(wallet.total_debited_gnf) },
           { label: "Retraits en attente", value: String(pendingWithdrawals) },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-xl p-3 text-center" style={{ backgroundColor: "var(--color-card)" }}>
+          <div key={label} className="wallet-stat-card">
             <p className="text-sm font-bold truncate" style={{ color: "var(--color-texte-principal)" }}>{value}</p>
             <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>{label}</p>
           </div>

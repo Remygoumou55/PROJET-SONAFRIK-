@@ -2,10 +2,9 @@ import { Suspense } from "react";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { getAdminSessionContext } from "@/features/admin/lib/getAdminSessionContext";
 import { requireAdmin } from "@/features/admin/lib/requireAdmin";
+import { isDevBypassActive } from "@/lib/auth/guards";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
 import AdminLoading from "./loading";
-import "@/app/styles/admin.css";
-import "@/app/styles/admin-dashboard-human.css";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +22,11 @@ async function AdminGuard({ children }: { children: React.ReactNode }) {
   ]);
 
   return (
-    <AdminLayoutShell navBadges={navBadges} adminUser={adminUser}>
+    <AdminLayoutShell
+      navBadges={navBadges}
+      adminUser={adminUser}
+      disableLiveRealtime={isDevBypassActive()}
+    >
       {children}
     </AdminLayoutShell>
   );

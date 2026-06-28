@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { WalletServiceProvider } from "../lib/walletServiceContext";
 
 const NAV_ITEMS = [
-  { href: "/wallet", label: "Portefeuille" },
-  { href: "/wallet/payout", label: "Retrait" },
-  { href: "/wallet/royalties", label: "Royalties" },
+  { href: "/wallet", label: "Portefeuille", short: "Wallet" },
+  { href: "/wallet/payout", label: "Retrait", short: "Retrait" },
+  { href: "/wallet/royalties", label: "Royalties", short: "Royalt." },
 ] as const;
 
 export function WalletLayoutClient({ children }: { children: React.ReactNode }) {
@@ -15,24 +15,22 @@ export function WalletLayoutClient({ children }: { children: React.ReactNode }) 
 
   return (
     <WalletServiceProvider>
-      <div className="min-h-dvh bg-noir-profond">
-        <div className="mx-auto max-w-2xl px-4 py-6">
-          <h1 className="mb-6 text-2xl font-bold text-texte-principal">Mon Wallet</h1>
+      <div className="wallet-shell">
+        <div className="wallet-shell__inner">
+          <h1 className="wallet-shell__title">Mon Wallet</h1>
 
-          <nav className="mb-8 flex gap-1 rounded-xl bg-surface p-1">
-            {NAV_ITEMS.map(({ href, label }) => {
+          <nav className="wallet-nav" aria-label="Navigation wallet">
+            {NAV_ITEMS.map(({ href, label, short }) => {
               const isActive = pathname === href;
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`flex-1 rounded-lg py-2 text-center text-sm font-medium transition-all ${
-                    isActive
-                      ? "bg-elevated text-texte-principal"
-                      : "bg-transparent text-texte-secondaire"
-                  }`}
+                  className={`wallet-nav__link${isActive ? " wallet-nav__link--active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  {label}
+                  <span className="hidden min-[360px]:inline">{label}</span>
+                  <span className="min-[360px]:hidden">{short}</span>
                 </Link>
               );
             })}

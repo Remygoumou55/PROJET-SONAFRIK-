@@ -2,6 +2,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@sonafrik/database/types";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import { createSonafrikClient } from "@sonafrik/database";
+import { isClientLocalControlMode } from "@sonafrik/shared/auth";
 
 let client: SonafrikSupabaseClient | undefined;
 
@@ -14,9 +15,9 @@ function getSupabaseEnv(): { url: string; anonKey: string } {
   return { url, anonKey };
 }
 
-// Retourne true si le mode audit local est actif (jamais sur Vercel).
+// Mode local sans session navigateur fiable (BYPASS / Live Control) — pas de Realtime WebSocket.
 export function isLocalAuditMode(): boolean {
-  return process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true";
+  return isClientLocalControlMode();
 }
 
 // Utilisateur mock stable retourné quand le mode audit est actif.
@@ -41,7 +42,7 @@ export function getSupabaseBrowserClient(): SonafrikSupabaseClient {
 
   // En mode audit local : mock getUser() seulement sans session réelle.
   // Ne pas remplacer l'objet auth (casse _useSession) — getSession reste intact pour stream-start.
-  if (process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") {
+  if (isClientLocalControlMode()) {
     const auth = client.auth;
     auth.getUser = async () => {
       const { data: { session } } = await auth.getSession();

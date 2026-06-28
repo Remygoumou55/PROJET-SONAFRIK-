@@ -1,9 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import {
-  createAdminService,
   adminChangeArtistTierSchema,
   adminDeleteUserSchema,
   adminSuspendCreatorSchema,
@@ -11,15 +9,11 @@ import {
   adminVerifyArtistSchema,
   adminWarnUserSchema,
 } from "@sonafrik/api/admin";
-import { verifyAdminForAction } from "@/features/admin/lib/requireAdmin";
-
-async function getModerationService() {
-  const auth = await verifyAdminForAction();
-  if (!auth.ok) return { error: auth.error as string, service: null, userId: null };
-
-  const supabase = await getSupabaseServerClient();
-  return { error: null, service: createAdminService(supabase), userId: auth.userId };
-}
+import {
+  getAdminServiceForAction,
+  formatAdminActionError,
+  type AdminActionResult,
+} from "@/features/admin/lib/getAdminActionContext";
 
 function selfTargetError(userId: string, actorId: string | null, action: string): string | null {
   if (actorId && userId === actorId) {
@@ -32,15 +26,15 @@ export async function adminWarnUserAction(input: {
   userId: string;
   reason?: string;
   adminNote?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminWarnUserSchema.safeParse(input);
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.warnUser(
+    await ctx.service.warnUser(
       parsed.data.userId,
       parsed.data.reason ?? "Avertissement administrateur",
       parsed.data.adminNote ?? "",
@@ -48,8 +42,8 @@ export async function adminWarnUserAction(input: {
     revalidatePath("/admin/users");
     revalidatePath("/admin/artists");
     return {};
-  } catch {
-    return { error: "Impossible d'envoyer l'avertissement." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible d'envoyer l'avertissement.") };
   }
 }
 
@@ -57,51 +51,51 @@ export async function adminSuspendUserAction(input: {
   userId: string;
   durationDays?: number;
   reason?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminSuspendUserSchema.safeParse(input);
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service, userId } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
-  const selfErr = selfTargetError(parsed.data.userId, userId, "suspendre");
+  const selfErr = selfTargetError(parsed.data.userId, ctx.userId, "suspendre");
   if (selfErr) return { error: selfErr };
 
   try {
-    await service.suspendUser(
+    await ctx.service.suspendUser(
       parsed.data.userId,
       parsed.data.durationDays ?? 30,
       parsed.data.reason ?? "Suspension par l'administrateur",
     );
     revalidatePath("/admin/users");
     return {};
-  } catch {
-    return { error: "Impossible de suspendre le compte." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de suspendre le compte.") };
   }
 }
 
 export async function adminDeleteUserAction(input: {
   userId: string;
   reason?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminDeleteUserSchema.safeParse(input);
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service, userId } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
-  const selfErr = selfTargetError(parsed.data.userId, userId, "supprimer");
+  const selfErr = selfTargetError(parsed.data.userId, ctx.userId, "supprimer");
   if (selfErr) return { error: selfErr };
 
   try {
-    await service.deleteUser(
+    await ctx.service.deleteUser(
       parsed.data.userId,
       parsed.data.reason ?? "Suppression définitive par l'administrateur",
     );
     revalidatePath("/admin/users");
     return {};
-  } catch {
-    return { error: "Impossible de supprimer le compte." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de supprimer le compte.") };
   }
 }
 
@@ -109,67 +103,67 @@ export async function adminVerifyArtistAction(input: {
   creatorId: string;
   approved: boolean;
   note?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminVerifyArtistSchema.safeParse(input);
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.verifyArtist(parsed.data.creatorId, parsed.data.approved, parsed.data.note ?? "");
+    await ctx.service.verifyArtist(parsed.data.creatorId, parsed.data.approved, parsed.data.note ?? "");
     revalidatePath("/admin/artists");
     return {};
-  } catch {
-    return { error: "Impossible de traiter la vérification." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de traiter la vérification.") };
   }
 }
 
 export async function adminChangeArtistTierAction(input: {
   creatorId: string;
   newTier: "emergent" | "croissance" | "etabli";
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminChangeArtistTierSchema.safeParse(input);
   if (!parsed.success) return { error: "Tier invalide." };
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.changeArtistTier(parsed.data.creatorId, parsed.data.newTier);
+    await ctx.service.changeArtistTier(parsed.data.creatorId, parsed.data.newTier);
     revalidatePath("/admin/artists");
     return {};
-  } catch {
-    return { error: "Impossible de modifier le tier." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de modifier le tier.") };
   }
 }
 
 export async function adminSuspendCreatorAction(input: {
   creatorId: string;
   reason?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminSuspendCreatorSchema.safeParse(input);
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.suspendCreator(
+    await ctx.service.suspendCreator(
       parsed.data.creatorId,
       parsed.data.reason ?? "Suspension artiste par l'administrateur",
     );
     revalidatePath("/admin/artists");
     return {};
-  } catch {
-    return { error: "Impossible de suspendre l'artiste." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de suspendre l'artiste.") };
   }
 }
 
 export async function adminWarnCreatorAction(input: {
   ownerId: string;
   artistName: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   const parsed = adminWarnUserSchema.safeParse({
     userId: input.ownerId,
     reason: "Avertissement artiste",
@@ -177,28 +171,28 @@ export async function adminWarnCreatorAction(input: {
   });
   if (!parsed.success) return { error: "Données invalides." };
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.warnCreatorOwner(
+    await ctx.service.warnCreatorOwner(
       parsed.data.userId,
       parsed.data.reason ?? "Avertissement artiste",
       parsed.data.adminNote ?? `Avertissement envoyé à ${input.artistName}`,
     );
     revalidatePath("/admin/artists");
     return {};
-  } catch {
-    return { error: "Impossible d'envoyer l'avertissement." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible d'envoyer l'avertissement.") };
   }
-}
+};
 
 export async function adminReviewCatalogAction(input: {
   id: string;
   entityType: "album" | "track";
   action: "published" | "rejected";
   reason?: string;
-}): Promise<{ error?: string }> {
+}): Promise<AdminActionResult> {
   if (!input.id || (input.entityType !== "album" && input.entityType !== "track")) {
     return { error: "Données invalides." };
   }
@@ -209,11 +203,11 @@ export async function adminReviewCatalogAction(input: {
     return { error: "Motif de rejet requis." };
   }
 
-  const { error, service } = await getModerationService();
-  if (error || !service) return { error: error ?? "Accès refusé." };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    await service.reviewCatalogItem(
+    await ctx.service.reviewCatalogItem(
       input.id,
       input.entityType,
       input.action,
@@ -222,7 +216,7 @@ export async function adminReviewCatalogAction(input: {
     revalidatePath("/admin/catalog");
     revalidatePath("/admin");
     return {};
-  } catch {
-    return { error: "Impossible de traiter la soumission." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de traiter la soumission.") };
   }
 }

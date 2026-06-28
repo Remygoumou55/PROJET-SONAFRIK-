@@ -53,10 +53,7 @@ export class AdminService {
     if (!parsed.success) throw new AdminError("flag_not_found");
 
     const userId = await this.getOptionalUserId();
-    const flag = await this.repository
-      .toggleFeatureFlag(name, enabled, userId)
-      .catch(() => { throw new AdminError("update_failed"); });
-    return flag;
+    return this.repository.toggleFeatureFlag(name, enabled, userId);
   }
 
   async listSystemSettings(): Promise<SystemSetting[]> {
@@ -68,10 +65,7 @@ export class AdminService {
     if (!parsed.success) throw new AdminError("setting_not_found");
 
     const userId = await this.getOptionalUserId();
-    const setting = await this.repository
-      .updateSystemSetting(key, value, userId)
-      .catch(() => { throw new AdminError("update_failed"); });
-    return setting;
+    return this.repository.updateSystemSetting(key, value, userId);
   }
 
   async reviewCatalogItem(
@@ -80,8 +74,7 @@ export class AdminService {
     action: "published" | "rejected",
     reason?: string,
   ): Promise<void> {
-    await this.repository.reviewCatalogItem(id, entityType, action, reason)
-      .catch(() => { throw new AdminError("update_failed"); });
+    await this.repository.reviewCatalogItem(id, entityType, action, reason);
   }
 
   async updateRightsClaim(
@@ -89,8 +82,7 @@ export class AdminService {
     status: "accepted" | "rejected" | "escalated" | "pending",
     notes?: string,
   ): Promise<void> {
-    await this.repository.updateRightsClaim(id, status, notes)
-      .catch(() => { throw new AdminError("update_failed"); });
+    await this.repository.updateRightsClaim(id, status, notes);
   }
 
   async listPendingCatalogItems(limit = 200): Promise<PendingCatalogItem[]> {

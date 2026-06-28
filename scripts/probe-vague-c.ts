@@ -142,6 +142,29 @@ function staticChecks() {
       existsSync(resolve(ROOT, "scripts/probe-vague-b.ts")),
     "certifications précédentes",
   );
+
+  const globalsCss = read("apps/web/src/app/globals.css");
+  log(
+    "C12 domain CSS registry (globals.css)",
+    globalsCss.includes("admin-bundle.css") && globalsCss.includes("creator.css"),
+    "admin + creator bundles enregistrés",
+  );
+
+  const layoutCssViolations: string[] = [];
+  for (const rel of [
+    "apps/web/src/app/(admin)/layout.tsx",
+    "apps/web/src/app/(creator)/layout.tsx",
+    "apps/web/src/app/lancement/page.tsx",
+  ]) {
+    if (read(rel).includes('@/app/styles/')) {
+      layoutCssViolations.push(rel);
+    }
+  }
+  log(
+    "C13 pas d'import CSS orphelin layout/page",
+    layoutCssViolations.length === 0,
+    layoutCssViolations.length ? layoutCssViolations.join(", ") : "globals.css seul registre",
+  );
 }
 
 async function liveChecks() {

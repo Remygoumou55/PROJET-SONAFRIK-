@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { formatDateTime } from "@/lib/formatters";
 import { adminReviewCatalogAction } from "../actions/admin-moderation.actions";
 import { AdminModerationActions } from "./AdminModerationActions";
 import { AdminReasonModal } from "./AdminReasonModal";
+import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 import type { PendingCatalogItem } from "@sonafrik/api/admin";
 
 interface Props {
@@ -21,11 +21,10 @@ const RELEASE_TYPE_LABELS: Record<string, string> = {
 };
 
 export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { error, setError, isPending, run } = useAdminActionRunner();
   const [items, setItems] = useState<PendingCatalogItem[]>(initialItems);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
-  const [error, setError] = useState<string | null>(loadError);
+  const displayError = error ?? loadError;
 
   const [rejectTarget, setRejectTarget] = useState<{
     id: string;
@@ -42,26 +41,18 @@ export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
     ) => {
       setActionState((prev) => ({ ...prev, [id]: true }));
       setError(null);
-      try {
-        const result = await adminReviewCatalogAction({
-          id,
-          entityType,
-          action,
-          reason,
-        });
-        if (result.error) {
-          setError(result.error);
-          return;
-        }
-        setItems((prev) => prev.filter((item) => item.id !== id));
-        startTransition(() => router.refresh());
-      } catch {
-        setError("Erreur lors de l'action.");
-      } finally {
-        setActionState((prev) => ({ ...prev, [id]: false }));
-      }
+      const ok = await run(
+        () => adminReviewCatalogAction({ id, entityType, action, reason }),
+        {
+          onSuccess: () => {
+            setItems((prev) => prev.filter((item) => item.id !== id));
+          },
+        },
+      );
+      setActionState((prev) => ({ ...prev, [id]: false }));
+      return ok;
     },
-    [router],
+    [run, setError],
   );
 
   const confirmReject = () => {
@@ -77,9 +68,9 @@ export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
         {items.length} élément{items.length !== 1 ? "s" : ""} en attente d&apos;approbation
       </p>
 
-      {error ? (
+      {displayError ? (
         <p className="admin-inline-alert admin-inline-alert--error" role="alert">
-          {error}
+          {displayError}
         </p>
       ) : null}
 

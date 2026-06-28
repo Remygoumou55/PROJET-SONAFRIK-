@@ -2,25 +2,21 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { getSupabaseAdminClient } from "@/lib/supabase/server";
-import { createAdminService } from "@sonafrik/api/admin";
-import { verifyAdminForAction } from "@/features/admin/lib/requireAdmin";
+import { getAdminServiceForAction, formatAdminActionError } from "@/features/admin/lib/getAdminActionContext";
 
 export async function toggleFeatureFlagAction(
   name: string,
   enabled: boolean,
 ): Promise<{ error?: string }> {
-  const auth = await verifyAdminForAction();
-  if (!auth.ok) return { error: auth.error };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    const supabase = getSupabaseAdminClient({ adminVerified: true });
-    const service = createAdminService(supabase);
-    await service.toggleFeatureFlag(name, enabled);
+    await ctx.service.toggleFeatureFlag(name, enabled);
     revalidatePath("/admin/flags");
     return {};
-  } catch {
-    return { error: "Impossible de modifier le flag." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de modifier le flag.") };
   }
 }
 
@@ -43,13 +39,11 @@ export async function triggerRoyaltyCycleAction(
     revenuePoolPercent?: number;
   },
 ): Promise<{ error?: string; artistCount?: number; totalDistributed?: number; cycleId?: string }> {
-  const auth = await verifyAdminForAction();
-  if (!auth.ok) return { error: auth.error };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
-    const supabase = getSupabaseAdminClient({ adminVerified: true });
-    const service = createAdminService(supabase);
-    const result = await service.triggerRoyaltyCycle({
+    const result = await ctx.service.triggerRoyaltyCycle({
       ...input,
       revenuePoolPercent: input.revenuePoolPercent ?? 65,
     });
@@ -60,8 +54,8 @@ export async function triggerRoyaltyCycleAction(
       artistCount: result.calculation.artist_count,
       totalDistributed: result.distribution.total_gnf,
     };
-  } catch {
-    return { error: "Impossible de déclencher le cycle royalties." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de déclencher le cycle royalties.") };
   }
 }
 
@@ -69,8 +63,8 @@ export async function updateSystemSettingAction(
   key: string,
   value: string,
 ): Promise<{ error?: string }> {
-  const auth = await verifyAdminForAction();
-  if (!auth.ok) return { error: auth.error };
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
 
   try {
     // Les valeurs sont stockées en JSONB — on tente le parse JSON, sinon string brute
@@ -90,12 +84,10 @@ export async function updateSystemSettingAction(
       parsedValue = result.data;
     }
 
-    const supabase = getSupabaseAdminClient({ adminVerified: true });
-    const service = createAdminService(supabase);
-    await service.updateSystemSetting(key, parsedValue);
+    await ctx.service.updateSystemSetting(key, parsedValue);
     revalidatePath("/admin/settings");
     return {};
-  } catch {
-    return { error: "Impossible de mettre à jour le paramètre." };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de mettre à jour le paramètre.") };
   }
 }

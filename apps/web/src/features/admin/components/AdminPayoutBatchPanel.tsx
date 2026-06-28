@@ -2,30 +2,36 @@
 
 import { useCallback, useState } from "react";
 import type { PayoutBatch } from "@sonafrik/types";
-import { usePayoutService } from "../hooks/usePayoutService";
 import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
+import {
+  adminCreatePayoutBatchAction,
+  adminListPayoutBatchesAction,
+} from "../actions/admin-financial.actions";
+import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 
 interface Props {
   initialBatches: PayoutBatch[];
 }
 
 export function AdminPayoutBatchPanel({ initialBatches }: Props) {
-  const service = usePayoutService();
+  const { error, setError, isPending, run } = useAdminActionRunner();
   const [batches, setBatches] = useState(initialBatches);
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    try {
-      const data = await service.listPayoutBatches(20);
-      setBatches(data);
-    } catch {
-      setError("Impossible de charger les lots de retrait.");
-    }
-  }, [service]);
+    await run(
+      () => adminListPayoutBatchesAction(20),
+      {
+        refresh: false,
+        onSuccess: (result) => {
+          if (result.batches) setBatches(result.batches);
+        },
+      },
+    );
+  }, [run]);
 
   const handleCreate = async () => {
     const trimmed = name.trim();
@@ -35,16 +41,17 @@ export function AdminPayoutBatchPanel({ initialBatches }: Props) {
     }
     setBusy(true);
     setError(null);
-    try {
-      await service.createPayoutBatch({ name: trimmed, notes: notes.trim() || undefined });
-      setName("");
-      setNotes("");
-      await refresh();
-    } catch {
-      setError("Création du lot impossible.");
-    } finally {
-      setBusy(false);
-    }
+    await run(
+      () => adminCreatePayoutBatchAction({ name: trimmed, notes: notes.trim() || undefined }),
+      {
+        onSuccess: () => {
+          setName("");
+          setNotes("");
+          void refresh();
+        },
+      },
+    );
+    setBusy(false);
   };
 
   return (
@@ -67,7 +74,7 @@ export function AdminPayoutBatchPanel({ initialBatches }: Props) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nom du lot (ex. Juin 2026 — Wave)"
-          className="min-w-[220px] flex-1 rounded-lg px-3 py-2 text-sm"
+          className="wallet-mono-field min-w-0 flex-1 rounded-lg px-3 py-2 text-sm"
           style={{
             backgroundColor: "var(--color-elevated)",
             border: "1px solid var(--color-bordure)",
@@ -79,7 +86,7 @@ export function AdminPayoutBatchPanel({ initialBatches }: Props) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optionnel)"
-          className="min-w-[180px] flex-1 rounded-lg px-3 py-2 text-sm"
+          className="wallet-mono-field min-w-0 flex-1 rounded-lg px-3 py-2 text-sm"
           style={{
             backgroundColor: "var(--color-elevated)",
             border: "1px solid var(--color-bordure)",
@@ -89,11 +96,11 @@ export function AdminPayoutBatchPanel({ initialBatches }: Props) {
         <button
           type="button"
           onClick={() => void handleCreate()}
-          disabled={busy}
+          disabled={busy || isPending}
           className="rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60"
           style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
         >
-          {busy ? "…" : "Créer un lot"}
+          {busy || isPending ? "…" : "Créer un lot"}
         </button>
       </div>
 

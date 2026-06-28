@@ -2,10 +2,18 @@
 
 import { useState, useCallback } from "react";
 import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
-import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS, PAYOUT_ENGINE_ERROR_MESSAGES } from "@sonafrik/types";
-import { usePayoutService } from "../hooks/usePayoutService";
+import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
+import {
+  adminApproveWithdrawalAction,
+  adminCancelWithdrawalAction,
+  adminGetPayoutQueueAction,
+  adminMarkWithdrawalPaidAction,
+  adminProcessWithdrawalAction,
+  adminRejectWithdrawalAction,
+} from "../actions/admin-financial.actions";
+import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
 import { AdminRoyaltyPanel } from "./AdminRoyaltyPanel";
@@ -39,56 +47,63 @@ interface Props {
 }
 
 export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initialBatches }: Props) {
-  const service = usePayoutService();
+  const { error, setError, isPending, run } = useAdminActionRunner();
   const [queue, setQueue] = useState<AdminPayoutEntry[]>(initialQueue);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const [modal, setModal] = useState<{ type: "reject" | "mark_paid"; withdrawalId: string; value: string } | null>(null);
 
-  const fetchQueue = useCallback(async (status: StatusFilter) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await service.getAdminPayoutQueue({ status, limit: 100 });
-      setQueue(data);
-    } catch {
-      setError("Impossible de charger la file.");
-    } finally {
+  const fetchQueue = useCallback(
+    async (status: StatusFilter) => {
+      setLoading(true);
+      setError(null);
+      await run(
+        () => adminGetPayoutQueueAction(status),
+        {
+          refresh: false,
+          onSuccess: (result) => {
+            if (result.queue) setQueue(result.queue);
+          },
+        },
+      );
       setLoading(false);
-    }
-  }, [service]);
+    },
+    [run, setError],
+  );
 
-  const runAction = async (withdrawalId: string, fn: () => Promise<unknown>) => {
-    setActionState((prev) => ({ ...prev, [withdrawalId]: true }));
-    setError(null);
-    try {
-      await fn();
-      await fetchQueue(statusFilter);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      setError(PAYOUT_ENGINE_ERROR_MESSAGES[msg] ?? PAYOUT_ENGINE_ERROR_MESSAGES["unknown"] ?? "Une erreur est survenue.");
-    } finally {
+  const runAction = useCallback(
+    async (withdrawalId: string, fn: () => Promise<{ error?: string }>) => {
+      setActionState((prev) => ({ ...prev, [withdrawalId]: true }));
+      await run(fn, {
+        onSuccess: () => {
+          void fetchQueue(statusFilter);
+        },
+      });
       setActionState((prev) => ({ ...prev, [withdrawalId]: false }));
-    }
+    },
+    [run, fetchQueue, statusFilter],
+  );
+
+  const handleFilterChange = (s: StatusFilter) => {
+    setStatusFilter(s);
+    void fetchQueue(s);
   };
 
-  const handleFilterChange = (s: StatusFilter) => { setStatusFilter(s); void fetchQueue(s); };
-  const handleApprove = (id: string) => void runAction(id, () => service.approvePayoutRequest({ withdrawalId: id }));
+  const handleApprove = (id: string) => void runAction(id, () => adminApproveWithdrawalAction(id));
   const handleReject  = (id: string) => setModal({ type: "reject", withdrawalId: id, value: "" });
-  const handleProcess = (id: string) => void runAction(id, () => service.processPayoutRequest({ withdrawalId: id }));
+  const handleProcess = (id: string) => void runAction(id, () => adminProcessWithdrawalAction(id));
   const handleMarkPaid = (id: string) => setModal({ type: "mark_paid", withdrawalId: id, value: "" });
-  const handleCancel  = (id: string) => void runAction(id, () => service.cancelPayoutRequest({ withdrawalId: id }));
+  const handleCancel  = (id: string) => void runAction(id, () => adminCancelWithdrawalAction(id));
 
   const confirmModal = () => {
     if (!modal) return;
     const { type, withdrawalId, value } = modal;
     setModal(null);
     if (type === "reject") {
-      void runAction(withdrawalId, () => service.rejectPayoutRequest({ withdrawalId, reason: value }));
+      void runAction(withdrawalId, () => adminRejectWithdrawalAction(withdrawalId, value));
     } else {
-      void runAction(withdrawalId, () => service.markPayoutPaid({ withdrawalId, reference: value }));
+      void runAction(withdrawalId, () => adminMarkWithdrawalPaidAction(withdrawalId, value));
     }
   };
 
@@ -171,20 +186,20 @@ export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initial
                   <div className="flex flex-wrap gap-2">
                     {entry.status === "pending" && (
                       <>
-                        <AdminActionBtn label="Approuver" color="var(--color-vert-energie)" textColor="var(--color-noir-profond)" disabled={busy} onClick={() => handleApprove(entry.id)} />
-                        <AdminActionBtn label="Rejeter" color="rgba(255,68,68,0.13)" textColor="var(--color-erreur)" disabled={busy} onClick={() => handleReject(entry.id)} />
+                        <AdminActionBtn label="Approuver" color="var(--color-vert-energie)" textColor="var(--color-noir-profond)" disabled={busy || isPending} onClick={() => handleApprove(entry.id)} />
+                        <AdminActionBtn label="Rejeter" color="rgba(255,68,68,0.13)" textColor="var(--color-erreur)" disabled={busy || isPending} onClick={() => handleReject(entry.id)} />
                       </>
                     )}
                     {entry.status === "approved" && (
                       <>
-                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="var(--color-accent-bleu-clair)" disabled={busy} onClick={() => handleProcess(entry.id)} />
-                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy} onClick={() => handleCancel(entry.id)} />
+                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="var(--color-accent-bleu-clair)" disabled={busy || isPending} onClick={() => handleProcess(entry.id)} />
+                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
                     {entry.status === "processing" && (
                       <>
-                        <AdminActionBtn label="Marquer payé" color="rgba(0,210,106,0.13)" textColor="var(--color-vert-energie)" disabled={busy} onClick={() => handleMarkPaid(entry.id)} />
-                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy} onClick={() => handleCancel(entry.id)} />
+                        <AdminActionBtn label="Marquer payé" color="rgba(0,210,106,0.13)" textColor="var(--color-vert-energie)" disabled={busy || isPending} onClick={() => handleMarkPaid(entry.id)} />
+                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
                     {busy && <span className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>…</span>}

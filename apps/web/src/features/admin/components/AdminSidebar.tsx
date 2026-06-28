@@ -11,6 +11,7 @@ import {
 
 interface AdminSidebarProps {
   badges?: AdminNavBadges;
+  onNavigate?: () => void;
 }
 
 function isNavActive(pathname: string, href: string): boolean {
@@ -40,7 +41,7 @@ function resolveBadge(
   return null;
 }
 
-export function AdminSidebar({ badges }: AdminSidebarProps) {
+export function AdminSidebar({ badges, onNavigate }: AdminSidebarProps) {
   const pathname = usePathname();
   const resolvedBadges: AdminNavBadges = badges ?? {
     content: 0,
@@ -50,7 +51,7 @@ export function AdminSidebar({ badges }: AdminSidebarProps) {
   };
 
   return (
-    <aside className="admin-sidebar" aria-label="Navigation admin">
+    <aside id="admin-sidebar-nav" className="admin-sidebar" aria-label="Navigation admin">
       <div className="admin-sidebar-logo">
         <p className="admin-logo-brand">
           SON<span className="admin-logo-accent">AFRIK</span>
@@ -58,7 +59,7 @@ export function AdminSidebar({ badges }: AdminSidebarProps) {
         <span className="admin-logo-badge">Back-office</span>
       </div>
 
-      <Link href="/listen" className="admin-sidebar-back">
+      <Link href="/listen" className="admin-sidebar-back" onClick={onNavigate}>
         ← Retour à l&apos;app
       </Link>
 
@@ -72,6 +73,7 @@ export function AdminSidebar({ badges }: AdminSidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onNavigate}
                 className={`admin-nav-item${active ? " admin-nav-item--active" : ""}`}
                 aria-current={active ? "page" : undefined}
               >

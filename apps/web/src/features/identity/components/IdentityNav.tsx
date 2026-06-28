@@ -1,5 +1,6 @@
 import { SidebarNav } from "@/components/SidebarNav";
 import type { SidebarNavItem } from "@/components/SidebarNav";
+import { IDENTITY_NAV_ENTRIES } from "../lib/identityNavConfig";
 
 interface IdentityNavProps {
   activePath: string;
@@ -7,16 +8,12 @@ interface IdentityNavProps {
 }
 
 export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNavProps) {
-  const items: SidebarNavItem[] = [
-    { href: "/profile", label: "Mon profil", exact: true },
-    { href: "/profile/edit", label: "Modifier le profil" },
-    { href: "/settings/account", label: "Mon compte" },
-    { href: "/settings/sessions", label: "Sécurité" },
-    { href: "/settings/notifications", label: "Notifications", badge: unreadNotifications },
-    { href: "/settings/payment", label: "Paiements" },
-    { href: "/settings/preferences", label: "Préférences" },
-    { href: "/settings/help", label: "Aide" },
-  ];
+  const items: SidebarNavItem[] = IDENTITY_NAV_ENTRIES.map((item) => ({
+    href: item.href,
+    label: item.label,
+    exact: item.exact,
+    badge: item.href === "/settings/notifications" ? unreadNotifications : undefined,
+  }));
 
   return (
     <SidebarNav
