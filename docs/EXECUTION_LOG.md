@@ -11,6 +11,33 @@
 
 ---
 
+## 2026-06-27 — Profile Phase 9 : Musical DNA Engine
+
+### Fichiers touchés
+- `lib/profileMusicalDna/` — types, registry, adapters, interpretations, buildMusicalDna (moteur data-driven, extensible IA)
+- `ProfileMusicalDnaSection.tsx` + `ProfileMusicalDnaSpectrum.tsx` + `ProfileMusicalDnaInterpretation.tsx`
+- `identity-musical-dna.css` — carte premium « Mon ADN Musical »
+- `ProfileHeader.tsx` — insertion après Identité musicale, avant Story (seul fichier profil modifié hors module)
+- `globals.css` — import CSS DNA
+
+### Architecture
+- ADN calculé depuis profil + activité (pas de formulaire)
+- Registre catégories (genres, langues, régions, styles, influences) + adaptateurs futurs (`DNA_SOURCE_ADAPTERS`)
+- Visualisations modulaires : bar, stack, ring, radial
+- Interprétations data-driven (`DNA_INTERPRETATIONS`) — prêt pour IA
+- Accent culture guinéenne (`guinea` variant, langues nationales, régions)
+
+### Validation
+- `pnpm lint` + `typecheck` + `build` — ✅
+- Aucune: API, DB, Hero, Journey, Rewards, Goals, Story, navigation
+
+### Tests à faire
+- [ ] `/profile` — carte « Mon ADN Musical » visible entre Identité et Story
+- [ ] Profil GN + langue nationale → accent guinéen affiché
+- [ ] Responsive mobile/tablet/desktop sans débordement
+
+---
+
 ## 2026-06-28 — Listen P5 : Audit fonctionnalités futur + activation flags
 
 ### Cause racine

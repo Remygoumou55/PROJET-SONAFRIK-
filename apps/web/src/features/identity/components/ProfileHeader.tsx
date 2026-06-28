@@ -4,6 +4,7 @@ import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
 import { ProfileGoalsSection } from "./ProfileGoalsSection";
 import { ProfileJourneySection } from "./ProfileJourneySection";
+import { ProfileMusicalDnaSection } from "./ProfileMusicalDnaSection";
 import { ProfileMusicalIdentitySection } from "./ProfileMusicalIdentitySection";
 import { ProfileRewardsSection } from "./ProfileRewardsSection";
 import { ProfileStorySection } from "./ProfileStorySection";
@@ -25,6 +26,12 @@ export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderPro
       <ProfileHeroPassport context={context} avatarUrl={avatarUrl} />
 
       <ProfileMusicalIdentitySection identity={musicalIdentity} />
+
+      <ProfileMusicalDnaSection
+        profile={context.profile}
+        activity={activity}
+        isArtist={isArtist}
+      />
 
       <ProfileStorySection
         profile={context.profile}

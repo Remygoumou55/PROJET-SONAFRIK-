@@ -1,0 +1,466 @@
+/* ── Musical DNA Engine — Phase 9 ── */
+
+.identity-dna {
+  margin-top: 1.25rem;
+  border: 1px solid var(--color-bordure);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgb(0 210 106 / 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 40% at 100% 80%, rgb(255 193 7 / 0.05) 0%, transparent 55%),
+    var(--color-surface);
+  padding: 1.5rem;
+}
+
+.identity-dna__header {
+  margin-bottom: 1.25rem;
+}
+
+.identity-dna__title {
+  color: var(--color-texte-principal);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.identity-dna__subtitle {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.4rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  max-width: 38rem;
+}
+
+/* ── Evolution summary ── */
+
+.identity-dna__evolution {
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.02);
+  padding: 1.125rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.identity-dna__evolution-meta {
+  display: inline-block;
+}
+
+.identity-dna__evolution-percent {
+  display: block;
+  color: var(--color-vert-energie);
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.identity-dna__evolution-label {
+  color: var(--color-texte-secondaire);
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.identity-dna__evolution-stats {
+  color: var(--color-texte-secondaire);
+  font-size: 0.8125rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.identity-dna__evolution-stats strong {
+  color: var(--color-texte-principal);
+  font-weight: 700;
+}
+
+.identity-dna__evolution-track {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.identity-dna__evolution-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-vert-energie), var(--color-or-solaire));
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Interpretation ── */
+
+.identity-dna-interpretation {
+  border-left: 3px solid var(--color-or-solaire);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  background: rgb(255 193 7 / 0.04);
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.identity-dna-interpretation__headline {
+  color: var(--color-texte-principal);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 0.35rem;
+}
+
+.identity-dna-interpretation__detail {
+  color: var(--color-texte-secondaire);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.identity-dna-interpretation__guinea {
+  color: var(--color-or-solaire);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 0.625rem;
+}
+
+/* ── Category grid ── */
+
+.identity-dna__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .identity-dna__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .identity-dna__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Spectrum card ── */
+
+.identity-dna-spectrum {
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.02);
+  padding: 1rem;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.identity-dna-spectrum:hover,
+.identity-dna-spectrum:focus-within {
+  border-color: rgb(0 210 106 / 0.22);
+  background: rgb(255 255 255 / 0.035);
+  transform: translateY(-1px);
+}
+
+.identity-dna-spectrum__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+
+.identity-dna-spectrum__icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.identity-dna-spectrum__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.identity-dna-spectrum__title {
+  color: var(--color-texte-principal);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.identity-dna-spectrum__badge {
+  display: inline-block;
+  color: var(--color-texte-subtil);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.2rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 99px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+}
+
+/* ── Bar visualization ── */
+
+.identity-dna-spectrum__bars {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.identity-dna-spectrum__bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.identity-dna-spectrum__bar-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.identity-dna-spectrum__bar-label {
+  color: var(--color-texte-secondaire);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.identity-dna-spectrum__bar-value {
+  color: var(--color-texte-subtil);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.identity-dna-spectrum__bar-track {
+  height: 4px;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.08);
+  overflow: hidden;
+}
+
+.identity-dna-spectrum__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.identity-dna-spectrum__bar-fill--default {
+  background: rgb(255 255 255 / 0.45);
+}
+
+.identity-dna-spectrum__bar-fill--guinea {
+  background: var(--color-or-solaire);
+}
+
+.identity-dna-spectrum__bar-fill--accent {
+  background: var(--color-vert-energie);
+}
+
+.identity-dna-spectrum__bar-fill--emerging,
+.identity-dna-spectrum__bar-fill--placeholder {
+  background: rgb(255 255 255 / 0.22);
+}
+
+/* ── Stack visualization ── */
+
+.identity-dna-spectrum__stack {
+  display: flex;
+  height: 0.625rem;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.identity-dna-spectrum__stack-segment {
+  min-width: 2px;
+  transition: flex-grow 0.4s ease;
+}
+
+/* ── Ring visualization ── */
+
+.identity-dna-spectrum__ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.identity-dna-spectrum__ring {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.identity-dna-spectrum:hover .identity-dna-spectrum__ring {
+  transform: scale(1.03);
+}
+
+.identity-dna-spectrum__ring-hole {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.25rem;
+}
+
+.identity-dna-spectrum__ring-value {
+  color: var(--color-vert-energie);
+  font-size: 0.875rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.identity-dna-spectrum__ring-caption {
+  color: var(--color-texte-subtil);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  margin-top: 0.15rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Radial visualization ── */
+
+.identity-dna-spectrum__radial-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.identity-dna-spectrum__radial-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 4.5rem;
+  max-width: 5.5rem;
+  text-align: center;
+}
+
+.identity-dna-spectrum__radial-bubble {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.identity-dna-spectrum__radial-label {
+  color: var(--color-texte-secondaire);
+  font-size: 0.625rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.identity-dna-spectrum__radial-value {
+  color: var(--color-texte-subtil);
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Legend ── */
+
+.identity-dna-spectrum__legend {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.identity-dna-spectrum__legend--compact {
+  margin-top: 0;
+}
+
+.identity-dna-spectrum__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.6875rem;
+}
+
+.identity-dna-spectrum__legend-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.identity-dna-spectrum__legend-label {
+  color: var(--color-texte-secondaire);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity-dna-spectrum__legend-value {
+  color: var(--color-texte-subtil);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 639px) {
+  .identity-dna {
+    padding: 1.125rem;
+  }
+
+  .identity-dna__evolution-percent {
+    font-size: 1.625rem;
+  }
+
+  .identity-dna-spectrum__ring {
+    width: 4.75rem;
+    height: 4.75rem;
+  }
+
+  .identity-dna-spectrum__ring-hole {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* ── Focus accessibility ── */
+
+.identity-dna-spectrum:focus-within {
+  outline: 2px solid var(--color-vert-energie);
+  outline-offset: 2px;
+}
+
+.identity-dna-interpretation:focus-within {
+  outline: 2px solid var(--color-or-solaire);
+  outline-offset: 2px;
+}
