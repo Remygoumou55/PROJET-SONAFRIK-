@@ -2,11 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SearchResult, SearchType } from "@sonafrik/types";
-import {
-  buildSearchCacheKey,
-  getCachedSearchResult,
-  setCachedSearchResult,
-} from "@sonafrik/shared/performance";
+import { ldseCache } from "@/features/shared/ldse/cache";
+import { searchLdseKey } from "@/features/shared/ldse/search/search-ldse-config";
 import { usePerformanceFlags } from "@/lib/performance";
 import { useStreamingService } from "./useStreaming";
 
@@ -31,10 +28,10 @@ export function useSearch(beatStoreEnabled = false) {
 
       debounceRef.current = setTimeout(async () => {
         const currentId = ++searchIdRef.current;
-        const cacheKey = buildSearchCacheKey(query, type);
+        const cacheKey = searchLdseKey(query, type, beatStoreEnabled);
 
         if (cacheEnabled) {
-          const cached = getCachedSearchResult(cacheKey);
+          const cached = ldseCache.get<SearchResult>(cacheKey);
           if (cached) {
             if (currentId === searchIdRef.current) {
               setResults(cached);
@@ -57,7 +54,7 @@ export function useSearch(beatStoreEnabled = false) {
           if (currentId === searchIdRef.current) {
             setResults(data);
             if (cacheEnabled) {
-              setCachedSearchResult(cacheKey, data);
+              ldseCache.set(cacheKey, data, 120_000);
             }
           }
         } catch {

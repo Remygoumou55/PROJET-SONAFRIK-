@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { ArtistResult, TrackWithMeta } from "@sonafrik/types";
 import { filterValidArtists, filterValidTracks } from "@/lib/content-filter";
+import { ldseCache } from "@/features/shared/ldse/cache";
+import { searchLdseKey } from "@/features/shared/ldse/search/search-ldse-config";
 import { useStreamingService } from "./useStreaming";
 
 const DEBOUNCE_MS = 200;
@@ -34,12 +36,24 @@ export function useSmartSearch() {
     }
 
     const currentId = ++searchIdRef.current;
+    const cacheKey = searchLdseKey(debouncedQuery, "all", false);
+    const cached = ldseCache.get<{ artists: ArtistResult[]; tracks: TrackWithMeta[] }>(cacheKey);
+    if (cached) {
+      setResults({
+        artists: filterValidArtists(cached.artists).slice(0, MAX_PER_TYPE),
+        tracks: filterValidTracks(cached.tracks).slice(0, MAX_PER_TYPE),
+      });
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
 
     void streaming
       .search({ query: debouncedQuery, limit: MAX_PER_TYPE, type: "all" })
       .then((data) => {
         if (currentId !== searchIdRef.current) return;
+        ldseCache.set(cacheKey, data, 120_000);
         setResults({
           artists: filterValidArtists(data.artists).slice(0, MAX_PER_TYPE),
           tracks: filterValidTracks(data.tracks).slice(0, MAX_PER_TYPE),

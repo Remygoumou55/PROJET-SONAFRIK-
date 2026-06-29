@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { AdminLiveSnapshot, AdminNavBadges, AdminFraudMetrics, AdminModerationMetrics, AdminUserMetrics } from "@sonafrik/api/admin";
-import { refreshAdminLiveSnapshotAction } from "@/features/admin/actions/admin-ldse.actions";
+import { fetchAdminLiveSnapshot } from "@/features/admin/lib/adminLdseClient";
 import { ldseCache } from "@/features/shared/ldse/cache";
 import { ldseEventBus } from "@/features/shared/ldse/event-bus";
 import { registerLdseInvalidationRule } from "@/features/shared/ldse/invalidate-map";
@@ -119,7 +119,7 @@ export function AdminLdseProvider({ initialSnapshot, children }: Props) {
   const refreshSnapshot = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const next = await refreshAdminLiveSnapshotAction();
+      const next = await fetchAdminLiveSnapshot();
       ldseCache.set(ADMIN_LDSE_KEYS.liveSnapshot, next, 60_000);
       ldseCache.set(ADMIN_LDSE_KEYS.navBadges, next.navBadges, 60_000);
       ldseCache.set(ADMIN_LDSE_KEYS.fraudMetrics, next.fraudMetrics, 60_000);

@@ -31,7 +31,7 @@ export function mergeAdminLiveData(
       pendingWithdrawals: moderationMetrics.pendingWithdrawals,
       pendingArtistVerif: moderationMetrics.pendingArtistVerifications,
       pendingCatalog: moderationMetrics.pendingCatalog,
-      fraudSessions: fraudMetrics.flaggedThisMonth,
+      fraudSessions: fraudMetrics.totalFlagged,
     },
   };
 

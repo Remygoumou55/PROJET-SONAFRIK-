@@ -3,6 +3,7 @@ import type { AdminFraudIncident } from "@sonafrik/api/admin";
 import {
   buildIncidentHeadline,
   resolveIncidentSeverity,
+  SEVERITY_META,
   type FraudSeverity,
 } from "./humanizeFraudIncident";
 import { countryLabel, parseDeviceLabel } from "./fraudDisplayHelpers";
@@ -76,7 +77,7 @@ export function useFraudIncidentFilters(
   adminStates: Record<string, FraudIncidentAdminState>,
 ) {
   return useMemo(() => {
-    return incidents.filter((incident) => {
+    const filtered = incidents.filter((incident) => {
       const state = adminStates[incident.id];
       if (state?.hidden) return false;
 
@@ -118,6 +119,13 @@ export function useFraudIncidentFilters(
       }
 
       return true;
+    });
+
+    return filtered.sort((a, b) => {
+      const sa = SEVERITY_META[resolveIncidentSeverity(a.fraud_flags)].priority;
+      const sb = SEVERITY_META[resolveIncidentSeverity(b.fraud_flags)].priority;
+      if (sb !== sa) return sb - sa;
+      return new Date(b.started_at).getTime() - new Date(a.started_at).getTime();
     });
   }, [incidents, filters, adminStates]);
 }

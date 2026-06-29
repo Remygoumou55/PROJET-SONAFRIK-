@@ -6,6 +6,8 @@ import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Track } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types/catalog";
 import { FIELD_LIMITS } from "@sonafrik/shared/field-limits";
+import { publishCreatorLdseEvent } from "@/features/shared/ldse/creator/publishCreatorLdseEvent";
+import { CREATOR_LDSE_EVENTS } from "@/features/shared/ldse/creator/creator-ldse-config";
 import { useCatalogService } from "../hooks/useCatalog";
 
 const AudioUploader = dynamic(
@@ -45,6 +47,7 @@ export function TrackList({
     try {
       const track = await catalog.createTrack({ title, isrc: isrc || null });
       setTracks((current) => [track, ...current]);
+      publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.trackUpdated, creatorId, { trackId: track.id });
       setTitle("");
       setIsrc("");
     } catch (err) {
@@ -63,6 +66,7 @@ export function TrackList({
     setTracks((current) =>
       current.map((t) => t.id === trackId ? { ...t, publication_status: "pending_review" } : t),
     );
+    publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.trackPublished, creatorId, { trackId });
   }
 
   return (

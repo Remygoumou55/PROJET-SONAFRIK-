@@ -5,12 +5,14 @@ export const ADMIN_LDSE_KEYS = {
   fraudMetrics: "admin:fraud-metrics",
   moderationMetrics: "admin:moderation-metrics",
   userMetrics: "admin:user-metrics",
+  analyticsDashboard: "admin:analytics-dashboard",
 } as const;
 
 /** Événements métier admin — Event Bus LDSE */
 export const ADMIN_LDSE_EVENTS = {
   snapshotRefreshed: "admin.snapshot.refreshed",
   snapshotInvalidate: "admin.snapshot.invalidate",
+  analyticsRefreshed: "admin.analytics.refreshed",
   fraudUpdated: "fraud.updated",
   fraudCreated: "fraud.created",
   userUpdated: "admin.user.updated",

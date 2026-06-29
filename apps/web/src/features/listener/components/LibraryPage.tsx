@@ -6,7 +6,7 @@ import type { AlbumWithMeta, LibraryItem, TrackWithMeta } from "@sonafrik/types"
 import { LibraryList } from "./LibraryList";
 import { CreatePlaylistModal } from "./CreatePlaylistModal";
 import { FavoritesList } from "./FavoritesList";
-import { useLibrary } from "../hooks/useLibrary";
+import { useLibraryLdse } from "../lib/libraryLdseContext";
 
 type Tab = "playlists" | "favoris";
 
@@ -15,7 +15,7 @@ export function LibraryPage() {
   const initialTab = searchParams.get("tab") === "favoris" ? "favoris" : "playlists";
   const [tab, setTab] = useState<Tab>(initialTab);
   const [modalOpen, setModalOpen] = useState(false);
-  const { library, isLoading, error, createPlaylist } = useLibrary();
+  const { library, isLoading, error, createPlaylist } = useLibraryLdse();
 
   useEffect(() => {
     setTab(searchParams.get("tab") === "favoris" ? "favoris" : "playlists");

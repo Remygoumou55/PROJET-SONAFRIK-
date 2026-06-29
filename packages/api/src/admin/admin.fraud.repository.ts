@@ -27,18 +27,6 @@ type SessionRow = {
   user_agent: string | null;
 };
 
-function startOfTodayIso(): string {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString();
-}
-
-function isCritical(flags: string[]): boolean {
-  return flags.some((f) =>
-    ["multi_session_start", "bot_pattern", "duplicate_session"].includes(f),
-  );
-}
-
 export class AdminFraudRepository {
   constructor(
     private readonly client: SonafrikSupabaseClient,
@@ -70,58 +58,7 @@ export class AdminFraudRepository {
   }
 
   async getFraudSupervisionStats(): Promise<AdminFraudSupervisionStats> {
-    const todayStart = startOfTodayIso();
-
-    const [fraudMetrics, todayRes, criticalRes, validTodayRes, rejectedTodayRes, activeRes] =
-      await Promise.all([
-        this.metrics.getFraudMetrics(),
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .gte("started_at", todayStart),
-        this.client
-          .from("stream_sessions")
-          .select("fraud_flags")
-          .gte("started_at", todayStart)
-          .filter("fraud_flags", "neq", "{}")
-          .limit(500),
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .gte("started_at", todayStart)
-          .eq("is_valid_listen", true)
-          .filter("fraud_flags", "eq", "{}"),
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .gte("started_at", todayStart)
-          .eq("is_valid_listen", false),
-        this.client
-          .from("stream_sessions")
-          .select("*", { count: "exact", head: true })
-          .is("completed_at", null)
-          .gte("last_heartbeat_at", new Date(Date.now() - 5 * 60 * 1000).toISOString()),
-      ]);
-
-    const criticalRows = (criticalRes.data ?? []) as { fraud_flags: string[] }[];
-    const criticalIncidents = criticalRows.filter((r) => isCritical(r.fraud_flags)).length;
-
-    const { count: suspendedHint } = await this.client
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .gte("fraud_score", 70);
-
-    return {
-      todayTotal: todayRes.count ?? 0,
-      activeSessions: activeRes.count ?? 0,
-      fraudDetectedToday: fraudMetrics.flaggedToday,
-      criticalIncidents,
-      normalSessionsToday: validTodayRes.count ?? 0,
-      suspendedAccountsHint: suspendedHint ?? 0,
-      validListensToday: validTodayRes.count ?? 0,
-      rejectedListensToday: rejectedTodayRes.count ?? 0,
-      totalFlagged: fraudMetrics.totalFlagged,
-    };
+    return this.metrics.getFraudSupervisionStats();
   }
 
   async listSessionStreamEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {

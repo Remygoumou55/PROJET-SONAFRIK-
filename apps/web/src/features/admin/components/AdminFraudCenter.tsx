@@ -10,6 +10,7 @@ import { useAdminFraudMetrics } from "@/features/shared/ldse/admin/AdminLdseProv
 import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
 import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { loadFraudIncidentsPageAction } from "../actions/admin-fraud.actions";
+import { fetchFraudSupervisionStats } from "../lib/adminLdseClient";
 import {
   addFraudIncidentNote,
   bulkPatchFraudIncidents,
@@ -37,16 +38,22 @@ const SERVER_PAGE = 200;
 interface Props {
   initialPage: AdminFraudIncidentsPage;
   stats: AdminFraudSupervisionStats;
+  initialFilters?: FraudFilterState;
 }
 
-export function AdminFraudCenter({ initialPage, stats }: Props) {
-  const liveFraudMetrics = useAdminFraudMetrics({ totalFlagged: stats.totalFlagged, flaggedThisMonth: 0, flaggedToday: stats.fraudDetectedToday });
+export function AdminFraudCenter({ initialPage, stats, initialFilters }: Props) {
+  const liveFraudMetrics = useAdminFraudMetrics({
+    totalFlagged: stats.totalFlagged,
+    flaggedThisMonth: stats.flaggedThisMonth,
+    flaggedToday: stats.flaggedToday,
+  });
+  const [supervisionStats, setSupervisionStats] = useState(stats);
   const [incidents, setIncidents] = useState<AdminFraudIncident[]>(initialPage.items);
   const [totalRemote, setTotalRemote] = useState(initialPage.total);
   const [remoteOffset, setRemoteOffset] = useState(initialPage.items.length);
   const [loadingMoreRemote, setLoadingMoreRemote] = useState(false);
 
-  const [filters, setFilters] = useState<FraudFilterState>(DEFAULT_FRAUD_FILTERS);
+  const [filters, setFilters] = useState<FraudFilterState>(initialFilters ?? DEFAULT_FRAUD_FILTERS);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [adminStates, setAdminStates] = useState<Record<string, FraudIncidentAdminState>>({});
@@ -61,21 +68,37 @@ export function AdminFraudCenter({ initialPage, stats }: Props) {
     setTotalRemote(liveFraudMetrics.totalFlagged);
   }, [liveFraudMetrics.totalFlagged]);
 
-  useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, () => {
-    void loadFraudIncidentsPageAction(0, SERVER_PAGE).then((page) => {
+  const refreshLiveData = useCallback(() => {
+    void Promise.all([
+      loadFraudIncidentsPageAction(0, SERVER_PAGE),
+      fetchFraudSupervisionStats(),
+    ]).then(([page, nextStats]) => {
       setIncidents(page.items);
       setRemoteOffset(page.items.length);
       setTotalRemote(page.total);
+      setSupervisionStats(nextStats);
     });
-  });
+  }, []);
+
+  useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, refreshLiveData);
+  useLdseEvent(ADMIN_LDSE_EVENTS.fraudUpdated, refreshLiveData);
 
   const mergedStats = useMemo(
     () => ({
-      ...stats,
+      ...supervisionStats,
       totalFlagged: liveFraudMetrics.totalFlagged,
-      fraudDetectedToday: liveFraudMetrics.flaggedToday || stats.fraudDetectedToday,
+      totalIncidents: liveFraudMetrics.totalFlagged,
+      flaggedToday: liveFraudMetrics.flaggedToday,
+      fraudDetectedToday: liveFraudMetrics.flaggedToday,
+      suspicionsToday: liveFraudMetrics.flaggedToday,
+      flaggedThisMonth: liveFraudMetrics.flaggedThisMonth,
     }),
-    [stats, liveFraudMetrics.totalFlagged, liveFraudMetrics.flaggedToday],
+    [
+      supervisionStats,
+      liveFraudMetrics.totalFlagged,
+      liveFraudMetrics.flaggedToday,
+      liveFraudMetrics.flaggedThisMonth,
+    ],
   );
 
   const filtered = useFraudIncidentFilters(incidents, filters, adminStates);
@@ -207,6 +230,7 @@ export function AdminFraudCenter({ initialPage, stats }: Props) {
         }}
         resultCount={filtered.length}
         totalLoaded={incidents.length}
+        ssotTotal={mergedStats.totalIncidents}
       />
 
       <FraudBulkActionBar

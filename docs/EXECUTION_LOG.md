@@ -11,7 +11,32 @@
 
 ---
 
-## 2026-06-28 — LDSE v2 : moderation + users SSOT + notifications
+## 2026-06-29 — Back Office Fraude : SSOT supervision enterprise
+
+### Fichiers touchés
+- `packages/api/src/admin/admin.metrics.repository.ts` — `getFraudSupervisionStats()` SSOT unique (hiérarchie + UTC)
+- `packages/api/src/admin/admin.fraud.hierarchy.ts` — tiers métier événement/incident/suspicion/fraude
+- `packages/api/src/admin/admin.fraud.coherence.ts` + test Vitest — validateurs KPI
+- `packages/api/src/admin/admin.fraud.repository.ts` — délégation metrics (suppression cap 500)
+- `apps/web/src/features/admin/components/fraud/FraudSupervisionDashboard.tsx` — 3 zones (plateforme/sécurité/qualité)
+- `apps/web/src/features/admin/components/fraud/FraudIncidentDrawer.tsx` — aide à la décision
+- `apps/web/src/features/admin/components/fraud/FraudIncidentTimeline.tsx` — chronologie intelligente
+- `apps/web/src/app/api/admin/ldse/fraud-supervision/route.ts` — refresh LDSE stable
+- `apps/web/src/features/admin/lib/mergeAdminLiveData.ts` — cockpit alerts = `totalFlagged` SSOT
+- `apps/web/src/app/(admin)/admin/fraud/page.tsx` — deep link `?filter=fraud`
+
+### Problèmes corrigés
+- Sidebar 387 vs cockpit « 12 ce mois » → un seul compteur SSOT `totalFlagged`
+- Comptage critiques plafonné à 500 lignes → count DB overlap
+- Doublon « écoutes normales » / « écoutes valides »
+- KPI supervision stale après Realtime → fetch `/api/admin/ldse/fraud-supervision`
+- `?filter=fraud` ignoré depuis dashboard
+
+### Validation
+- `pnpm build` + `pnpm lint` + `pnpm typecheck` ✅
+- Vitest `admin.fraud.coherence.test.ts` 3/3 ✅
+
+---
 
 ### Fichiers touchés
 - `packages/api/src/admin/admin.metrics.repository.ts` — `getModerationMetrics()`, `getUserMetrics()`, `buildNavBadges()`

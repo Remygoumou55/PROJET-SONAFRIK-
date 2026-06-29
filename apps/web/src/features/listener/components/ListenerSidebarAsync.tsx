@@ -2,6 +2,7 @@
 
 import { Suspense, use } from "react";
 import type { ListenerSidebarData } from "@sonafrik/types";
+import { useListenSidebarLdse } from "@/features/shared/ldse/listener/useListenSidebarLdse";
 import { ListenerDesktopSidebar } from "./ListenerDesktopSidebar";
 
 function SidebarSkeleton() {
@@ -21,16 +22,20 @@ function SidebarSkeleton() {
 }
 
 function SidebarWithData({
+  userId,
   sidebarDataPromise,
 }: {
+  userId: string;
   sidebarDataPromise: Promise<ListenerSidebarData>;
 }) {
-  const sidebarData = use(sidebarDataPromise);
+  const initial = use(sidebarDataPromise);
+  const sidebarData = useListenSidebarLdse(userId, initial);
   return <ListenerDesktopSidebar sidebarData={sidebarData} />;
 }
 
 export function ListenerSidebarAsync({
   sidebarDataPromise,
+  userId,
 }: {
   sidebarDataPromise: Promise<ListenerSidebarData>;
   userId: string;
@@ -38,7 +43,7 @@ export function ListenerSidebarAsync({
 }) {
   return (
     <Suspense fallback={<SidebarSkeleton />}>
-      <SidebarWithData sidebarDataPromise={sidebarDataPromise} />
+      <SidebarWithData userId={userId} sidebarDataPromise={sidebarDataPromise} />
     </Suspense>
   );
 }

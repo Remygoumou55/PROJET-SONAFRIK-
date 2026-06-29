@@ -14,6 +14,10 @@ import type {
   PayoutAccount,
   RoyaltyCalculation,
 } from "@sonafrik/types";
+import { ldseCache } from "@/features/shared/ldse/cache";
+import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
+import { WALLET_LDSE_EVENTS, WALLET_LDSE_KEYS } from "@/features/shared/ldse/wallet/wallet-ldse-config";
+import { publishWalletLdseEvent } from "@/features/shared/ldse/wallet/publishWalletLdseEvent";
 import { useWalletService } from "../lib/walletServiceContext";
 
 export function useWallet() {
@@ -138,38 +142,58 @@ export function useRequestWithdrawal() {
   const service = useWalletService();
 
   return useCallback(async (input: RequestWithdrawalInput) => {
-    return service.requestWithdrawal(input);
+    const result = await service.requestWithdrawal(input);
+    publishWalletLdseEvent(WALLET_LDSE_EVENTS.withdrawalRequested);
+    return result;
   }, [service]);
 }
 
-/** Charge comptes de retrait + historique en parallèle — une seule phase de chargement pour PayoutPage. */
+/** Charge comptes de retrait + historique en parallèle — SSOT LDSE payout page. */
 export function usePayoutPageData() {
   const service = useWalletService();
+  const cacheKey = WALLET_LDSE_KEYS.payoutPage;
   const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const reload = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const cached = ldseCache.get<{ accounts: PayoutAccount[]; withdrawals: Withdrawal[] }>(cacheKey);
+      if (cached) {
+        setAccounts(cached.accounts);
+        setWithdrawals(cached.withdrawals);
+      }
+      const [accs, wds] = await Promise.all([
+        service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
+        service.getWithdrawals().catch(() => [] as Withdrawal[]),
+      ]);
+      ldseCache.set(cacheKey, { accounts: accs, withdrawals: wds }, 30_000);
+      setAccounts(accs);
+      setWithdrawals(wds);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [service, cacheKey]);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  useLdseEvent(WALLET_LDSE_EVENTS.invalidate, () => {
+    void reload();
+  });
+
   const reloadAccounts = useCallback(async () => {
     const data = await service.getPayoutAccounts().catch(() => [] as PayoutAccount[]);
     setAccounts(data);
-  }, [service]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    Promise.all([
-      service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
-      service.getWithdrawals().catch(() => [] as Withdrawal[]),
-    ])
-      .then(([accs, wds]) => {
-        setAccounts(accs);
-        setWithdrawals(wds);
-      })
-      .finally(() => { setIsLoading(false); });
-  }, [service]);
+    ldseCache.set(cacheKey, { accounts: data, withdrawals }, 30_000);
+  }, [service, cacheKey, withdrawals]);
 
   const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
     try {
       await service.addPayoutAccount(input);
+      publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
       await reloadAccounts();
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
@@ -179,6 +203,7 @@ export function usePayoutPageData() {
   const removeAccount = useCallback(async (id: string) => {
     try {
       await service.removePayoutAccount(id);
+      publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
       await reloadAccounts();
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
@@ -190,16 +215,34 @@ export function usePayoutPageData() {
 
 export function useRoyalties() {
   const service = useWalletService();
+  const cacheKey = WALLET_LDSE_KEYS.royalties;
   const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    service.getRoyaltyCalculations()
-      .then(setRoyalties)
-      .catch(() => setError("Impossible de charger les royalties."))
-      .finally(() => setIsLoading(false));
-  }, [service]);
+  const reload = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const cached = ldseCache.get<RoyaltyCalculation[]>(cacheKey);
+      if (cached) setRoyalties(cached);
+      const data = await service.getRoyaltyCalculations();
+      ldseCache.set(cacheKey, data, 60_000);
+      setRoyalties(data);
+    } catch {
+      setError("Impossible de charger les royalties.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [service, cacheKey]);
 
-  return { royalties, isLoading, error };
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  useLdseEvent(WALLET_LDSE_EVENTS.invalidate, () => {
+    void reload();
+  });
+
+  return { royalties, isLoading, error, reload };
 }

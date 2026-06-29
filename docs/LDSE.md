@@ -138,7 +138,10 @@ window.__SONAFRIK_LDSE__() // cache hits, events, subscriptions Realtime
 ## Migration progressive
 
 1. Admin (v1 — fait)
-2. Notifications + social
-3. Creator catalog
-4. Listener library
-5. Wallet (tests obligatoires)
+2. Notifications + social (v2 — fait)
+3. Listener library + sidebar + search (v2 — fait)
+4. Creator catalog mutations (v2 — fait)
+5. Wallet + identity (v2 — fait)
+6. Creator analytics refresh client (v3)
+7. Listener reactions → service layer (v3)
+8. Wallet Vitest (TEST-WALLET — bloquant prod)

@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Album } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS, RELEASE_TYPE_LABELS } from "@sonafrik/types/catalog";
 import { FIELD_LIMITS } from "@sonafrik/shared/field-limits";
+import { publishCreatorLdseEvent } from "@/features/shared/ldse/creator/publishCreatorLdseEvent";
+import { CREATOR_LDSE_EVENTS } from "@/features/shared/ldse/creator/creator-ldse-config";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CoverUploader } from "./CoverUploader";
 import { CoverImage } from "@/components/CoverImage";
@@ -13,7 +14,6 @@ import { CoverImage } from "@/components/CoverImage";
 const UPC_MAX = 14;
 
 export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; creatorId: string }) {
-  const router = useRouter();
   const catalog = useCatalogService();
   const [albums, setAlbums] = useState(initial);
   const [title, setTitle] = useState("");
@@ -34,7 +34,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
       setAlbums((current) => [album, ...current]);
       setTitle("");
       setUpc("");
-      router.refresh();
+      publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.catalogInvalidate, creatorId, { albumId: album.id });
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
         a.id === albumId ? { ...a, publication_status: "pending_review" } : a,
       ),
     );
-    router.refresh();
+    publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.albumPublished, creatorId, { albumId });
   }
 
   return (
@@ -123,7 +123,9 @@ export function ReleaseList({ albums: initial, creatorId }: { albums: Album[]; c
                   creatorId={creatorId}
                   onSuccess={() => {
                     setExpandedCover(null);
-                    router.refresh();
+                    publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.catalogInvalidate, creatorId, {
+                      albumId: album.id,
+                    });
                   }}
                 />
                 <button

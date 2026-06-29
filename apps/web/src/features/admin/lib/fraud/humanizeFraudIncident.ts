@@ -156,10 +156,88 @@ export function humanizeStreamEventType(eventType: string): { label: string; emo
 
 export const SEVERITY_META: Record<
   FraudSeverity,
-  { label: string; emoji: string; cssClass: string }
+  { label: string; emoji: string; cssClass: string; priority: number }
 > = {
-  info: { label: "Information", emoji: "ℹ️", cssClass: "fraud-severity--info" },
-  attention: { label: "Attention", emoji: "🟡", cssClass: "fraud-severity--attention" },
-  important: { label: "Important", emoji: "🟠", cssClass: "fraud-severity--important" },
-  critical: { label: "Critique", emoji: "🔴", cssClass: "fraud-severity--critical" },
+  info: { label: "Information", emoji: "ℹ️", cssClass: "fraud-severity--info", priority: 0 },
+  attention: { label: "Faible", emoji: "🟡", cssClass: "fraud-severity--attention", priority: 1 },
+  important: { label: "Moyen", emoji: "🟠", cssClass: "fraud-severity--important", priority: 2 },
+  critical: { label: "Critique", emoji: "🔴", cssClass: "fraud-severity--critical", priority: 3 },
 };
+
+export interface IncidentDecisionAid {
+  confidencePercent: number;
+  why: string;
+  impact: string;
+  analysis: string;
+  recommendedAction: string;
+  businessTier: "event" | "incident" | "suspicion" | "fraud";
+}
+
+export function buildIncidentDecisionAid(
+  flags: string[],
+  isValidListen: boolean,
+  listenPercentage: number,
+): IncidentDecisionAid {
+  const severity = resolveIncidentSeverity(flags);
+  const humanized = humanizeFraudFlags(flags);
+  const hasBot = flags.includes("bot_pattern");
+  const hasDuplicate = flags.includes("duplicate_session");
+  const hasMulti = flags.includes("multi_session_start");
+
+  let businessTier: IncidentDecisionAid["businessTier"] = "event";
+  if (hasBot || hasDuplicate) businessTier = "fraud";
+  else if (flags.length > 0) businessTier = "suspicion";
+  else if (!isValidListen) businessTier = "incident";
+
+  const confidencePercent =
+    severity === "critical"
+      ? hasBot || hasDuplicate
+        ? 96
+        : 91
+      : severity === "important"
+        ? 78
+        : severity === "attention"
+          ? 62
+          : isValidListen
+            ? 45
+            : 55;
+
+  const primary = humanized[0];
+  const why =
+    flags.length > 0
+      ? (primary?.sentence ?? "Signaux anti-fraude détectés sur cette session.")
+      : isValidListen
+        ? "Session conforme aux règles d'écoute SONAFRIK."
+        : "Écoute non retenue dans le calcul des statistiques.";
+
+  const impact =
+    businessTier === "fraud"
+      ? "Impact élevé sur les royalties et la crédibilité des métriques artistes."
+      : businessTier === "suspicion"
+        ? "Impact modéré — vérification recommandée avant action."
+        : "Impact faible — surveillance passive suffisante.";
+
+  let analysis = primary?.label ?? "Activité standard";
+  if (hasMulti) analysis = "Écoutes simultanées depuis ce compte.";
+  else if (hasBot) analysis = "Comportement automatisé probable.";
+  else if (flags.includes("orphaned_session")) analysis = "Interruption avant seuil Real Listen.";
+  else if (listenPercentage < 30 && !isValidListen) analysis = "Écoute trop courte pour être comptabilisée.";
+
+  let recommendedAction = "Aucune intervention nécessaire.";
+  if (businessTier === "fraud" || severity === "critical") {
+    recommendedAction = "Contrôle manuel recommandé — examiner le compte et l'historique.";
+  } else if (businessTier === "suspicion" || severity === "important") {
+    recommendedAction = "Surveiller — marquer traité si comportement expliqué.";
+  } else if (!isValidListen) {
+    recommendedAction = "Informatif — aucune action requise.";
+  }
+
+  return {
+    confidencePercent,
+    why,
+    impact,
+    analysis,
+    recommendedAction,
+    businessTier,
+  };
+}

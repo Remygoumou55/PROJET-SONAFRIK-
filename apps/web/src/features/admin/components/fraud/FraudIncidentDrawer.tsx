@@ -7,6 +7,7 @@ import { formatDateTime } from "@/lib/formatters";
 import { loadFraudSessionEventsAction } from "../../actions/admin-fraud.actions";
 import {
   buildIncidentHeadline,
+  buildIncidentDecisionAid,
   humanizeFraudFlags,
   SEVERITY_META,
 } from "../../lib/fraud/humanizeFraudIncident";
@@ -73,6 +74,11 @@ function FraudIncidentDrawerView({
 
   const headline = buildIncidentHeadline(incident.fraud_flags, incident.is_valid_listen);
   const severity = SEVERITY_META[headline.severity];
+  const decision = buildIncidentDecisionAid(
+    incident.fraud_flags,
+    incident.is_valid_listen,
+    incident.listen_percentage,
+  );
   const flags = humanizeFraudFlags(incident.fraud_flags);
   const device = parseDeviceLabel(incident.user_agent, incident.platform);
 
@@ -101,6 +107,38 @@ function FraudIncidentDrawerView({
         </header>
 
         <div className="fraud-drawer__body">
+          <section className="fraud-drawer__section fraud-drawer__decision-aid">
+            <h3 className="fraud-drawer__section-title">Aide à la décision</h3>
+            <div className="fraud-decision-aid">
+              <div className="fraud-decision-aid__confidence">
+                <span className="fraud-decision-aid__confidence-label">Confiance moteur</span>
+                <strong>{decision.confidencePercent} %</strong>
+              </div>
+              <dl className="fraud-decision-aid__dl">
+                <div>
+                  <dt>Pourquoi</dt>
+                  <dd>{decision.why}</dd>
+                </div>
+                <div>
+                  <dt>Impact</dt>
+                  <dd>{decision.impact}</dd>
+                </div>
+                <div>
+                  <dt>Analyse</dt>
+                  <dd>{decision.analysis}</dd>
+                </div>
+                <div>
+                  <dt>Action recommandée</dt>
+                  <dd className="fraud-decision-aid__action">{decision.recommendedAction}</dd>
+                </div>
+                <div>
+                  <dt>Niveau métier</dt>
+                  <dd className="fraud-decision-aid__tier">{decision.businessTier}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
           <section className="fraud-drawer__section">
             <h3 className="fraud-drawer__section-title">Résumé</h3>
             <dl className="fraud-drawer__dl">
@@ -190,7 +228,12 @@ function FraudIncidentDrawerView({
             {loadingEvents ? (
               <p className="fraud-drawer__loading">Chargement de l&apos;historique…</p>
             ) : (
-              <FraudIncidentTimeline events={events} startedAt={incident.started_at} />
+              <FraudIncidentTimeline
+                events={events}
+                startedAt={incident.started_at}
+                flags={incident.fraud_flags}
+                isValidListen={incident.is_valid_listen}
+              />
             )}
           </section>
 

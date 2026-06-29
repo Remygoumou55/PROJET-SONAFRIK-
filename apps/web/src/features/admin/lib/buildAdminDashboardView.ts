@@ -204,7 +204,7 @@ function buildCoachTips(kpis: AdminCockpitKpis, alerts: AdminCockpitAlerts): Adm
   if (alerts.fraudSessions > 0) {
     tips.push({
       id: "fraud",
-      text: `${alerts.fraudSessions} écoute${alerts.fraudSessions > 1 ? "s" : ""} suspecte${alerts.fraudSessions > 1 ? "s" : ""} ce mois — score fraude élevé`,
+      text: `${alerts.fraudSessions} session${alerts.fraudSessions > 1 ? "s" : ""} signalée${alerts.fraudSessions > 1 ? "s" : ""} — supervision fraude`,
       cta: "Analyser →",
       href: "/admin/fraud?filter=fraud",
       color: "var(--color-rouge-alerte)",
@@ -238,7 +238,7 @@ function buildCategorizedAlerts(alerts: AdminCockpitAlerts): AdminCategorizedAle
     rows.push({
       id: "fraud",
       count: alerts.fraudSessions,
-      label: "écoutes suspectes ce mois",
+      label: "sessions signalées (SSOT)",
       icon: "🔴",
       severity: "danger",
       href: "/admin/fraud?filter=fraud",

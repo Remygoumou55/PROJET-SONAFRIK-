@@ -8,6 +8,7 @@ interface Props {
   onChange: (patch: Partial<FraudFilterState>) => void;
   resultCount: number;
   totalLoaded: number;
+  ssotTotal?: number;
 }
 
 function Pill({
@@ -31,7 +32,7 @@ function Pill({
   );
 }
 
-function FraudIncidentToolbarView({ filters, onChange, resultCount, totalLoaded }: Props) {
+function FraudIncidentToolbarView({ filters, onChange, resultCount, totalLoaded, ssotTotal }: Props) {
   return (
     <div className="fraud-toolbar">
       <div className="fraud-toolbar__search-wrap">
@@ -49,7 +50,8 @@ function FraudIncidentToolbarView({ filters, onChange, resultCount, totalLoaded 
       </div>
 
       <div className="fraud-toolbar__meta">
-        {resultCount} incident{resultCount !== 1 ? "s" : ""} affiché{resultCount !== 1 ? "s" : ""}
+        {resultCount} affiché{resultCount !== 1 ? "s" : ""}
+        {typeof ssotTotal === "number" ? ` · ${ssotTotal.toLocaleString("fr-FR")} SSOT` : null}
         {totalLoaded > 0 ? ` · ${totalLoaded} chargés` : null}
       </div>
 

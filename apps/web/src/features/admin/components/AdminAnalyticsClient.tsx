@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AdminAnalyticsDashboard } from "@sonafrik/api/admin";
 import { isValidContentName } from "@/lib/content-filter";
 import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
+import { fetchAdminAnalyticsDashboard } from "@/features/admin/lib/adminLdseClient";
+import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { ldseCache } from "@/features/shared/ldse/cache";
+import { ADMIN_LDSE_KEYS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { ldseEventBus } from "@/features/shared/ldse/event-bus";
 
 type LiveMetrics = {
   activeListeners: number;
@@ -13,7 +19,7 @@ type LiveMetrics = {
   recentStreams: AdminAnalyticsDashboard["recentStreams"];
 };
 
-type HealthStatus = AdminAnalyticsDashboard["health"];
+const DEBOUNCE_MS = 400;
 
 function healthColor(status: "ok" | "slow" | "down"): string {
   if (status === "ok") return "var(--color-vert-energie)";
@@ -31,62 +37,85 @@ function formatStreamTime(iso: string): string {
   return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function AdminAnalyticsClient({ initialData }: { initialData: AdminAnalyticsDashboard }) {
-  const [live, setLive] = useState<LiveMetrics>({
-    activeListeners: initialData.activeListeners,
-    tracksBeingPlayed: initialData.tracksBeingPlayed,
-    topCityNow: initialData.topCity,
-    topTrackNow: initialData.topTrack,
-    recentStreams: initialData.recentStreams,
-  });
-  const [health] = useState<HealthStatus>(initialData.health);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
+function filterDashboard(data: AdminAnalyticsDashboard): AdminAnalyticsDashboard {
+  return {
+    ...data,
+    recentStreams: data.recentStreams.filter((s) => isValidContentName(s.trackTitle)),
+    topTracks: data.topTracks.filter((t) => isValidContentName(t.title)),
+    topArtists: data.topArtists.filter((a) => isValidContentName(a.stageName)),
+  };
+}
+
+function toLiveMetrics(data: AdminAnalyticsDashboard): LiveMetrics {
+  return {
+    activeListeners: data.activeListeners,
+    tracksBeingPlayed: data.tracksBeingPlayed,
+    topCityNow: data.topCity,
+    topTrackNow: data.topTrack,
+    recentStreams: data.recentStreams,
+  };
+}
+
+type AdminAnalyticsClientProps = {
+  initialData: AdminAnalyticsDashboard;
+  /** ISO snapshot from RSC — keeps SSR and hydration in sync */
+  initialUpdatedAt: string;
+};
+
+export function AdminAnalyticsClient({ initialData, initialUpdatedAt }: AdminAnalyticsClientProps) {
+  const [dashboard, setDashboard] = useState(() => filterDashboard(initialData));
+  const [live, setLive] = useState<LiveMetrics>(() => toLiveMetrics(filterDashboard(initialData)));
+  const [lastUpdated, setLastUpdated] = useState(() => new Date(initialUpdatedAt));
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const applyDashboard = useCallback((data: AdminAnalyticsDashboard) => {
+    const filtered = filterDashboard(data);
+    ldseCache.set(ADMIN_LDSE_KEYS.analyticsDashboard, filtered, 30_000);
+    setDashboard(filtered);
+    setLive(toLiveMetrics(filtered));
+    setLastUpdated(new Date());
+    ldseEventBus.publish(ADMIN_LDSE_EVENTS.analyticsRefreshed);
+  }, []);
+
+  const refreshFromServer = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+      void fetchAdminAnalyticsDashboard()
+        .then(applyDashboard)
+        .catch(() => {});
+    }, DEBOUNCE_MS);
+  }, [applyDashboard]);
 
   useRealtimeChannel(
     "admin-analytics-live",
     [
-      {
-        event: "INSERT",
-        table: "stream_sessions",
-        onEvent: () => {
-          setLive((prev) => ({
-            ...prev,
-            activeListeners: prev.activeListeners + 1,
-          }));
-          setLastUpdated(new Date());
-        },
-      },
-      {
-        event: "UPDATE",
-        table: "stream_sessions",
-        filter: "completed_at=not.is.null",
-        onEvent: () => {
-          setLive((prev) => ({
-            ...prev,
-            activeListeners: Math.max(0, prev.activeListeners - 1),
-          }));
-          setLastUpdated(new Date());
-        },
-      },
+      { event: "INSERT", table: "stream_sessions", onEvent: refreshFromServer },
+      { event: "UPDATE", table: "stream_sessions", onEvent: refreshFromServer },
     ],
     true,
   );
 
-  useEffect(() => {
-    setLive({
-      activeListeners: initialData.activeListeners,
-      tracksBeingPlayed: initialData.tracksBeingPlayed,
-      topCityNow: initialData.topCity,
-      topTrackNow: initialData.topTrack,
-      recentStreams: initialData.recentStreams,
-    });
-  }, [initialData]);
+  useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, () => {
+    refreshFromServer();
+  });
 
+  useEffect(() => {
+    applyDashboard(initialData);
+  }, [initialData, applyDashboard]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const health = dashboard.health;
   const okCount = Object.values(health).filter((h) => h.status === "ok").length;
   const healthScore = okCount * 25;
 
-  const topTracks = initialData.topTracks.filter((t) => isValidContentName(t.title));
-  const topArtists = initialData.topArtists.filter((a) => isValidContentName(a.stageName));
+  const topTracks = dashboard.topTracks;
+  const topArtists = dashboard.topArtists;
   const recentStreams = live.recentStreams.filter((s) => isValidContentName(s.trackTitle));
 
   return (
@@ -96,10 +125,17 @@ export function AdminAnalyticsClient({ initialData }: { initialData: AdminAnalyt
           <div>
             <h1 className="admin-page-title">Analytiques</h1>
             <p className="admin-page-sub">
-              Temps réel · Mis à jour à {lastUpdated.toLocaleTimeString("fr-FR")}
+              Temps réel · Mis à jour à{" "}
+              <span suppressHydrationWarning>
+                {lastUpdated.toLocaleTimeString("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </span>
             </p>
           </div>
-          <div className="admin-live-indicator">
+          <div className="admin-live-indicator admin-live-indicator--active">
             <span className="admin-live-dot" />
             <span>Live</span>
           </div>

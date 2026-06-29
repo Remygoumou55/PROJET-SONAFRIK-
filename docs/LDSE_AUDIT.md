@@ -76,22 +76,21 @@ flowchart TB
   ALP --> FraudCenter
 ```
 
-## Modules compatibles LDSE (v1.1)
+## Modules compatibles LDSE (v2 — 29 juin 2026)
 
-- ✅ Admin layout (snapshot + provider)
-- ✅ Sidebar badges
-- ✅ Fraude (metrics + refresh liste)
-- ✅ Cockpit dashboard (merge live LDSE)
-- ✅ Catalog center (moderation metrics)
-- ✅ Withdrawals (publishAdminLdseEvent)
+- ✅ Admin OS (layout, sidebar, cockpit, fraude, catalog, withdrawals)
 - ✅ Notifications (cloche + liste)
-- ✅ Realtime admin (event mapping)
+- ✅ Social (likes/follows — cache partagé + sync multi-composants)
+- ✅ Listener library (LibraryLdseProvider — SSOT, sidebar live)
+- ✅ Listener sidebar (useListenSidebarLdse — compteurs favoris live)
+- ✅ Search (useSearch + useSmartSearch — cache LDSE unifié)
+- ✅ Creator catalog (publishCreatorLdseEvent après mutations)
+- ✅ Wallet (page data, royalties, payout — cache + invalidation)
+- ✅ Identity (profile + preferences — publishIdentityLdseEvent)
 
 ## Modules restant à migrer
 
-- Creator OS (catalog, analytics)
-- Listener OS (streaming, library)
-- Wallet / royalties dashboards
-- Notifications bell
-- Recherche
-- Profil identity
+- ⏳ Creator analytics dashboard (refresh client post-mutation)
+- ⏳ Listener streaming queue (éphemère — PlayerProvider)
+- ⏳ Listener reactions (useTrackReactions — direct Supabase)
+- ⏳ Wallet Vitest modules financiers (TEST-WALLET critique)

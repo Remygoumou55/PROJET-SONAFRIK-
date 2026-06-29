@@ -8,14 +8,17 @@ import {
   LANGUAGE_OPTIONS,
   type UserPreferences,
 } from "@sonafrik/types";
+import { publishIdentityLdseEvent } from "@/features/shared/ldse/identity/publishIdentityLdseEvent";
+import { IDENTITY_LDSE_EVENTS } from "@/features/shared/ldse/identity/identity-ldse-config";
 import { useIdentityService } from "../hooks/useIdentity";
 import { ToggleSetting } from "./ToggleSetting";
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
+  userId: string;
 }
 
-export function PreferencesForm({ preferences }: PreferencesFormProps) {
+export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
   const router = useRouter();
   const identity = useIdentityService();
   const [state, setState] = useState(preferences);
@@ -49,6 +52,7 @@ export function PreferencesForm({ preferences }: PreferencesFormProps) {
         timezone: state.timezone,
       });
       setMessage("Préférences enregistrées.");
+      publishIdentityLdseEvent(IDENTITY_LDSE_EVENTS.preferencesUpdated, userId);
       router.refresh();
     } catch {
       setMessage("Erreur lors de l'enregistrement.");

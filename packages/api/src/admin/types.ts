@@ -65,16 +65,34 @@ export type AdminFraudStreamEvent = {
 };
 
 export type AdminFraudSupervisionStats = {
+  /** SSOT — total incidents signalés (fraud_flags non vide) */
+  totalFlagged: number;
+  totalIncidents: number;
+  flaggedThisMonth: number;
+  flaggedToday: number;
+
+  /** Zone 1 — Santé plateforme */
   todayTotal: number;
   activeSessions: number;
+
+  /** Zone 2 — Sécurité (hiérarchie métier) */
   fraudDetectedToday: number;
+  suspicionsToday: number;
+  confirmedFraudToday: number;
   criticalIncidents: number;
-  normalSessionsToday: number;
-  suspendedAccountsHint: number;
+  criticalToday: number;
+  importantToday: number;
+  attentionToday: number;
+  watchAccounts: number;
+
+  /** Zone 3 — Qualité */
   validListensToday: number;
   rejectedListensToday: number;
-  /** SSOT — aligné sidebar / dashboard / liste fraude */
-  totalFlagged: number;
+  listenSuccessRate: number;
+
+  /** Alias rétrocompat */
+  normalSessionsToday: number;
+  suspendedAccountsHint: number;
 };
 
 /** Snapshot admin synchronisé (LDSE) — badges + métriques canoniques */

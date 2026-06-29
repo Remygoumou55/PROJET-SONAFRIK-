@@ -2,6 +2,8 @@
 export const LISTENER_LDSE_KEYS = {
   sidebar: (userId: string) => `listener:${userId}:sidebar`,
   libraryCounts: (userId: string) => `listener:${userId}:library-counts`,
+  libraryFull: (userId: string) => `listener:${userId}:library-full`,
+  playlists: (userId: string) => `listener:${userId}:playlists`,
   queue: (userId: string) => `listener:${userId}:queue`,
 } as const;
 
@@ -11,4 +13,5 @@ export const LISTENER_LDSE_EVENTS = {
   playlistUpdated: "listener.playlist.updated",
   playbackStarted: "listener.playback.started",
   libraryInvalidate: "listener.library.invalidate",
+  sidebarInvalidate: "listener.sidebar.invalidate",
 } as const;

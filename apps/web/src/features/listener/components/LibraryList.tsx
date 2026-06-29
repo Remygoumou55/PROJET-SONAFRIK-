@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Playlist } from "@sonafrik/types";
-import { useLibrary } from "../hooks/useLibrary";
+import { useLibraryLdse } from "../lib/libraryLdseContext";
 import { PlaylistVisibilityBadge } from "@/components/playlist/PlaylistVisibilityBadge";
 
 function PlaylistCard({
@@ -53,7 +53,7 @@ function PlaylistCard({
 }
 
 export function LibraryList() {
-  const { playlists, isLoading, error, deletePlaylist } = useLibrary();
+  const { playlists, isLoading, error, deletePlaylist } = useLibraryLdse();
 
   if (isLoading) {
     return (

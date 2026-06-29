@@ -27,6 +27,8 @@ export default async function AdminAnalyticsPage() {
   let data = EMPTY;
   let loadError: string | null = null;
 
+  const fetchedAt = new Date().toISOString();
+
   try {
     const raw = await admin.getAnalyticsDashboard();
     data = {
@@ -42,7 +44,7 @@ export default async function AdminAnalyticsPage() {
   return (
     <>
       {loadError && <p className="admin-inline-error">{loadError}</p>}
-      <AdminAnalyticsClient initialData={data} />
+      <AdminAnalyticsClient initialData={data} initialUpdatedAt={fetchedAt} />
     </>
   );
 }

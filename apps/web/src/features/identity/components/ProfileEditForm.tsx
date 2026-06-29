@@ -6,6 +6,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafr
 import type { Profile } from "@sonafrik/types";
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { AvatarUpload } from "./AvatarUpload";
+import { publishIdentityLdseEvent } from "@/features/shared/ldse/identity/publishIdentityLdseEvent";
+import { IDENTITY_LDSE_EVENTS } from "@/features/shared/ldse/identity/identity-ldse-config";
 import { useIdentityService } from "../hooks/useIdentity";
 
 interface ProfileEditFormProps {
@@ -40,6 +42,7 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
         email: email || null,
       });
       setSuccess(true);
+      publishIdentityLdseEvent(IDENTITY_LDSE_EVENTS.profileUpdated, profile.id);
       router.refresh();
     } catch {
       setError("Impossible d'enregistrer le profil. Vérifiez les champs.");

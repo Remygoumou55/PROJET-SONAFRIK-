@@ -1,7 +1,7 @@
 import { getSupabaseAdminClient, getSupabaseServerClient } from "@/lib/supabase/server";
 import { createAdminService, type AdminService } from "@sonafrik/api/admin";
 import { isDevBypassActive } from "@/lib/auth/guards";
-import { requireAdmin } from "./requireAdmin";
+import { requireAdmin, verifyAdminForAction } from "./requireAdmin";
 
 /**
  * Admin connecté → client session (RLS admin, audit_logs OK).
@@ -20,4 +20,20 @@ export async function getAdminServiceForSession(): Promise<AdminService> {
 export async function getAdminServiceWithServiceRole(): Promise<AdminService> {
   await requireAdmin();
   return createAdminService(getSupabaseAdminClient({ adminVerified: true }));
+}
+
+/** Client LDSE / Route Handlers — JSON au lieu de redirect. */
+export async function getAdminServiceForApi(): Promise<
+  { ok: true; service: AdminService } | { ok: false; error: string }
+> {
+  const auth = await verifyAdminForAction();
+  if (!auth.ok) return { ok: false, error: auth.error };
+  if (isDevBypassActive()) {
+    return {
+      ok: true,
+      service: createAdminService(getSupabaseAdminClient({ adminVerified: true })),
+    };
+  }
+  const supabase = await getSupabaseServerClient();
+  return { ok: true, service: createAdminService(supabase) };
 }
