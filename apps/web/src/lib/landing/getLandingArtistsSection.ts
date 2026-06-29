@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { createPublicCachedQuery } from "@/lib/cache";
 import type { LandingArtistsSection, LandingFounderArtist } from "@sonafrik/types";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { getArtistInitials } from "./artistDisplay";
@@ -120,8 +120,8 @@ async function fetchLandingArtistsSection(): Promise<LandingArtistsSection> {
   }
 }
 
-export const getLandingArtistsSection = unstable_cache(
+export const getLandingArtistsSection = createPublicCachedQuery(
+  "landing-artists-section",
   fetchLandingArtistsSection,
-  ["landing-artists-section"],
   { revalidate: 300, tags: ["landing-artists"] },
 );

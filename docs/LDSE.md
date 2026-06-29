@@ -125,6 +125,16 @@ window.__SONAFRIK_LDSE__() // cache hits, events, subscriptions Realtime
 - `useNotificationsLdseCount` — cloche + liste notifications
 - `RootLdseShell` — provider global Event Bus + cache
 
+## LDSE v1.1 (29 juin 2026)
+
+- `useLdseQuery` — hook générique SSOT (cache + Event Bus + background refresh)
+- `AdminCockpitDashboard` client — merge `mergeAdminLiveData` + snapshot LDSE live
+- SSOT fraude unifié : `totalFlagged` = sidebar = governance = modules = page fraude
+- Alertes cockpit « ce mois » = `flaggedThisMonth` (libellé explicite)
+- Scaffolds `creator-ldse-config` / `listener-ldse-config`
+- Tests `pnpm test:ldse` — cache, event bus, invalidation
+- Observabilité dev : `window.__SONAFRIK_LDSE__()`
+
 ## Migration progressive
 
 1. Admin (v1 — fait)

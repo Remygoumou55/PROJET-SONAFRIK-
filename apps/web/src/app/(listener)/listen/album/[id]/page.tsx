@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createListenerService } from "@sonafrik/api/listener";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { CoverImage } from "@/components/CoverImage";
 import { formatDate } from "@/lib/formatters";
 import { AlbumTracksClient } from "@/features/listener/components/AlbumTracksClient";
@@ -15,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabasePublicClient();
   const listener = createListenerService(supabase);
   const meta = await listener.getPublishedAlbumMeta(id);
   if (!meta) return { title: "Album — SONAFRIK" };
@@ -31,7 +31,7 @@ export default async function AlbumDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabasePublicClient();
   const listener = createListenerService(supabase);
 
   const album = await listener.getPublishedAlbumDetail(id);

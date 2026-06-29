@@ -22,6 +22,9 @@ import type {
   AdminRevenueDashboardData,
   AdminWithdrawalsDashboardMeta,
   AdminRightsClaim,
+  AdminAnalyticsDashboard,
+  AdminAwardsDashboard,
+  AdminBeatStoreDashboard,
   LiveControlSnapshot,
   PendingCatalogItem,
 } from "./types";
@@ -236,6 +239,56 @@ export class AdminService {
 
   async warnCreatorOwner(ownerId: string, reason: string, note: string): Promise<void> {
     await this.artists.warnCreatorOwner(ownerId, reason, note).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async getAnalyticsDashboard(): Promise<AdminAnalyticsDashboard> {
+    return this.repository.getAnalyticsDashboard();
+  }
+
+  async getAwardsDashboard(): Promise<AdminAwardsDashboard> {
+    return this.repository.getAwardsDashboard();
+  }
+
+  async closeAwardVotes(editionId: string): Promise<void> {
+    await this.repository.closeAwardVotes(editionId).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async distributeAwardPrizes(editionId: string, adminNote = ""): Promise<void> {
+    await this.repository.distributeAwardPrizes(editionId, adminNote).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async getBeatStoreDashboard(params: {
+    filter: "pending" | "published" | "rejected";
+    page?: number;
+    limit?: number;
+  }): Promise<AdminBeatStoreDashboard> {
+    return this.repository.getBeatStoreDashboard({
+      filter: params.filter,
+      page: params.page ?? 1,
+      limit: params.limit ?? 25,
+    });
+  }
+
+  async approveBeat(beatId: string): Promise<void> {
+    await this.repository.approveBeat(beatId).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async rejectBeat(beatId: string, reason: string): Promise<void> {
+    await this.repository.rejectBeat(beatId, reason).catch(() => {
+      throw new AdminError("update_failed");
+    });
+  }
+
+  async deleteBeat(beatId: string): Promise<void> {
+    await this.repository.deleteBeat(beatId).catch(() => {
       throw new AdminError("update_failed");
     });
   }

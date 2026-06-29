@@ -19,3 +19,8 @@ export function resolveInvalidationKeys(eventType: string): string[] {
   }
   return keys;
 }
+
+/** Tests uniquement */
+export function _resetInvalidationRulesForTests(): void {
+  rules.length = 0;
+}

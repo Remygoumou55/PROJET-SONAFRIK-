@@ -21,10 +21,10 @@
 | Fraude all-time | `admin.dashboard.repository`, `admin.fraud.repository`, sidebar layout | ✅ Unifié via `AdminMetricsRepository` |
 | Fraude mois | Cockpit seul | ✅ `flaggedThisMonth` explicite |
 | Fraude jour | `getFraudSupervisionStats` requête dédiée | ✅ `flaggedToday` via metrics |
-| Catalog pending | `getNavBadges`, `getDashboardKpis`, `getCockpitData` | ⏳ Dupliqué — migration LDSE phase 2 |
-| Withdrawals pending | Idem | ⏳ À migrer |
-| Rights claims pending | Idem | ⏳ À migrer |
-| Users count | Dashboard + Cockpit + Live Control | ⏳ À migrer |
+| Catalog pending | `getNavBadges`, `getDashboardKpis`, `getCockpitData` | ✅ Unifié via `AdminMetricsRepository` + LDSE |
+| Withdrawals pending | Idem | ✅ Unifié via LDSE snapshot |
+| Rights claims pending | Idem | ✅ Unifié via LDSE snapshot |
+| Users count | Dashboard + Cockpit + Live Control | ✅ Cockpit merge LDSE live |
 
 ## Appels Supabase directs côté React (hors LDSE)
 
@@ -76,11 +76,15 @@ flowchart TB
   ALP --> FraudCenter
 ```
 
-## Modules compatibles LDSE (v1)
+## Modules compatibles LDSE (v1.1)
 
 - ✅ Admin layout (snapshot + provider)
 - ✅ Sidebar badges
 - ✅ Fraude (metrics + refresh liste)
+- ✅ Cockpit dashboard (merge live LDSE)
+- ✅ Catalog center (moderation metrics)
+- ✅ Withdrawals (publishAdminLdseEvent)
+- ✅ Notifications (cloche + liste)
 - ✅ Realtime admin (event mapping)
 
 ## Modules restant à migrer

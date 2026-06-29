@@ -1,4 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import { enrichTrackCreditsWithCreatorIds } from "../common/profile-creator.helpers";
 import { fetchStageNamesByCreatorIds } from "../common/stage-name.helpers";
 import type { DiscoveryTrack, ListenMusicCategory, RecentlyPlayedTrack, TrackCredit, TrackListenCounts, TrackWithMeta, TrendingTrack } from "@sonafrik/types";
 import {
@@ -197,10 +198,30 @@ export class ListenerRepository {
       .in("track_id", trackIds)
       .order("display_order");
     if (error) throw error;
-    return (data ?? []) as TrackCredit[];
+    return enrichTrackCreditsWithCreatorIds(this.client, (data ?? []) as TrackCredit[]);
   }
 
   async getPublicArtistProfile(creatorId: string): Promise<ListenerArtistProfile | null> {
+    const { data: rpcData, error: rpcError } = await this.client.rpc("get_public_artist_profile", {
+      p_creator_id: creatorId,
+    });
+
+    if (!rpcError && rpcData && typeof rpcData === "object" && !Array.isArray(rpcData)) {
+      const raw = rpcData as Record<string, unknown>;
+      const stageName = String(raw.stage_name ?? "").trim();
+      if (stageName.length > 0) {
+        return {
+          creator_id: String(raw.creator_id ?? creatorId),
+          stage_name: stageName,
+          bio: (raw.bio as string | null) ?? null,
+          genres: Array.isArray(raw.genres) ? (raw.genres as string[]) : [],
+          cover_path: (raw.cover_path as string | null) ?? null,
+          banner_path: (raw.banner_path as string | null) ?? null,
+          verified: Boolean(raw.verified),
+        };
+      }
+    }
+
     const { data, error } = await this.client
       .from("artist_profiles")
       .select("creator_id, stage_name, bio, genres, cover_path, banner_path, verified, is_public")

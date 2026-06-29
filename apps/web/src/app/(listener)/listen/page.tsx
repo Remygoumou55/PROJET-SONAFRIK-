@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { unstable_cache } from "next/cache";
+import { createPublicCachedQuery } from "@/lib/cache";
 import type { Metadata } from "next";
 import type {
   DiscoveryArtist,
@@ -41,7 +41,8 @@ function dedupeDiscoveryTracks(tracks: DiscoveryTrack[]): DiscoveryTrack[] {
 }
 
 function createHomepageLoader(category: ListenMusicCategory) {
-  return unstable_cache(
+  return createPublicCachedQuery(
+    `homepage-content-v8-${category}`,
     async function _getHomepageContent(): Promise<HomepageData> {
       try {
         const supabase = getSupabasePublicClient();
@@ -140,7 +141,6 @@ function createHomepageLoader(category: ListenMusicCategory) {
         };
       }
     },
-    [`homepage-content-v8-${category}`],
     { revalidate: 300, tags: ["homepage", "catalog-tracks", "stream-listen-counts"] },
   );
 }

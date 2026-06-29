@@ -34,3 +34,6 @@ export {
   useNotificationsLdseCount,
   publishNotificationLdseEvent,
 } from "./notifications/useNotificationsLdseCount";
+export { useLdseQuery, invalidateLdseQuery, type UseLdseQueryOptions } from "./useLdseQuery";
+export { CREATOR_LDSE_KEYS, CREATOR_LDSE_EVENTS } from "./creator/creator-ldse-config";
+export { LISTENER_LDSE_KEYS, LISTENER_LDSE_EVENTS } from "./listener/listener-ldse-config";

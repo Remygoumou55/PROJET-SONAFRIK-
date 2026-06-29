@@ -45,6 +45,7 @@
     "test:audio": "pnpm test:audio-pipeline && pnpm --filter @sonafrik/shared test",
     "test:storage": "pnpm remediate:audio:dry-run",
     "test:player": "pnpm --filter @sonafrik/api exec vitest run src/streaming/playback/playback.certification.test.ts src/streaming/playback/playback-engine.test.ts",
+    "test:ldse": "pnpm --filter @sonafrik/api exec vitest run --config ../../scripts/vitest.ldse.config.ts",
     "probe:cors": "npx tsx scripts/probe-cors-infrastructure.ts",
     "analyze:web": "pnpm --filter @sonafrik/web analyze"
   },

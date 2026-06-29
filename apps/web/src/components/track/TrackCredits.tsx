@@ -42,9 +42,9 @@ export function TrackCredits({ credits }: TrackCreditsProps) {
                 {group.map((c, i) => (
                   <span key={c.id}>
                     {i > 0 && ", "}
-                    {c.contributor_profile_id ? (
+                    {c.contributor_creator_id ? (
                       <Link
-                        href={`/listen/artist/${c.contributor_profile_id}`}
+                        href={`/listen/artist/${c.contributor_creator_id}`}
                         className="hover:text-vert-energie transition-colors"
                         style={{ color: "inherit" }}
                       >

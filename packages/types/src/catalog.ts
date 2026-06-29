@@ -102,6 +102,8 @@ export interface TrackCredit {
   id: string;
   track_id: string;
   contributor_profile_id: string | null;
+  /** creator.id résolu depuis contributor_profile_id (profiles.id → creators.owner_id) */
+  contributor_creator_id?: string | null;
   contributor_name: string;
   role: TrackCreditRole;
   display_order: number;

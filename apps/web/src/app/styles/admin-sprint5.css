@@ -1,0 +1,548 @@
+/* Sprint Admin 5 — Awards · Beat Store · Analytiques */
+
+.admin-analytics-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-analytics-kpis {
+  margin-bottom: 24px;
+}
+
+.admin-kpi-value--live {
+  color: var(--color-vert-energie);
+}
+
+.admin-kpi-value--compact {
+  font-size: 20px;
+}
+
+.admin-kpi-value--track {
+  font-size: 16px;
+}
+
+.admin-kpi-value--ok {
+  color: var(--color-vert-energie);
+}
+
+.admin-kpi-value--warn {
+  color: var(--color-erreur);
+}
+
+.admin-kpi-value--gold {
+  color: var(--color-or-solaire);
+}
+
+.admin-kpi-card--alert {
+  border-color: rgba(255, 77, 79, 0.3);
+}
+
+.admin-kpis-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.admin-kpis-grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.admin-text-ok {
+  color: var(--color-vert-energie);
+}
+
+.admin-text-warn {
+  color: var(--color-accent-orange);
+}
+
+.admin-inline-error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 77, 79, 0.1);
+  color: var(--color-erreur);
+  font-size: 13px;
+}
+
+.admin-card--centered {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.admin-card--spaced {
+  margin-bottom: 16px;
+}
+
+.admin-empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* Analytiques temps réel */
+.analytics-live-card {
+  position: relative;
+}
+
+.analytics-live-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: rgba(0, 210, 106, 0.15);
+  color: var(--color-vert-energie);
+  border: 1px solid rgba(0, 210, 106, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+  animation: live-badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-badge-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.admin-analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+}
+
+.admin-analytics-tops {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.analytics-stream-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-stream-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.2s;
+}
+
+.analytics-stream-item--new {
+  animation: stream-new 0.4s ease;
+}
+
+@keyframes stream-new {
+  from {
+    background: rgba(0, 210, 106, 0.08);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+.analytics-stream-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.analytics-stream-dot--live {
+  background: var(--color-vert-energie);
+}
+
+.analytics-stream-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.analytics-stream-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-stream-meta {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.analytics-stream-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.analytics-health-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.analytics-health-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+  font-weight: 500;
+}
+
+.analytics-health-latency {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.analytics-health-status {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.analytics-health-score {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(0, 210, 106, 0.06);
+  border-radius: 10px;
+}
+
+.analytics-health-score-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.analytics-health-score-label {
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+}
+
+.analytics-health-score-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-vert-energie);
+}
+
+.analytics-health-score-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.analytics-health-score-fill {
+  height: 100%;
+  background: var(--color-vert-energie);
+  border-radius: 99px;
+}
+
+.analytics-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.analytics-top-rank {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+  min-width: 24px;
+}
+
+.analytics-top-rank--medal {
+  color: var(--color-or-solaire);
+}
+
+.analytics-top-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.analytics-top-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-texte-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-top-sub {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.analytics-top-stat {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-vert-energie);
+}
+
+/* Awards */
+.awards-edition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.awards-edition-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 13px;
+  color: var(--color-texte-desactive);
+  margin-top: 8px;
+}
+
+.awards-edition-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.awards-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.awards-prize-label {
+  font-size: 12px;
+  color: var(--color-or-solaire);
+  font-weight: 700;
+}
+
+.awards-nominee-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+
+.awards-nominee-row--leading {
+  border-color: rgba(255, 194, 14, 0.2);
+  background: rgba(255, 194, 14, 0.04);
+}
+
+.awards-rank {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 30px;
+  text-align: center;
+}
+
+.awards-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.awards-nominee-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.awards-nominee-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.awards-nominee-name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+  font-size: 13px;
+}
+
+.awards-vote-count {
+  font-weight: 700;
+  color: var(--color-vert-energie);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.awards-vote-bar {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.awards-vote-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 2px;
+  background: var(--color-vert-energie);
+}
+
+.awards-vote-fill--gold {
+  background: var(--color-or-solaire);
+}
+
+.awards-score {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+  min-width: 50px;
+  text-align: right;
+}
+
+.admin-field-config {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-field-config-label {
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+}
+
+.awards-config-amount {
+  font-weight: 700;
+  color: var(--color-or-solaire);
+}
+
+.awards-history-row {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.awards-history-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.awards-history-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.awards-history-meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+}
+
+/* Beat Store */
+.beatstore-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beatstore-cover-icon {
+  font-size: 18px;
+}
+
+.beatstore-title {
+  margin: 0 0 2px;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.beatstore-artist {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.beatstore-specs {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.beatstore-price {
+  font-weight: 700;
+  color: var(--color-or-solaire);
+}
+
+.beatstore-stats-sub {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.beatstore-date {
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-inline-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.admin-inline-player-title {
+  font-weight: 600;
+  color: var(--color-or-solaire);
+}
+
+.admin-inline-player-audio {
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+  height: 32px;
+}
+
+.admin-table-footer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+}
+
+@media (max-width: 960px) {
+  .admin-analytics-grid,
+  .admin-analytics-tops,
+  .admin-kpis-grid--3,
+  .admin-kpis-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}

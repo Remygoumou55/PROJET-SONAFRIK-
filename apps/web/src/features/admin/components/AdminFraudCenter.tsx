@@ -49,10 +49,13 @@ export function AdminFraudCenter({ initialPage, stats }: Props) {
   const [filters, setFilters] = useState<FraudFilterState>(DEFAULT_FRAUD_FILTERS);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [adminStates, setAdminStates] = useState<Record<string, FraudIncidentAdminState>>(() =>
-    typeof window !== "undefined" ? loadAllFraudIncidentStates() : {},
-  );
+  const [adminStates, setAdminStates] = useState<Record<string, FraudIncidentAdminState>>({});
   const [drawerIncident, setDrawerIncident] = useState<AdminFraudIncident | null>(null);
+
+  /** localStorage après hydratation — évite mismatch SSR (200 vs N filtrés). */
+  useEffect(() => {
+    setAdminStates(loadAllFraudIncidentStates());
+  }, []);
 
   useEffect(() => {
     setTotalRemote(liveFraudMetrics.totalFlagged);

@@ -266,3 +266,128 @@ export type AdminWithdrawalsDashboardMeta = {
     totalPendingAmount: number;
   };
 };
+
+export type AdminAnalyticsHealthService = {
+  latency: number;
+  status: "ok" | "slow" | "down";
+};
+
+export type AdminAnalyticsRecentStream = {
+  trackTitle: string;
+  artistName: string;
+  city: string;
+  at: string;
+};
+
+export type AdminAnalyticsTopTrack = {
+  id: string;
+  title: string;
+  artistName: string;
+  streams: number;
+};
+
+export type AdminAnalyticsTopArtist = {
+  id: string;
+  stageName: string;
+  genre: string;
+  streams: number;
+};
+
+export type AdminAnalyticsDashboard = {
+  activeListeners: number;
+  tracksBeingPlayed: number;
+  topCity: string;
+  topTrack: string;
+  recentStreams: AdminAnalyticsRecentStream[];
+  topTracks: AdminAnalyticsTopTrack[];
+  topArtists: AdminAnalyticsTopArtist[];
+  health: {
+    database: AdminAnalyticsHealthService;
+    storage: AdminAnalyticsHealthService;
+    payments: AdminAnalyticsHealthService;
+    streaming: AdminAnalyticsHealthService;
+  };
+};
+
+export type AdminAwardEdition = {
+  id: string;
+  year: number;
+  status: string;
+  votes_open_at: string | null;
+  votes_close_at: string | null;
+  votes_closed_at: string | null;
+  ceremony_date: string | null;
+  prizes_distributed_at: string | null;
+  score_streams_weight: number;
+  score_votes_weight: number;
+};
+
+export type AdminAwardCategory = {
+  id: string;
+  edition_id: string;
+  name: string;
+  prize_amount_gnf: number;
+  sort_order: number;
+};
+
+export type AdminAwardFundEntry = {
+  amount_gnf: number;
+  direction: string;
+  created_at: string;
+  source: string | null;
+};
+
+export type AdminAwardNominee = {
+  id: string;
+  categoryId: string;
+  categoryName: string;
+  prizeAmountGnf: number;
+  voteCount: number;
+  scoreCalculated: number | null;
+  rankPosition: number | null;
+  creatorId: string;
+  stageName: string;
+  avatarPath: string | null;
+};
+
+export type AdminAwardsDashboard = {
+  activeEdition: AdminAwardEdition | null;
+  nomineesByCategory: Record<string, AdminAwardNominee[]>;
+  totalNominees: number;
+  fundBalance: number;
+  fundHistory: AdminAwardFundEntry[];
+  pastEditions: AdminAwardEdition[];
+  categories: AdminAwardCategory[];
+};
+
+export type AdminBeatStoreRow = {
+  id: string;
+  title: string;
+  bpm: number | null;
+  keySignature: string | null;
+  genre: string | null;
+  priceGnf: number;
+  publicationStatus: string;
+  audioPreviewPath: string | null;
+  coverPath: string | null;
+  createdAt: string;
+  creatorId: string;
+  stageName: string;
+  purchaseCount: number;
+  revenueGnf: number;
+  rejectionReason: string | null;
+};
+
+export type AdminBeatStoreDashboard = {
+  beats: AdminBeatStoreRow[];
+  total: number;
+  page: number;
+  limit: number;
+  currentFilter: "pending" | "published" | "rejected";
+  counts: {
+    pending: number;
+    published: number;
+    rejected: number;
+  };
+  totalRevenue: number;
+};

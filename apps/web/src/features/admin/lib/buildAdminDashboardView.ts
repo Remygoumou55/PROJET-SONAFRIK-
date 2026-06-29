@@ -238,7 +238,7 @@ function buildCategorizedAlerts(alerts: AdminCockpitAlerts): AdminCategorizedAle
     rows.push({
       id: "fraud",
       count: alerts.fraudSessions,
-      label: "écoutes suspectes",
+      label: "écoutes suspectes ce mois",
       icon: "🔴",
       severity: "danger",
       href: "/admin/fraud?filter=fraud",
@@ -282,7 +282,7 @@ function buildCategorizedAlerts(alerts: AdminCockpitAlerts): AdminCategorizedAle
   return rows;
 }
 
-function buildPriorities(alerts: AdminCockpitAlerts): AdminPriorityItem[] {
+function buildPriorities(alerts: AdminCockpitAlerts, fraudSessionsTotal: number): AdminPriorityItem[] {
   const items: AdminPriorityItem[] = [];
   if (alerts.pendingWithdrawals > 0) {
     items.push({
@@ -324,11 +324,11 @@ function buildPriorities(alerts: AdminCockpitAlerts): AdminPriorityItem[] {
       actionLabel: "Vérifier les profils",
     });
   }
-  if (alerts.fraudSessions > 0) {
+  if (fraudSessionsTotal > 0) {
     items.push({
       id: "fraud",
-      label: "Écoutes suspectes",
-      count: alerts.fraudSessions,
+      label: "Écoutes signalées (SSOT)",
+      count: fraudSessionsTotal,
       urgency: "critical",
       href: "/admin/fraud",
       actionLabel: "Analyser la fraude",
@@ -341,6 +341,7 @@ function synthesizeTimeline(
   cockpit: AdminCockpitData,
   alerts: AdminCockpitAlerts,
   live: LiveControlSnapshot | null,
+  fraudSessionsTotal: number,
 ): AdminTimelineItem[] {
   const items: AdminTimelineItem[] = [];
   const cleanActivity = filterAuditActivity(cockpit.recentActivity);
@@ -371,10 +372,10 @@ function synthesizeTimeline(
       tone: "warning",
     });
   }
-  if (alerts.fraudSessions > 0 && items.length < 8) {
+  if (fraudSessionsTotal > 0 && items.length < 8) {
     items.unshift({
       id: "syn-fraud",
-      label: "Activité d'écoute suspecte détectée",
+      label: `${fraudSessionsTotal.toLocaleString("fr-FR")} session(s) signalée(s) — SSOT fraude`,
       time: new Date().toISOString(),
       tone: "danger",
     });
@@ -426,6 +427,8 @@ export function buildAdminDashboardView(input: {
   const { cockpit, extended, health, live } = input;
   const { kpis, alerts } = cockpit;
   const first = firstName(input.adminName);
+  /** SSOT fraude — aligné sidebar + page fraude (totalFlagged). */
+  const fraudTotal = extended.fraudSessions;
 
   const categorizedAlerts = buildCategorizedAlerts(alerts);
   const criticalAlerts = categorizedAlerts.length;
@@ -627,9 +630,9 @@ export function buildAdminDashboardView(input: {
       icon: "🛡️",
       label: "Sécurité",
       desc: "Fraude et écoutes invalides",
-      stat: `${alerts.fraudSessions} alerte${alerts.fraudSessions > 1 ? "s" : ""}`,
+      stat: `${fraudTotal.toLocaleString("fr-FR")} signalée${fraudTotal > 1 ? "s" : ""}`,
       activity: "Protection de la chaîne d'écoute",
-      status: alerts.fraudSessions > 0 ? "attention" : "ok",
+      status: fraudTotal > 0 ? "attention" : "ok",
     },
     {
       href: "/admin/live-control",
@@ -699,9 +702,9 @@ export function buildAdminDashboardView(input: {
     kpis: kpisView,
     categorizedAlerts,
     launchTargets,
-    priorities: buildPriorities(alerts),
+    priorities: buildPriorities(alerts, fraudTotal),
     coachTips: buildCoachTips(kpis, alerts),
-    timeline: synthesizeTimeline(cockpit, alerts, live),
+    timeline: synthesizeTimeline(cockpit, alerts, live, fraudTotal),
     healthServices: mapHealthServices(health),
     modules,
     musical: {
@@ -728,7 +731,7 @@ export function buildAdminDashboardView(input: {
           : "Consolidez les sorties et les abonnements Premium pour accélérer la croissance.",
     },
     governance: {
-      fraudSessions: alerts.fraudSessions,
+      fraudSessions: fraudTotal,
       pendingClaims: alerts.pendingRightsClaims,
       pendingVerif: alerts.pendingArtistVerif,
       pendingCatalog: alerts.pendingCatalog,

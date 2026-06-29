@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { createPublicCachedQuery } from "@/lib/cache";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import {
   DEFAULT_LISTEN_FEATURE_FLAGS,
@@ -10,7 +10,8 @@ const CACHE_KEY = "listen-feature-flags-v3";
 const REVALIDATE_SECONDS = 120;
 
 /** Flags /listen — cache 120s, évite 1 requête DB par layout listener. */
-export const getCachedListenFeatureFlags = unstable_cache(
+export const getCachedListenFeatureFlags = createPublicCachedQuery(
+  CACHE_KEY,
   async (): Promise<ListenFeatureFlags> => {
     try {
       const client = getSupabasePublicClient();
@@ -19,7 +20,6 @@ export const getCachedListenFeatureFlags = unstable_cache(
       return DEFAULT_LISTEN_FEATURE_FLAGS;
     }
   },
-  [CACHE_KEY],
   { revalidate: REVALIDATE_SECONDS, tags: ["listen-feature-flags"] },
 );
 

@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -11,31 +11,6 @@ export type Database = {
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
   }
   public: {
     Tables: {
@@ -284,6 +259,179 @@ export type Database = {
         }
         Relationships: []
       }
+      award_categories: {
+        Row: {
+          created_at: string
+          edition_id: string
+          id: string
+          name: string
+          prize_amount_gnf: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          edition_id: string
+          id?: string
+          name: string
+          prize_amount_gnf?: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          edition_id?: string
+          id?: string
+          name?: string
+          prize_amount_gnf?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "award_categories_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "award_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      award_editions: {
+        Row: {
+          ceremony_date: string | null
+          created_at: string
+          id: string
+          prizes_distributed_at: string | null
+          score_streams_weight: number
+          score_votes_weight: number
+          status: string
+          updated_at: string
+          votes_close_at: string | null
+          votes_closed_at: string | null
+          votes_open_at: string | null
+          year: number
+        }
+        Insert: {
+          ceremony_date?: string | null
+          created_at?: string
+          id?: string
+          prizes_distributed_at?: string | null
+          score_streams_weight?: number
+          score_votes_weight?: number
+          status?: string
+          updated_at?: string
+          votes_close_at?: string | null
+          votes_closed_at?: string | null
+          votes_open_at?: string | null
+          year: number
+        }
+        Update: {
+          ceremony_date?: string | null
+          created_at?: string
+          id?: string
+          prizes_distributed_at?: string | null
+          score_streams_weight?: number
+          score_votes_weight?: number
+          status?: string
+          updated_at?: string
+          votes_close_at?: string | null
+          votes_closed_at?: string | null
+          votes_open_at?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
+      award_fund_ledger: {
+        Row: {
+          amount_gnf: number
+          created_at: string
+          direction: string
+          edition_id: string | null
+          id: string
+          source: string | null
+        }
+        Insert: {
+          amount_gnf: number
+          created_at?: string
+          direction: string
+          edition_id?: string | null
+          id?: string
+          source?: string | null
+        }
+        Update: {
+          amount_gnf?: number
+          created_at?: string
+          direction?: string
+          edition_id?: string | null
+          id?: string
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "award_fund_ledger_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "award_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      award_nominees: {
+        Row: {
+          category_id: string
+          created_at: string
+          creator_id: string
+          edition_id: string
+          id: string
+          rank_position: number | null
+          score_calculated: number | null
+          updated_at: string
+          vote_count: number
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          creator_id: string
+          edition_id: string
+          id?: string
+          rank_position?: number | null
+          score_calculated?: number | null
+          updated_at?: string
+          vote_count?: number
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          creator_id?: string
+          edition_id?: string
+          id?: string
+          rank_position?: number | null
+          score_calculated?: number | null
+          updated_at?: string
+          vote_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "award_nominees_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "award_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "award_nominees_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "award_nominees_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "award_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beat_purchases: {
         Row: {
           amount_gnf: number
@@ -358,6 +506,10 @@ export type Database = {
           license_type: string
           price_gnf: number
           publication_status: string
+          published_at: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           slug: string
           tags: string[]
           title: string
@@ -378,6 +530,10 @@ export type Database = {
           license_type?: string
           price_gnf?: number
           publication_status?: string
+          published_at?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           slug: string
           tags?: string[]
           title: string
@@ -398,6 +554,10 @@ export type Database = {
           license_type?: string
           price_gnf?: number
           publication_status?: string
+          published_at?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           slug?: string
           tags?: string[]
           title?: string
@@ -2684,6 +2844,47 @@ export type Database = {
           },
         ]
       }
+      track_lyrics: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          lines: Json
+          status: string
+          submitted_by: string | null
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language?: string
+          lines?: Json
+          status?: string
+          submitted_by?: string | null
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          lines?: Json
+          status?: string
+          submitted_by?: string | null
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_lyrics_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       track_reaction_counts: {
         Row: {
           count: number
@@ -2748,47 +2949,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      track_lyrics: {
-        Row: {
-          created_at: string
-          id: string
-          language: string
-          lines: Json
-          status: string
-          submitted_by: string | null
-          track_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          language?: string
-          lines?: Json
-          status?: string
-          submitted_by?: string | null
-          track_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          language?: string
-          lines?: Json
-          status?: string
-          submitted_by?: string | null
-          track_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "track_lyrics_track_id_fkey"
-            columns: ["track_id"]
-            isOneToOne: false
-            referencedRelation: "tracks"
             referencedColumns: ["id"]
           },
         ]
@@ -3346,6 +3506,7 @@ export type Database = {
         Args: { p_creator_id: string }
         Returns: undefined
       }
+      _is_privileged_admin: { Args: never; Returns: boolean }
       add_payout_account: {
         Args: {
           p_account_holder_name: string
@@ -3362,14 +3523,7 @@ export type Database = {
         Args: { p_emoji: string; p_track_id: string }
         Returns: undefined
       }
-      append_stream_session_fraud_flags: {
-        Args: { p_flags: string[]; p_session_id: string }
-        Returns: undefined
-      }
-      approve_payout_request: {
-        Args: { p_withdrawal_id: string }
-        Returns: Json
-      }
+      admin_approve_beat: { Args: { p_beat_id: string }; Returns: undefined }
       admin_batch_creator_catalog_stats: {
         Args: { p_creator_ids: string[] }
         Returns: {
@@ -3381,7 +3535,7 @@ export type Database = {
       admin_batch_user_list_stats: {
         Args: { p_user_ids: string[] }
         Returns: {
-          last_seen_at: string | null
+          last_seen_at: string
           session_count: number
           user_id: string
         }[]
@@ -3390,8 +3544,21 @@ export type Database = {
         Args: { p_creator_id: string; p_new_tier: string }
         Returns: undefined
       }
+      admin_close_award_votes: {
+        Args: { p_edition_id: string }
+        Returns: undefined
+      }
+      admin_delete_beat: { Args: { p_beat_id: string }; Returns: undefined }
       admin_delete_user: {
         Args: { p_reason?: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_distribute_awards_prizes: {
+        Args: { p_admin_note?: string; p_edition_id: string }
+        Returns: undefined
+      }
+      admin_reject_beat: {
+        Args: { p_beat_id: string; p_reason: string }
         Returns: undefined
       }
       admin_suspend_creator: {
@@ -3409,6 +3576,14 @@ export type Database = {
       admin_warn_user: {
         Args: { p_admin_note?: string; p_reason?: string; p_user_id: string }
         Returns: undefined
+      }
+      append_stream_session_fraud_flags: {
+        Args: { p_flags: string[]; p_session_id: string }
+        Returns: undefined
+      }
+      approve_payout_request: {
+        Args: { p_withdrawal_id: string }
+        Returns: Json
       }
       assign_admin_role: { Args: { p_user_id: string }; Returns: undefined }
       assign_role_for_account_type: {
@@ -3546,6 +3721,10 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: number
       }
+      get_landing_public_stats: {
+        Args: { p_heartbeat_since: string; p_month_start: string }
+        Returns: Json
+      }
       get_launch_progress: { Args: never; Returns: Json }
       get_like_count: { Args: { p_track_id: string }; Returns: number }
       get_my_recent_activity: {
@@ -3564,6 +3743,10 @@ export type Database = {
       }
       get_payout_summary: { Args: never; Returns: Json }
       get_playback_position: { Args: { p_track_id: string }; Returns: number }
+      get_public_artist_profile: {
+        Args: { p_creator_id: string }
+        Returns: Json
+      }
       get_recommendations: { Args: { p_limit?: number }; Returns: Json }
       get_royalty_cycle_summary: { Args: { p_cycle_id: string }; Returns: Json }
       get_similar_tracks: {
@@ -3573,16 +3756,10 @@ export type Database = {
       get_suggested_albums: { Args: { p_limit?: number }; Returns: Json }
       get_suggested_artists: { Args: { p_limit?: number }; Returns: Json }
       get_system_setting: { Args: { p_key: string }; Returns: Json }
+      get_top_guinea_feed: { Args: { p_limit?: number }; Returns: Json }
+      get_track_listen_counts: { Args: { p_track_id: string }; Returns: Json }
       get_trending_tracks: {
         Args: { p_limit?: number; p_window?: string }
-        Returns: Json
-      }
-      get_top_guinea_feed: {
-        Args: { p_limit?: number }
-        Returns: Json
-      }
-      get_track_listen_counts: {
-        Args: { p_track_id: string }
         Returns: Json
       }
       get_user_payouts: { Args: { p_limit?: number }; Returns: Json }
@@ -3638,6 +3815,10 @@ export type Database = {
           p_entity_type?: string
           p_metadata?: Json
         }
+        Returns: string
+      }
+      map_intent_provider_to_payment_method: {
+        Args: { p_provider: string }
         Returns: string
       }
       mark_all_notifications_read: { Args: never; Returns: number }
@@ -3961,9 +4142,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       contract_type: [

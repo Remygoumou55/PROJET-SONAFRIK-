@@ -1,6 +1,7 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
 import type { Album, Genre, Track, TrackAppearance, TrackCredit, TrackCreditRole, TrackFile } from "@sonafrik/types";
+import { enrichTrackCreditsWithCreatorIds } from "../common/profile-creator.helpers";
 import type { TrackCreditItem } from "./schemas";
 
 function slugify(value: string): string {
@@ -270,7 +271,7 @@ export class CatalogRepository {
       .order("display_order");
 
     if (error) throw error;
-    return (data ?? []) as TrackCredit[];
+    return enrichTrackCreditsWithCreatorIds(this.client, (data ?? []) as TrackCredit[]);
   }
 
   async setTrackCredits(trackId: string, credits: TrackCreditItem[]): Promise<void> {

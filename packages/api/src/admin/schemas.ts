@@ -53,3 +53,17 @@ export const adminSuspendCreatorSchema = z.object({
   creatorId: z.string().uuid(),
   reason: z.string().min(3).max(500).optional(),
 });
+
+export const adminAwardEditionActionSchema = z.object({
+  editionId: z.string().uuid(),
+  adminNote: z.string().max(1000).optional(),
+});
+
+export const adminBeatActionSchema = z.object({
+  beatId: z.string().uuid(),
+});
+
+export const adminRejectBeatSchema = z.object({
+  beatId: z.string().uuid(),
+  reason: z.string().min(3).max(500),
+});

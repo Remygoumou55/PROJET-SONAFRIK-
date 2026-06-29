@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import type {
   AdminCockpitData,
   AdminDashboardKpis,
@@ -6,6 +9,8 @@ import type {
 } from "@sonafrik/api/admin";
 import type { AdminSessionContext } from "../lib/getAdminSessionContext";
 import { buildAdminDashboardView } from "../lib/buildAdminDashboardView";
+import { mergeAdminLiveData } from "../lib/mergeAdminLiveData";
+import { useAdminLdse } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { AdminCommandHero } from "./dashboard/AdminCommandHero";
 import { AdminPremiumKpiGrid } from "./dashboard/AdminPremiumKpiGrid";
 import { AdminLiveTimeline } from "./dashboard/AdminLiveTimeline";
@@ -42,6 +47,9 @@ export interface AdminCockpitDashboardProps {
   adminUser: AdminSessionContext;
 }
 
+/**
+ * Cockpit admin — vue reconstruite à chaque refresh LDSE (SSOT badges/metrics).
+ */
 export function AdminCockpitDashboard({
   cockpit,
   extendedKpis,
@@ -49,13 +57,22 @@ export function AdminCockpitDashboard({
   live,
   adminUser,
 }: AdminCockpitDashboardProps) {
-  const view = buildAdminDashboardView({
-    adminName: adminUser.fullName,
-    cockpit,
-    extended: extendedKpis,
-    health: health ?? EMPTY_HEALTH,
-    live: live ?? EMPTY_LIVE,
-  });
+  const { snapshot } = useAdminLdse();
+
+  const view = useMemo(() => {
+    const { cockpit: liveCockpit, extended: liveExtended } = mergeAdminLiveData(
+      cockpit,
+      extendedKpis,
+      snapshot,
+    );
+    return buildAdminDashboardView({
+      adminName: adminUser.fullName,
+      cockpit: liveCockpit,
+      extended: liveExtended,
+      health: health ?? EMPTY_HEALTH,
+      live: live ?? EMPTY_LIVE,
+    });
+  }, [cockpit, extendedKpis, snapshot, adminUser.fullName, health, live]);
 
   return (
     <div className="admin-dashboard admin-dashboard--human">

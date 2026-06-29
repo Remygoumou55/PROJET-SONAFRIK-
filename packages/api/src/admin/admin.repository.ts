@@ -6,8 +6,14 @@ import { AdminFinancialRepository } from "./admin.financial.repository";
 import { AdminFraudRepository } from "./admin.fraud.repository";
 import { AdminMetricsRepository } from "./admin.metrics.repository";
 import { AdminModerationRepository } from "./admin.moderation.repository";
+import { AdminAnalyticsRepository } from "./admin.analytics.repository";
+import { AdminAwardsRepository } from "./admin.awards.repository";
+import { AdminBeatStoreRepository, type BeatStoreFilter } from "./admin.beatstore.repository";
 import type {
   AdminAlert,
+  AdminAnalyticsDashboard,
+  AdminAwardsDashboard,
+  AdminBeatStoreDashboard,
   AdminCockpitData,
   AdminDashboardKpis,
   AdminFraudMetrics,
@@ -34,6 +40,9 @@ export class AdminRepository {
   private readonly dashboard: AdminDashboardRepository;
   private readonly financial: AdminFinancialRepository;
   private readonly fraud: AdminFraudRepository;
+  private readonly analytics: AdminAnalyticsRepository;
+  private readonly awards: AdminAwardsRepository;
+  private readonly beatstore: AdminBeatStoreRepository;
 
   constructor(client: SonafrikSupabaseClient) {
     this.config = new AdminConfigRepository(client);
@@ -42,6 +51,9 @@ export class AdminRepository {
     this.dashboard = new AdminDashboardRepository(client, this.metrics);
     this.financial = new AdminFinancialRepository(client);
     this.fraud = new AdminFraudRepository(client, this.metrics);
+    this.analytics = new AdminAnalyticsRepository(client);
+    this.awards = new AdminAwardsRepository(client);
+    this.beatstore = new AdminBeatStoreRepository(client);
   }
 
   listFeatureFlags(): Promise<FeatureFlag[]> {
@@ -166,5 +178,41 @@ export class AdminRepository {
 
   getWalletBalancesByUserIds(userIds: string[]): Promise<Record<string, number>> {
     return this.financial.getWalletBalancesByUserIds(userIds);
+  }
+
+  getAnalyticsDashboard(): Promise<AdminAnalyticsDashboard> {
+    return this.analytics.getDashboard();
+  }
+
+  getAwardsDashboard(): Promise<AdminAwardsDashboard> {
+    return this.awards.getDashboard();
+  }
+
+  closeAwardVotes(editionId: string): Promise<void> {
+    return this.awards.closeVotes(editionId);
+  }
+
+  distributeAwardPrizes(editionId: string, adminNote?: string): Promise<void> {
+    return this.awards.distributePrizes(editionId, adminNote);
+  }
+
+  getBeatStoreDashboard(params: {
+    filter: BeatStoreFilter;
+    page: number;
+    limit: number;
+  }): Promise<AdminBeatStoreDashboard> {
+    return this.beatstore.getDashboard(params);
+  }
+
+  approveBeat(beatId: string): Promise<void> {
+    return this.beatstore.approveBeat(beatId);
+  }
+
+  rejectBeat(beatId: string, reason: string): Promise<void> {
+    return this.beatstore.rejectBeat(beatId, reason);
+  }
+
+  deleteBeat(beatId: string): Promise<void> {
+    return this.beatstore.deleteBeat(beatId);
   }
 }

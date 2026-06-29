@@ -87,9 +87,8 @@ export function getSupabaseAdminClient(options?: { adminVerified?: boolean }): S
   }) as unknown as SonafrikSupabaseClient;
 }
 
-// React.cache() déduplique les appels dans le même rendu serveur :
-// layout.tsx + page.tsx + composants qui appellent getSupabaseServerClient()
-// partagent la même instance — une seule création par request HTTP.
+// React.cache() déduplique les appels dans le même rendu serveur.
+// Ne pas utiliser dans unstable_cache — voir @/lib/cache (createRequestCachedQuery / createPublicCachedQuery).
 export const getSupabaseServerClient = cache(
   async (): Promise<SonafrikSupabaseClient> => {
     const cookieStore = await cookies();

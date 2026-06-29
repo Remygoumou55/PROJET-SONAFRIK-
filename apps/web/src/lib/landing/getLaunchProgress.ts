@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { createPublicCachedQuery } from "@/lib/cache";
 import type { LaunchProgress } from "@sonafrik/types";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { parseLaunchProgress } from "./parseLaunchProgress";
@@ -14,8 +14,8 @@ async function fetchLaunchProgress(): Promise<LaunchProgress | null> {
   }
 }
 
-export const getLaunchProgress = unstable_cache(
+export const getLaunchProgress = createPublicCachedQuery(
+  "landing-launch-progress",
   fetchLaunchProgress,
-  ["landing-launch-progress"],
   { revalidate: 300, tags: ["subscriber-count", "launch-progress"] },
 );
