@@ -5,7 +5,6 @@ import type { CreatorDashboardData } from "@sonafrik/types";
 import { HeroCard } from "../dashboard/components/HeroCard";
 import { GlanceKpiGrid } from "../dashboard/components/enterprise/GlanceKpiGrid";
 import { WelcomeModal } from "../dashboard/components/WelcomeModal";
-import { DashboardQuickCards } from "../dashboard/components/DashboardQuickCards";
 import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalogueCard";
 import { DashboardCareerProgressCard } from "../dashboard/components/DashboardCareerProgressCard";
 import { DashboardCoachCard } from "../dashboard/components/DashboardCoachCard";
@@ -21,20 +20,6 @@ function fmtGnf(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M GNF`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k GNF`;
   return `${n.toLocaleString("fr-FR")} GNF`;
-}
-
-function RevenueCard({ revenueStats }: { revenueStats: CreatorDashboardData["revenueStats"] }) {
-  return (
-    <div className="co-card">
-      <p className="co-card-label">💰 Revenus</p>
-      <p className="co-wallet-value">{fmtGnf(revenueStats.total_royalties_gnf)}</p>
-      <div className="co-revenue-details">
-        <span className="co-revenue-pending">
-          En attente : {fmtGnf(revenueStats.pending_royalties_gnf)}
-        </span>
-      </div>
-    </div>
-  );
 }
 
 function WalletCard({ balanceGnf }: { balanceGnf: number }) {
@@ -57,13 +42,10 @@ function WalletCard({ balanceGnf }: { balanceGnf: number }) {
 }
 
 export function CreatorDashboardView({ data }: Props) {
-  const { context, hero, revenueStats, topTrack, catalogCounts, activities, assistantTips, careerOs, kpis, profileCreatedAt } = data;
+  const { context, hero, revenueStats, topTrack, catalogCounts, activities, assistantTips, careerOs, profileCreatedAt } = data;
   const creatorId = context.creator.id;
 
   const validTopTrack = topTrack && isValidContentName(topTrack.title) ? topTrack : null;
-
-  const followersKpi = kpis.find((k) => k.id === "followers");
-  const followersValue = followersKpi?.value ?? "0";
 
   return (
     <div className="creator-dashboard">
@@ -79,17 +61,9 @@ export function CreatorDashboardView({ data }: Props) {
         profileCreatedAt={profileCreatedAt}
       />
 
-      <DashboardQuickCards
-        tracksPublished={catalogCounts.tracksPublished}
-        followersValue={followersValue}
-      />
-
       <GlanceKpiGrid data={data} />
 
-      <div className="co-bottom-row">
-        <RevenueCard revenueStats={revenueStats} />
-        <WalletCard balanceGnf={revenueStats.wallet_balance_gnf} />
-      </div>
+      <WalletCard balanceGnf={revenueStats.wallet_balance_gnf} />
 
       <DashboardCatalogueCard
         topTrack={validTopTrack}

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { memo } from "react";
 import type {
   ArtistProfile,
@@ -42,10 +41,8 @@ export const ArtistHero = memo(function ArtistHero({
     profileCreatedAt,
   });
 
-  // Keep only "online" and "verified" — remove "member since" and "profile %" per spec
-  const visibleBadges = allBadges.filter(
-    (b) => b.id === "online" || b.id === "verified",
-  );
+  // V3: only "verified" badge (Artiste Émergent) — online removed per spec
+  const visibleBadges = allBadges.filter((b) => b.id === "verified");
 
   const artistType = resolveArtistTypeLabel(creator);
 
@@ -73,9 +70,18 @@ export const ArtistHero = memo(function ArtistHero({
           <p className="artist-hero__greeting artist-hero__greeting--vitrine">
             {formatCreatorGreeting(artistProfile.stage_name)}
           </p>
-          <h2 className="artist-hero__name artist-hero__name--vitrine">
-            {artistProfile.stage_name}
-          </h2>
+          <div className="artist-hero__name-row">
+            <h2 className="artist-hero__name artist-hero__name--vitrine">
+              {artistProfile.stage_name}
+            </h2>
+            <button
+              type="button"
+              className="artist-hero__follow-btn"
+              aria-label={`Suivre ${artistProfile.stage_name}`}
+            >
+              + Suivre
+            </button>
+          </div>
           <p className="artist-hero__type artist-hero__type--vitrine">{artistType}</p>
 
           {visibleBadges.length > 0 && (
@@ -88,31 +94,11 @@ export const ArtistHero = memo(function ArtistHero({
                   key={badge.id}
                   className={`artist-hero__badge artist-hero__badge--${badge.tone}`}
                 >
-                  {badge.tone === "online" ? (
-                    <>
-                      <span className="artist-hero__online-dot" aria-hidden="true" />
-                      {badge.label}
-                    </>
-                  ) : (
-                    badge.label
-                  )}
+                  {badge.label}
                 </li>
               ))}
             </ul>
           )}
-        </div>
-
-        <div className="artist-hero__cta-group">
-          <button
-            type="button"
-            className="artist-hero__follow-btn"
-            aria-label={`Suivre ${artistProfile.stage_name}`}
-          >
-            Suivre
-          </button>
-          <Link href="/creator/catalog/tracks" className="artist-hero__publish-btn">
-            Publier maintenant
-          </Link>
         </div>
       </div>
     </section>
