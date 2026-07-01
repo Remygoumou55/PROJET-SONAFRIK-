@@ -11,26 +11,12 @@ export type CreatorNavLink = {
 
 export type CreatorNavEntry = CreatorNavSection | CreatorNavLink;
 
-export function buildCreatorNavEntries(pendingVerifications = 0): CreatorNavEntry[] {
+export function buildCreatorNavEntries(_pendingVerifications = 0): CreatorNavEntry[] {
   return [
-    { type: "section", label: "Espace artiste" },
-    { href: "/creator", label: "Vue d'ensemble", icon: "📊", exact: true },
-    { href: "/creator/analytics", label: "Mes statistiques", icon: "📈", exact: true },
-    { type: "section", label: "Mon catalogue" },
-    { href: "/creator/catalog", label: "Tout mon catalogue", icon: "💿", exact: true },
-    { href: "/creator/catalog/tracks", label: "Uploader un morceau", icon: "🎵" },
-    { href: "/creator/catalog/releases", label: "Mes sorties", icon: "📀" },
-    { type: "section", label: "Mon profil" },
-    { href: "/creator/identity", label: "Identité artiste", icon: "👤" },
-    {
-      href: "/creator/verification",
-      label: "Vérification",
-      icon: "✓",
-      badge: pendingVerifications,
-    },
-    { href: "/creator/rights", label: "Droits et contrats", icon: "⚖️" },
-    { href: "/creator/labels", label: "Labels", icon: "🏷" },
-    { href: "/creator/team", label: "Équipe", icon: "👥" },
+    { href: "/creator",           label: "Vue d'ensemble", icon: "📊", exact: true },
+    { href: "/creator/catalog",   label: "Mon catalogue",  icon: "🎵", exact: true },
+    { href: "/creator/analytics", label: "Statistiques",   icon: "📈", exact: true },
+    { href: "/creator/identity",  label: "Mon profil",     icon: "👤" },
   ];
 }
 

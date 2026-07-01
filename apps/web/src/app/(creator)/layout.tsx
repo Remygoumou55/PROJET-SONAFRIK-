@@ -31,6 +31,7 @@ async function CreatorGuard({ children }: { children: React.ReactNode }) {
         stageName={context.artistProfile.stage_name || "Artiste"}
         creatorId={context.creator.id}
         avatarPath={avatarPath}
+        tier={context.creator.tier}
       >
         {children}
       </CreatorLayoutClient>
