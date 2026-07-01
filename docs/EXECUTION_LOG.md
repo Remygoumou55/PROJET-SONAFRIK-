@@ -11,6 +11,26 @@
 
 ---
 
+## 2026-07-01 — Onboarding Choose Your Journey (humanisation)
+
+### Fichiers touchés
+- `apps/web/src/app/onboarding/role/page.tsx` — hero émotionnel, grille 2 portes
+- `apps/web/src/app/onboarding/role/JourneyDoorCard.tsx` — cartes Artiste/Auditeur premium
+- `apps/web/src/app/styles/onboarding-journey.css` — fonds SVG, hover, sélection, responsive
+- `apps/web/src/components/onboarding/OnboardingPageShell.tsx` — props `wide` + `bare`
+
+### Logique métier
+- Inchangée : `setAccountType` + redirect `/onboarding/artist|listener`
+- Sélection puis CTA (2 clics) pour feedback visuel
+
+### Tests à faire
+- [ ] `/onboarding/role` desktop 2 colonnes, mobile vertical
+- [ ] Sélection + CTA Artiste → onboarding artiste
+- [ ] Sélection + CTA Auditeur → onboarding listener
+- [ ] Navigation clavier + focus visible
+
+---
+
 ## 2026-07-01 — Auth Google-only (auth_phone_enabled)
 
 ### Fichiers touchés

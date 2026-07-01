@@ -2,25 +2,39 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { OnboardingPageShell } from "@/components/onboarding/OnboardingPageShell";
 import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
-import { ROLE_ICONS, RoleSelectionCard } from "./RoleSelectionCard";
+import { JourneyDoorCard, type JourneyDoorKind } from "./JourneyDoorCard";
 
-const ROLES = [
+const JOURNEYS = [
   {
-    value: "listener" as const,
-    accountType: "auditeur" as const,
-    label: "Auditeur",
-    description: "Découvrir, écouter et soutenir les artistes guinéens",
-    dest: "/onboarding/listener",
+    kind: "artist" as const,
+    accountType: "artiste" as const,
+    heading: "JE SUIS UN ARTISTE",
+    subtitle: "Votre musique mérite d'être entendue.",
+    benefits: [
+      "Publier mes morceaux",
+      "Recevoir mes revenus",
+      "Construire ma carrière",
+      "Développer ma communauté",
+    ],
+    ctaLabel: "Commencer ma carrière →",
+    dest: "/onboarding/artist",
   },
   {
-    value: "artist" as const,
-    accountType: "artiste" as const,
-    label: "Artiste",
-    description: "Publier mes morceaux et toucher mes revenus",
-    dest: "/onboarding/artist",
+    kind: "listener" as const,
+    accountType: "auditeur" as const,
+    heading: "JE SUIS UN AUDITEUR",
+    subtitle: "Découvrez les talents de Guinée.",
+    benefits: [
+      "Explorer la musique",
+      "Créer mes playlists",
+      "Soutenir les artistes",
+      "Découvrir les nouveautés",
+    ],
+    ctaLabel: "Commencer l'écoute →",
+    dest: "/onboarding/listener",
   },
 ] as const;
 
@@ -37,49 +51,74 @@ const BACK_LINK = (
 export default function RolePage() {
   const router = useRouter();
   const auth = useAuthService();
-  const [loading, setLoading] = useState<"listener" | "artist" | null>(null);
+  const [selected, setSelected] = useState<JourneyDoorKind | null>(null);
+  const [loading, setLoading] = useState<JourneyDoorKind | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSelect(role: (typeof ROLES)[number]) {
-    setLoading(role.value);
-    setError(null);
-    try {
-      await auth.setAccountType(role.accountType);
-      router.push(role.dest);
-    } catch {
-      setError("Une erreur est survenue. Réessayez.");
-      setLoading(null);
-    }
-  }
+  const handleContinue = useCallback(
+    async (journey: (typeof JOURNEYS)[number]) => {
+      if (loading) return;
+      setLoading(journey.kind);
+      setError(null);
+      try {
+        await auth.setAccountType(journey.accountType);
+        router.push(journey.dest);
+      } catch {
+        setError("Une erreur est survenue. Réessayez.");
+        setLoading(null);
+      }
+    },
+    [auth, loading, router],
+  );
 
   return (
-    <OnboardingPageShell
-      leading={BACK_LINK}
-      stepLabel="Étape 1 · Choisir votre profil"
-      title="Comment voulez-vous utiliser SONAFRIK ?"
-      subtitle="Vous pourrez changer de mode plus tard."
-    >
-      <div className="flex flex-col gap-3">
-        {ROLES.map((role) => (
-          <RoleSelectionCard
-            key={role.value}
-            icon={ROLE_ICONS[role.value]}
-            label={role.label}
-            description={role.description}
-            accent={role.value}
-            loading={loading === role.value}
-            disabled={loading !== null}
-            dimmed={loading !== null && loading !== role.value}
-            onSelect={() => handleSelect(role)}
-          />
-        ))}
-      </div>
+    <OnboardingPageShell leading={BACK_LINK} title="" wide bare>
+      <div className="onboarding-journey">
+        <header className="onboarding-journey__hero">
+          <p className="onboarding-journey__tagline">La musique commence par un choix.</p>
+          <h1 className="onboarding-journey__title">
+            Quelle sera votre place dans l&apos;histoire de la musique guinéenne ?
+          </h1>
+          <p className="onboarding-journey__hint">Vous pourrez changer de mode plus tard.</p>
+        </header>
 
-      {error ? (
-        <p className="mt-4 text-center text-sm text-erreur" role="alert">
-          {error}
+        <div
+          className="onboarding-journey__grid"
+          role="group"
+          aria-label="Choisissez votre aventure musicale"
+        >
+          {JOURNEYS.map((journey) => (
+            <JourneyDoorCard
+              key={journey.kind}
+              kind={journey.kind}
+              heading={journey.heading}
+              subtitle={journey.subtitle}
+              benefits={journey.benefits}
+              ctaLabel={journey.ctaLabel}
+              selected={selected === journey.kind}
+              loading={loading === journey.kind}
+              dimmed={loading !== null && loading !== journey.kind}
+              onSelect={() => setSelected(journey.kind)}
+              onContinue={() => {
+                if (selected !== journey.kind) {
+                  setSelected(journey.kind);
+                }
+                void handleContinue(journey);
+              }}
+            />
+          ))}
+        </div>
+
+        <p className="onboarding-journey__footer">
+          Chaque artiste que vous soutenez contribue au rayonnement de la musique guinéenne.
         </p>
-      ) : null}
+
+        {error ? (
+          <p className="text-center text-sm text-erreur" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </OnboardingPageShell>
   );
 }

@@ -1,0 +1,358 @@
+/* Onboarding — Choose Your Journey (portes Artiste / Auditeur) */
+
+.onboarding-journey {
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.onboarding-journey__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.onboarding-journey__tagline {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-or-solaire);
+}
+
+.onboarding-journey__title {
+  margin: 0;
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-texte-principal);
+  max-width: 28rem;
+}
+
+.onboarding-journey__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-texte-desactive);
+}
+
+.onboarding-journey__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.onboarding-journey__footer {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-texte-secondaire);
+  padding: 0 1rem;
+}
+
+/* —— Porte —— */
+.journey-door {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100%;
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--color-bordure);
+  background: var(--color-surface);
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.journey-door:hover:not(.journey-door--dimmed) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--color-noir-profond) 45%, transparent);
+}
+
+.journey-door--artist:hover:not(.journey-door--dimmed) {
+  border-color: color-mix(in srgb, var(--color-or-solaire) 50%, var(--color-bordure));
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--color-noir-profond) 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-or-solaire) 20%, transparent);
+}
+
+.journey-door--listener:hover:not(.journey-door--dimmed) {
+  border-color: color-mix(in srgb, var(--color-vert-energie) 50%, var(--color-bordure));
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--color-noir-profond) 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-vert-energie) 20%, transparent);
+}
+
+.journey-door--selected.journey-door--artist {
+  border-color: var(--color-or-solaire);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-or-solaire) 35%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-or-solaire) 15%, transparent);
+}
+
+.journey-door--selected.journey-door--listener {
+  border-color: var(--color-vert-energie);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-vert-energie) 35%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-vert-energie) 15%, transparent);
+}
+
+.journey-door--dimmed {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.journey-door__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.journey-door__check {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.journey-door--selected .journey-door__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.journey-door--artist .journey-door__check {
+  background: color-mix(in srgb, var(--color-or-solaire) 20%, transparent);
+  color: var(--color-or-solaire);
+  border: 1px solid color-mix(in srgb, var(--color-or-solaire) 45%, transparent);
+}
+
+.journey-door--listener .journey-door__check {
+  background: color-mix(in srgb, var(--color-vert-energie) 15%, transparent);
+  color: var(--color-vert-energie);
+  border: 1px solid color-mix(in srgb, var(--color-vert-energie) 40%, transparent);
+}
+
+.journey-door__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.journey-door__select {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  color: inherit;
+  font: inherit;
+}
+
+.journey-door__select:focus-visible {
+  outline: 2px solid var(--color-vert-energie);
+  outline-offset: 4px;
+  border-radius: var(--radius-md, 8px);
+}
+
+.journey-door__icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.journey-door:hover .journey-door__icon {
+  transform: scale(1.06);
+}
+
+.journey-door__heading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-texte-principal);
+}
+
+.journey-door--artist .journey-door__heading {
+  color: var(--color-or-solaire);
+}
+
+.journey-door--listener .journey-door__heading {
+  color: var(--color-vert-energie);
+}
+
+.journey-door__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-texte-secondaire);
+}
+
+.journey-door__benefits {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+  text-align: left;
+}
+
+.journey-door__benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-texte-secondaire);
+}
+
+.journey-door__benefits li span[aria-hidden] {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  margin-top: 0.1rem;
+}
+
+.journey-door--artist .journey-door__benefits li span[aria-hidden] {
+  color: var(--color-or-solaire);
+}
+
+.journey-door--listener .journey-door__benefits li span[aria-hidden] {
+  color: var(--color-vert-energie);
+}
+
+.journey-door__cta {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    opacity 0.2s ease;
+}
+
+.journey-door__cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.journey-door__cta:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.journey-door__cta:focus-visible {
+  outline: 2px solid var(--color-texte-principal);
+  outline-offset: 2px;
+}
+
+.journey-door--artist .journey-door__cta {
+  background: color-mix(in srgb, var(--color-or-solaire) 18%, var(--color-noir-profond));
+  color: var(--color-or-solaire);
+  border: 1px solid color-mix(in srgb, var(--color-or-solaire) 45%, transparent);
+}
+
+.journey-door--artist .journey-door__cta:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-or-solaire) 28%, var(--color-noir-profond));
+}
+
+.journey-door--listener .journey-door__cta {
+  background: color-mix(in srgb, var(--color-vert-energie) 14%, var(--color-noir-profond));
+  color: var(--color-vert-energie);
+  border: 1px solid color-mix(in srgb, var(--color-vert-energie) 40%, transparent);
+}
+
+.journey-door--listener .journey-door__cta:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-vert-energie) 22%, var(--color-noir-profond));
+}
+
+.journey-door__cta-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: journey-spin 0.7s linear infinite;
+}
+
+@keyframes journey-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Fonds graphiques SVG */
+.journey-door__bg svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .onboarding-journey__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .journey-door {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .journey-door__cta {
+    min-height: 3rem;
+    font-size: 0.9375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-door,
+  .journey-door__icon,
+  .journey-door__check,
+  .journey-door__cta {
+    transition: none;
+  }
+
+  .journey-door:hover {
+    transform: none;
+  }
+
+  .journey-door__cta-spinner {
+    animation: none;
+  }
+}

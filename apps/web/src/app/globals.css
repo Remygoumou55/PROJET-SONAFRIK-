@@ -23,6 +23,7 @@
 @import "./styles/wallet.css";
 @import "./styles/admin-bundle.css";
 @import "./styles/auth-google-only.css";
+@import "./styles/onboarding-journey.css";
 
 @theme {
   --color-vert-energie: #00d26a;
