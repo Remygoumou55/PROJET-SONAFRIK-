@@ -1,0 +1,366 @@
+/* ─── Artist Public Profile Page ────────────────────────────────────────── */
+
+.ap-page {
+  min-height: 100svh;
+  background: var(--color-noir-profond);
+  padding-bottom: 6rem; /* room for player bar */
+}
+
+/* Back link */
+.ap-back {
+  padding: 1rem 1.25rem 0;
+}
+.ap-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--color-texte-secondaire);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.ap-back-link:hover { color: var(--color-texte-principal); }
+
+/* Banner */
+.ap-banner {
+  margin-top: 0.75rem;
+  width: 100%;
+  height: 7.5rem;
+  overflow: hidden;
+  position: relative;
+}
+@media (min-width: 640px) {
+  .ap-banner { height: 10rem; }
+}
+.ap-banner--img { background: var(--color-card); }
+.ap-banner--gradient {
+  background: linear-gradient(135deg, rgba(0, 210, 106, 0.13) 0%, rgba(255, 194, 14, 0.07) 100%);
+}
+
+/* Body */
+.ap-body {
+  padding: 0 1.25rem 1rem;
+}
+@media (min-width: 640px) {
+  .ap-body { padding-inline: 1.75rem; }
+}
+
+/* Avatar */
+.ap-avatar-wrap {
+  margin-top: -2.75rem;
+  margin-bottom: 0.75rem;
+}
+.ap-avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--color-noir-profond);
+  background: var(--color-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+@media (min-width: 640px) {
+  .ap-avatar { width: 6.5rem; height: 6.5rem; }
+}
+.ap-avatar-initial {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-vert-energie);
+  line-height: 1;
+}
+
+/* Name + verified */
+.ap-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+.ap-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-texte-principal);
+  line-height: 1.2;
+}
+@media (min-width: 640px) {
+  .ap-name { font-size: 1.875rem; }
+}
+.ap-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgba(255, 194, 14, 0.13);
+  color: var(--color-or-solaire);
+}
+
+/* Genres */
+.ap-genres {
+  margin: 0 0 0.875rem;
+  font-size: 0.875rem;
+  color: var(--color-texte-secondaire);
+}
+
+/* Stats row — TikTok style */
+.ap-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.125rem;
+}
+.ap-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 1rem 0 0;
+}
+.ap-stat:first-child { padding-left: 0; }
+.ap-stat-value {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-texte-principal);
+  line-height: 1.1;
+}
+.ap-stat-label {
+  font-size: 0.6875rem;
+  color: var(--color-texte-desactive);
+}
+.ap-stat-sep {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+/* Follow + Support */
+.ap-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Bio */
+.ap-bio {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-texte-secondaire);
+  max-width: 36rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Sections */
+.ap-section {
+  margin-bottom: 2rem;
+}
+.ap-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-texte-desactive);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.ap-pin-icon { font-size: 0.875rem; }
+
+/* Albums horizontal scroll */
+.ap-albums-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+.ap-albums-scroll::-webkit-scrollbar { display: none; }
+.ap-album-card {
+  flex-shrink: 0;
+  width: 7rem;
+  text-decoration: none;
+}
+.ap-album-cover {
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  position: relative;
+  background: var(--color-card);
+}
+.ap-album-title {
+  margin: 0 0 0.125rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ap-album-title:hover { text-decoration: underline; }
+.ap-album-type {
+  margin: 0;
+  font-size: 0.625rem;
+  color: var(--color-texte-desactive);
+}
+
+/* Tracks header with sort tabs */
+.ap-tracks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.ap-tracks-header .ap-section-title { margin-bottom: 0; }
+.ap-sort-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  padding: 0.2rem;
+}
+.ap-sort-tab {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-texte-secondaire);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.ap-sort-tab:hover { color: var(--color-texte-principal); }
+.ap-sort-tab--active {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--color-texte-principal);
+  font-weight: 600;
+}
+
+/* Track list */
+.ap-track-list { display: flex; flex-direction: column; gap: 0; }
+.ap-track-list-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.ap-play-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--color-vert-energie);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-noir-profond);
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.ap-play-all-btn:hover { filter: brightness(1.08); }
+
+.ap-track-error {
+  font-size: 0.8125rem;
+  padding: 0 0.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-erreur);
+}
+
+.ap-track-rows { display: flex; flex-direction: column; gap: 0.125rem; }
+
+.ap-track-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.ap-track-row:hover { background: rgba(255, 255, 255, 0.03); }
+.ap-track-row--active {
+  background: rgba(0, 210, 106, 0.07);
+  border-color: rgba(0, 210, 106, 0.18);
+}
+.ap-track-play-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.ap-track-index {
+  width: 2rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+.ap-track-num {
+  font-size: 0.875rem;
+  color: var(--color-texte-desactive);
+}
+.ap-track-cover {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--color-card);
+}
+.ap-track-meta { flex: 1; min-width: 0; }
+.ap-track-title {
+  margin: 0 0 0.125rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-texte-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ap-track-title--active { color: var(--color-vert-energie); }
+.ap-track-plays {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-texte-desactive);
+}
+.ap-track-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.ap-track-duration {
+  font-size: 0.75rem;
+  color: var(--color-texte-desactive);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty state */
+.ap-empty {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  background: var(--color-card);
+  border-radius: 0.75rem;
+}
+.ap-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-texte-desactive);
+}

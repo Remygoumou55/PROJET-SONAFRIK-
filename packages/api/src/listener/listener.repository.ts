@@ -299,6 +299,110 @@ export class ListenerRepository {
     });
   }
 
+  async getArtistPublicStats(creatorId: string): Promise<{ follower_count: number; total_streams: number; track_count: number }> {
+    const [followResult, tracksResult] = await Promise.all([
+      this.client
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("entity_type", "artist")
+        .eq("entity_id", creatorId),
+      this.client
+        .from("tracks")
+        .select("play_count")
+        .eq("creator_id", creatorId)
+        .eq("publication_status", "published")
+        .is("deleted_at", null),
+    ]);
+
+    const follower_count = followResult.count ?? 0;
+    const rows = tracksResult.data ?? [];
+    const track_count = rows.length;
+    const total_streams = rows.reduce((acc, r) => {
+      const row = r as Record<string, unknown>;
+      return acc + (typeof row.play_count === "number" ? row.play_count : 0);
+    }, 0);
+
+    return { follower_count, total_streams, track_count };
+  }
+
+  async getPinnedTracksForArtist(
+    creatorId: string,
+    artistName: string,
+    albumCovers: Map<string, string | null>,
+  ): Promise<TrackWithMeta[]> {
+    const { data, error } = await this.client
+      .from("tracks")
+      .select("id, title, duration_seconds, track_number, creator_id, publication_status, album_id, play_count, is_pinned, pin_order")
+      .eq("creator_id", creatorId)
+      .eq("publication_status", "published")
+      .eq("is_pinned", true)
+      .is("deleted_at", null)
+      .order("pin_order", { ascending: true })
+      .limit(3);
+    if (error) throw error;
+
+    return (data ?? []).map((t) => {
+      const r = t as Record<string, unknown>;
+      const albumId = (r.album_id as string | null) ?? null;
+      return {
+        id: String(r.id ?? ""),
+        title: String(r.title ?? ""),
+        duration_seconds: typeof r.duration_seconds === "number" ? r.duration_seconds : null,
+        track_number: typeof r.track_number === "number" ? r.track_number : null,
+        creator_id: String(r.creator_id ?? ""),
+        publication_status: String(r.publication_status ?? ""),
+        album_id: albumId,
+        artist_name: artistName,
+        cover_url: albumId ? (albumCovers.get(albumId) ?? null) : null,
+        play_count: typeof r.play_count === "number" ? r.play_count : 0,
+      } as TrackWithMeta & { play_count: number };
+    });
+  }
+
+  async getPublishedTracksForArtistSorted(
+    creatorId: string,
+    artistName: string,
+    albumCovers: Map<string, string | null>,
+    sort: "popular" | "recent" | "oldest" = "recent",
+    limit = 30,
+  ): Promise<(TrackWithMeta & { play_count: number })[]> {
+    let query = this.client
+      .from("tracks")
+      .select("id, title, duration_seconds, track_number, creator_id, publication_status, album_id, play_count")
+      .eq("creator_id", creatorId)
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .limit(limit);
+
+    if (sort === "popular") {
+      query = query.order("play_count", { ascending: false });
+    } else if (sort === "oldest") {
+      query = query.order("published_at", { ascending: true });
+    } else {
+      query = query.order("published_at", { ascending: false });
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return (data ?? []).map((t) => {
+      const r = t as Record<string, unknown>;
+      const albumId = (r.album_id as string | null) ?? null;
+      return {
+        id: String(r.id ?? ""),
+        title: String(r.title ?? ""),
+        duration_seconds: typeof r.duration_seconds === "number" ? r.duration_seconds : null,
+        track_number: typeof r.track_number === "number" ? r.track_number : null,
+        creator_id: String(r.creator_id ?? ""),
+        publication_status: String(r.publication_status ?? ""),
+        album_id: albumId,
+        artist_name: artistName,
+        cover_url: albumId ? (albumCovers.get(albumId) ?? null) : null,
+        play_count: typeof r.play_count === "number" ? r.play_count : 0,
+      } as TrackWithMeta & { play_count: number };
+    });
+  }
+
   async getPlaylistTracksForPage(playlistId: string): Promise<ListenerPlaylistTrackRow[]> {
     const { data, error } = await this.client
       .from("playlist_tracks")

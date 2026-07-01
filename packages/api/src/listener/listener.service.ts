@@ -97,6 +97,28 @@ export class ListenerService {
     return this.repository.getPublishedTracksForArtist(creatorId, artistName, albumCovers, limit);
   }
 
+  getArtistPublicStats(creatorId: string) {
+    return this.repository.getArtistPublicStats(creatorId);
+  }
+
+  getPinnedTracksForArtist(
+    creatorId: string,
+    artistName: string,
+    albumCovers: Map<string, string | null>,
+  ) {
+    return this.repository.getPinnedTracksForArtist(creatorId, artistName, albumCovers);
+  }
+
+  getPublishedTracksForArtistSorted(
+    creatorId: string,
+    artistName: string,
+    albumCovers: Map<string, string | null>,
+    sort?: "popular" | "recent" | "oldest",
+    limit?: number,
+  ) {
+    return this.repository.getPublishedTracksForArtistSorted(creatorId, artistName, albumCovers, sort, limit);
+  }
+
   getPlaylistTracksForPage(playlistId: string): Promise<ListenerPlaylistTrackRow[]> {
     return this.repository.getPlaylistTracksForPage(playlistId);
   }

@@ -3025,10 +3025,13 @@ export type Database = {
           duration_seconds: number | null
           explicit: boolean
           id: string
+          is_pinned: boolean
           isrc: string | null
           language: string
           metadata: Json
           musical_key: string | null
+          pin_order: number
+          play_count: number
           publication_status: string
           published_at: string | null
           rejection_reason: string | null
@@ -3049,10 +3052,13 @@ export type Database = {
           duration_seconds?: number | null
           explicit?: boolean
           id?: string
+          is_pinned?: boolean
           isrc?: string | null
           language?: string
           metadata?: Json
           musical_key?: string | null
+          pin_order?: number
+          play_count?: number
           publication_status?: string
           published_at?: string | null
           rejection_reason?: string | null
@@ -3073,10 +3079,13 @@ export type Database = {
           duration_seconds?: number | null
           explicit?: boolean
           id?: string
+          is_pinned?: boolean
           isrc?: string | null
           language?: string
           metadata?: Json
           musical_key?: string | null
+          pin_order?: number
+          play_count?: number
           publication_status?: string
           published_at?: string | null
           rejection_reason?: string | null
@@ -3730,6 +3739,7 @@ export type Database = {
         Args: { p_limit?: number; p_status?: string }
         Returns: Json
       }
+      get_auth_feature_flags: { Args: never; Returns: Json }
       get_creator_audience_stats: {
         Args: { p_creator_id: string }
         Returns: Json
@@ -3967,6 +3977,15 @@ export type Database = {
       }
       request_withdrawal: {
         Args: { p_amount_gnf: number; p_payout_account_id: string }
+        Returns: string
+      }
+      resolve_track_cover_path: {
+        Args: {
+          p_album_cover: string
+          p_artist_cover: string
+          p_cover_images: string[]
+          p_profile_photo: string
+        }
         Returns: string
       }
       review_album_publication: {
