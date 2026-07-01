@@ -15,6 +15,23 @@ type AudioFormat = "mp3" | "aac";
 const ACCEPTED_EXTENSIONS = ".mp3,.m4a";
 const MAX_SIZE_MB = 50;
 
+function resolveFormatFromFile(file: File): AudioFormat | null {
+  const byMime = mimeToUploadFormat(file.type);
+  if (byMime) return byMime === "mp3" ? "mp3" : "aac";
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (ext === "mp3") return "mp3";
+  if (ext === "m4a") return "aac";
+  return null;
+}
+
+function resolveEffectiveMime(file: File): string {
+  if (file.type && mimeToUploadFormat(file.type)) return file.type;
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (ext === "mp3") return "audio/mpeg";
+  if (ext === "m4a") return "audio/mp4";
+  return file.type;
+}
+
 interface Props {
   trackId: string;
   creatorId: string;
@@ -61,22 +78,23 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
   const [isDragOver, setIsDragOver] = useState(false);
 
   const validate = useCallback(async (file: File): Promise<string | null> => {
-    const format = mimeToUploadFormat(file.type);
+    const format = resolveFormatFromFile(file);
     if (!format) {
-      return "Format non supporté. Formats acceptés : MP3, M4A.";
+      return "Format non supporté. Choisissez un fichier MP3 ou M4A.";
+    }
+    if (file.size === 0) {
+      return "Fichier vide.";
     }
     if (file.size > MAX_UPLOAD_BYTES) {
       const fileMB = (file.size / (1024 * 1024)).toFixed(1);
       return `Fichier trop volumineux (${fileMB} MB). Maximum autorisé : ${MAX_SIZE_MB} MB.`;
     }
-    if (file.size === 0) {
-      return "Fichier vide.";
-    }
 
     const header = new Uint8Array(await file.slice(0, 512).arrayBuffer());
+    const effectiveMime = resolveEffectiveMime(file);
     const precheck = validateAudioAsset({
       header,
-      mime: file.type,
+      mime: effectiveMime,
       fileSizeBytes: file.size,
       dbFormat: format === "mp3" ? "mp3" : "aac",
     });
@@ -104,7 +122,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
       return;
     }
 
-    const format: AudioFormat = mimeToUploadFormat(file.type) === "mp3" ? "mp3" : "aac";
+    const format: AudioFormat = resolveFormatFromFile(file) ?? "mp3";
 
     try {
       const durationSeconds = await getAudioDuration(file);
@@ -147,10 +165,11 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
     setState({ status: "uploading", file, durationSeconds, format, progress: 0 });
 
     try {
+      const effectiveMime = resolveEffectiveMime(file);
       const { signedUrl, path } = await catalog.requestAssetUploadUrl({
         creatorId,
         assetType: "audio",
-        contentType: file.type,
+        contentType: effectiveMime,
         trackId,
         format,
       });
@@ -158,7 +177,7 @@ export function AudioUploader({ trackId, creatorId, onSuccess }: Props) {
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", signedUrl, true);
-        xhr.setRequestHeader("Content-Type", file.type);
+        xhr.setRequestHeader("Content-Type", effectiveMime);
 
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {

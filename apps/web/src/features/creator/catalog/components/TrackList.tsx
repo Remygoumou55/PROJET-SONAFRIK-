@@ -20,8 +20,6 @@ const CreditsEditor = dynamic(
   { ssr: false, loading: () => <p className="text-texte-desactive text-xs">Chargement…</p> },
 );
 
-const ISRC_MAX = 12;
-
 export function TrackList({
   tracks: initial,
   creatorId,
@@ -34,7 +32,6 @@ export function TrackList({
   const catalog = useCatalogService();
   const [tracks, setTracks] = useState(initial);
   const [title, setTitle] = useState("");
-  const [isrc, setIsrc] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedAudio, setExpandedAudio] = useState<string | null>(null);
@@ -45,11 +42,10 @@ export function TrackList({
     setLoading(true);
     setError(null);
     try {
-      const track = await catalog.createTrack({ title, isrc: isrc || null });
+      const track = await catalog.createTrack({ title, isrc: null });
       setTracks((current) => [track, ...current]);
       publishCreatorLdseEvent(CREATOR_LDSE_EVENTS.trackUpdated, creatorId, { trackId: track.id });
       setTitle("");
-      setIsrc("");
     } catch (err) {
       const message =
         err instanceof Error
@@ -90,12 +86,6 @@ export function TrackList({
                 </span>
               </div>
             </div>
-            <Input
-              value={isrc}
-              maxLength={ISRC_MAX}
-              onChange={(e) => setIsrc(e.target.value.toUpperCase())}
-              placeholder="ISRC (ex. GNA012600001)"
-            />
             <Button type="submit" disabled={loading || title.length < 2}>
               Créer un morceau
             </Button>
