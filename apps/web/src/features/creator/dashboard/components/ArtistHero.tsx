@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { memo } from "react";
 import type {
   ArtistProfile,
@@ -35,11 +36,16 @@ export const ArtistHero = memo(function ArtistHero({
         ? [artistProfile.banner_path]
         : [];
 
-  const badges = buildHeroVitrineBadges({
+  const allBadges = buildHeroVitrineBadges({
     artistProfile,
     profilePercent: hero.profilePercent,
     profileCreatedAt,
   });
+
+  // Keep only "online" and "verified" — remove "member since" and "profile %" per spec
+  const visibleBadges = allBadges.filter(
+    (b) => b.id === "online" || b.id === "verified",
+  );
 
   const artistType = resolveArtistTypeLabel(creator);
 
@@ -69,31 +75,44 @@ export const ArtistHero = memo(function ArtistHero({
           </p>
           <h2 className="artist-hero__name artist-hero__name--vitrine">
             {artistProfile.stage_name}
-            <span className="artist-hero__note" aria-hidden="true">
-              🎵
-            </span>
           </h2>
           <p className="artist-hero__type artist-hero__type--vitrine">{artistType}</p>
-          <ul
-            className="artist-hero__badges artist-hero__badges--vitrine"
-            aria-label="Statut du profil"
+
+          {visibleBadges.length > 0 && (
+            <ul
+              className="artist-hero__badges artist-hero__badges--vitrine"
+              aria-label="Statut du profil"
+            >
+              {visibleBadges.map((badge) => (
+                <li
+                  key={badge.id}
+                  className={`artist-hero__badge artist-hero__badge--${badge.tone}`}
+                >
+                  {badge.tone === "online" ? (
+                    <>
+                      <span className="artist-hero__online-dot" aria-hidden="true" />
+                      {badge.label}
+                    </>
+                  ) : (
+                    badge.label
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="artist-hero__cta-group">
+          <button
+            type="button"
+            className="artist-hero__follow-btn"
+            aria-label={`Suivre ${artistProfile.stage_name}`}
           >
-            {badges.map((badge) => (
-              <li
-                key={badge.id}
-                className={`artist-hero__badge artist-hero__badge--${badge.tone}`}
-              >
-                {badge.tone === "online" ? (
-                  <>
-                    <span className="artist-hero__online-dot" aria-hidden="true" />
-                    {badge.label}
-                  </>
-                ) : (
-                  badge.label
-                )}
-              </li>
-            ))}
-          </ul>
+            Suivre
+          </button>
+          <Link href="/creator/catalog/tracks" className="artist-hero__publish-btn">
+            Publier maintenant
+          </Link>
         </div>
       </div>
     </section>

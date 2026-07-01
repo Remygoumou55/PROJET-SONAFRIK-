@@ -10,10 +10,10 @@ export function CreatorLayoutClient({
   pendingVerifications,
   userId,
   initialUnreadCount,
-  stageName,
-  creatorId,
-  avatarPath,
-  tier,
+  stageName: _stageName,
+  creatorId: _creatorId,
+  avatarPath: _avatarPath,
+  tier: _tier,
   children,
 }: {
   pendingVerifications: number;
@@ -52,9 +52,6 @@ export function CreatorLayoutClient({
             <CreatorHeaderUtilities
               userId={userId}
               initialUnreadCount={initialUnreadCount}
-              stageName={stageName}
-              creatorId={creatorId}
-              avatarPath={avatarPath}
             />
           </div>
         </div>
@@ -66,12 +63,7 @@ export function CreatorLayoutClient({
       />
 
       <div className="creator-workspace__frame">
-        <CreatorSidebar
-          stageName={stageName}
-          creatorId={creatorId}
-          avatarPath={avatarPath}
-          tier={tier}
-        />
+        <CreatorSidebar />
         <div className="min-w-0 flex-1 creator-workspace__main">{children}</div>
       </div>
     </div>

@@ -13,10 +13,13 @@ export type CreatorNavEntry = CreatorNavSection | CreatorNavLink;
 
 export function buildCreatorNavEntries(_pendingVerifications = 0): CreatorNavEntry[] {
   return [
-    { href: "/creator",           label: "Vue d'ensemble", icon: "📊", exact: true },
-    { href: "/creator/catalog",   label: "Mon catalogue",  icon: "🎵", exact: true },
-    { href: "/creator/analytics", label: "Statistiques",   icon: "📈", exact: true },
-    { href: "/creator/identity",  label: "Mon profil",     icon: "👤" },
+    { href: "/creator",                label: "Vue d'ensemble", icon: "🏠", exact: true },
+    { href: "/creator/catalog/tracks", label: "Publier",        icon: "🎵", exact: false },
+    { href: "/creator/analytics",      label: "Analytics",      icon: "📊", exact: true },
+    { href: "/wallet",                 label: "Wallet",         icon: "👛", exact: false },
+    { type: "section",                 label: "" },
+    { href: "/creator/identity",       label: "Paramètres",     icon: "⚙", exact: false },
+    { href: "/profile",                label: "Aide & Support", icon: "❓", exact: false },
   ];
 }
 

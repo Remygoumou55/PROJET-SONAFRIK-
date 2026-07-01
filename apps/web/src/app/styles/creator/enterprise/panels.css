@@ -239,3 +239,360 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── Wallet retirable label ─────────────────────────────────────────────────── */
+.co-wallet-retirable {
+  font-size: 11px;
+  color: rgba(0, 210, 106, 0.7);
+  margin: -8px 0 10px;
+}
+
+.co-revenue-details { margin-top: -6px; }
+
+.co-revenue-pending {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+/* ─── Quick access cards ─────────────────────────────────────────────────────── */
+.dash-quick-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .dash-quick-cards { grid-template-columns: 1fr; }
+}
+
+.dash-quick-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+a.dash-quick-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 210, 106, 0.25);
+}
+
+.dash-quick-card__icon { font-size: 1.25rem; }
+
+.dash-quick-card__label {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.dash-quick-card__value {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-texte-desactive);
+}
+
+.dash-quick-card__arrow {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-vert-energie);
+}
+
+/* ─── Catalogue card ─────────────────────────────────────────────────────────── */
+.dash-catalogue-card {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dash-catalogue-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.dash-catalogue-card__link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-vert-energie);
+  text-decoration: none;
+}
+
+.dash-catalogue-card__link:hover { text-decoration: underline; }
+
+.dash-catalogue-card__empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.dash-catalogue-card__empty-icon { font-size: 1.5rem; }
+
+.dash-catalogue-card__empty-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-texte-desactive);
+}
+
+.dash-catalogue-card__track {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.dash-catalogue-card__cover {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.dash-catalogue-card__cover-img { width: 100%; height: 100%; object-fit: cover; }
+.dash-catalogue-card__cover-fallback { font-size: 1.25rem; }
+.dash-catalogue-card__meta { flex: 1; min-width: 0; }
+
+.dash-catalogue-card__track-title {
+  margin: 0 0 0.2rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-texte-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-catalogue-card__track-streams {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-texte-desactive);
+}
+
+.dash-catalogue-card__badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0, 210, 106, 0.1);
+  border: 1px solid rgba(0, 210, 106, 0.2);
+  color: var(--color-vert-energie);
+  flex-shrink: 0;
+}
+
+/* ─── Career progress card ───────────────────────────────────────────────────── */
+.dash-career-progress {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dash-career-progress__body {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.dash-career-circle {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dash-career-circle__svg { width: 72px; height: 72px; }
+.dash-career-circle__track { stroke: rgba(255, 255, 255, 0.08); }
+
+.dash-career-circle__fill {
+  stroke: var(--color-vert-energie);
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.dash-career-circle__pct {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--color-texte-principal);
+  font-family: inherit;
+}
+
+.dash-career-circle__label {
+  margin: 0;
+  font-size: 0.625rem;
+  color: var(--color-texte-desactive);
+  text-align: center;
+}
+
+.dash-career-progress__info { flex: 1; min-width: 0; }
+
+.dash-career-progress__level {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-or-solaire);
+}
+
+.dash-career-progress__streams {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--color-texte-secondaire);
+}
+
+.dash-career-progress__streams-val {
+  font-weight: 700;
+  color: var(--color-texte-principal);
+}
+
+.dash-career-progress__next {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-texte-desactive);
+}
+
+/* ─── Coach card ─────────────────────────────────────────────────────────────── */
+.dash-coach {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 194, 14, 0.12);
+  background: rgba(255, 194, 14, 0.04);
+}
+
+.dash-coach__tip {
+  display: flex;
+  gap: 0.625rem;
+  padding-bottom: 0.875rem;
+  margin-bottom: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dash-coach__tip-icon { font-size: 1.125rem; flex-shrink: 0; }
+.dash-coach__tip-body { min-width: 0; }
+
+.dash-coach__tip-label {
+  margin: 0 0 0.2rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-or-solaire);
+}
+
+.dash-coach__tip-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.45;
+}
+
+.dash-coach__activities {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dash-coach__activity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dash-coach__activity--future { opacity: 0.5; }
+.dash-coach__dot { font-size: 0.75rem; flex-shrink: 0; width: 1rem; text-align: center; }
+
+.dash-coach__activity-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-texte-principal);
+}
+
+.dash-coach__see-all {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-vert-energie);
+  text-decoration: none;
+}
+
+.dash-coach__see-all:hover { text-decoration: underline; }
+
+/* ─── Bottom 2-col layout ─────────────────────────────────────────────────────── */
+.dash-bottom-2col {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .dash-bottom-2col {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* ─── Premium footer card ─────────────────────────────────────────────────────── */
+.dash-premium {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 194, 14, 0.25);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 194, 14, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+.dash-premium__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  flex-wrap: wrap;
+}
+
+.dash-premium__icon { font-size: 1.75rem; flex-shrink: 0; }
+.dash-premium__body { flex: 1; min-width: 12rem; }
+
+.dash-premium__title {
+  margin: 0 0 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-or-solaire);
+}
+
+.dash-premium__text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-texte-secondaire);
+  line-height: 1.45;
+}
+
+.dash-premium__cta {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 194, 14, 0.4);
+  background: rgba(255, 194, 14, 0.1);
+  color: var(--color-or-solaire);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.dash-premium__cta:hover { background: rgba(255, 194, 14, 0.18); }
