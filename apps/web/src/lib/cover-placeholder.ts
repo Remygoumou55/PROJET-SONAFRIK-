@@ -14,6 +14,6 @@ export function getArtistGradientStyle(name: string | undefined | null, fallback
 }
 
 export function getCoverInitials(name: string | undefined | null): string {
-  if (!name?.trim()) return "🎵";
+  if (!name?.trim()) return "SA";
   return getInitials(name);
 }

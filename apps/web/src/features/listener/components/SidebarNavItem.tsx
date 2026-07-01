@@ -8,7 +8,6 @@ export const LISTENER_NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" as const },
   { href: "/search", label: "Explorer", icon: "search" as const },
   { href: "/library", label: "Bibliothèque", icon: "library" as const },
-  { href: "/notifications", label: "Alertes", icon: "bell" as const },
   { href: "/wallet", label: "Wallet", icon: "wallet" as const },
   { href: "/profile", label: "Profil", icon: "profile" as const },
 ] as const;
@@ -46,14 +45,6 @@ const NavIcon = memo(function NavIcon({
         <path d="M12.5 19V9.5l8 2.5V19" />
         <path d="M12.5 19h8" />
         <circle cx="7" cy="3.5" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    );
-  }
-  if (icon === "bell") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
       </svg>
     );
   }

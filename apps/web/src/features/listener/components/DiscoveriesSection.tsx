@@ -14,6 +14,30 @@ const FILTERS: { key: TimeFilter; label: string }[] = [
   { key: "all", label: "Tout" },
 ];
 
+function DiscoveriesIcon() {
+  return (
+    <svg
+      className="discoveries-icon"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M8 4.5V15.5L4 13V7L8 4.5Z"
+        fill="currentColor"
+        fillOpacity="0.9"
+      />
+      <path
+        d="M12 3.5L16 5.5V13.5L12 15.5V3.5Z"
+        fill="currentColor"
+        fillOpacity="0.55"
+      />
+    </svg>
+  );
+}
+
 function toTrackWithMeta(track: DiscoveryTrack): TrackWithMeta {
   return {
     id: track.track_id,
@@ -83,8 +107,10 @@ export function DiscoveriesSection({ tracks }: DiscoveriesSectionProps) {
     setPlayError(null);
     try {
       await loadQueueAndPlay(tracksWithMeta, index);
-    } catch {
-      setPlayError("Impossible de lancer la lecture. Réessayez.");
+    } catch (err) {
+      setPlayError(
+        err instanceof Error ? err.message : "Impossible de lancer la lecture. Réessayez.",
+      );
     }
   }
 
@@ -94,10 +120,13 @@ export function DiscoveriesSection({ tracks }: DiscoveriesSectionProps) {
     <section className="discoveries-section listen-page-section mt-8" aria-label="Découvertes musicales">
       <div className="discoveries-header listen-section-header">
         <div className="discoveries-title-wrap">
-          <span className="discoveries-emoji" aria-hidden="true">
-            🎵
-          </span>
-          <h2 className="discoveries-title listen-section-title">Découvertes</h2>
+          <DiscoveriesIcon />
+          <div className="discoveries-heading">
+            <h2 className="discoveries-title listen-section-title">Découvertes</h2>
+            <p className="discoveries-count">
+              {filteredTracks.length} morceau{filteredTracks.length !== 1 ? "x" : ""}
+            </p>
+          </div>
         </div>
 
         <div className="discoveries-filters" role="tablist" aria-label="Filtrer par période">
@@ -115,10 +144,6 @@ export function DiscoveriesSection({ tracks }: DiscoveriesSectionProps) {
           ))}
         </div>
       </div>
-
-      <p className="discoveries-count">
-        {filteredTracks.length} morceau{filteredTracks.length !== 1 ? "x" : ""}
-      </p>
 
       {playError ? (
         <p className="px-6 text-xs mb-2" role="alert" style={{ color: "var(--color-danger)" }}>
