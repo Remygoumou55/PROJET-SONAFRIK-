@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LyricLine } from "@sonafrik/types";
+import { createListenerService } from "@sonafrik/api/listener";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useListenFeatures } from "../lib/listenFeaturesContext";
 
@@ -21,42 +22,24 @@ export function useTrackLyrics(trackId: string | null) {
     }
 
     let cancelled = false;
-
     const id = trackId;
 
     async function load() {
       setIsLoading(true);
-      const supabase = getSupabaseBrowserClient();
-      const { data, error } = await supabase
-        .from("track_lyrics")
-        .select("lines")
-        .eq("track_id", id)
-        .eq("status", "approved")
-        .eq("language", "fr")
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      if (error || !data?.lines || !Array.isArray(data.lines)) {
-        setLines([]);
-        setHasLyrics(false);
-      } else {
-        const raw = data.lines as unknown;
-        const parsed = Array.isArray(raw)
-          ? raw.filter(
-              (line): line is LyricLine =>
-                typeof line === "object" &&
-                line !== null &&
-                "time" in line &&
-                "text" in line &&
-                typeof (line as LyricLine).time === "number" &&
-                typeof (line as LyricLine).text === "string",
-            )
-          : [];
+      try {
+        const listener = createListenerService(getSupabaseBrowserClient());
+        const { lines: parsed } = await listener.getTrackLyrics(id);
+        if (cancelled) return;
         setLines(parsed);
         setHasLyrics(parsed.length > 0);
+      } catch {
+        if (!cancelled) {
+          setLines([]);
+          setHasLyrics(false);
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     void load();

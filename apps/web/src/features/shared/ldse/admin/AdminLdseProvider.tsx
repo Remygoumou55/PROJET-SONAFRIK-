@@ -9,7 +9,9 @@ import {
   type ReactNode,
 } from "react";
 import type { AdminLiveSnapshot, AdminNavBadges, AdminFraudMetrics, AdminModerationMetrics, AdminUserMetrics } from "@sonafrik/api/admin";
-import { fetchAdminLiveSnapshot } from "@/features/admin/lib/adminLdseClient";
+import {
+  fetchAdminLiveSnapshot,
+} from "@/features/shared/ldse/admin/admin-ldse-fetch";
 import { ldseCache } from "@/features/shared/ldse/cache";
 import { ldseEventBus } from "@/features/shared/ldse/event-bus";
 import { registerLdseInvalidationRule } from "@/features/shared/ldse/invalidate-map";

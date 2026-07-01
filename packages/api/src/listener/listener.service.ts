@@ -101,6 +101,22 @@ export class ListenerService {
     return this.repository.getPlaylistTracksForPage(playlistId);
   }
 
+  getTrackReactionCounts(trackId: string) {
+    return this.repository.getTrackReactionCounts(trackId);
+  }
+
+  getLiveListenerCount(trackId: string) {
+    return this.repository.getLiveListenerCount(trackId);
+  }
+
+  addTrackReaction(trackId: string, emoji: string) {
+    return this.repository.addTrackReaction(trackId, emoji);
+  }
+
+  getTrackLyrics(trackId: string, language?: string) {
+    return this.repository.getTrackLyrics(trackId, language);
+  }
+
   isFeatureEnabled(name: string): Promise<boolean> {
     return this.featureFlags.isFeatureEnabled(name);
   }

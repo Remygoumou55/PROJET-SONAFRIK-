@@ -1,124 +1,90 @@
 # DOMAIN MAP — SONAFRIK
 
 > Cartographie officielle des domaines métier et leurs emplacements code.  
-> Dernière mise à jour : 2026-06-25 (SPRING 2 programme)
+> Dernière mise à jour : **30 juin 2026** (Vague G — 3 silos Martin)
 
 ## Règle fondamentale
 
 Un domaine = un périmètre métier isolé. Les composants partagés vont dans `shared/`.  
-**Listener ↔ Creator : import interdit.**
+**Listener ↔ Creator : import interdit** (ESLint + probes F9–F12).
+
+---
+
+## Les 3 silos (vision produit)
+
+| Silo | Rôle | Bug isolé ? |
+|---|---|---|
+| **Auditeur** | Écoute, bibliothèque, recherche, beats (gelé) | Oui — web features |
+| **Artiste** | Catalogue, droits, analytics, dashboard | Oui — web features |
+| **Admin** | Modération, finance, fraude, flags | Oui — web features |
+
+**Transversal MVP :** `wallet/`, `identity/auth`, `shared/social` — changements documentés dans EXECUTION_LOG.
 
 ---
 
 ## Cartographie Web (`apps/web/src/features/`)
 
-| Domaine UI | Dossier | Route group | Rôle |
-|---|---|---|---|
-| **Listener** | `listener/` | `(listener)/` | Écoute, player, bibliothèque, recherche auditeur |
-| **Creator** | `creator/` | `(creator)/` | Catalogue, analytics créateur, droits, équipe |
-| **Admin** | `admin/` | `admin/` | Modération, finance, flags, santé |
-| **Wallet** | `wallet/` | `wallet/` | Solde, royalties UI, retraits UI |
-| **Identity** | `identity/` | `auth/`, `profile/`, `settings/` | Auth, profil, préférences |
-| **Shared** | `shared/` | transversal | Social (likes/follows), notifications, UI shell |
-| **Launch** | `launch/` | `lancement/` | Page pré-lancement |
+| Domaine UI | Dossier | Route group | Fichiers (~) | Rôle |
+|---|---|---|---:|---|
+| **Listener** | `listener/` | `(listener)/` | 79 | Player, discover, library, search, `beats/` |
+| **Creator** | `creator/` | `(creator)/` | 53 | catalog/, rights/, analytics/, dashboard/ |
+| **Admin** | `admin/` | `(admin)/` | 78 | Cockpit, fraude SSOT, modération |
+| **Wallet** | `wallet/` | `/wallet` | 14 | Solde, royalties UI, payout UI |
+| **Identity** | `identity/` | profile, settings, auth | 92 | Auth MVP + Profile OS **gelé** (`profile_os=false`) |
+| **Shared** | `shared/` | transversal | 40 | social, notifications, LDSE |
 
-### Alias historiques (ne pas recréer)
+### Retirés / gelés
 
 | Ancien | Actuel | Statut |
 |---|---|---|
-| `streaming/` (web) | `listener/` | ✅ Migré (Vague F4) |
+| `marketplace/` | `listener/beats/` | ✅ Supprimé Vague G — README tombstone |
+| `streaming/` (web) | `listener/` | ✅ Migré Vague F |
 | `catalog/` (web racine) | `creator/catalog/` | ✅ Migré |
+| `launch/` (features) | `app/lancement/` + `components/lancement/` | Pas de domaine features |
+
+### CSS registry (`apps/web/src/app/globals.css`)
+
+| Bundle | Silo | MVP |
+|---|---|:---:|
+| `listen-home-bundle.css` | Auditeur | ✅ |
+| `creator.css` | Artiste | ✅ |
+| `admin-bundle.css` | Admin | ✅ |
+| `identity.css` + `identity-account.css` | Identity | ✅ |
+| `identity-post-mvp-bundle.css` | Identity OS | ❌ dormant |
+| `wallet.css` | Wallet | ✅ |
 
 ---
 
 ## Cartographie API (`packages/api/src/`)
 
-| Domaine API | Dossier | Consommateurs autorisés |
-|---|---|---|
-| **streaming** | `streaming/` | listener (web/mobile), admin (lecture) |
-| **metadata** | `metadata/` | publication, admin |
-| **publication** | `publication/` | creator/catalog |
-| **catalog** | `catalog/` | creator |
-| **creator** | `creator/` | creator dashboard |
-| **analytics** | `analytics/` | creator (⚠️ chevauche streaming analytics) |
-| **rights** | `rights/` | creator, admin |
-| **wallet** | `wallet/` | wallet UI, admin |
-| **identity** | `identity/` | identity, auth |
-| **social** | `social/` | listener, creator (via shared) |
-| **admin** | `admin/` | admin UI |
-
-### SPRING 2 — nouveaux modules prévus (`packages/api/src/streaming/`)
-
-```
-streaming/
-├── application/          ← SPRING 2.1 — CQRS, DTO, use cases (comme metadata)
-├── runtime/              ← SPRING 2.1 — coordinateur playback
-├── session/              ← SPRING 2.2 — Session Engine
-├── playback/             ← SPRING 2.3 — Playback Runtime Engine
-├── analytics/            ← SPRING 2.4 — Analytics Engine (agrégations)
-├── antifraud/            ← SPRING 2.5 — Anti-Fraud Engine
-├── ledger/               ← SPRING 2.6 — Stream Ledger (source vérité financière)
-└── integration/          ← SPRING 2.8 — bridges + feature flags
-```
-
-Le module `streaming/` existant (`streaming.service.ts`, `streaming.repository.ts`) reste **legacy path** jusqu'à SPRING 2.8.
-
----
-
-## Cartographie Persistence (`packages/persistence/` + Supabase)
-
-| Ressource | Tables / fonctions | Domaine propriétaire |
-|---|---|---|
-| Sessions playback | `stream_sessions` | streaming/session |
-| Événements playback | `stream_events` (INSERT ONLY) | streaming/session |
-| Reprise lecture | `playback_positions` | streaming/playback |
-| **Stream Ledger** (à créer 2.6) | `stream_ledger_entries` (proposé) | streaming/ledger |
-| Royalties | `royalty_cycles`, `royalty_calculations` | wallet (lecture seule depuis ledger en 2.6) |
-| Wallet | `wallets`, `wallet_ledger` (IMMUTABLE) | wallet |
-| Catalogue | `tracks`, `track_files`, `albums` | catalog |
-| Métadonnées | `metadata_*` | metadata |
-
----
-
-## Cartographie Edge Functions (`supabase/functions/`)
-
-| Function | Domaine | Rôle actuel | Évolution SPRING 2 |
+| Domaine API | Dossier | Silo | Migration planifiée |
 |---|---|---|---|
-| `stream-start` | streaming/playback | URL signée + session | Devient adaptateur transport (2.3) |
-| `stream-progress` | streaming/session + antifraud | Heartbeat + anti-fraude basique | Délègue Session + Anti-Fraud engines (2.2, 2.5) |
-| `stream-complete` | streaming/session | Real Listen 90 % | Délègue Session Engine + émet événement ledger (2.2, 2.6) |
+| **listener** | `listener/` | Auditeur | — |
+| **creator** | `creator/` | Artiste | — |
+| **admin** | `admin/` | Admin | — |
+| **catalog** | `catalog/` | Artiste | → `creator/catalog/` (Vague I) |
+| **rights** | `rights/` | Artiste | → `creator/rights/` (Vague I) |
+| **analytics** | `analytics/` | Artiste | → `creator/analytics/` (Vague I) |
+| **streaming** | `streaming/` | Transversal | **LOCKED** — Session Engine |
+| **wallet** | `wallet/` | Transversal | MVP |
+| **social** | `social/` | Shared | MVP |
+| **creator/career** | `creator/career/` | Artiste | **GELÉ** — flag `career_os` |
 
 ---
 
-## Flux financier cible (post SPRING 2.6)
+## Cartographie Persistence (Supabase)
 
-```
-Écoute validée (Real Listen ≥90 %)
-        ↓
-Stream Ledger (append-only, idempotent)
-        ↓
-Royalty Engine (existant — NON modifié en SPRING 2)
-        ↓
-wallet_ledger / royalty_calculations
-```
-
-**SPRING 2 ne modifie pas** le wallet, les retraits, ni le moteur royalties — il pose le **ledger intermédiaire** comme contrat.
-
----
-
-## Mobile (`apps/mobile/`)
-
-| Domaine | Statut MVP | Alignement SPRING 2 |
+| Ressource | Tables / RPC | Domaine propriétaire |
 |---|---|---|
-| Player / tabs | Partiel | Consomme `@sonafrik/api/streaming` — même bridge 2.8 |
+| Sessions playback | `stream_sessions`, `stream_events` | streaming/session (LOCKED) |
+| Wallet | `wallets`, `wallet_ledger` | wallet |
+| Catalogue | `tracks`, `albums`, `track_files` | catalog → creator |
+| Royalties | `royalty_cycles` | wallet / admin |
 
 ---
 
-## Matrice d'interaction autorisée
+## Références
 
-| De → Vers | listener | creator | wallet | streaming API | ledger |
-|---|---|---|---|---|---|
-| listener | ✅ | ❌ | ❌ (UI route only) | ✅ | ❌ |
-| creator | ❌ | ✅ | ❌ | ✅ (analytics read) | ❌ |
-| wallet | ❌ | ❌ | ✅ | ❌ | ✅ (read via service) |
-| streaming/ledger | ❌ | ❌ | ❌ (event only) | ✅ | ✅ |
+- Plan correction : [`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)
+- Audit V2 : [`AUDIT-V2-FORENSIQUE.md`](./AUDIT-V2-FORENSIQUE.md)
+- Règles imports : [`DEPENDENCY_RULES.md`](./DEPENDENCY_RULES.md)

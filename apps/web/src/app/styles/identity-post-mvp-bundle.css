@@ -1,0 +1,10 @@
+/* Profile OS post-MVP — bundle dormant (flag profile_os OFF en MVP).
+ * Réimporter dans globals.css quand le flag est activé en prod :
+ * @import "./styles/identity-post-mvp-bundle.css";
+ */
+@import "./identity-journey.css";
+@import "./identity-goals.css";
+@import "./identity-rewards.css";
+@import "./identity-musical.css";
+@import "./identity-musical-dna.css";
+@import "./identity-story.css";

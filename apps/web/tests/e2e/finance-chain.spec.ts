@@ -44,4 +44,50 @@ test.describe("Finance chain (authenticated)", () => {
     ).first();
     await expect(payoutUi).toBeVisible({ timeout: 12_000 });
   });
+
+  test("/wallet — solde ou historique visible", async ({ page }) => {
+    await page.goto("/wallet");
+    await expect(
+      page.locator("text=/Solde|Historique|GNF|Portefeuille/i").first(),
+    ).toBeVisible({ timeout: 12_000 });
+  });
+
+  test("sandbox payment-initiate — refus opérateur prod sans credentials", async ({ request }) => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    test.skip(!supabaseUrl || !anonKey, "Supabase env manquant");
+
+    const authRes = await request.post(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+      headers: { apikey: anonKey!, "Content-Type": "application/json" },
+      data: {
+        email: "s13b-playwright-listener@sonafrik.test",
+        password: "S13BCert2026!",
+      },
+    });
+    test.skip(!authRes.ok(), "Compte certification indisponible");
+    const authBody = (await authRes.json()) as { access_token?: string };
+    test.skip(!authBody.access_token, "JWT certification absent");
+
+    const res = await request.post(`${supabaseUrl}/functions/v1/payment-initiate`, {
+      headers: {
+        Authorization: `Bearer ${authBody.access_token}`,
+        apikey: anonKey!,
+        "Content-Type": "application/json",
+      },
+      data: {
+        provider: "orange_money_gn",
+        purpose: "topup",
+        amountGnf: 5000,
+        phone: "620000000",
+      },
+    });
+
+    const body = (await res.json()) as { sandbox?: boolean; error?: string };
+    expect([200, 503]).toContain(res.status());
+    if (res.status() === 503) {
+      expect(body.error).toBe("payment_operator_not_ready");
+    } else {
+      expect(body.sandbox).toBe(true);
+    }
+  });
 });

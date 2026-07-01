@@ -6,6 +6,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   type PaymentProvider,
+  assertPaymentOperatorReady,
   getWebBaseUrl,
   initiateMtnMomo,
   initiateOrangeMoney,
@@ -114,6 +115,21 @@ Deno.serve(async (req: Request) => {
 
     if (insertErr || !intent?.id) return json({ error: "intent_creation_failed" }, 500);
     const intentId = intent.id;
+
+    try {
+      assertPaymentOperatorReady(provider);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "payment_operator_not_ready";
+      await userClient
+        .from("payment_intents")
+        .update({
+          status: "failed",
+          failed_at: new Date().toISOString(),
+          metadata: { operator_error: message },
+        })
+        .eq("id", intentId);
+      return json({ error: "payment_operator_not_ready", message }, 503);
+    }
 
     if (isProviderSandbox(provider)) {
       const { error: updateErr } = await userClient

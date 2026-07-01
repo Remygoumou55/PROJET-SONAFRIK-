@@ -1,5 +1,9 @@
 "use server";
 
+/**
+ * Mutations admin — verifyAdminForAction() puis getSupabaseAdminClient({ adminVerified: true }).
+ * Implémentation centralisée : getAdminServiceForAction() (getAdminActionContext.ts).
+ */
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getAdminServiceForAction, formatAdminActionError } from "@/features/admin/lib/getAdminActionContext";
@@ -62,12 +66,12 @@ export async function triggerRoyaltyCycleAction(
 export async function updateSystemSettingAction(
   key: string,
   value: string,
+  motive?: string,
 ): Promise<{ error?: string }> {
   const ctx = await getAdminServiceForAction();
   if (!ctx.ok) return { error: ctx.error };
 
   try {
-    // Les valeurs sont stockées en JSONB — on tente le parse JSON, sinon string brute
     let parsedValue: unknown = value;
     try {
       parsedValue = JSON.parse(value);
@@ -79,15 +83,40 @@ export async function updateSystemSettingAction(
     if (schema) {
       const result = schema.safeParse(parsedValue);
       if (!result.success) {
-        return { error: `Valeur invalide pour « ${key} » : ${result.error.issues[0]?.message ?? "format incorrect"}.` };
+        return { error: `Valeur invalide : ${result.error.issues[0]?.message ?? "format incorrect"}.` };
       }
       parsedValue = result.data;
     }
 
-    await ctx.service.updateSystemSetting(key, parsedValue);
+    await ctx.service.updateSystemSetting(key, parsedValue, motive ?? null, ctx.userId);
     revalidatePath("/admin/settings");
     return {};
   } catch (err) {
     return { error: formatAdminActionError(err, "Impossible de mettre à jour le paramètre.") };
+  }
+}
+
+export async function restoreSystemSettingAction(
+  key: string,
+  auditLogId: string,
+): Promise<{ error?: string }> {
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
+
+  try {
+    const history = await ctx.service.listSystemSettingAuditHistory(200);
+    const entry = history.find((h) => h.id === auditLogId && h.settingKey === key);
+    if (!entry) return { error: "Version introuvable dans l'historique." };
+
+    await ctx.service.updateSystemSetting(
+      key,
+      entry.previousValue,
+      "Restauration version antérieure",
+      ctx.userId,
+    );
+    revalidatePath("/admin/settings");
+    return {};
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de restaurer cette version.") };
   }
 }

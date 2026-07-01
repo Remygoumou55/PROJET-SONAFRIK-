@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createListenerService } from "@sonafrik/api/listener";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { usePlayerContext } from "../lib/playerContext";
 import { useTrackReactions } from "../hooks/useTrackReactions";
@@ -19,11 +20,8 @@ export function LiveReactions() {
     setRecentlyReacted(emoji);
     setTimeout(() => setRecentlyReacted(null), 2000);
 
-    const supabase = getSupabaseBrowserClient();
-    await supabase.rpc("add_track_reaction", {
-      p_track_id: currentTrack.id,
-      p_emoji: emoji,
-    });
+    const listener = createListenerService(getSupabaseBrowserClient());
+    await listener.addTrackReaction(currentTrack.id, emoji).catch(() => undefined);
   };
 
   return (

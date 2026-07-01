@@ -13,7 +13,12 @@ import {
   StatsCareerSection,
 } from "../dashboard/components/enterprise";
 
-export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
+interface CreatorDashboardViewProps {
+  data: CreatorDashboardData;
+  careerOsEnabled?: boolean;
+}
+
+export function CreatorDashboardView({ data, careerOsEnabled = false }: CreatorDashboardViewProps) {
   const {
     context,
     hero,
@@ -45,7 +50,7 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
 
       <GlanceKpiGrid data={data} />
 
-      <NextObjectiveCard careerOs={careerOs} />
+      {careerOsEnabled ? <NextObjectiveCard careerOs={careerOs} /> : null}
 
       <QuickActions
         actions={quickActions}
@@ -53,7 +58,9 @@ export function CreatorDashboardView({ data }: { data: CreatorDashboardData }) {
         sectionId="creator-quick-actions"
       />
 
-      <StatsCareerSection kpis={kpis} timeline={timeline} careerOs={careerOs} />
+      {careerOsEnabled ? (
+        <StatsCareerSection kpis={kpis} timeline={timeline} careerOs={careerOs} />
+      ) : null}
 
       <div className="dash-bottom-row">
         <ActivityFeed activities={activities} />

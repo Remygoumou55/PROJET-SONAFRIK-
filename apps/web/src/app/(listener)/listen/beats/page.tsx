@@ -2,8 +2,8 @@ import { requireIdentityContext } from "@/features/identity/lib/requireIdentity"
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createBeatsService } from "@sonafrik/api/beats";
 import { createListenerService } from "@sonafrik/api/listener";
-import { BeatStoreClient } from "@/features/marketplace/components/BeatStoreClient";
-import { redirect } from "next/navigation";
+import { BeatStoreClient } from "@/features/listener/beats/BeatStoreClient";
+import { ComingSoon } from "@/components/ComingSoon";
 
 export const metadata = { title: "Beat Store — SONAFRIK" };
 
@@ -19,7 +19,13 @@ export default async function BeatStorePage({
   const listener = createListenerService(supabase);
 
   if (!(await listener.isFeatureEnabled("beat_store"))) {
-    redirect("/listen");
+    return (
+      <ComingSoon
+        title="Beat Store"
+        description="La vente de beats arrive bientôt. Restez connectés."
+        emoji="🎹"
+      />
+    );
   }
 
   const service = createBeatsService(supabase);

@@ -5,11 +5,6 @@ import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { isDevBypassActive } from "@/lib/auth/guards";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
 import AdminLoading from "./loading";
-import "@/app/styles/admin.css";
-import "@/app/styles/admin-dashboard-human.css";
-import "@/app/styles/admin-responsive.css";
-import "@/app/styles/admin-fraud-human.css";
-import "@/app/styles/admin-sprint5.css";
 
 export const dynamic = "force-dynamic";
 

@@ -15,6 +15,7 @@ import {
   addFraudIncidentNote,
   bulkPatchFraudIncidents,
   exportIncidentIdsAsCsv,
+  hydrateFraudIncidentStatesFromDb,
   loadAllFraudIncidentStates,
   patchFraudIncidentState,
   type FraudIncidentAdminState,
@@ -59,9 +60,9 @@ export function AdminFraudCenter({ initialPage, stats, initialFilters }: Props) 
   const [adminStates, setAdminStates] = useState<Record<string, FraudIncidentAdminState>>({});
   const [drawerIncident, setDrawerIncident] = useState<AdminFraudIncident | null>(null);
 
-  /** localStorage après hydratation — évite mismatch SSR (200 vs N filtrés). */
+  /** États admin persistés en DB (admin_fraud_reviews) après hydratation. */
   useEffect(() => {
-    setAdminStates(loadAllFraudIncidentStates());
+    void hydrateFraudIncidentStatesFromDb().then(setAdminStates);
   }, []);
 
   useEffect(() => {

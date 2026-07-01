@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
-import { REAL_LISTEN_THRESHOLD_PERCENT, STREAM_HEARTBEAT_INTERVAL_MS } from "@sonafrik/types";
+import { REAL_LISTEN_THRESHOLD_PERCENT } from "@sonafrik/types";
 import type {
   AudioErrorType,
   PlayerContextValue,
@@ -10,9 +10,15 @@ import type {
   QueueState,
   StreamCompletePayload,
 } from "./playerTypes";
-import { buildStreamCompletePayload, type StreamCompleteMode } from "@sonafrik/shared/streaming";
+import type { StreamCompleteMode } from "@sonafrik/shared/streaming";
 import { INITIAL_PLAYER_STATE, INITIAL_QUEUE_STATE } from "./playerTypes";
 import { usePlayerQueueControls } from "./usePlayerQueueControls";
+import {
+  buildCompletePayload,
+  clearAudioElement,
+  createStreamHeartbeat,
+  resolveTrackDurationSeconds,
+} from "./playerSessionLifecycle";
 export type { AudioErrorType } from "./playerTypes";
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -31,7 +37,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const volumeRef = useRef<number>(1);
-  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onHeartbeatCallbackRef = useRef<((pos: number) => void) | null>(null);
   const onCompleteCallbackRef = useRef<((payload: StreamCompletePayload) => void) | null>(null);
   const activeSessionIdRef = useRef<string | null>(null);
@@ -41,40 +46,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const shuffledOrderRef = useRef<number[]>([]);
   const loadGenerationRef = useRef(0);
 
-  const clearAudioElement = useCallback((audio: HTMLAudioElement) => {
-    audio.pause();
-    audio.onerror = null;
-    audio.oncanplay = null;
-    audio.onloadedmetadata = null;
-    audio.ontimeupdate = null;
-    audio.onended = null;
-    audio.removeAttribute("src");
-    audio.load();
-  }, []);
+  const heartbeatCtl = useMemo(
+    () => createStreamHeartbeat(audioRef, accumulatedListenSecondsRef, onHeartbeatCallbackRef),
+    [],
+  );
 
   const clearHeartbeat = useCallback(() => {
-    if (heartbeatRef.current) {
-      clearInterval(heartbeatRef.current);
-      heartbeatRef.current = null;
-    }
-  }, []);
+    heartbeatCtl.clear();
+  }, [heartbeatCtl]);
 
   const startHeartbeat = useCallback(() => {
-    clearHeartbeat();
-    heartbeatRef.current = setInterval(() => {
-      const audio = audioRef.current;
-      if (audio && !audio.paused) {
-        accumulatedListenSecondsRef.current += STREAM_HEARTBEAT_INTERVAL_MS / 1000;
-        onHeartbeatCallbackRef.current?.(accumulatedListenSecondsRef.current);
-      }
-    }, STREAM_HEARTBEAT_INTERVAL_MS);
-  }, [clearHeartbeat]);
+    heartbeatCtl.start();
+  }, [heartbeatCtl]);
 
   const resolveDurationSeconds = useCallback((): number => {
-    const audio = audioRef.current;
-    const fromAudio =
-      audio && audio.duration > 0 && isFinite(audio.duration) ? audio.duration : 0;
-    return Math.max(fromAudio, activeDurationRef.current, 1);
+    return resolveTrackDurationSeconds(audioRef.current, activeDurationRef);
   }, []);
 
   const takeCompletePayload = useCallback(
@@ -84,13 +70,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
       activeSessionIdRef.current = null;
 
-      return buildStreamCompletePayload({
+      return buildCompletePayload(
         sessionId,
-        positionSeconds: positionRef.current,
-        accumulatedSeconds: accumulatedListenSecondsRef.current,
-        durationSeconds: resolveDurationSeconds(),
+        positionRef.current,
+        accumulatedListenSecondsRef.current,
+        resolveDurationSeconds(),
         mode,
-      });
+      );
     },
     [resolveDurationSeconds],
   );
@@ -201,7 +187,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.src = signedUrl;
       audio.load();
     },
-    [clearHeartbeat, clearAudioElement, startHeartbeat, takeCompletePayload],
+    [clearHeartbeat, startHeartbeat, takeCompletePayload],
   );
 
   const pause = useCallback(() => {

@@ -1,19 +1,32 @@
 # DEPENDENCY RULES — SONAFRIK
 
 > Règles de couplage et d'import — obligatoires pour toute IA et tout contributeur.  
-> Dernière mise à jour : 2026-06-25 (SPRING 2 programme)
+> Dernière mise à jour : **30 juin 2026** (Vague G — silos API planifiés)
 
 ---
 
 ## 1. Règles Web (`apps/web`)
+
+### 1.0 Les 3 silos Martin
+
+```
+AUDITEUR   → features/listener/  + app/(listener)/
+ARTISTE    → features/creator/   + app/(creator)/
+ADMIN      → features/admin/     + app/(admin)/
+```
+
+Un bug corrigé dans un silo **ne doit pas** exiger de toucher les deux autres silos web.
 
 ### 1.1 Isolation domaines features
 
 ```
 ❌ features/listener/**  →  features/creator/**
 ❌ features/creator/**   →  features/listener/**
+❌ features/shared/**    →  features/admin/**     (fetch LDSE → shared/ldse/admin/)
 ✅ features/*/           →  features/shared/**
 ```
+
+**Canonique Beat Store :** `features/listener/beats/` — `features/marketplace/` supprimé (Vague G).
 
 ### 1.2 Couche données
 
@@ -23,7 +36,7 @@
 ✅ Server Component      →  packages/api service (pas de .from() direct — gap connu SSR listener)
 ```
 
-**Dette documentée :** pages SSR listener appellent encore Supabase direct (`MASTER_PLAN` R1).  
+**Dette documentée :** pages SSR listener appellent encore Supabase direct.  
 **SPRING 2.8** doit router via Application Services sans changer les écrans.
 
 ### 1.3 Player
@@ -36,6 +49,18 @@
 ---
 
 ## 2. Règles API (`packages/api`)
+
+### 2.0 Silos backend (Vague I — planifié)
+
+```
+packages/api/src/creator/catalog/   ← migrer depuis catalog/
+packages/api/src/creator/rights/    ← migrer depuis rights/
+packages/api/src/creator/analytics/ ← migrer depuis analytics/
+```
+
+**Règle MVP :** ne pas importer `catalog/` depuis `listener/` — passer par `@sonafrik/api/listener` ou `@sonafrik/api/creator`.
+
+**GELÉ :** `creator/career/` — flag `career_os=false` (voir README dans le dossier).
 
 ### 2.1 Hiérarchie des couches (SPRING 2)
 

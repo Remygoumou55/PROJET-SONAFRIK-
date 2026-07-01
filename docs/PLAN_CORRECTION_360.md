@@ -1,9 +1,6 @@
-# PLAN DE CORRECTION 360° — ARCHIVÉ
+# Plan correction 360 — redirect
 
-> ⚠️ Ce document a été **archivé le 26 juin 2026**.
->
-> - **Historique figé (23 juin 2026)** : [`archive/PLAN_CORRECTION_360.md`](./archive/PLAN_CORRECTION_360.md)
-> - **Source de vérité actuelle** : [`EXECUTION_LOG.md`](./EXECUTION_LOG.md)
-> - **Index documentation** : [`README.md`](./README.md)
+> **Archivé le 23 juin 2026** — score 88/100 obsolète.
 
-Ne plus mettre à jour ce fichier.
+**Plan actif :** [`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)  
+**Audit V2 :** [`AUDIT-V2-FORENSIQUE.md`](./AUDIT-V2-FORENSIQUE.md)

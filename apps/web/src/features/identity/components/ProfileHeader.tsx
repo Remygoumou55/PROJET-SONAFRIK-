@@ -16,9 +16,15 @@ interface ProfileHeaderProps {
   context: IdentityContext;
   avatarUrl?: string | null;
   activity: ProfileActivitySummary;
+  profileOsEnabled?: boolean;
 }
 
-export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderProps) {
+export function ProfileHeader({
+  context,
+  avatarUrl,
+  activity,
+  profileOsEnabled = false,
+}: ProfileHeaderProps) {
   const isArtist = isArtistAccount(context.profile.account_type);
   const musicalIdentity = buildMusicalIdentity(context.profile, activity, isArtist);
 
@@ -26,41 +32,39 @@ export function ProfileHeader({ context, avatarUrl, activity }: ProfileHeaderPro
     <div className="identity-profile">
       <ProfileHeroPassport context={context} avatarUrl={avatarUrl} />
 
-      <ProfileSectionQuickNav />
-
-      <ProfileMusicalIdentitySection identity={musicalIdentity} />
-
-      <ProfileMusicalDnaSection
-        profile={context.profile}
-        activity={activity}
-        isArtist={isArtist}
-      />
-
-      <ProfileStorySection
-        profile={context.profile}
-        activity={activity}
-        isArtist={isArtist}
-      />
-
-      <ProfileJourneySection
-        profile={context.profile}
-        activity={activity}
-        isArtist={isArtist}
-      />
-
-      <ProfileGoalsSection
-        profile={context.profile}
-        activity={activity}
-        isArtist={isArtist}
-      />
+      {profileOsEnabled ? (
+        <>
+          <ProfileSectionQuickNav />
+          <ProfileMusicalIdentitySection identity={musicalIdentity} />
+          <ProfileMusicalDnaSection
+            profile={context.profile}
+            activity={activity}
+            isArtist={isArtist}
+          />
+          <ProfileStorySection
+            profile={context.profile}
+            activity={activity}
+            isArtist={isArtist}
+          />
+          <ProfileJourneySection
+            profile={context.profile}
+            activity={activity}
+            isArtist={isArtist}
+          />
+          <ProfileGoalsSection
+            profile={context.profile}
+            activity={activity}
+            isArtist={isArtist}
+          />
+          <ProfileRewardsSection
+            profile={context.profile}
+            activity={activity}
+            isArtist={isArtist}
+          />
+        </>
+      ) : null}
 
       <ProfileActivitySection activity={activity} isArtist={isArtist} />
-
-      <ProfileRewardsSection
-        profile={context.profile}
-        activity={activity}
-        isArtist={isArtist}
-      />
 
       {context.profile.account_type === "auditeur" ? (
         <aside className="identity-become-artist" aria-labelledby="become-artist-title">

@@ -24,6 +24,16 @@ export interface SystemSetting {
   updated_at: string;
 }
 
+export type SystemSettingAuditEntry = {
+  id: string;
+  settingKey: string;
+  actorId: string | null;
+  previousValue: unknown;
+  newValue: unknown;
+  motive: string | null;
+  createdAt: string;
+};
+
 export const SETTING_CATEGORY_LABELS: Record<SettingCategory, string> = {
   streaming: "Streaming",
   wallet:    "Portefeuille",
@@ -108,3 +118,46 @@ export type AdminArtistsListResult = {
 export type AdminUsersFilter = "all" | "premium" | "suspended" | "new";
 
 export type AdminArtistsFilter = "all" | "pending" | "verified" | "tier_etabli" | "suspended";
+
+/** Badges navigation admin (LDSE) */
+export type AdminNavBadges = {
+  content: number;
+  pendingRightsClaims: number;
+  fraudSessions: number;
+  withdrawals: number;
+};
+
+/** Métriques fraude admin — SSOT dashboard + page fraude */
+export type AdminFraudMetrics = {
+  totalFlagged: number;
+  flaggedThisMonth: number;
+  flaggedToday: number;
+};
+
+/** Comptages modération admin */
+export type AdminModerationMetrics = {
+  pendingAlbums: number;
+  pendingTracks: number;
+  pendingCatalog: number;
+  pendingWithdrawals: number;
+  pendingRightsClaims: number;
+  pendingArtistVerifications: number;
+};
+
+/** Comptages utilisateurs admin */
+export type AdminUserMetrics = {
+  totalUsers: number;
+  premiumUsers: number;
+  newUsersToday: number;
+  activeArtists: number;
+  newArtistsThisWeek: number;
+};
+
+/** Snapshot admin synchronisé (LDSE) */
+export type AdminLiveSnapshot = {
+  navBadges: AdminNavBadges;
+  fraudMetrics: AdminFraudMetrics;
+  moderationMetrics: AdminModerationMetrics;
+  userMetrics: AdminUserMetrics;
+  fetchedAt: string;
+};

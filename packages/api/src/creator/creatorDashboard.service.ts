@@ -2,6 +2,7 @@ import type { CreatorContext } from "@sonafrik/types";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { createAnalyticsService } from "../analytics/analytics.service";
+import { AdminConfigRepository } from "../admin/admin.config.repository";
 import { CreatorService } from "./creator.service";
 import { CreatorDashboardRepository } from "./creatorDashboard.repository";
 import { buildCreatorDashboardData, computeRevenueProjection } from "./creatorDashboard.presentation";
@@ -48,11 +49,13 @@ export class CreatorDashboardService {
   private readonly creatorService: CreatorService;
   private readonly analyticsService: ReturnType<typeof createAnalyticsService>;
   private readonly dashboardRepo: CreatorDashboardRepository;
+  private readonly featureFlags: AdminConfigRepository;
 
   constructor(private readonly client: SonafrikSupabaseClient) {
     this.creatorService = new CreatorService(client);
     this.analyticsService = createAnalyticsService(client);
     this.dashboardRepo = new CreatorDashboardRepository(client);
+    this.featureFlags = new AdminConfigRepository(client);
   }
 
   async getDashboardData(): Promise<CreatorDashboardData> {
@@ -73,6 +76,7 @@ export class CreatorDashboardService {
       catalogCounts,
       paymentConfigured,
       monthlyRevenue,
+      careerOsEnabled,
     ] = await Promise.all([
       this.analyticsService.getStreamStats({ creatorId }).catch(() => EMPTY_STREAM_STATS),
       this.analyticsService.getStreamTimeline({ creatorId, days: 14 }).catch(() => []),
@@ -86,24 +90,28 @@ export class CreatorDashboardService {
       })),
       this.dashboardRepo.isPaymentConfigured(userId).catch(() => false),
       this.dashboardRepo.getMonthlyRoyalties(creatorId).catch(() => []),
+      this.featureFlags.isFeatureEnabled("career_os").catch(() => false),
     ]);
 
     const revenueProjectionGnf = computeRevenueProjection(streamStats.week_streams, revenueStats);
 
-    return buildCreatorDashboardData({
-      context,
-      streamStats,
-      timeline,
-      audienceStats,
-      revenueStats,
-      topTrack: topTracks[0] ?? null,
-      catalogCounts,
-      playlistsCount: catalogCounts.playlistsCount,
-      paymentConfigured,
-      inspirationArtists: [],
-      monthlyRevenue,
-      revenueProjectionGnf,
-    });
+    return buildCreatorDashboardData(
+      {
+        context,
+        streamStats,
+        timeline,
+        audienceStats,
+        revenueStats,
+        topTrack: topTracks[0] ?? null,
+        catalogCounts,
+        playlistsCount: catalogCounts.playlistsCount,
+        paymentConfigured,
+        inspirationArtists: [],
+        monthlyRevenue,
+        revenueProjectionGnf,
+      },
+      { includeCareerOs: careerOsEnabled },
+    );
   }
 }
 

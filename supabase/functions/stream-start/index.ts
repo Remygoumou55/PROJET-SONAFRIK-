@@ -146,7 +146,7 @@ Deno.serve(async (req: Request) => {
 
     // Générer URL pré-signée (Règle #10 CDC — URLs audio côté serveur uniquement)
 
-    const SIGNED_URL_EXPIRY = 1800; // 30 minutes — réduit l'exposition si URL divulguée
+    const SIGNED_URL_EXPIRY = 900; // 15 minutes — limite exposition URL signée
 
     const { data: signedData, error: signedError } = await supabaseAdmin.storage
       .from("catalog-audio")

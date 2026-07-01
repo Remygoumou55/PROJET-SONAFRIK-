@@ -485,4 +485,60 @@ export class ListenerRepository {
       })
       .slice(0, limit);
   }
+
+  async getTrackReactionCounts(trackId: string): Promise<{ emoji: string; count: number }[]> {
+    const { data, error } = await this.client
+      .from("track_reaction_counts")
+      .select("emoji, count")
+      .eq("track_id", trackId);
+    if (error) throw error;
+    return (data ?? []).map((row) => ({
+      emoji: String((row as { emoji: string }).emoji),
+      count: Number((row as { count: number | null }).count ?? 0),
+    }));
+  }
+
+  async getLiveListenerCount(trackId: string): Promise<number> {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { count, error } = await this.client
+      .from("stream_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("track_id", trackId)
+      .gte("last_heartbeat_at", fiveMinutesAgo)
+      .is("completed_at", null);
+    if (error) throw error;
+    return count ?? 0;
+  }
+
+  async addTrackReaction(trackId: string, emoji: string): Promise<void> {
+    const { error } = await this.client.rpc("add_track_reaction", {
+      p_track_id: trackId,
+      p_emoji: emoji,
+    });
+    if (error) throw error;
+  }
+
+  async getTrackLyrics(trackId: string, language = "fr"): Promise<{ lines: import("@sonafrik/types").LyricLine[] }> {
+    const { data, error } = await this.client
+      .from("track_lyrics")
+      .select("lines")
+      .eq("track_id", trackId)
+      .eq("status", "approved")
+      .eq("language", language)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data?.lines || !Array.isArray(data.lines)) {
+      return { lines: [] };
+    }
+    const lines = (data.lines as unknown[]).filter(
+      (line): line is import("@sonafrik/types").LyricLine =>
+        typeof line === "object" &&
+        line !== null &&
+        "time" in line &&
+        "text" in line &&
+        typeof (line as import("@sonafrik/types").LyricLine).time === "number" &&
+        typeof (line as import("@sonafrik/types").LyricLine).text === "string",
+    );
+    return { lines };
+  }
 }

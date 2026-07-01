@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import type { Beat } from "@sonafrik/types";
 import { BEAT_LICENSE_LABELS } from "@sonafrik/types";
-import { purchaseBeatAction } from "../actions/beats.actions";
+import { purchaseBeatAction } from "./beats.actions";
 
 interface Props {
   beats: Beat[];
@@ -55,7 +55,6 @@ function BeatCard({
         boxShadow: highlighted ? "0 0 16px rgba(255,194,14,0.25)" : undefined,
       }}
     >
-      {/* En-tête */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-semibold" style={{ color: "var(--color-texte-principal)" }}>
@@ -82,7 +81,6 @@ function BeatCard({
         )}
       </div>
 
-      {/* Méta */}
       <div className="mb-3 flex flex-wrap gap-2">
         {beat.bpm ? (
           <span className="rounded px-2 py-0.5 text-xs" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-texte-secondaire)" }}>

@@ -10,26 +10,18 @@
  * Tout CSS de route-group : @import ici (ou via *-bundle.css).
  * Ne pas compter uniquement sur layout.tsx (fragile en dev/HMR). */
 @import "./styles/landing.css";
-@import "./styles/listen-home.css";
-@import "./styles/listen-future.css";
+@import "./styles/listen-home-bundle.css";
+/* listen-future.css : styles dormants — réactiver quand flags listen_* ON (post-MVP) */
 @import "./styles/identity.css";
 @import "./styles/performance.css";
 @import "./styles/identity-account.css";
-@import "./styles/identity-journey.css";
-@import "./styles/identity-goals.css";
-@import "./styles/identity-rewards.css";
-@import "./styles/identity-musical.css";
-@import "./styles/identity-musical-dna.css";
-@import "./styles/identity-story.css";
+/* Profile OS post-MVP — réactiver via identity-post-mvp-bundle.css quand flag profile_os ON */
 @import "./styles/revenue.css";
 @import "./styles/creator.css";
 @import "./styles/lancement.css";
 @import "./styles/responsive-system.css";
 @import "./styles/wallet.css";
-@import "./styles/admin.css";
-@import "./styles/admin-dashboard-human.css";
-@import "./styles/admin-responsive.css";
-@import "./styles/admin-fraud-human.css";
+@import "./styles/admin-bundle.css";
 
 @theme {
   --color-vert-energie: #00d26a;

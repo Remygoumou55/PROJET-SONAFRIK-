@@ -1,4 +1,9 @@
-const STORAGE_KEY = "sonafrik-fraud-incident-admin-v1";
+import {
+  addFraudReviewNoteAction,
+  bulkPatchFraudReviewStatesAction,
+  loadFraudReviewStatesAction,
+  patchFraudReviewStateAction,
+} from "../../actions/admin-fraud.actions";
 
 export interface FraudIncidentAdminState {
   treated: boolean;
@@ -10,40 +15,26 @@ export interface FraudIncidentAdminState {
 
 type Store = Record<string, FraudIncidentAdminState>;
 
-function readStore(): Store {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as Store;
-  } catch {
-    return {};
-  }
-}
-
-function writeStore(store: Store): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-}
+/** État local optimiste — synchronisé avec admin_fraud_reviews via Server Actions. */
+let optimisticStore: Store = {};
 
 export function getFraudIncidentState(id: string): FraudIncidentAdminState | null {
-  return readStore()[id] ?? null;
+  return optimisticStore[id] ?? null;
 }
 
 export function patchFraudIncidentState(
   id: string,
   patch: Partial<Omit<FraudIncidentAdminState, "updatedAt">>,
 ): FraudIncidentAdminState {
-  const store = readStore();
-  const prev = store[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
+  const prev = optimisticStore[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
   const next: FraudIncidentAdminState = {
     ...prev,
     ...patch,
     notes: patch.notes ?? prev.notes,
     updatedAt: new Date().toISOString(),
   };
-  store[id] = next;
-  writeStore(store);
+  optimisticStore = { ...optimisticStore, [id]: next };
+  void patchFraudReviewStateAction(id, patch).catch(() => undefined);
   return next;
 }
 
@@ -51,35 +42,45 @@ export function bulkPatchFraudIncidents(
   ids: string[],
   patch: Partial<Omit<FraudIncidentAdminState, "updatedAt">>,
 ): void {
-  const store = readStore();
   const now = new Date().toISOString();
+  const nextStore = { ...optimisticStore };
   for (const id of ids) {
-    const prev = store[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
-    store[id] = {
+    const prev = nextStore[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
+    nextStore[id] = {
       ...prev,
       ...patch,
       notes: patch.notes ?? prev.notes,
       updatedAt: now,
     };
   }
-  writeStore(store);
+  optimisticStore = nextStore;
+  void bulkPatchFraudReviewStatesAction(ids, patch).catch(() => undefined);
 }
 
 export function addFraudIncidentNote(id: string, note: string): void {
   const trimmed = note.trim();
   if (!trimmed) return;
-  const store = readStore();
-  const prev = store[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
-  store[id] = {
-    ...prev,
-    notes: [...prev.notes, trimmed],
-    updatedAt: new Date().toISOString(),
+  const prev = optimisticStore[id] ?? { treated: false, archived: false, hidden: false, notes: [] };
+  const notes = [...prev.notes, trimmed];
+  optimisticStore = {
+    ...optimisticStore,
+    [id]: { ...prev, notes, updatedAt: new Date().toISOString() },
   };
-  writeStore(store);
+  void addFraudReviewNoteAction(id, trimmed).catch(() => undefined);
+}
+
+export async function hydrateFraudIncidentStatesFromDb(): Promise<Store> {
+  try {
+    const remote = await loadFraudReviewStatesAction();
+    optimisticStore = remote;
+    return remote;
+  } catch {
+    return optimisticStore;
+  }
 }
 
 export function loadAllFraudIncidentStates(): Store {
-  return readStore();
+  return optimisticStore;
 }
 
 export function exportIncidentIdsAsCsv(ids: string[], rows: { id: string; title: string }[]): void {

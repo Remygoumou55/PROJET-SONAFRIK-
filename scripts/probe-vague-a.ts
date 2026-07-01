@@ -92,7 +92,7 @@ function staticChecks() {
   );
 
   const tipsActions = read("apps/web/src/features/shared/actions/tips.actions.ts");
-  const beatsActions = read("apps/web/src/features/marketplace/actions/beats.actions.ts");
+  const beatsActions = read("apps/web/src/features/listener/beats/beats.actions.ts");
   log(
     "A1 server actions session guard",
     tipsActions.includes('if (!user) return { error: "Connexion requise." }') &&

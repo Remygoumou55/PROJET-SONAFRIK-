@@ -58,6 +58,10 @@ export class AdminService {
     return this.repository.listFeatureFlags();
   }
 
+  async isFeatureEnabled(name: string): Promise<boolean> {
+    return this.repository.isFeatureEnabled(name);
+  }
+
   async toggleFeatureFlag(name: string, enabled: boolean): Promise<FeatureFlag> {
     const parsed = toggleFeatureFlagSchema.safeParse({ name, enabled });
     if (!parsed.success) throw new AdminError("flag_not_found");
@@ -70,12 +74,25 @@ export class AdminService {
     return this.repository.listSystemSettings();
   }
 
-  async updateSystemSetting(key: string, value: unknown): Promise<SystemSetting> {
+  async updateSystemSetting(
+    key: string,
+    value: unknown,
+    motive?: string | null,
+    actorId?: string,
+  ): Promise<SystemSetting> {
     const parsed = updateSystemSettingSchema.safeParse({ key, value });
     if (!parsed.success) throw new AdminError("setting_not_found");
 
-    const userId = await this.getOptionalUserId();
-    return this.repository.updateSystemSetting(key, value, userId);
+    const userId = actorId ?? (await this.getOptionalUserId());
+    return this.repository.updateSystemSetting(key, value, userId, motive);
+  }
+
+  async listSystemSettingAuditHistory(limit = 100) {
+    return this.repository.listSystemSettingAuditHistory(limit);
+  }
+
+  async getSystemSettingAuditHistory(key: string, limit = 20) {
+    return this.repository.getSystemSettingAuditHistory(key, limit);
   }
 
   async reviewCatalogItem(
@@ -117,6 +134,26 @@ export class AdminService {
 
   async listFraudSessionEvents(sessionId: string, limit = 40): Promise<AdminFraudStreamEvent[]> {
     return this.repository.listFraudSessionEvents(sessionId, limit);
+  }
+
+  async listFraudReviewStates(adminUserId: string) {
+    return this.repository.listFraudReviewStates(adminUserId);
+  }
+
+  async upsertFraudReviewState(
+    adminUserId: string,
+    incidentId: string,
+    patch: Partial<{ treated: boolean; archived: boolean; hidden: boolean; notes: string[] }>,
+  ) {
+    return this.repository.upsertFraudReviewState(adminUserId, incidentId, patch);
+  }
+
+  async bulkUpsertFraudReviewStates(
+    adminUserId: string,
+    incidentIds: string[],
+    patch: Partial<{ treated: boolean; archived: boolean; hidden: boolean }>,
+  ) {
+    return this.repository.bulkUpsertFraudReviewStates(adminUserId, incidentIds, patch);
   }
 
   async getFraudMetrics(): Promise<AdminFraudMetrics> {

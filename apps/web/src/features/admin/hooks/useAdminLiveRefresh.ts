@@ -68,9 +68,8 @@ export function useAdminLiveRefresh(options?: Options) {
     debounceRef.current = setTimeout(() => {
       debounceRef.current = null;
       ldseEventBus.publish(ADMIN_LDSE_EVENTS.snapshotInvalidate);
-      refresh();
     }, DEBOUNCE_MS);
-  }, [refresh]);
+  }, []);
 
   const onRealtimeChange = useCallback(
     (table: (typeof ADMIN_REALTIME_TABLES)[number]) => {

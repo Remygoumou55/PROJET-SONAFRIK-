@@ -111,7 +111,7 @@ function staticChecks() {
 
   const searchResults = read("apps/web/src/features/listener/components/SearchResults.tsx");
   const searchRows = read("apps/web/src/features/listener/components/SearchResultRows.tsx");
-  const beatStore = read("apps/web/src/features/marketplace/components/BeatStoreClient.tsx");
+  const beatStore = read("apps/web/src/features/listener/beats/BeatStoreClient.tsx");
   const hasPlaylistLink =
     searchResults.includes("/library/playlist/${playlist.id}") ||
     searchRows.includes("/library/playlist/${playlist.id}");

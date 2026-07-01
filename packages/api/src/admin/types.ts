@@ -95,39 +95,14 @@ export type AdminFraudSupervisionStats = {
   suspendedAccountsHint: number;
 };
 
-/** Snapshot admin synchronisé (LDSE) — badges + métriques canoniques */
-export type AdminLiveSnapshot = {
-  navBadges: AdminNavBadges;
-  fraudMetrics: AdminFraudMetrics;
-  moderationMetrics: AdminModerationMetrics;
-  userMetrics: AdminUserMetrics;
-  fetchedAt: string;
-};
-
-export type AdminFraudMetrics = {
-  totalFlagged: number;
-  flaggedThisMonth: number;
-  flaggedToday: number;
-};
-
-/** Comptages modération — SSOT catalog / droits / retraits / vérif artistes */
-export type AdminModerationMetrics = {
-  pendingAlbums: number;
-  pendingTracks: number;
-  pendingCatalog: number;
-  pendingWithdrawals: number;
-  pendingRightsClaims: number;
-  pendingArtistVerifications: number;
-};
-
-/** Comptages utilisateurs / artistes — SSOT dashboard + cockpit */
-export type AdminUserMetrics = {
-  totalUsers: number;
-  premiumUsers: number;
-  newUsersToday: number;
-  activeArtists: number;
-  newArtistsThisWeek: number;
-};
+/** Snapshot admin synchronisé (LDSE) — SSOT @sonafrik/types */
+export type {
+  AdminFraudMetrics,
+  AdminLiveSnapshot,
+  AdminModerationMetrics,
+  AdminNavBadges,
+  AdminUserMetrics,
+} from "@sonafrik/types";
 
 export type AdminDashboardKpis = {
   totalUsers: number;
@@ -146,13 +121,6 @@ export type AdminHealthCheck = {
   ok: boolean;
   latencyMs?: number;
   detail?: string;
-};
-
-export type AdminNavBadges = {
-  content: number;
-  pendingRightsClaims: number;
-  fraudSessions: number;
-  withdrawals: number;
 };
 
 export type AdminAuditActivityItem = {

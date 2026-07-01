@@ -11,13 +11,17 @@ export function getStageName(
 export async function countQuery(
   q: PromiseLike<{ count: number | null; error: unknown }>,
 ): Promise<number> {
-  try {
-    const r = await Promise.resolve(q);
-    if (r.error) return 0;
-    return r.count ?? 0;
-  } catch {
-    return 0;
+  const r = await Promise.resolve(q);
+  if (r.error) {
+    const detail =
+      r.error instanceof Error
+        ? r.error.message
+        : typeof r.error === "object" && r.error !== null && "message" in r.error
+          ? String((r.error as { message: unknown }).message)
+          : String(r.error);
+    throw new Error(`countQuery failed: ${detail}`);
   }
+  return r.count ?? 0;
 }
 
 export type AdminRepoClient = SonafrikSupabaseClient;

@@ -1,5 +1,6 @@
 import { AdminAwardsClient } from "@/features/admin/components/AdminAwardsClient";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+import { requireAdminFeatureFlag } from "@/features/admin/lib/requireAdminFeatureFlag";
 import { isValidContentName } from "@/lib/content-filter";
 import type { AdminAwardsDashboard } from "@sonafrik/api/admin";
 
@@ -17,6 +18,7 @@ const EMPTY: AdminAwardsDashboard = {
 };
 
 export default async function AdminAwardsPage() {
+  await requireAdminFeatureFlag("awards_admin");
   const admin = await getAdminServiceForSession();
   let data = EMPTY;
   let loadError: string | null = null;

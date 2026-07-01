@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useNotificationsService } from "@/features/shared/notifications/hooks/useNotificationsService";
 import { useNotificationsLdseCount } from "@/features/shared/ldse/notifications/useNotificationsLdseCount";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function NotificationBell({ initialCount, userId }: Props) {
+  useNotificationsService();
   const { count } = useNotificationsLdseCount(userId, initialCount);
 
   return (

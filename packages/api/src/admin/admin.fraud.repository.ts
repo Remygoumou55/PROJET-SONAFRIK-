@@ -168,4 +168,120 @@ export class AdminFraudRepository {
       };
     });
   }
+
+  async listFraudReviewStates(
+    adminUserId: string,
+  ): Promise<
+    Record<
+      string,
+      {
+        treated: boolean;
+        archived: boolean;
+        hidden: boolean;
+        notes: string[];
+        updatedAt: string;
+      }
+    >
+  > {
+    const { data, error } = await this.client
+      .from("admin_fraud_reviews")
+      .select("incident_id, treated, archived, hidden, notes, updated_at")
+      .eq("admin_user_id", adminUserId);
+    if (error) throw error;
+
+    const store: Record<
+      string,
+      { treated: boolean; archived: boolean; hidden: boolean; notes: string[]; updatedAt: string }
+    > = {};
+
+    for (const row of data ?? []) {
+      const raw = row as {
+        incident_id: string;
+        treated: boolean;
+        archived: boolean;
+        hidden: boolean;
+        notes: unknown;
+        updated_at: string;
+      };
+      store[raw.incident_id] = {
+        treated: raw.treated,
+        archived: raw.archived,
+        hidden: raw.hidden,
+        notes: Array.isArray(raw.notes) ? (raw.notes as string[]) : [],
+        updatedAt: raw.updated_at,
+      };
+    }
+    return store;
+  }
+
+  async upsertFraudReviewState(
+    adminUserId: string,
+    incidentId: string,
+    patch: Partial<{ treated: boolean; archived: boolean; hidden: boolean; notes: string[] }>,
+  ): Promise<{
+    treated: boolean;
+    archived: boolean;
+    hidden: boolean;
+    notes: string[];
+    updatedAt: string;
+  }> {
+    const existingRes = await this.client
+      .from("admin_fraud_reviews")
+      .select("treated, archived, hidden, notes")
+      .eq("admin_user_id", adminUserId)
+      .eq("incident_id", incidentId)
+      .maybeSingle();
+
+    if (existingRes.error) throw existingRes.error;
+
+    const prev = existingRes.data as {
+      treated: boolean;
+      archived: boolean;
+      hidden: boolean;
+      notes: unknown;
+    } | null;
+
+    const nextNotes = patch.notes ?? (Array.isArray(prev?.notes) ? (prev!.notes as string[]) : []);
+    const payload = {
+      incident_id: incidentId,
+      admin_user_id: adminUserId,
+      treated: patch.treated ?? prev?.treated ?? false,
+      archived: patch.archived ?? prev?.archived ?? false,
+      hidden: patch.hidden ?? prev?.hidden ?? false,
+      notes: nextNotes,
+    };
+
+    const { data, error } = await this.client
+      .from("admin_fraud_reviews")
+      .upsert(payload, { onConflict: "incident_id,admin_user_id" })
+      .select("treated, archived, hidden, notes, updated_at")
+      .single();
+
+    if (error) throw error;
+    const row = data as {
+      treated: boolean;
+      archived: boolean;
+      hidden: boolean;
+      notes: unknown;
+      updated_at: string;
+    };
+
+    return {
+      treated: row.treated,
+      archived: row.archived,
+      hidden: row.hidden,
+      notes: Array.isArray(row.notes) ? (row.notes as string[]) : [],
+      updatedAt: row.updated_at,
+    };
+  }
+
+  async bulkUpsertFraudReviewStates(
+    adminUserId: string,
+    incidentIds: string[],
+    patch: Partial<{ treated: boolean; archived: boolean; hidden: boolean }>,
+  ): Promise<void> {
+    for (const incidentId of incidentIds) {
+      await this.upsertFraudReviewState(adminUserId, incidentId, patch);
+    }
+  }
 }

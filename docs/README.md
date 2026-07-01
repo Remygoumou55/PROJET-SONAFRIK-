@@ -24,6 +24,8 @@
 
 | Document | Rôle |
 |---|---|
+| **[`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)** | **Plan correction actif** — vagues G→K, lots, fichiers IA |
+| **[`AUDIT-V2-FORENSIQUE.md`](./AUDIT-V2-FORENSIQUE.md)** | Audit risques V2 — silos, duplications, CSS |
 | [`MVP_SCOPE_LOCK.md`](./MVP_SCOPE_LOCK.md) | Périmètre produit MVP · chaîne E2E |
 | [`AI_GOVERNANCE.md`](./AI_GOVERNANCE.md) | Comportement IA · ordre de lecture |
 | [`NOUVELLE_REGLE_DE_TRAVAIL.md`](./NOUVELLE_REGLE_DE_TRAVAIL.md) | Workflow S0–S23 page par page |
@@ -112,11 +114,13 @@ Stubs : [`MASTER_PLAN.md`](./MASTER_PLAN.md) · [`PLAN_CORRECTION_360.md`](./PLA
 ## Onboarding IA (ordre obligatoire)
 
 ```
-1. docs/README.md          ← vous êtes ici
-2. docs/EXECUTION_LOG.md   ← ÉTAT MESURÉ + 5 dernières entrées
-3. docs/MVP_SCOPE_LOCK.md
-4. CLAUDE.md
-5. docs/CDC-v9.0.md
+1. docs/README.md                    ← vous êtes ici
+2. CLAUDE.md                         ← gouvernance IA (challenge obligatoire)
+3. docs/PLAN-CORRECTION-360-V2.md    ← plan vagues G→K
+4. docs/AUDIT-V2-FORENSIQUE.md       ← risques et état silos
+5. docs/EXECUTION_LOG.md             ← ÉTAT MESURÉ + collection interventions
+6. docs/MVP_SCOPE_LOCK.md
+7. docs/CDC-v9.0.md
 ```
 
 ---

@@ -11,7 +11,94 @@
 
 ---
 
-## 2026-06-29 — Back Office Fraude : SSOT supervision enterprise
+## 2026-06-30 — Config Règles Métiers — Humanisation cockpit admin
+
+### Fichiers touchés
+- `apps/web/src/features/admin/components/AdminBusinessRulesCenter.tsx` — cockpit cartes, recherche, modales historique/compare/restaurer
+- `apps/web/src/features/admin/lib/businessRulesDictionary.ts` — dictionnaire métier (labels, criticité, modules)
+- `apps/web/src/features/admin/lib/formatBusinessRuleValue.ts` — formatage valeurs + parsing brouillon
+- `apps/web/src/app/styles/admin-settings-human.css` — styles cockpit (tokens CSS)
+- `apps/web/src/app/(admin)/admin/settings/page.tsx` — chargement settings + audit + libellés auteurs
+- `packages/api/src/admin/admin.config.repository.ts` — audit `log_audit_event` sur modification setting
+- `packages/types/src/admin.ts` — type `SystemSettingAuditEntry`
+- `apps/web/src/features/admin/actions/admin.actions.ts` — restore + motive + actorId
+
+### Dette technique créée
+- Historique limité aux entrées `admin.system_setting.updated` (pas de snapshots avant cette version)
+- Comparaison = dernière modification uniquement (pas de sélection libre de 2 versions)
+
+### Tests à faire
+- [ ] `/admin/settings` — recherche « revenu », « stream »
+- [ ] Modifier règle critique → alerte confirmation
+- [ ] Historique / Restaurer après modification
+- [ ] Vérifier aucune clé technique visible dans l'UI
+
+---
+
+## 2026-06-30 — Vague G — Hygiène structurelle (G1–G4)
+
+### Fichiers touchés
+- `apps/web/src/features/marketplace/` — shims supprimés, README tombstone
+- `apps/web/src/app/styles/listen-home.css` — supprimé (orphan 2369L)
+- `apps/web/src/app/globals.css` — retrait CSS Profile OS post-MVP
+- `apps/web/src/app/styles/identity-post-mvp-bundle.css` — bundle dormant créé
+- `packages/api/src/creator/career/README.md` — Career OS gelé documenté
+- `scripts/split-listen-home-css.mjs` — regénère bundle depuis modules
+- `docs/DOMAIN_MAP.md`, `docs/DEPENDENCY_RULES.md`, `docs/MVP_SCOPE_LOCK.md`
+
+### Code avant (extrait globals.css)
+```before
+@import "./styles/identity-journey.css";
+@import "./styles/identity-goals.css";
+/* … 4 autres bundles Profile OS … */
+```
+
+### Code après (extrait globals.css)
+```after
+/* Profile OS post-MVP — réactiver via identity-post-mvp-bundle.css quand flag profile_os ON */
+@import "./styles/identity.css";
+@import "./styles/identity-account.css";
+```
+
+### Validation
+- [x] pnpm build / lint / typecheck
+- [x] probe:certification 134/134
+- [ ] Test manuel : page /profile sans Profile OS (styles MVP OK)
+
+### Dette créée
+- Aucune — Vague H (découpage admin.css) suit
+
+---
+
+## 2026-06-30 — Audit V2 + Plan correction 360 V2 (cadrage Martin)
+
+### Contexte
+Martin (conseiller tech) : stopper le mode « oui oui » — challenger les demandes, séparer découpage vs déplacement, global CSS SSOT, plan IA handoff.
+
+### Livrables (documentation — pas de big-bang déplacement)
+- `docs/AUDIT-V2-FORENSIQUE.md` — audit complet V2 (silos, duplications, CSS, risques)
+- `docs/PLAN-CORRECTION-360-V2.md` — vagues G→K détaillées (lots + fichiers à toucher)
+- `CLAUDE.md` — sections 1bis (3 silos), 1ter (global CSS), boucle Martin
+- `docs/PLAN_CORRECTION_360.md` — redirect vers V2
+
+### Réponse honnête déplacement vs découpage
+| Travail | État |
+|---|---|
+| Déplacement web listener/creator/admin | ~80 % (Vague F) |
+| Déplacement packages/api | ~0 % — planifié Vague I |
+| Découpage fichiers TS web | ~90 % (0 fichier >400L) |
+| Découpage CSS | ~40 % (admin.css 1354L, orphan listen-home.css) |
+| Global CSS 1-clic couleur | ~65 % (tokens OK, 39 bundles CSS) |
+
+### Prochaine vague recommandée
+**Vague G** (hygiène) → **Vague H** (découpage CSS/composants) — pas de déplacement massif avant H terminée.
+
+### Validation
+- Probes : 134/134 (session précédente)
+- Aucun code métier modifié dans cette entrée (planning only)
+
+---
+
 
 ### Fichiers touchés
 - `packages/api/src/admin/admin.metrics.repository.ts` — `getFraudSupervisionStats()` SSOT unique (hiérarchie + UTC)

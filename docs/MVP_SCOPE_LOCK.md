@@ -266,7 +266,7 @@ Fonctionnalités **déjà présentes dans le codebase** mais sans valeur MVP imm
 
 | Élément | Statut | Action | Justification |
 |---|---|---|---|
-| `features/marketplace/` (Beat Store) | **GELÉ** | Flag `beat_store=false`, pas de dev | POST-MVP CDC |
+| `features/marketplace/` (Beat Store) | **RETIRÉ** | Canonique : `listener/beats/` · tombstone README | POST-MVP CDC |
 | `/listen/beats` | **GELÉ** | ComingSoon tant que flag off | POST-MVP |
 | `/wallet/royalties` UI | **MVP Core** | `RoyaltiesPage.tsx` branché — valider E2E avec cycle réel | Chaîne MVP |
 | `RoyaltiesPage.tsx` | **ACTIF** | Route `/wallet/royalties` | — |

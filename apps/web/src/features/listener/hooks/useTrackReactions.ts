@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createListenerService } from "@sonafrik/api/listener";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export interface ReactionCount {
@@ -12,6 +13,13 @@ const REACTION_EMOJIS = ["❤️", "🔥", "😢", "🕺", "😮"] as const;
 
 function emptyReactions(): ReactionCount[] {
   return REACTION_EMOJIS.map((emoji) => ({ emoji, count: 0 }));
+}
+
+function mergeReactionRows(rows: { emoji: string; count: number }[]): ReactionCount[] {
+  return emptyReactions().map((reaction) => {
+    const found = rows.find((row) => row.emoji === reaction.emoji);
+    return found ? { ...reaction, count: found.count } : reaction;
+  });
 }
 
 export function useTrackReactions(trackId: string | null) {
@@ -26,35 +34,24 @@ export function useTrackReactions(trackId: string | null) {
     }
 
     const supabase = getSupabaseBrowserClient();
+    const listener = createListenerService(supabase);
 
     const loadInitialReactions = async () => {
-      const { data } = await supabase
-        .from("track_reaction_counts")
-        .select("emoji, count")
-        .eq("track_id", trackId);
-
-      if (data?.length) {
-        setReactions((prev) =>
-          prev.map((reaction) => {
-            const found = data.find((row) => row.emoji === reaction.emoji);
-            return found ? { ...reaction, count: found.count ?? 0 } : reaction;
-          }),
-        );
-      } else {
+      try {
+        const rows = await listener.getTrackReactionCounts(trackId);
+        setReactions(rows.length ? mergeReactionRows(rows) : emptyReactions());
+      } catch {
         setReactions(emptyReactions());
       }
     };
 
     const loadLiveListeners = async () => {
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-      const { count } = await supabase
-        .from("stream_sessions")
-        .select("id", { count: "exact", head: true })
-        .eq("track_id", trackId)
-        .gte("last_heartbeat_at", fiveMinutesAgo)
-        .is("completed_at", null);
-
-      setLiveListeners(count ?? 0);
+      try {
+        const count = await listener.getLiveListenerCount(trackId);
+        setLiveListeners(count);
+      } catch {
+        setLiveListeners(0);
+      }
     };
 
     void loadInitialReactions();

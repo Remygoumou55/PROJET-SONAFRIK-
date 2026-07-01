@@ -16,20 +16,67 @@ export interface OperatorInitResult {
 }
 
 /** Détecte le mode sandbox (env explicite ou clé API absente). */
-export function isProviderSandbox(provider: PaymentProvider): boolean {
-  const envKey = `${provider.toUpperCase()}_SANDBOX`;
-  if (Deno.env.get(envKey) === "true") return true;
+export function isProductionDeployment(): boolean {
+  const env =
+    Deno.env.get("SONAFRIK_ENV") ??
+    Deno.env.get("ENVIRONMENT") ??
+    Deno.env.get("DENO_ENV") ??
+    "";
+  return env.toLowerCase() === "production";
+}
 
-  switch (provider) {
-    case "orange_money_gn":
-      return !Deno.env.get("ORANGE_MONEY_API_KEY");
-    case "mtn_momo_gn":
-      return !Deno.env.get("MTN_MOMO_API_KEY");
-    case "wave_gn":
-      return !Deno.env.get("WAVE_API_KEY");
-    case "soutra_money":
-      return !Deno.env.get("SOUTRA_API_KEY");
+const PROVIDER_CREDENTIAL_KEYS: Record<PaymentProvider, string[]> = {
+  orange_money_gn: ["ORANGE_MONEY_API_KEY", "ORANGE_MONEY_MERCHANT_KEY"],
+  mtn_momo_gn: ["MTN_MOMO_SUBSCRIPTION_KEY", "MTN_MOMO_API_KEY"],
+  wave_gn: ["WAVE_API_KEY"],
+  soutra_money: ["SOUTRA_API_KEY", "SOUTRA_MERCHANT_ID"],
+};
+
+export interface PaymentOperatorReadiness {
+  provider: PaymentProvider;
+  mode: "sandbox" | "production" | "blocked";
+  ready: boolean;
+  missingKeys: string[];
+}
+
+export function getPaymentOperatorReadiness(provider: PaymentProvider): PaymentOperatorReadiness {
+  const explicitSandbox = Deno.env.get(`${provider.toUpperCase()}_SANDBOX`) === "true";
+  const missingKeys = PROVIDER_CREDENTIAL_KEYS[provider].filter((key) => !Deno.env.get(key));
+
+  if (explicitSandbox) {
+    return { provider, mode: "sandbox", ready: true, missingKeys };
   }
+
+  if (missingKeys.length === 0) {
+    return { provider, mode: "production", ready: true, missingKeys: [] };
+  }
+
+  if (isProductionDeployment()) {
+    return { provider, mode: "blocked", ready: false, missingKeys };
+  }
+
+  return { provider, mode: "sandbox", ready: true, missingKeys };
+}
+
+export function getPaymentOperatorsReadiness(): PaymentOperatorReadiness[] {
+  return (["orange_money_gn", "mtn_momo_gn", "wave_gn", "soutra_money"] as PaymentProvider[]).map(
+    getPaymentOperatorReadiness,
+  );
+}
+
+export function assertPaymentOperatorReady(provider: PaymentProvider): void {
+  const readiness = getPaymentOperatorReadiness(provider);
+  if (readiness.mode === "blocked") {
+    throw new Error(
+      `payment_operator_not_ready:${provider}:missing=${readiness.missingKeys.join(",")}`,
+    );
+  }
+}
+
+/** Détecte le mode sandbox (env explicite ou clé API absente). */
+export function isProviderSandbox(provider: PaymentProvider): boolean {
+  const readiness = getPaymentOperatorReadiness(provider);
+  return readiness.mode === "sandbox";
 }
 
 export function getWebBaseUrl(): string {

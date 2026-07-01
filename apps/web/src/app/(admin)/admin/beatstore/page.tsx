@@ -1,5 +1,6 @@
 import { AdminBeatStoreClient } from "@/features/admin/components/AdminBeatStoreClient";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+import { requireAdminFeatureFlag } from "@/features/admin/lib/requireAdminFeatureFlag";
 import { isValidContentName } from "@/lib/content-filter";
 
 export const metadata = { title: "Beat Store — Admin SONAFRIK" };
@@ -15,6 +16,7 @@ function parseFilter(value: string | undefined): "pending" | "published" | "reje
 }
 
 export default async function AdminBeatstorePage({ searchParams }: PageProps) {
+  await requireAdminFeatureFlag("beat_store_admin");
   const params = await searchParams;
   const filter = parseFilter(params.filter);
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);

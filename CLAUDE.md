@@ -2,7 +2,7 @@
 > Ce fichier est lu en premier par toute IA travaillant sur ce projet.
 > Il définit le comportement attendu, les rôles, les principes non-négociables.
 > **Toute IA doit le lire avant d'écrire une seule ligne de code.**
-> Dernière mise à jour : 2026-06-21 — Accès autonome complet accordé par Rémy Goumou.
+> Dernière mise à jour : **30 juin 2026** — Cadrage Martin (challenge obligatoire, silos, global CSS)
 
 ---
 
@@ -18,6 +18,37 @@ Tu n'es **pas** un exécutant. Tu es un partenaire technique qui pense à la pla
 - Quand une idée est prématurée pour le MVP → **tu le dis clairement et tu la mets directement dans la roadmap**
 - Quand une implémentation risque de casser autre chose → **tu l'identifies et tu le nommes ou si tu vois vois il peut cassé les choses tu l'ignore completement ou tu le supprime**
 - Tu ne dis jamais "oui, oui" sans avoir réfléchi aux conséquences
+- **Martin (conseiller tech) :** si une demande mélange trop de choses, découper en vagues et proposer le **moment opportun** — ne pas brûler des crédits sur du hors-MVP
+- **Rémy (fondateur) :** il pilote la vision produit ; **tu** pilotes la conséquence technique. Toujours expliquer : « Si on fait X maintenant → Y casse, Z retard, W va en roadmap »
+
+---
+
+## 1bis. LES TROIS SILOS (RÈGLE MARTIN)
+
+L'application repose sur **3 silos fonctionnels** indépendants :
+
+| Silo | Dossiers web | Dossiers API | Règle bug |
+|---|---|---|---|
+| **Auditeur** | `features/listener/`, `app/(listener)/` | `packages/api/listener/` | Un bug ici ne doit **pas** casser artiste ni admin |
+| **Artiste** | `features/creator/`, `app/(creator)/` | `packages/api/creator/*` (+ migration catalog/rights) | Idem |
+| **Admin** | `features/admin/`, `app/(admin)/` | `packages/api/admin/` | Idem |
+
+**Transversal MVP (normal) :** `wallet/`, `identity/auth`, `shared/social` — documenter tout changement cross-silo.
+
+**Découpage ≠ Déplacement :**
+- **Découpage** = fichiers trop longs → modules ≤400 lignes (Vague H)
+- **Déplacement** = chaque fichier au bon silo (Vague F web ✅, Vague I API ⏳)
+
+Plan détaillé : `docs/PLAN-CORRECTION-360-V2.md` · Audit : `docs/AUDIT-V2-FORENSIQUE.md`
+
+---
+
+## 1ter. GLOBAL CSS — SOURCE UNIQUE
+
+- **Couleurs / tokens :** `apps/web/src/app/globals.css` → bloc `@theme { }` **seule source**
+- **Interdit :** hex `#` ou couleurs inventées dans les composants
+- **CSS domaine :** `apps/web/src/app/styles/*` — layout uniquement, couleurs via `var(--color-*)`
+- **Objectif Vague J :** changer la palette = éditer `@theme` uniquement
 
 ---
 
@@ -61,6 +92,14 @@ Après avoir écrit du code, **avant de le livrer**, faire obligatoirement cette
 ```
 
 Si une case est cochée "non" → **corriger avant de déclarer la tâche terminée.**
+
+### Boucle Martin (qualité avant rapport)
+
+1. Écrire le code
+2. **Se relire soi-même** — critiquer son propre diff comme un reviewer externe
+3. Si qualité insuffisante → **reprendre**, ne pas livrer un rapport « terminé »
+4. Mettre à jour `docs/EXECUTION_LOG.md` (format collection : fichiers, avant/après)
+5. Seulement alors → rapport final + `pnpm build && pnpm lint && pnpm typecheck`
 
 ---
 
@@ -235,6 +274,8 @@ Avant de travailler sur n'importe quelle tâche, lire :
 | Fichier | Pourquoi |
 |---|---|
 | `docs/README.md` | Index — point d'entrée documentation |
+| `docs/PLAN-CORRECTION-360-V2.md` | **Plan de correction actif** — vagues G→K, lots, fichiers |
+| `docs/AUDIT-V2-FORENSIQUE.md` | **Audit risques V2** — duplications, silos, CSS |
 | `docs/EXECUTION_LOG.md` | **Source de vérité unique** — état actuel, sprints, métriques |
 | `docs/MVP_SCOPE_LOCK.md` | Périmètre MVP · chaîne E2E |
 | `docs/AI_GOVERNANCE.md` | Comportement IA · ordre de lecture |

@@ -1,4 +1,4 @@
-import type { CreatorDashboardData, CreatorRevenueStats } from "@sonafrik/types";
+import type { CreatorCareerOsState, CreatorDashboardData, CreatorRevenueStats } from "@sonafrik/types";
 import { buildActivities } from "./creatorDashboard.activities.presentation";
 import { buildHero } from "./creatorDashboard.hero.presentation";
 import { buildKpis } from "./creatorDashboard.kpis.presentation";
@@ -10,6 +10,24 @@ import {
   buildGoals,
   buildQuickActions,
 } from "./creatorDashboard.widgets.presentation";
+
+const EMPTY_CAREER_OS: CreatorCareerOsState = {
+  level: {
+    id: "starter",
+    label: "Starter",
+    icon: "🎵",
+    unlocked: true,
+    isCurrent: true,
+  },
+  levels: [],
+  currentMission: null,
+  missions: [],
+  completedMissionCount: 0,
+  totalMissionCount: 0,
+  overallProgressPercent: 0,
+  motivationMessage: "",
+  encouragementTone: "launch",
+};
 
 export type { BuildDashboardInput } from "./creatorDashboard.presentation.shared";
 
@@ -28,7 +46,11 @@ export function computeRevenueProjection(
   return Math.round(weeklyStreams * 4 * perStream);
 }
 
-export function buildCreatorDashboardData(input: BuildDashboardInput): CreatorDashboardData {
+export function buildCreatorDashboardData(
+  input: BuildDashboardInput,
+  options?: { includeCareerOs?: boolean },
+): CreatorDashboardData {
+  const includeCareerOs = options?.includeCareerOs !== false;
   const hero = buildHero(input);
   return {
     context: input.context,
@@ -36,8 +58,8 @@ export function buildCreatorDashboardData(input: BuildDashboardInput): CreatorDa
     kpis: buildKpis(input),
     activities: buildActivities(input),
     goals: buildGoals(input),
-    careerSteps: buildCareerSteps(input),
-    careerOs: buildCareerOs(input),
+    careerSteps: includeCareerOs ? buildCareerSteps(input) : [],
+    careerOs: includeCareerOs ? buildCareerOs(input) : EMPTY_CAREER_OS,
     assistantTips: buildAssistantTips(input, hero.profilePercent),
     quickActions: buildQuickActions(input),
     streamStats: input.streamStats,
