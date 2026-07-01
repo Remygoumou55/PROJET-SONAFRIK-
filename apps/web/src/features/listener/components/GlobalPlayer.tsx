@@ -131,14 +131,17 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
           </div>
         ) : null}
 
-        <div className="gp-body">
+        <div
+          className="gp-body"
+          role="button"
+          tabIndex={0}
+          onClick={() => setIsFullPlayerOpen(true)}
+          onKeyDown={(e) => e.key === "Enter" && setIsFullPlayerOpen(true)}
+          aria-label={`Ouvrir le lecteur — ${currentTrack.title}`}
+          style={{ cursor: "pointer" }}
+        >
           <div className="gp-track-info">
-            <button
-              type="button"
-              className="gp-track-clickable"
-              onClick={() => setIsFullPlayerOpen(true)}
-              aria-label={`Ouvrir le lecteur pour ${currentTrack.title}`}
-            >
+            <div className="gp-track-clickable">
               <div className="gp-cover">
                 <CoverImage
                   coverPath={currentTrack.cover_url ?? null}
@@ -151,26 +154,27 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
                 <p className="gp-title">{currentTrack.title}</p>
                 <p className="gp-artist">{currentTrack.artist_name ?? "Artiste"}</p>
               </div>
-              <span className="gp-expand-hint" aria-hidden="true">
-                ▲
-              </span>
-            </button>
-            <LikeButton trackId={currentTrack.id} size="sm" />
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <LikeButton trackId={currentTrack.id} size="sm" />
+            </div>
             {whatsappShare ? (
-              <ShareButton
-                trackId={currentTrack.id}
-                title={currentTrack.title}
-                artistName={artistLabel}
-              />
+              <div onClick={(e) => e.stopPropagation()}>
+                <ShareButton
+                  trackId={currentTrack.id}
+                  title={currentTrack.title}
+                  artistName={artistLabel}
+                />
+              </div>
             ) : null}
           </div>
 
-          <div className="gp-controls">
+          <div className="gp-controls" onClick={(e) => e.stopPropagation()}>
             {fullscreenPlayer ? (
               <button
                 type="button"
                 className="gp-expand-btn"
-                onClick={() => setIsFullScreen(true)}
+                onClick={(e) => { e.stopPropagation(); setIsFullScreen(true); }}
                 aria-label="Ouvrir le lecteur plein écran"
               >
                 ↑
@@ -180,7 +184,7 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
             <GlobalPlayerTime />
           </div>
 
-          <div className="gp-actions">
+          <div className="gp-actions" onClick={(e) => e.stopPropagation()}>
             {qualityLevel !== "standard" ? (
               <span className="gp-quality-badge">
                 {qualityLevel === "ultra_economique" ? "Ultra-éco" : "Éco données"}

@@ -167,6 +167,11 @@ html[data-player-active="true"] .has-global-player main {
   padding: 0 24px;
   min-height: 72px;
   gap: 24px;
+  transition: background 0.15s ease;
+}
+
+.gp-body:hover {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .gp-track-info {
