@@ -11,6 +11,27 @@
 
 ---
 
+## 2026-07-01 — Audit Global IA (document onboarding toutes IAs)
+
+### Mission
+Compiler l'intégralité du travail accompli depuis la première session en un document unique `docs/AUDIT_GLOBAL_IA.md` permettant à toute nouvelle IA de reprendre le projet au niveau actuel.
+
+### Fichiers touchés
+- `docs/AUDIT_GLOBAL_IA.md` — créé (document 14 sections, ~450 lignes)
+
+### Contenu
+- Identité projet + stack + sécurité absolue
+- 3 silos (Règle Martin) + design token system (web + mobile)
+- État DB (53 tables, 161 RLS policies, 48 migrations)
+- Historique chronologique complet (Phase 0 → 2026-07-01)
+- État actuel : 193/193 probes, 283/283 tests, 38/38 pages HTTP 200, 0 hex hardcodé
+- ADRs 001→009, pièges connus, commandes utiles
+
+### Tests à faire
+- [x] Document accessible à `docs/AUDIT_GLOBAL_IA.md`
+
+---
+
 ## 2026-07-01 — Onboarding Choose Your Journey (humanisation)
 
 ### Fichiers touchés
