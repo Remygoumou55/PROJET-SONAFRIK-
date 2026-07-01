@@ -1,8 +1,8 @@
 import { SkeletonRow } from "@/components/ui/SkeletonRow";
 
-export default function CreatorLoading() {
+export default function CreatorPageLoading() {
   return (
-    <div style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100%" }}>
+    <div className="creator-dashboard creator-dashboard--enterprise px-4 py-6 sm:px-6" aria-busy="true">
       {/* Header */}
       <div className="px-6 pt-8 pb-6" style={{ borderBottom: "1px solid var(--color-surface)" }}>
         <div className="h-3 w-24 rounded-full animate-pulse mb-3" style={{ backgroundColor: "var(--color-card)" }} />

@@ -38,7 +38,7 @@ export function profileCompletionPercent(profile: {
   const checks = [
     Boolean(profile.stage_name?.trim()),
     Boolean(profile.bio?.trim()),
-    profile.genres.length > 0,
+    (profile.genres?.length ?? 0) > 0,
     Boolean(profile.profile_photo ?? profile.cover_path),
     Boolean(profile.banner_path),
     Object.keys(profile.social_links ?? {}).length > 0,

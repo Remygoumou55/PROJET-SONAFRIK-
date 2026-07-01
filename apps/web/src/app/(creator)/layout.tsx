@@ -28,7 +28,7 @@ async function CreatorGuard({ children }: { children: React.ReactNode }) {
         pendingVerifications={context.pendingVerifications}
         userId={context.creator.owner_id}
         initialUnreadCount={unreadCount}
-        stageName={context.artistProfile.stage_name}
+        stageName={context.artistProfile.stage_name || "Artiste"}
         creatorId={context.creator.id}
         avatarPath={avatarPath}
       >
@@ -40,8 +40,10 @@ async function CreatorGuard({ children }: { children: React.ReactNode }) {
 
 export default function CreatorLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<CreatorLoading />}>
-      <CreatorGuard>{children}</CreatorGuard>
-    </Suspense>
+    <div className="min-h-dvh bg-noir-profond text-texte-principal">
+      <Suspense fallback={<CreatorLoading />}>
+        <CreatorGuard>{children}</CreatorGuard>
+      </Suspense>
+    </div>
   );
 }

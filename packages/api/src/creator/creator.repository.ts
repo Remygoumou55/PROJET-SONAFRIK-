@@ -82,6 +82,7 @@ export class CreatorRepository {
       social_links: (data.social_links as Record<string, string>) ?? {},
       profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
       cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
       cover_updated_at: (data.cover_updated_at as string | null) ?? null,
     };
   }
@@ -110,6 +111,7 @@ export class CreatorRepository {
       social_links: (data.social_links as Record<string, string>) ?? {},
       profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
       cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
       cover_updated_at: (data.cover_updated_at as string | null) ?? null,
     };
   }
@@ -138,6 +140,7 @@ export class CreatorRepository {
       social_links: (data.social_links as Record<string, string>) ?? {},
       profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
       cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
+      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
       cover_updated_at: (data.cover_updated_at as string | null) ?? null,
     };
   }

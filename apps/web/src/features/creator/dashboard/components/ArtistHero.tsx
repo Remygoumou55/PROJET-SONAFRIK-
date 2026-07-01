@@ -29,7 +29,7 @@ export const ArtistHero = memo(function ArtistHero({
 }: ArtistHeroProps) {
   const photoPath = artistProfile.profile_photo ?? artistProfile.cover_path;
   const coverImages =
-    artistProfile.cover_images.length > 0
+    (artistProfile.cover_images?.length ?? 0) > 0
       ? artistProfile.cover_images
       : artistProfile.banner_path
         ? [artistProfile.banner_path]

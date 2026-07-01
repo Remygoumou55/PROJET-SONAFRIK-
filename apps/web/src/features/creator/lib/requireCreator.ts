@@ -52,10 +52,17 @@ const fetchCreatorContext = cache(async () => {
 
   if (!profile) redirect("/auth/connexion");
 
-  if (
-    !profile.onboarding_completed ||
-    (profile.account_type !== "artiste" && profile.account_type !== "auditeur_artiste")
-  ) {
+  if (!profile.onboarding_completed) {
+    if (profile.account_type === "artiste" || profile.account_type === "auditeur_artiste") {
+      redirect("/onboarding/artist");
+    }
+    if (profile.account_type === "auditeur") {
+      redirect("/onboarding/listener");
+    }
+    redirect("/onboarding/role");
+  }
+
+  if (profile.account_type !== "artiste" && profile.account_type !== "auditeur_artiste") {
     redirect("/profile");
   }
 
