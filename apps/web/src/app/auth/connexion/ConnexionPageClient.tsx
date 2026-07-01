@@ -5,16 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isClientLocalControlMode } from "@sonafrik/shared/auth";
 import { AuthPageShell } from "@/features/identity/auth/components/AuthPageShell";
+import { ConnexionPhoneAuthSection } from "@/features/identity/auth/components/ConnexionPhoneAuthSection";
 import { GoogleAuthButton } from "@/features/identity/auth/components/GoogleAuthButton";
-import { LegalConsentCheckbox } from "@/features/identity/auth/components/LegalConsentCheckbox";
+import { LegalConsentNotice } from "@/features/identity/auth/components/LegalConsentNotice";
 import { OtpForm } from "@/features/identity/auth/components/OtpForm";
-import { PhoneForm } from "@/features/identity/auth/components/PhoneForm";
 import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
 
 type Step = "phone" | "otp";
 type RoleParam = "artist" | "listener" | null;
 
-const AUTH_SUBTITLE = "Écoute · Participe · Prospère";
+const GOOGLE_ONLY_TITLE = "Bienvenue sur SONAFRIK";
+const GOOGLE_ONLY_SUBTITLE =
+  "Découvrez, écoutez, soutenez et développez la musique guinéenne, africaine et mondiale.";
+const LEGACY_TITLE = "Créer votre compte";
+const LEGACY_SUBTITLE = "Écoute · Participe · Prospère";
 
 const BACK_LINK = (
   <Link
@@ -23,6 +27,14 @@ const BACK_LINK = (
   >
     ← Retour à l&apos;accueil
   </Link>
+);
+
+const HELP_LINK = (
+  <p className="text-center">
+    <Link href="/auth/mot-de-passe-oublie" className="auth-help-link">
+      Besoin d&apos;aide ?
+    </Link>
+  </p>
 );
 
 function homeForProfile(accountType: string | null | undefined): string {
@@ -39,13 +51,17 @@ function onboardingForRole(role: RoleParam, accountType?: string | null): string
   return "/onboarding/role";
 }
 
-interface ConnexionPageClientProps {
+export interface ConnexionPageClientProps {
   bypassAuth: boolean;
+  phoneAuthEnabled: boolean;
   initialRole?: RoleParam;
 }
 
-/** Page unique OTP — connexion ET inscription (Supabase signInWithOtp). */
-export function ConnexionPageClient({ bypassAuth, initialRole = null }: ConnexionPageClientProps) {
+export function ConnexionPageClient({
+  bypassAuth,
+  phoneAuthEnabled,
+  initialRole = null,
+}: ConnexionPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const auth = useAuthService();
@@ -57,6 +73,11 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
   const [consentError, setConsentError] = useState<string | null>(null);
   const [roleParam, setRoleParam] = useState<RoleParam>(initialRole);
 
+  const googleOnly = !phoneAuthEnabled;
+  const pageTitle = googleOnly ? GOOGLE_ONLY_TITLE : LEGACY_TITLE;
+  const pageSubtitle = googleOnly ? GOOGLE_ONLY_SUBTITLE : LEGACY_SUBTITLE;
+  const shellClass = googleOnly ? "auth-page-google-only" : undefined;
+
   useEffect(() => {
     const r = searchParams.get("role");
     if (r === "artist" || r === "listener") setRoleParam(r);
@@ -65,7 +86,9 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
   useEffect(() => {
     const localControl = bypassAuth || isClientLocalControlMode();
     if (searchParams.get("error") === "oauth") {
-      setError("La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.");
+      setError(
+        "La connexion Google a échoué. Vérifiez que vous avez autorisé l'accès et réessayez.",
+      );
       setDetecting(false);
       return;
     }
@@ -74,26 +97,31 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
       return;
     }
     let cancelled = false;
-    void auth.getCurrentProfile().then((profile) => {
-      if (cancelled) return;
-      if (!profile) {
-        setDetecting(false);
-        return;
-      }
-      if (!profile.onboarding_completed) {
-        router.replace(onboardingForRole(roleParam, profile.account_type));
-        return;
-      }
-      const next = searchParams.get("next");
-      const dest =
-        next && next.startsWith("/") && !next.startsWith("/auth")
-          ? next
-          : homeForProfile(profile.account_type);
-      router.replace(dest);
-    }).catch(() => {
-      if (!cancelled) setDetecting(false);
-    });
-    return () => { cancelled = true; };
+    void auth
+      .getCurrentProfile()
+      .then((profile) => {
+        if (cancelled) return;
+        if (!profile) {
+          setDetecting(false);
+          return;
+        }
+        if (!profile.onboarding_completed) {
+          router.replace(onboardingForRole(roleParam, profile.account_type));
+          return;
+        }
+        const next = searchParams.get("next");
+        const dest =
+          next && next.startsWith("/") && !next.startsWith("/auth")
+            ? next
+            : homeForProfile(profile.account_type);
+        router.replace(dest);
+      })
+      .catch(() => {
+        if (!cancelled) setDetecting(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router, roleParam, bypassAuth]);
 
@@ -126,10 +154,12 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
         router.push(onboardingForRole(roleParam, profile?.account_type));
         return;
       }
-      auth.registerCurrentSession({
-        platform: "web",
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
-      }).catch(() => {});
+      auth
+        .registerCurrentSession({
+          platform: "web",
+          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        })
+        .catch(() => {});
       const next = searchParams.get("next");
       const dest =
         next && next.startsWith("/") && !next.startsWith("/auth")
@@ -143,11 +173,7 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
 
   if (detecting) {
     return (
-      <AuthPageShell
-        title="Créer votre compte"
-        subtitle={AUTH_SUBTITLE}
-        leading={BACK_LINK}
-      >
+      <AuthPageShell title={pageTitle} subtitle={pageSubtitle} leading={BACK_LINK} className={shellClass}>
         <div className="flex justify-center py-12" aria-busy="true" aria-label="Chargement">
           <div className="size-8 animate-spin rounded-full border-2 border-vert-energie border-t-transparent" />
         </div>
@@ -155,46 +181,9 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
     );
   }
 
-  return (
-    <AuthPageShell
-      title="Créer votre compte"
-      subtitle={AUTH_SUBTITLE}
-      leading={BACK_LINK}
-    >
-      <p className="text-center text-xs text-texte-desactive">
-        Nouveau ou déjà inscrit — votre numéro suffit
-      </p>
-      {step === "phone" && (
-        <>
-          <LegalConsentCheckbox
-            checked={acceptedTerms}
-            error={consentError}
-            onChange={(checked) => {
-              setAcceptedTerms(checked);
-              if (checked) setConsentError(null);
-            }}
-          />
-          <PhoneForm
-            onSubmit={handlePhoneSubmit}
-            submitDisabled={!acceptedTerms}
-            onBlockedSubmit={() =>
-              setConsentError("Veuillez accepter les conditions pour continuer")
-            }
-          />
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-bordure" />
-            <span className="text-xs text-texte-desactive">ou</span>
-            <div className="h-px flex-1 bg-bordure" />
-          </div>
-          <GoogleAuthButton
-            label="Continuer avec Google"
-            role={roleParam ?? undefined}
-            disabled={!acceptedTerms}
-            onDisabledClick={requireConsent}
-          />
-        </>
-      )}
-      {step === "otp" && (
+  if (phoneAuthEnabled && step === "otp") {
+    return (
+      <AuthPageShell title={pageTitle} subtitle={pageSubtitle} leading={BACK_LINK}>
         <OtpForm
           phone={phone}
           onSubmit={handleOtpSubmit}
@@ -204,24 +193,58 @@ export function ConnexionPageClient({ bypassAuth, initialRole = null }: Connexio
             setError(null);
           }}
         />
+        {error ? (
+          <p className="text-center text-sm text-erreur" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {HELP_LINK}
+      </AuthPageShell>
+    );
+  }
+
+  return (
+    <AuthPageShell title={pageTitle} subtitle={pageSubtitle} leading={BACK_LINK} className={shellClass}>
+      {googleOnly ? (
+        <>
+          <div className="auth-google-hero">
+            <p className="auth-google-hero__hint">
+              Votre compte Google suffit pour rejoindre la communauté SONAFRIK.
+            </p>
+          </div>
+          <div className="auth-google-cta-wrap">
+            <GoogleAuthButton
+              label="Continuer avec Google"
+              role={roleParam ?? undefined}
+              variant="primary"
+            />
+            <LegalConsentNotice />
+          </div>
+        </>
+      ) : (
+        <ConnexionPhoneAuthSection
+          roleParam={roleParam}
+          acceptedTerms={acceptedTerms}
+          consentError={consentError}
+          onTermsChange={(checked) => {
+            setAcceptedTerms(checked);
+            if (checked) setConsentError(null);
+          }}
+          onPhoneSubmit={handlePhoneSubmit}
+          onRequireConsent={requireConsent}
+          onConsentBlocked={() =>
+            setConsentError("Veuillez accepter les conditions pour continuer")
+          }
+        />
       )}
-      {step === "phone" && error && (
-        <p className="text-center text-sm text-erreur" role="alert">{error}</p>
-      )}
-      <p className="text-center text-xs">
-        <Link
-          href="/auth/mot-de-passe-oublie"
-          className="inline-flex items-center gap-1.5 text-vert-energie transition-colors hover:underline"
-        >
-          <span
-            aria-hidden="true"
-            className="inline-flex size-4 items-center justify-center rounded-full border-[1.5px] border-vert-energie text-[10px] font-bold"
-          >
-            ?
-          </span>
-          Problème d&apos;accès à votre compte ?
-        </Link>
-      </p>
+
+      {error ? (
+        <p className="text-center text-sm text-erreur" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      {HELP_LINK}
     </AuthPageShell>
   );
 }

@@ -22,6 +22,7 @@
 @import "./styles/responsive-system.css";
 @import "./styles/wallet.css";
 @import "./styles/admin-bundle.css";
+@import "./styles/auth-google-only.css";
 
 @theme {
   --color-vert-energie: #00d26a;

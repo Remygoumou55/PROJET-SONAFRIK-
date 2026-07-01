@@ -8,12 +8,14 @@ interface AuthPageShellProps {
   subtitle?: string;
   /** Contenu au-dessus du header (ex. lien retour) — slot stable pour éviter hydration mismatch */
   leading?: ReactNode;
+  /** Classe additionnelle sur le conteneur */
+  className?: string;
   children: ReactNode;
 }
 
-export function AuthPageShell({ title, subtitle, leading, children }: AuthPageShellProps) {
+export function AuthPageShell({ title, subtitle, leading, className, children }: AuthPageShellProps) {
   return (
-    <div className="app-page-content app-page-stack w-full max-w-md space-y-8">
+    <div className={`app-page-content app-page-stack w-full max-w-md space-y-8 ${className ?? ""}`.trim()}>
       {leading ? <div>{leading}</div> : null}
       <header className="text-center">
         <div className="mb-4 flex justify-center">

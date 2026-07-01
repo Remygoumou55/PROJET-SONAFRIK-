@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useAuthService } from "../hooks/useAuth";
 
 interface GoogleAuthButtonProps {
@@ -8,37 +8,39 @@ interface GoogleAuthButtonProps {
   role?: "artist" | "listener";
   disabled?: boolean;
   onDisabledClick?: () => void;
+  /** primary = CTA unique page Google-only */
+  variant?: "default" | "primary";
 }
 
-export function GoogleAuthButton({
+export const GoogleAuthButton = memo(function GoogleAuthButton({
   label = "Continuer avec Google",
   role,
   disabled = false,
   onDisabledClick,
+  variant = "default",
 }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const auth = useAuthService();
 
-  async function handleGoogleAuth() {
+  const handleGoogleAuth = useCallback(async () => {
     if (disabled) {
       onDisabledClick?.();
       return;
     }
     setLoading(true);
     setError(null);
-    // NEXT_PUBLIC_APP_URL fixe l'URL stable (prod Vercel) pour éviter que les
-    // URLs de preview changeantes soient rejetées par Supabase Redirect URLs
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
     const roleParam = role ? `?role=${role}` : "";
     try {
       await auth.signInWithGoogle(`${appUrl}/auth/callback${roleParam}`);
-      // Si pas d'erreur, le navigateur est redirigé vers Google — pas besoin de setLoading(false)
     } catch {
-      setError("Erreur de connexion Google. Réessayez.");
+      setError("La connexion Google a échoué. Réessayez dans un instant.");
       setLoading(false);
     }
-  }
+  }, [auth, disabled, onDisabledClick, role]);
+
+  const isPrimary = variant === "primary";
 
   return (
     <div className="flex flex-col gap-2">
@@ -46,34 +48,42 @@ export function GoogleAuthButton({
         type="button"
         onClick={handleGoogleAuth}
         disabled={loading || disabled}
-        className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60"
-        style={{
-          backgroundColor: "var(--color-card)",
-          border: "1px solid var(--color-bordure)",
-          color: "var(--color-texte-principal)",
-        }}
+        className={isPrimary ? "auth-google-btn" : "flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60"}
+        style={
+          isPrimary
+            ? undefined
+            : {
+                backgroundColor: "var(--color-card)",
+                border: "1px solid var(--color-bordure)",
+                color: "var(--color-texte-principal)",
+              }
+        }
+        aria-busy={loading}
       >
         {loading ? (
           <div
             className="h-5 w-5 rounded-full border-2 animate-spin"
-            style={{ borderColor: "var(--color-texte-desactive)", borderTopColor: "var(--color-texte-principal)" }}
+            style={{
+              borderColor: "var(--color-texte-desactive)",
+              borderTopColor: isPrimary ? "var(--color-or-solaire)" : "var(--color-texte-principal)",
+            }}
+            aria-hidden="true"
           />
         ) : (
           <GoogleIcon />
         )}
-        {loading ? "Redirection…" : label}
+        {loading ? "Redirection vers Google…" : label}
       </button>
-      {error && (
-        <p className="text-xs text-center" style={{ color: "var(--color-erreur)" }}>
+      {error ? (
+        <p className="text-xs text-center text-erreur" role="alert">
           {error}
         </p>
-      )}
+      ) : null}
     </div>
   );
-}
+});
 
 function GoogleIcon() {
-  // Google brand colors per official brand guidelines — cannot be changed
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path

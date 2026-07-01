@@ -11,6 +11,30 @@
 
 ---
 
+## 2026-07-01 — Auth Google-only (auth_phone_enabled)
+
+### Fichiers touchés
+- `apps/web/src/app/auth/connexion/ConnexionPageClient.tsx` — UI Google-only + legacy OTP derrière flag
+- `apps/web/src/features/identity/auth/components/ConnexionPhoneAuthSection.tsx` — flux SMS conservé
+- `apps/web/src/features/identity/auth/components/LegalConsentNotice.tsx` — CGU implicites
+- `apps/web/src/features/identity/auth/components/GoogleAuthButton.tsx` — variant primary premium
+- `apps/web/src/lib/auth/auth-feature-flags.ts` — résolution flag serveur
+- `apps/web/src/app/styles/auth-google-only.css` — styles page connexion
+- `apps/web/src/app/auth/mot-de-passe-oublie/page.tsx` — aide Google
+- `supabase/migrations/20260701000000_auth_phone_enabled_flag.sql` — flag + RPC `get_auth_feature_flags`
+
+### Dette technique
+- Mobile (`apps/mobile/app/auth/connexion.tsx`) encore en OTP — hors scope web sprint
+- Régénérer types DB pour inclure `get_auth_feature_flags` (cast temporaire)
+
+### Tests à faire
+- [ ] `/auth/connexion` — un seul bouton Google visible
+- [ ] Première connexion Google → onboarding
+- [ ] Reconnexion → redirect home
+- [ ] Admin : activer `auth_phone_enabled` → SMS réapparaît
+
+---
+
 ## 2026-06-30 — Config Règles Métiers — Humanisation cockpit admin
 
 ### Fichiers touchés

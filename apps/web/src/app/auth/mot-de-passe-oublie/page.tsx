@@ -1,93 +1,82 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthPageShell } from "@/features/identity/auth/components/AuthPageShell";
+import { resolveAuthFeatureFlags } from "@/lib/auth/auth-feature-flags";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Accès à votre compte — SONAFRIK",
-  description: "SONAFRIK ne nécessite pas de mot de passe. Connectez-vous avec votre numéro de téléphone.",
+  title: "Besoin d'aide ? — SONAFRIK",
+  description: "Assistance connexion SONAFRIK — Google et support.",
 };
 
-export default function MotDePasseOubliePage() {
+export default async function MotDePasseOubliePage() {
+  const supabase = await getSupabaseServerClient();
+  const { phoneAuthEnabled } = await resolveAuthFeatureFlags(supabase);
+
   return (
     <AuthPageShell
-      title="Pas de mot de passe ?"
-      subtitle="SONAFRIK utilise votre téléphone pour vous identifier"
+      title="Besoin d'aide ?"
+      subtitle={
+        phoneAuthEnabled
+          ? "SONAFRIK vous connecte avec Google ou par SMS"
+          : "Connectez-vous en un clic avec votre compte Google"
+      }
     >
       <div className="space-y-6">
-        {/* Explication */}
         <div
-          className="rounded-xl p-5 space-y-3"
+          className="space-y-4 rounded-xl p-5"
           style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-elevated)" }}
         >
           <div className="flex items-start gap-3">
             <div
-              className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: "rgba(0, 210, 106, 0.09)" }}
+              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: "color-mix(in srgb, var(--color-or-solaire) 12%, transparent)" }}
+              aria-hidden
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth="2" strokeLinecap="round">
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.64a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-              </svg>
+              <span className="text-sm">G</span>
             </div>
             <div>
-              <p className="font-semibold text-sm" style={{ color: "var(--color-texte-principal)" }}>
-                Connexion par SMS
-              </p>
-              <p className="text-sm mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
-                Entrez votre numéro de téléphone et recevez un code à usage unique. Aucun mot de passe à retenir.
+              <p className="text-sm font-semibold text-texte-principal">Connexion avec Google</p>
+              <p className="mt-1 text-sm text-texte-secondaire">
+                Cliquez sur « Continuer avec Google », choisissez votre compte et autorisez
+                SONAFRIK. Votre profil est créé automatiquement à la première connexion.
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div
-              className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: "rgba(0, 210, 106, 0.09)" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth="2" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4l3 3" />
-              </svg>
+          {phoneAuthEnabled ? (
+            <div className="flex items-start gap-3">
+              <div
+                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                style={{ backgroundColor: "color-mix(in srgb, var(--color-vert-energie) 12%, transparent)" }}
+                aria-hidden
+              >
+                <span className="text-sm">📱</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-texte-principal">Connexion par SMS</p>
+                <p className="mt-1 text-sm text-texte-secondaire">
+                  Entrez votre numéro guinéen (+224) et saisissez le code reçu par SMS. Chaque code
+                  est valide quelques minutes.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-sm" style={{ color: "var(--color-texte-principal)" }}>
-                Code valide 10 minutes
-              </p>
-              <p className="text-sm mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
-                Chaque code est à usage unique et expire automatiquement.
-              </p>
-            </div>
-          </div>
+          ) : null}
         </div>
 
-        {/* CTA principal */}
         <Link
           href="/auth/connexion"
           className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-opacity hover:opacity-90"
           style={{ backgroundColor: "var(--color-vert-energie)", color: "var(--color-noir-profond)" }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" />
-          </svg>
-          Recevoir un code SMS
+          Retour à la connexion
         </Link>
 
-        <p className="text-center text-sm" style={{ color: "var(--color-texte-desactive)" }}>
-          Vous pouvez aussi{" "}
-          <Link
-            href="/auth/connexion"
-            className="hover:underline"
-            style={{ color: "var(--color-texte-secondaire)" }}
-          >
-            vous connecter avec Google
-          </Link>
-        </p>
-
-        <p className="text-center text-sm" style={{ color: "var(--color-texte-desactive)" }}>
+        <p className="text-center text-sm text-texte-desactive">
           Toujours bloqué ?{" "}
           <a
             href="mailto:support@sonafrik.com"
-            className="hover:underline"
-            style={{ color: "var(--color-texte-secondaire)" }}
+            className="text-texte-secondaire hover:underline"
           >
             Contacter le support
           </a>
