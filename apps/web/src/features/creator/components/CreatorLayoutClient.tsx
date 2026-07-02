@@ -35,7 +35,7 @@ export function CreatorLayoutClient({
             <div className="creator-header__copy">
               <h1 className="creator-page-title">
                 {pathname.startsWith("/creator/catalog/tracks")
-                  ? "Uploader un morceau"
+                  ? "Publier"
                   : pathname.startsWith("/creator/catalog/releases")
                     ? "Albums et morceaux"
                     : pathname.startsWith("/creator/catalog")
@@ -48,6 +48,11 @@ export function CreatorLayoutClient({
                             ? "Vue d'ensemble"
                             : "Espace Artiste"}
               </h1>
+              {pathname.startsWith("/creator/catalog/tracks") && (
+                <p className="creator-page-sub">
+                  Partagez votre musique avec le monde entier 🚀
+                </p>
+              )}
             </div>
             <CreatorHeaderUtilities
               userId={userId}
