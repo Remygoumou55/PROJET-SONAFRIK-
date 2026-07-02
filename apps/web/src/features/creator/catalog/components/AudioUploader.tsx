@@ -2,7 +2,6 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
-  detectContainerFromBytes,
   mimeToUploadFormat,
   sha256Hex,
   validateAudioAsset,
@@ -71,16 +70,19 @@ function resolveEffectiveMime(file: File): string {
   return file.type;
 }
 
-let _audioCtx: AudioContext | null = null;
-function getAudioCtx(): AudioContext {
-  if (!_audioCtx || _audioCtx.state === "closed") _audioCtx = new AudioContext();
-  return _audioCtx;
-}
-
-async function getAudioDuration(file: File): Promise<number> {
-  const arrayBuffer = await file.arrayBuffer();
-  const decoded = await getAudioCtx().decodeAudioData(arrayBuffer.slice(0));
-  return decoded.duration;
+// Uses HTML5 audio metadata — never decodes the audio signal (no RAM expansion)
+function getAudioDuration(url: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audio.onloadedmetadata = () => {
+      resolve(isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0);
+    };
+    audio.onerror = () => {
+      reject(new Error("Lecture des métadonnées audio impossible. Vérifiez que le fichier est un MP3 ou M4A valide."));
+    };
+    audio.src = url;
+  });
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -119,7 +121,6 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
     const effectiveMime = resolveEffectiveMime(file);
     const precheck = validateAudioAsset({ header, mime: effectiveMime, fileSizeBytes: file.size, dbFormat: format === "mp3" ? "mp3" : "aac" });
     if (precheck.status === "invalid" || precheck.status === "needs_review") return precheck.message;
-    if (detectContainerFromBytes(header) === "unknown") return "Fichier audio illisible ou corrompu.";
     return null;
   }, []);
 
@@ -132,18 +133,27 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
     const format: AudioFormat = resolveFormatFromFile(file) ?? "mp3";
     try {
-      const durationSeconds = await getAudioDuration(file);
-      if (durationSeconds <= 0) { setState({ status: "error", message: "Durée audio invalide." }); return; }
-
+      // Create objectURL once — reused by duration detection AND the audio player
       if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
-      audioUrlRef.current = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file);
+      audioUrlRef.current = url;
+
+      const durationSeconds = await getAudioDuration(url);
+      if (durationSeconds <= 0) {
+        URL.revokeObjectURL(url);
+        audioUrlRef.current = null;
+        setState({ status: "error", message: "Durée audio invalide ou fichier corrompu." });
+        return;
+      }
 
       setState({ status: "ready", file, durationSeconds, format });
       setPlaying(false);
       setCurrentTime(0);
       onFileReady?.();
-    } catch {
-      setState({ status: "error", message: "Impossible de décoder ce fichier. Vérifiez qu'il s'agit d'un MP3 ou M4A valide." });
+    } catch (err) {
+      if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+      const msg = err instanceof Error ? err.message : "Impossible de lire ce fichier.";
+      setState({ status: "error", message: msg });
     }
   }, [validate, onFileReady]);
 
@@ -184,7 +194,8 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
       setState({ status: "validating", fileName: file.name });
       const contentHash = await sha256Hex(await file.arrayBuffer());
-      const confirm = await catalog.confirmAssetUpload({ creatorId, trackId, path, format, contentType: file.type, fileSizeBytes: file.size, durationSeconds: Math.round(durationSeconds), contentHash });
+      // Use effectiveMime (normalized) — file.type may be "" for drag-dropped files
+      const confirm = await catalog.confirmAssetUpload({ creatorId, trackId, path, format, contentType: effectiveMime, fileSizeBytes: file.size, durationSeconds: Math.round(durationSeconds), contentHash });
       if (confirm.integrityStatus === "invalid") throw new Error(confirm.message || "Fichier rejeté après validation serveur.");
 
       setState({ status: "success", durationSeconds });

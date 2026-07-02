@@ -32,16 +32,29 @@ export function ArtistIdentityForm({
   }
 
   async function uploadBanner(file: File) {
+    const ALLOWED = ["image/jpeg", "image/png", "image/webp"] as const;
+    type BannerMime = (typeof ALLOWED)[number];
+    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
+    if (!ALLOWED.includes(file.type as BannerMime) && !extOk) {
+      throw new Error("Format non autorisé. Utilisez JPEG, PNG ou WebP.");
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("Image trop lourde. Maximum 5 Mo.");
+    }
+    const contentType: BannerMime = ALLOWED.includes(file.type as BannerMime)
+      ? (file.type as BannerMime)
+      : "image/jpeg";
     const { signedUrl, token } = await creatorService.requestAssetUploadUrl({
       creatorId: creator.id,
       assetKind: "banner",
-      contentType: file.type as "image/jpeg" | "image/png" | "image/webp",
+      contentType,
     });
-    await fetch(signedUrl, {
+    const res = await fetch(signedUrl, {
       method: "PUT",
-      headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
+      headers: { "Content-Type": contentType, ...(token ? { "x-upsert": "true" } : {}) },
       body: file,
     });
+    if (!res.ok) throw new Error(`Erreur envoi bannière (${res.status}).`);
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -80,11 +93,16 @@ export function ArtistIdentityForm({
               const file = event.target.files?.[0];
               if (!file) return;
               setLoading(true);
+              setMessage(null);
               try {
                 await uploadBanner(file);
                 router.refresh();
+                setMessage("Bannière mise à jour.");
+              } catch (err) {
+                setMessage(err instanceof Error ? err.message : "Erreur lors de l'envoi de la bannière.");
               } finally {
                 setLoading(false);
+                event.target.value = "";
               }
             }}
           />

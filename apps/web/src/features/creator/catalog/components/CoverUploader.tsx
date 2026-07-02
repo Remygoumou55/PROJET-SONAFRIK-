@@ -70,7 +70,10 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
   // ── Validate ─────────────────────────────────────────────────────────────────
 
   const validate = useCallback((file: File): string | null => {
-    if (!ACCEPTED_TYPES.includes(file.type)) return "Format non accepté. Utilisez JPEG, PNG ou WebP.";
+    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
+    if (!ACCEPTED_TYPES.includes(file.type) && !extOk) {
+      return `Format non supporté (${file.type || (file.name.split(".").pop() ?? "?")}) — utilisez JPEG, PNG ou WebP.`;
+    }
     if (file.size > MAX_SIZE_BYTES) return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${MAX_SIZE_LABEL}.`;
     return null;
   }, []);
