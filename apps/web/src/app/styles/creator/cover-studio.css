@@ -2,6 +2,22 @@
    COVER STUDIO — Studio Couverture SONAFRIK
    ═══════════════════════════════════════════════════════════════════════════════ */
 
+/* ─── Dialog container — popup plus compact (~20 % plus étroit) ──────────────── */
+[role="dialog"]:has(.cs-studio) {
+  max-width: min(calc(100vw - 2rem), 38rem) !important;
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+[role="dialog"]:has(.cs-studio)::-webkit-scrollbar { width: 4px; }
+[role="dialog"]:has(.cs-studio)::-webkit-scrollbar-track { background: transparent; }
+[role="dialog"]:has(.cs-studio)::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
 /* ─── Container ──────────────────────────────────────────────────────────────── */
 .cs-studio {
   display: flex;
