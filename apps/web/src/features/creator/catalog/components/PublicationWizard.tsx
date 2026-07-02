@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AudioUploader } from "./AudioUploader";
 import { CoverUploader } from "./CoverUploader";
+import type { AudioUploaderHandle } from "./AudioUploader";
+import type { CoverUploaderHandle } from "./CoverUploader";
 import { useCatalogService } from "../hooks/useCatalog";
 import type { Genre } from "@sonafrik/types";
 import { FIELD_LIMITS } from "@sonafrik/shared/field-limits";
@@ -135,8 +137,11 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
   const [release, setRelease] = useState<CreatedRelease | null>(null);
   const [titleInput, setTitleInput] = useState("");
   const [creating, setCreating] = useState(false);
+  const audioRef = useRef<AudioUploaderHandle>(null);
+  const coverRef = useRef<CoverUploaderHandle>(null);
   const [audioReady, setAudioReady] = useState(false);
   const [coverReady, setCoverReady] = useState(false);
+  const [uploading2, setUploading2] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [verifDone, setVerifDone] = useState(0);
   const [meta, setMeta] = useState<MetadataForm>({
@@ -196,6 +201,25 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
       setCreating(false);
     }
   }, [catalog, titleInput]);
+
+  // ── Step 2 — Upload automatique audio + pochette ──
+
+  const handleContinueStep2 = useCallback(async () => {
+    if (!audioRef.current || !coverRef.current) return;
+    setUploading2(true);
+    setError(null);
+    try {
+      await Promise.all([
+        audioRef.current.triggerUpload(),
+        coverRef.current.triggerUpload(),
+      ]);
+      setStep(3);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi. Réessayez.");
+    } finally {
+      setUploading2(false);
+    }
+  }, []);
 
   // ── Step 3 — Enregistrer les métadonnées ──
 
@@ -315,59 +339,66 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
 
       {/* ── STEP 2 ── */}
       {step === 2 && release && (
-        <div className="pub-wiz__body pub-wiz__body--two-col">
-          <div className="pub-wiz__main">
-            <div className="pub-wiz__files-grid">
-              {/* Audio card */}
-              <div className="pub-wiz__card">
-                <h3 className="pub-wiz__card-title">🎵 Fichier audio</h3>
-                <p className="pub-wiz__card-sub">MP3 · M4A — max 50 Mo</p>
-                <AudioUploader
-                  trackId={release.trackId}
-                  creatorId={creatorId}
-                  onSuccess={() => setAudioReady(true)}
-                />
-                {audioReady && (
-                  <p className="pub-wiz__file-ready">✔ Audio prêt</p>
-                )}
-              </div>
-
-              {/* Cover card */}
-              <div className="pub-wiz__card">
-                <h3 className="pub-wiz__card-title">🖼 Pochette</h3>
-                <p className="pub-wiz__card-sub">JPEG · PNG · WebP — max 5 Mo</p>
-                <CoverUploader
-                  albumId={release.albumId}
-                  creatorId={creatorId}
-                  onSuccess={() => setCoverReady(true)}
-                />
-                {coverReady && (
-                  <p className="pub-wiz__file-ready">✔ Pochette prête</p>
-                )}
-              </div>
+        <>
+          <div className="pub-wiz__body pub-wiz__body--step2">
+            {/* Audio card */}
+            <div className="pub-wiz__card">
+              <h3 className="pub-wiz__card-title">🎵 Fichier audio</h3>
+              <p className="pub-wiz__card-sub">MP3 · M4A — max 50 Mo</p>
+              <AudioUploader
+                ref={audioRef}
+                trackId={release.trackId}
+                creatorId={creatorId}
+                onFileReady={() => setAudioReady(true)}
+                onFileCleared={() => setAudioReady(false)}
+              />
             </div>
 
-            <div className="pub-wiz__actions">
-              <button className="pub-wiz__btn pub-wiz__btn--ghost" onClick={() => setStep(1)}>
-                ← Retour
-              </button>
-              <button
-                className="pub-wiz__btn pub-wiz__btn--primary"
-                disabled={!audioReady || !coverReady}
-                onClick={() => setStep(3)}
-              >
-                Continuer →
-              </button>
+            {/* Cover card */}
+            <div className="pub-wiz__card">
+              <h3 className="pub-wiz__card-title">🖼 Pochette</h3>
+              <p className="pub-wiz__card-sub">JPG · PNG · WebP — max 5 Mo</p>
+              <CoverUploader
+                ref={coverRef}
+                albumId={release.albumId}
+                creatorId={creatorId}
+                onFileReady={() => setCoverReady(true)}
+                onFileCleared={() => setCoverReady(false)}
+              />
+            </div>
+
+            {/* Tips card */}
+            <div className="pub-wiz__card pub-wiz__card--tips-step2">
+              <p className="pub-wiz__tips-title">💡 Conseils SONAFRIK</p>
+              <ul className="pub-wiz__tips-list">
+                {[
+                  "MP3 320 kbps recommandé",
+                  "JPG · PNG · WebP",
+                  "Image minimum 3000×3000",
+                  "Bonne qualité = meilleure visibilité",
+                ].map((tip) => (
+                  <li key={tip} className="pub-wiz__tips-item pub-wiz__tips-item--check">
+                    <span className="pub-wiz__tips-icon" aria-hidden="true">✓</span>
+                    <span>{tip}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
-          <TipsPanel tips={[
-            { icon: "🎚", text: "Formats recommandés : MP3 320 kbps ou M4A 256 kbps." },
-            { icon: "🖼", text: "Pochette carrée recommandée : 3000×3000 px minimum." },
-            { icon: "✨", text: "Un son de qualité professionnelle augmente les écoutes validées." },
-            { icon: "©", text: "Assurez-vous d'être titulaire des droits avant de publier." },
-          ]} />
-        </div>
+          <div className="pub-wiz__actions">
+            <button className="pub-wiz__btn pub-wiz__btn--ghost" onClick={() => setStep(1)}>
+              ← Retour
+            </button>
+            <button
+              className="pub-wiz__btn pub-wiz__btn--primary"
+              disabled={uploading2 || !audioReady || !coverReady}
+              onClick={() => void handleContinueStep2()}
+            >
+              {uploading2 ? "Envoi en cours…" : "Continuer →"}
+            </button>
+          </div>
+        </>
       )}
 
       {/* ── STEP 3 ── */}
