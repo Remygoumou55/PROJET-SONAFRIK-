@@ -33,7 +33,8 @@ function toCatalogError(
   code: "track_create_failed" | "unknown" = "unknown",
 ): CatalogError {
   if (err instanceof CatalogError) return err;
-  return new CatalogError(code);
+  const rawMsg = err instanceof Error ? err.message : String(err);
+  return new CatalogError(code, rawMsg);
 }
 
 export class CatalogService {

@@ -359,6 +359,6 @@ export class CatalogRepository {
 
   buildSlug(title: string, suffix: string): string {
     const base = slugify(title);
-    return `${base || "release"}-${suffix.slice(0, 8)}`;
+    return `${base || "release"}-${suffix.slice(0, 8)}-${Date.now().toString(36)}`;
   }
 }
