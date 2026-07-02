@@ -80,8 +80,69 @@
     padding-bottom: 2rem;
   }
 
+  /* V3 dashboard gap */
+  .creator-dashboard {
+    gap: 1rem;
+  }
+
   .creator-dashboard--enterprise {
     gap: 1rem;
+  }
+
+  /* ─── V3 new cards ─────────────────────────────────────── */
+  .dash-career-progress,
+  .dash-coach {
+    padding: 1rem;
+  }
+
+  .dash-career-circle__svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .dash-bottom-2col {
+    gap: 0.625rem;
+  }
+
+  .dash-catalogue-card {
+    padding: 1rem;
+  }
+
+  .dash-catalogue-card__header {
+    margin-bottom: 0.75rem;
+  }
+
+  .dash-premium__inner {
+    padding: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .dash-premium__body {
+    min-width: 0;
+    flex: 1 1 60%;
+  }
+
+  .dash-premium__title {
+    font-size: 0.875rem;
+  }
+
+  .dash-premium__text {
+    font-size: 0.75rem;
+  }
+
+  .dash-premium__cta {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  /* ─── Wallet card ─────────────────────────────────────────── */
+  .co-wallet-value {
+    font-size: 1.375rem;
+  }
+
+  .co-card {
+    padding: 1rem;
   }
 
   .creator-page-title {

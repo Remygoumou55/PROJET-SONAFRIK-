@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
-      "style-src-attr 'self'",
+      "style-src-attr 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: ${supabaseOrigin} https://lh3.googleusercontent.com`,
       `media-src 'self' blob: ${supabaseOrigin}`,
       `connect-src 'self' ${supabaseOrigin} ${supabaseWss} https://accounts.google.com https://vitals.vercel-insights.com`,
