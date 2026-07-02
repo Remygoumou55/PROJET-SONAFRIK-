@@ -134,16 +134,19 @@ export function ArtistProfilePhoto({
 
       // Upload original (only when a new file was selected)
       if (pendingOriginalFile) {
+        const origContentType: AllowedImageMime = isAllowedImageMime(pendingOriginalFile.type)
+          ? (pendingOriginalFile.type as AllowedImageMime)
+          : "image/jpeg";
         const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
           await creatorService.requestAssetUploadUrl({
             creatorId,
             assetKind: "gallery",
-            contentType: pendingOriginalFile.type as AllowedImageMime,
+            contentType: origContentType,
           });
         const origRes = await fetch(origSignedUrl, {
           method: "PUT",
           headers: {
-            "Content-Type": pendingOriginalFile.type,
+            "Content-Type": origContentType,
             ...(origToken ? { "x-upsert": "true" } : {}),
           },
           body: pendingOriginalFile,
@@ -285,6 +288,7 @@ export function ArtistProfilePhoto({
       {/* Crop editor modal */}
       {cropSrc && (
         <CropEditorModal
+          key={cropSrc}
           open={cropOpen}
           onClose={() => {
             if (cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
@@ -300,6 +304,7 @@ export function ArtistProfilePhoto({
           initialZoom={pendingOriginalFile ? undefined : localCropZoom}
           title="Recadrer l'avatar"
           onSave={handleCropSave}
+          onChangePhoto={() => fileInputRef.current?.click()}
         />
       )}
     </>

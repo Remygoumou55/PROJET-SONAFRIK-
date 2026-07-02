@@ -122,16 +122,19 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
 
       // Upload original (only for new files)
       if (pendingOriginalFile) {
+        const origContentType: AllowedImageMime = isAllowedImageMime(pendingOriginalFile.type)
+          ? (pendingOriginalFile.type as AllowedImageMime)
+          : "image/jpeg";
         const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
           await creatorService.requestAssetUploadUrl({
             creatorId,
             assetKind: "gallery",
-            contentType: pendingOriginalFile.type as AllowedImageMime,
+            contentType: origContentType,
           });
         const origRes = await fetch(origSignedUrl, {
           method: "PUT",
           headers: {
-            "Content-Type": pendingOriginalFile.type,
+            "Content-Type": origContentType,
             ...(origToken ? { "x-upsert": "true" } : {}),
           },
           body: pendingOriginalFile,
@@ -245,6 +248,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       {/* Crop editor */}
       {cropSrc && (
         <CropEditorModal
+          key={cropSrc}
           open={cropOpen}
           onClose={() => {
             if (cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
@@ -260,6 +264,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
           initialZoom={pendingOriginalFile ? undefined : localCropZoom}
           title="Recadrer la couverture"
           onSave={handleCropSave}
+          onChangePhoto={() => fileInputRef.current?.click()}
         />
       )}
     </>

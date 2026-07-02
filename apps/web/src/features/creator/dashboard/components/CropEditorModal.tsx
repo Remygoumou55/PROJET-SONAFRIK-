@@ -22,6 +22,7 @@ interface CropEditorModalProps {
   initialZoom?: number;
   title: string;
   onSave: (result: CropResult) => Promise<void> | void;
+  onChangePhoto?: () => void;
 }
 
 // ─── Device tabs ──────────────────────────────────────────────────────────────
@@ -81,6 +82,7 @@ export function CropEditorModal({
   initialZoom,
   title,
   onSave,
+  onChangePhoto,
 }: CropEditorModalProps) {
   const [crop, setCrop]                 = useState<Point>(initialCrop ?? { x: 0, y: 0 });
   const [zoom, setZoom]                 = useState(initialZoom ?? 1);
@@ -88,6 +90,7 @@ export function CropEditorModal({
   const [pctArea, setPctArea]           = useState<Area | null>(null); // for live preview
   const [activeDevice, setActiveDevice] = useState<DeviceId>("desktop");
   const [saving, setSaving]             = useState(false);
+  const [saved, setSaved]               = useState(false);
   const [error, setError]               = useState<string | null>(null);
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [wasReset, setWasReset]         = useState(false);
@@ -98,15 +101,16 @@ export function CropEditorModal({
   // Sync crop/zoom to initial values each time the modal opens.
   // Intentionally NOT including initialCrop/initialZoom in deps — they're treated
   // as one-shot config at open time (parent may pass new object refs each render).
+  // pctArea/pixelArea are NOT cleared here: Cropper fires onCropComplete on mount,
+  // which updates them promptly — clearing them would cause a preview flash.
   useEffect(() => {
     if (!open) return;
     setCrop(initialCrop ?? { x: 0, y: 0 });
     setZoom(initialZoom ?? 1);
     setFitZoom(1);
     setError(null);
+    setSaved(false);
     setWasReset(false);
-    setPctArea(null);
-    setPixelArea(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -205,10 +209,12 @@ export function CropEditorModal({
     if (!pixelArea) return;
     setSaving(true);
     setError(null);
+    setSaved(false);
     try {
       const blob = await getCroppedBlob(imageSrc, pixelArea);
       await onSave({ croppedBlob: blob, cropX: crop.x, cropY: crop.y, cropZoom: zoom });
-      onClose();
+      setSaved(true);
+      setTimeout(onClose, 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible d'enregistrer. Réessayez.");
     } finally {
@@ -341,7 +347,7 @@ export function CropEditorModal({
               </span>
             </div>
 
-            {/* Tools row: reset + image info */}
+            {/* Tools row: reset + change-photo + image info */}
             <div className="crop-modal__tools">
               <button
                 className="crop-modal__reset"
@@ -350,6 +356,15 @@ export function CropEditorModal({
               >
                 ↺ Réinitialiser le cadrage
               </button>
+              {onChangePhoto && (
+                <button
+                  className="crop-modal__change-photo"
+                  onClick={onChangePhoto}
+                  title="Choisir une autre photo sans fermer la fenêtre"
+                >
+                  🖼️ Changer la photo
+                </button>
+              )}
               {imgInfo && (
                 <span className="crop-modal__img-info">
                   ✔ Image prête · {imgInfo.w}×{imgInfo.h}
@@ -432,10 +447,10 @@ export function CropEditorModal({
           </button>
           <button
             className="crop-modal__btn crop-modal__btn--save"
-            disabled={saving || !pixelArea}
+            disabled={saving || saved || !pixelArea}
             onClick={() => void handleSave()}
           >
-            {saving ? "Enregistrement…" : "Enregistrer le cadrage"}
+            {saving ? "Enregistrement…" : saved ? "✓ Cadrage enregistré" : "Enregistrer le cadrage"}
           </button>
         </footer>
       </div>
