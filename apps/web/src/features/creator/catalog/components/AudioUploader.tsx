@@ -62,12 +62,20 @@ function resolveFormatFromFile(file: File): AudioFormat | null {
   return null;
 }
 
+// Non-standard MIME aliases → canonical types accepted by the Storage bucket
+const MIME_CANONICAL: Record<string, string> = {
+  "audio/mp3": "audio/mpeg",
+  "audio/m4a": "audio/mp4",
+  "audio/x-m4a": "audio/mp4",
+};
+
 function resolveEffectiveMime(file: File): string {
-  if (file.type && mimeToUploadFormat(file.type)) return file.type;
+  const normalized = MIME_CANONICAL[file.type] ?? file.type;
+  if (normalized && mimeToUploadFormat(normalized)) return normalized;
   const ext = file.name.split(".").pop()?.toLowerCase();
   if (ext === "mp3") return "audio/mpeg";
   if (ext === "m4a") return "audio/mp4";
-  return file.type;
+  return normalized || "audio/mpeg";
 }
 
 // Uses HTML5 audio metadata — never decodes the audio signal (no RAM expansion)
