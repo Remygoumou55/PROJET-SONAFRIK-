@@ -11,6 +11,48 @@
 
 ---
 
+## 2026-07-02 — Fix Publication Wizard étape 1 (blocage critique)
+
+### Cause racine identifiée
+Slug déterministe `${titre}-${creatorId.slice(0,8)}` collisionnait avec
+l'index UNIQUE `(creator_id, slug)` sur la table `albums` lors d'une 2e tentative
+avec le même titre. La vraie erreur Supabase était masquée par `toCatalogError`
+qui la remplaçait par `CatalogError("unknown")` → "Une erreur est survenue."
+
+**Preuve DB** : album `love-8f55a13e` (creator `8f55a13e-...`) créé à 03:00:15,
+bloquait toute nouvelle tentative avec le titre "love" pour ce créateur.
+
+### Fichiers touchés
+- `packages/api/src/catalog/errors.ts` — `CatalogError(code, rawMessage?)` : `rawMessage` optionnel
+- `packages/api/src/catalog/catalog.service.ts` — `toCatalogError` propage le vrai `err.message`
+- `packages/api/src/catalog/catalog.repository.ts` — `buildSlug` ajoute timestamp base-36 en suffixe
+
+### Code avant
+```before
+// buildSlug
+return `${base || "release"}-${suffix.slice(0, 8)}`;
+
+// toCatalogError
+return new CatalogError(code); // perd le vrai message
+```
+
+### Code après
+```after
+// buildSlug — unique par appel
+return `${base || "release"}-${suffix.slice(0, 8)}-${Date.now().toString(36)}`;
+
+// toCatalogError — propage le vrai message Supabase
+const rawMsg = err instanceof Error ? err.message : String(err);
+return new CatalogError(code, rawMsg);
+```
+
+### Tests à faire
+- [x] pnpm build + lint + typecheck : ✅ 0 erreur
+- [ ] Créer un album "love" → succès étape 1
+- [ ] Recréer "love" → slug différent, plus de collision
+
+---
+
 ## 2026-07-01 — Audit Global IA (document onboarding toutes IAs)
 
 ### Mission
