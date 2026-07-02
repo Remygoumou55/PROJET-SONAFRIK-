@@ -9,7 +9,6 @@ import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalog
 import { DashboardCareerProgressCard } from "../dashboard/components/DashboardCareerProgressCard";
 import { DashboardCoachCard } from "../dashboard/components/DashboardCoachCard";
 import { DashboardPremiumCard } from "../dashboard/components/DashboardPremiumCard";
-import { NextObjectiveCard } from "../dashboard/components/enterprise/NextObjectiveCard";
 import { isValidContentName } from "@/lib/content-filter";
 
 interface Props {
@@ -61,8 +60,6 @@ export function CreatorDashboardView({ data }: Props) {
         creator={context.creator}
         profileCreatedAt={profileCreatedAt}
       />
-
-      <NextObjectiveCard careerOs={careerOs} />
 
       <GlanceKpiGrid data={data} />
 
