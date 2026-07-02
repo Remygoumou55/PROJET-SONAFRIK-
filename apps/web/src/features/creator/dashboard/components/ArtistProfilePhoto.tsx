@@ -93,7 +93,8 @@ export function ArtistProfilePhoto({
 
     setError(null);
 
-    if (!isAllowedImageMime(file.type)) {
+    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
+    if (!isAllowedImageMime(file.type) && !extOk) {
       setError("Format non autorisé. Utilisez JPG, PNG ou WebP.");
       return;
     }

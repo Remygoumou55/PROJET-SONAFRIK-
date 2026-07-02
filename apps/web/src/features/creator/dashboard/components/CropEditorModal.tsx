@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 
@@ -29,10 +29,13 @@ interface CropEditorModalProps {
 type DeviceId = "desktop" | "tablet" | "mobile";
 
 const DEVICES: { id: DeviceId; label: string; icon: string; maxPx: number }[] = [
-  { id: "desktop", label: "Desktop", icon: "🖥", maxPx: 320 },
-  { id: "tablet",  label: "Tablet",  icon: "📱", maxPx: 220 },
-  { id: "mobile",  label: "Mobile",  icon: "📲", maxPx: 140 },
+  { id: "desktop", label: "Desktop", icon: "🖥", maxPx: 260 },
+  { id: "tablet",  label: "Tablet",  icon: "📱", maxPx: 180 },
+  { id: "mobile",  label: "Mobile",  icon: "📲", maxPx: 120 },
 ];
+
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 4;
 
 // ─── Canvas crop (used only on save) ─────────────────────────────────────────
 
@@ -42,11 +45,20 @@ async function getCroppedBlob(src: string, px: Area): Promise<Blob> {
     img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = px.width;
-      canvas.height = px.height;
+      const w = Math.max(1, Math.round(px.width));
+      const h = Math.max(1, Math.round(px.height));
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext("2d");
       if (!ctx) { reject(new Error("canvas_ctx_failed")); return; }
-      ctx.drawImage(img, px.x, px.y, px.width, px.height, 0, 0, px.width, px.height);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(
+        img,
+        Math.round(px.x), Math.round(px.y),
+        Math.round(px.width), Math.round(px.height),
+        0, 0, w, h,
+      );
       canvas.toBlob(
         (blob) => (blob ? resolve(blob) : reject(new Error("blob_failed"))),
         "image/jpeg",
@@ -70,20 +82,40 @@ export function CropEditorModal({
   title,
   onSave,
 }: CropEditorModalProps) {
-  const [crop, setCrop]                   = useState<Point>(initialCrop ?? { x: 0, y: 0 });
-  const [zoom, setZoom]                   = useState(initialZoom ?? 1);
-  const [pixelArea, setPixelArea]         = useState<Area | null>(null);
-  const [pctArea, setPctArea]             = useState<Area | null>(null); // for live preview
-  const [activeDevice, setActiveDevice]   = useState<DeviceId>("desktop");
-  const [saving, setSaving]               = useState(false);
-  const [error, setError]                 = useState<string | null>(null);
+  const [crop, setCrop]                 = useState<Point>(initialCrop ?? { x: 0, y: 0 });
+  const [zoom, setZoom]                 = useState(initialZoom ?? 1);
+  const [pixelArea, setPixelArea]       = useState<Area | null>(null);
+  const [pctArea, setPctArea]           = useState<Area | null>(null); // for live preview
+  const [activeDevice, setActiveDevice] = useState<DeviceId>("desktop");
+  const [saving, setSaving]             = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [showSafeZone, setShowSafeZone] = useState(false);
+  const [wasReset, setWasReset]         = useState(false);
+  const [imgInfo, setImgInfo]           = useState<{ w: number; h: number } | null>(null);
 
-  // Clear transient state every time the modal opens (guards stale error from prior session)
+  // Sync crop/zoom to initial values each time the modal opens.
+  // Intentionally NOT including initialCrop/initialZoom in deps — they're treated
+  // as one-shot config at open time (parent may pass new object refs each render).
   useEffect(() => {
-    if (open) {
-      setError(null);
-    }
+    if (!open) return;
+    // Access current prop values from closure at effect run time
+    setCrop(initialCrop ?? { x: 0, y: 0 });
+    setZoom(initialZoom ?? 1);
+    setError(null);
+    setWasReset(false);
+    setPctArea(null);
+    setPixelArea(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  // Read natural image dimensions for "✔ Image prête" info line
+  useEffect(() => {
+    if (!open || !imageSrc) { setImgInfo(null); return; }
+    const img = new Image();
+    img.onload = () => setImgInfo({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => setImgInfo(null);
+    img.src = imageSrc;
+  }, [open, imageSrc]);
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setPctArea(croppedArea);
@@ -93,19 +125,49 @@ export function CropEditorModal({
   // ── Zoom helpers ───────────────────────────────────────────────────────────
 
   const stepZoom = (delta: number) =>
-    setZoom((z) => Math.min(3, Math.max(1, parseFloat((z + delta).toFixed(2)))));
+    setZoom((z) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, parseFloat((z + delta).toFixed(2)))));
+
+  // ── Reset ──────────────────────────────────────────────────────────────────
+
+  const handleReset = () => {
+    setCrop(initialCrop ?? { x: 0, y: 0 });
+    setZoom(initialZoom ?? 1);
+    setWasReset(true);
+  };
+
+  // ── Safe-zone geometry (for 16:9 crop in 4:3 container) ───────────────────
+  //
+  // In a 4:3 container with a 16:9 crop indicator:
+  //   crop frame height = 75% of container height, centered (top = 12.5%)
+  // The content band (avatar + info + stats) occupies the bottom ~45% of frame.
+  //
+  const safeZone = useMemo(() => {
+    if (aspect === 1) return null; // avatar crops don't need a safe zone
+    const cH   = 75;    // crop frame height, % of container
+    const cTop = 12.5;  // crop frame top offset, % of container
+    return {
+      band: {
+        top:    cTop + cH * 0.55,
+        height: cH * 0.45,
+      },
+      avatar: {
+        top:    cTop + cH * 0.72,
+        height: cH * 0.28,
+        width:  17,
+      },
+      labelTop: cTop + cH * 0.57,
+    };
+  }, [aspect]);
 
   // ── Real-time preview via CSS transform ────────────────────────────────────
   //
-  // pctArea from react-easy-crop is expressed as % of the source image:
-  //   pctArea.x/y = top-left corner of the crop region (% of image dimensions)
-  //   pctArea.width/height = size of the crop region (% of image dimensions)
+  // pctArea from react-easy-crop (first arg of onCropComplete) is % of source image:
+  //   x/y = top-left of crop region  •  width/height = size of crop region
   //
-  // To show this region filling a container:
-  //   • image width  = (100 / pctArea.width) × 100% of container
-  //   • image height = auto  (preserves natural aspect ratio)
-  //   • translate(-pctArea.x%, -pctArea.y%) shifts the image by those %
-  //     which is relative to the IMAGE element, correctly mapping to the crop.
+  // To display the cropped region filling a container:
+  //   image width  = (100 / pctArea.width) × 100%  (scales so crop = 100% of container)
+  //   image height = auto  (preserves natural aspect — critical, do not set to %)
+  //   translate = (-pctArea.x%, -pctArea.y%)  (% relative to image element = correct offset)
   //
   const liveImgStyle = pctArea
     ? {
@@ -141,6 +203,13 @@ export function CropEditorModal({
   if (!open) return null;
 
   const aspectRatio = aspect === 1 ? "1 / 1" : "16 / 9";
+  const isCover     = aspect !== 1;
+
+  const helpText = wasReset
+    ? "Cadrage réinitialisé. Affinez si besoin puis enregistrez."
+    : initialCrop
+    ? "Recadrez selon vos préférences. Le résultat est affiché en temps réel."
+    : "Déplacez et zoomez votre image. Le résultat sera enregistré exactement comme affiché.";
 
   return (
     <div className="crop-modal" role="dialog" aria-modal="true" aria-label={title}>
@@ -151,7 +220,19 @@ export function CropEditorModal({
         {/* ── Header ─────────────────────────────────────────────────── */}
         <header className="crop-modal__header">
           <h2 className="crop-modal__title">{title}</h2>
-          <button className="crop-modal__close" onClick={onClose} aria-label="Fermer">✕</button>
+          <div className="crop-modal__header-actions">
+            {isCover && (
+              <button
+                className={`crop-modal__safe-toggle${showSafeZone ? " crop-modal__safe-toggle--on" : ""}`}
+                onClick={() => setShowSafeZone((v) => !v)}
+                aria-pressed={showSafeZone}
+                title="Afficher où le contenu (avatar, texte, stats) apparaîtra sur la cover"
+              >
+                ⊙ Zones
+              </button>
+            )}
+            <button className="crop-modal__close" onClick={onClose} aria-label="Fermer">✕</button>
+          </div>
         </header>
 
         {/* ── Body ───────────────────────────────────────────────────── */}
@@ -167,6 +248,9 @@ export function CropEditorModal({
                 crop={crop}
                 zoom={zoom}
                 aspect={aspect}
+                minZoom={MIN_ZOOM}
+                maxZoom={MAX_ZOOM}
+                restrictPosition={false}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
@@ -182,6 +266,32 @@ export function CropEditorModal({
                   },
                 }}
               />
+              {/* Safety zone overlay — approximates where hero content overlaps the cover */}
+              {showSafeZone && safeZone && (
+                <div className="crop-modal__safe-zone" aria-hidden="true">
+                  <div
+                    className="crop-modal__safe-band"
+                    style={{
+                      top:    `${safeZone.band.top}%`,
+                      height: `${safeZone.band.height}%`,
+                    }}
+                  />
+                  <div
+                    className="crop-modal__safe-avatar"
+                    style={{
+                      top:    `${safeZone.avatar.top}%`,
+                      height: `${safeZone.avatar.height}%`,
+                      width:  `${safeZone.avatar.width}%`,
+                    }}
+                  />
+                  <span
+                    className="crop-modal__safe-label"
+                    style={{ top: `${safeZone.labelTop}%` }}
+                  >
+                    Zone de contenu
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Zoom slider */}
@@ -190,15 +300,14 @@ export function CropEditorModal({
                 className="crop-modal__zoom-step"
                 onClick={() => stepZoom(-0.1)}
                 aria-label="Réduire le zoom"
-                tabIndex={0}
               >
                 −
               </button>
               <input
                 type="range"
                 className="crop-modal__zoom-range"
-                min={1}
-                max={3}
+                min={MIN_ZOOM}
+                max={MAX_ZOOM}
                 step={0.01}
                 value={zoom}
                 onChange={(e) => setZoom(Number(e.target.value))}
@@ -208,7 +317,6 @@ export function CropEditorModal({
                 className="crop-modal__zoom-step"
                 onClick={() => stepZoom(0.1)}
                 aria-label="Augmenter le zoom"
-                tabIndex={0}
               >
                 +
               </button>
@@ -217,11 +325,25 @@ export function CropEditorModal({
               </span>
             </div>
 
+            {/* Tools row: reset + image info */}
+            <div className="crop-modal__tools">
+              <button
+                className="crop-modal__reset"
+                onClick={handleReset}
+                title="Remettre le cadrage à sa valeur initiale"
+              >
+                ↺ Réinitialiser le cadrage
+              </button>
+              {imgInfo && (
+                <span className="crop-modal__img-info">
+                  ✔ Image prête · {imgInfo.w}×{imgInfo.h}
+                </span>
+              )}
+            </div>
+
             {/* Help text */}
             <div className="crop-modal__help">
-              <p className="crop-modal__help-main">
-                Déplacez et zoomez votre image. Le résultat sera enregistré exactement comme affiché.
-              </p>
+              <p className="crop-modal__help-main">{helpText}</p>
               <p className="crop-modal__help-note">
                 ✔ Le cadrage sera conservé sur Desktop, Tablet et Mobile.
               </p>
@@ -248,7 +370,7 @@ export function CropEditorModal({
               ))}
             </div>
 
-            {/* Preview panels — all rendered, only active is visible */}
+            {/* Preview panels — all in DOM, only active visible */}
             <div className="crop-modal__previews">
               {DEVICES.map((d) => (
                 <div
@@ -257,7 +379,6 @@ export function CropEditorModal({
                   aria-hidden={activeDevice !== d.id}
                   className={`crop-modal__preview${activeDevice === d.id ? " crop-modal__preview--active" : ""}`}
                 >
-                  {/* Clip window — enforces crop aspect ratio */}
                   <div
                     className="crop-modal__clip"
                     style={{ aspectRatio, maxWidth: d.maxPx }}

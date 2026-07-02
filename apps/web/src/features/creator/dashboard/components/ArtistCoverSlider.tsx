@@ -83,7 +83,8 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
     if (!file) return;
 
     setError(null);
-    if (!isAllowedImageMime(file.type)) {
+    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
+    if (!isAllowedImageMime(file.type) && !extOk) {
       setError("Format non supporté. Utilisez JPG, PNG ou WebP.");
       return;
     }
