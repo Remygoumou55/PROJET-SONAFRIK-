@@ -59,6 +59,12 @@ export function CreatorDashboardView({ data }: Props) {
         artistProfile={context.artistProfile}
         creator={context.creator}
         profileCreatedAt={profileCreatedAt}
+        stats={{
+          streams: data.streamStats.total_streams,
+          validStreams: data.streamStats.valid_streams,
+          tracksPublished: data.catalogCounts.tracksPublished,
+          estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
+        }}
       />
 
       <GlanceKpiGrid data={data} />

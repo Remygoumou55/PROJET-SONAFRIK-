@@ -77,13 +77,22 @@ export class CreatorRepository {
 
     if (error) throw error;
     if (!data) return null;
+    const row = data as unknown as Record<string, unknown>;
     return {
-      ...(data as ArtistProfile),
-      social_links: (data.social_links as Record<string, string>) ?? {},
-      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
-      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
-      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
-      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
+      ...(data as unknown as ArtistProfile),
+      social_links: (row.social_links as Record<string, string>) ?? {},
+      profile_photo: (row.profile_photo as string | null) ?? (row.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(row.cover_images) ? (row.cover_images as string[]) : [],
+      genres: Array.isArray(row.genres) ? (row.genres as string[]) : [],
+      cover_updated_at: (row.cover_updated_at as string | null) ?? null,
+      avatar_original_path: (row.avatar_original_path as string | null) ?? null,
+      avatar_crop_x: (row.avatar_crop_x as number) ?? 0,
+      avatar_crop_y: (row.avatar_crop_y as number) ?? 0,
+      avatar_crop_zoom: (row.avatar_crop_zoom as number) ?? 1,
+      cover_primary_original: (row.cover_primary_original as string | null) ?? null,
+      cover_primary_crop_x: (row.cover_primary_crop_x as number) ?? 0,
+      cover_primary_crop_y: (row.cover_primary_crop_y as number) ?? 0,
+      cover_primary_crop_zoom: (row.cover_primary_crop_zoom as number) ?? 1,
     };
   }
 
@@ -106,13 +115,14 @@ export class CreatorRepository {
       .single();
 
     if (error) throw error;
+    const row = data as unknown as Record<string, unknown>;
     return {
-      ...(data as ArtistProfile),
-      social_links: (data.social_links as Record<string, string>) ?? {},
-      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
-      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
-      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
-      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
+      ...(data as unknown as ArtistProfile),
+      social_links: (row.social_links as Record<string, string>) ?? {},
+      profile_photo: (row.profile_photo as string | null) ?? (row.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(row.cover_images) ? (row.cover_images as string[]) : [],
+      genres: Array.isArray(row.genres) ? (row.genres as string[]) : [],
+      cover_updated_at: (row.cover_updated_at as string | null) ?? null,
     };
   }
 
@@ -135,13 +145,58 @@ export class CreatorRepository {
       .single();
 
     if (error) throw error;
+    const row = data as unknown as Record<string, unknown>;
     return {
-      ...(data as ArtistProfile),
-      social_links: (data.social_links as Record<string, string>) ?? {},
-      profile_photo: (data.profile_photo as string | null) ?? (data.cover_path as string | null) ?? null,
-      cover_images: Array.isArray(data.cover_images) ? (data.cover_images as string[]) : [],
-      genres: Array.isArray(data.genres) ? (data.genres as string[]) : [],
-      cover_updated_at: (data.cover_updated_at as string | null) ?? null,
+      ...(data as unknown as ArtistProfile),
+      social_links: (row.social_links as Record<string, string>) ?? {},
+      profile_photo: (row.profile_photo as string | null) ?? (row.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(row.cover_images) ? (row.cover_images as string[]) : [],
+      genres: Array.isArray(row.genres) ? (row.genres as string[]) : [],
+      cover_updated_at: (row.cover_updated_at as string | null) ?? null,
+    };
+  }
+
+  async updateCropData(
+    creatorId: string,
+    userId: string,
+    updates: {
+      profile_photo?: string | null;
+      banner_path?: string | null;
+      avatar_original_path?: string | null;
+      avatar_crop_x?: number;
+      avatar_crop_y?: number;
+      avatar_crop_zoom?: number;
+      cover_images?: string[];
+      cover_primary_original?: string | null;
+      cover_primary_crop_x?: number;
+      cover_primary_crop_y?: number;
+      cover_primary_crop_zoom?: number;
+    },
+  ): Promise<ArtistProfile> {
+    const { data, error } = await this.client
+      .from("artist_profiles")
+      .update({ ...updates, updated_by: userId })
+      .eq("creator_id", creatorId)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    const row = data as unknown as Record<string, unknown>;
+    return {
+      ...(data as unknown as ArtistProfile),
+      social_links: (row.social_links as Record<string, string>) ?? {},
+      profile_photo: (row.profile_photo as string | null) ?? (row.cover_path as string | null) ?? null,
+      cover_images: Array.isArray(row.cover_images) ? (row.cover_images as string[]) : [],
+      genres: Array.isArray(row.genres) ? (row.genres as string[]) : [],
+      cover_updated_at: (row.cover_updated_at as string | null) ?? null,
+      avatar_original_path: (row.avatar_original_path as string | null) ?? null,
+      avatar_crop_x: (row.avatar_crop_x as number) ?? 0,
+      avatar_crop_y: (row.avatar_crop_y as number) ?? 0,
+      avatar_crop_zoom: (row.avatar_crop_zoom as number) ?? 1,
+      cover_primary_original: (row.cover_primary_original as string | null) ?? null,
+      cover_primary_crop_x: (row.cover_primary_crop_x as number) ?? 0,
+      cover_primary_crop_y: (row.cover_primary_crop_y as number) ?? 0,
+      cover_primary_crop_zoom: (row.cover_primary_crop_zoom as number) ?? 1,
     };
   }
 

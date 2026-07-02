@@ -293,6 +293,48 @@ export class CreatorService {
     });
   }
 
+  async saveAvatarCrop(input: {
+    creatorId: string;
+    croppedPath: string;
+    originalPath: string;
+    cropX: number;
+    cropY: number;
+    cropZoom: number;
+  }): Promise<ArtistProfile> {
+    const userId = await this.requireUserId();
+    await this.repository.ensureCreator();
+    return this.repository.updateCropData(input.creatorId, userId, {
+      profile_photo: input.croppedPath,
+      avatar_original_path: input.originalPath,
+      avatar_crop_x: input.cropX,
+      avatar_crop_y: input.cropY,
+      avatar_crop_zoom: input.cropZoom,
+    });
+  }
+
+  async saveCoverPrimaryCrop(input: {
+    creatorId: string;
+    croppedPath: string;
+    originalPath: string;
+    cropX: number;
+    cropY: number;
+    cropZoom: number;
+  }): Promise<ArtistProfile> {
+    const userId = await this.requireUserId();
+    await this.repository.ensureCreator();
+    const profile = await this.repository.getArtistProfile(input.creatorId);
+    const coverImages = profile?.cover_images ?? [];
+    const updatedImages = [input.croppedPath, ...coverImages.slice(1)];
+    return this.repository.updateCropData(input.creatorId, userId, {
+      cover_images: updatedImages,
+      banner_path: input.croppedPath,
+      cover_primary_original: input.originalPath,
+      cover_primary_crop_x: input.cropX,
+      cover_primary_crop_y: input.cropY,
+      cover_primary_crop_zoom: input.cropZoom,
+    });
+  }
+
   async getDashboardData(): Promise<CreatorDashboardData> {
     const { CreatorDashboardService } = await import("./creatorDashboard.service");
     return new CreatorDashboardService(this.client).getDashboardData();

@@ -1,108 +1,257 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { CreatorAssetImage } from "./CreatorAssetImage";
-import { ArtistCoverManager } from "./ArtistCoverManager";
+import { CropEditorModal } from "./CropEditorModal";
+import type { CropResult } from "./CropEditorModal";
+import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
+import { useCreatorService } from "../../hooks/useCreator";
+import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
+import {
+  compressImageFile,
+  IMAGE_UPLOAD,
+  isAllowedImageMime,
+  type AllowedImageMime,
+} from "@/lib/image/compress-image";
+import { useRouter } from "next/navigation";
+
+// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface ArtistCoverSliderProps {
   creatorId: string;
   stageName: string;
-  coverImages: string[];
-  variant?: "default" | "compact";
+  // Primary cover (first of cover_images or banner_path)
+  primaryCoverPath: string | null;
+  // Crop persistence
+  originalPath: string | null;
+  cropX: number;
+  cropY: number;
+  cropZoom: number;
 }
 
-const SLIDE_MS = 6000;
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export const ArtistCoverSlider = memo(function ArtistCoverSlider({
   creatorId,
   stageName,
-  coverImages,
-  variant = "default",
+  primaryCoverPath,
+  originalPath,
+  cropX,
+  cropY,
+  cropZoom,
 }: ArtistCoverSliderProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [managerOpen, setManagerOpen] = useState(false);
-  const slides = useMemo(() => coverImages.filter(Boolean), [coverImages]);
-  const isCompact = variant === "compact";
+  const creatorService = useCreatorService();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const goNext = useCallback(() => {
-    if (slides.length <= 1) return;
-    setActiveIndex((i) => (i + 1) % slides.length);
-  }, [slides.length]);
+  const [localCoverPath, setLocalCoverPath] = useState(primaryCoverPath);
+  const [localOriginalPath, setLocalOriginalPath] = useState(originalPath);
+  const [localCropX, setLocalCropX] = useState(cropX);
+  const [localCropY, setLocalCropY] = useState(cropY);
+  const [localCropZoom, setLocalCropZoom] = useState(cropZoom);
 
-  useEffect(() => {
-    if (slides.length <= 1) return;
-    const timer = window.setInterval(goNext, SLIDE_MS);
-    return () => window.clearInterval(timer);
-  }, [goNext, slides.length]);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [pendingOriginalFile, setPendingOriginalFile] = useState<File | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const sliderClass = isCompact
-    ? "artist-hero__cover-slider artist-hero__cover-slider--compact"
-    : "artist-hero__cover-slider";
+  // Signed URL for re-crop (original stored in gallery)
+  const { url: originalSignedUrl } = useCreatorAssetUrl(
+    creatorId,
+    localOriginalPath,
+    "gallery",
+  );
 
-  const activePath = slides[activeIndex] ?? null;
+  // ── Open crop editor ────────────────────────────────────────────────────
+
+  const openCropEditor = useCallback(() => {
+    setError(null);
+    if (localOriginalPath && originalSignedUrl) {
+      setCropSrc(originalSignedUrl);
+      setCropOpen(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  }, [localOriginalPath, originalSignedUrl]);
+
+  // ── Handle new file ─────────────────────────────────────────────────────
+
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setError(null);
+    if (!isAllowedImageMime(file.type)) {
+      setError("Format non supporté. Utilisez JPG, PNG ou WebP.");
+      return;
+    }
+    if (file.size > IMAGE_UPLOAD.MAX_BYTES) {
+      setError("Image trop lourde. Maximum 5 Mo.");
+      return;
+    }
+
+    try {
+      const compressed = await compressImageFile(file, {
+        maxWidth: IMAGE_UPLOAD.COVER_MAX_PX,
+        maxHeight: IMAGE_UPLOAD.COVER_MAX_PX,
+      });
+      setPendingOriginalFile(compressed);
+      setCropSrc(URL.createObjectURL(compressed));
+      setCropOpen(true);
+    } catch {
+      setError("Impossible de traiter cette image.");
+    }
+  }, []);
+
+  // ── Save crop result ────────────────────────────────────────────────────
+
+  const handleCropSave = useCallback(async (result: CropResult) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const croppedFile = new File([result.croppedBlob], "cover.jpg", { type: "image/jpeg" });
+
+      let finalOriginalPath = localOriginalPath;
+
+      // Upload original (only for new files)
+      if (pendingOriginalFile) {
+        const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
+          await creatorService.requestAssetUploadUrl({
+            creatorId,
+            assetKind: "gallery",
+            contentType: pendingOriginalFile.type as AllowedImageMime,
+          });
+        const origRes = await fetch(origSignedUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": pendingOriginalFile.type,
+            ...(origToken ? { "x-upsert": "true" } : {}),
+          },
+          body: pendingOriginalFile,
+        });
+        if (!origRes.ok) throw new Error("Échec de l'envoi de l'original.");
+        finalOriginalPath = origPath;
+      }
+
+      // Upload cropped cover
+      const { signedUrl: cropSignedUrl, token: cropToken, path: croppedPath } =
+        await creatorService.requestAssetUploadUrl({
+          creatorId,
+          assetKind: "gallery",
+          contentType: "image/jpeg",
+        });
+      const cropRes = await fetch(cropSignedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "image/jpeg",
+          ...(cropToken ? { "x-upsert": "true" } : {}),
+        },
+        body: croppedFile,
+      });
+      if (!cropRes.ok) throw new Error("Échec de l'envoi du recadrage.");
+
+      // Save to DB
+      await creatorService.saveCoverPrimaryCrop({
+        creatorId,
+        croppedPath,
+        originalPath: finalOriginalPath ?? croppedPath,
+        cropX: result.cropX,
+        cropY: result.cropY,
+        cropZoom: result.cropZoom,
+      });
+
+      invalidateCreatorAssetUrl(creatorId);
+      setLocalCoverPath(croppedPath);
+      setLocalOriginalPath(finalOriginalPath ?? croppedPath);
+      setLocalCropX(result.cropX);
+      setLocalCropY(result.cropY);
+      setLocalCropZoom(result.cropZoom);
+      setPendingOriginalFile(null);
+      if (cropSrc?.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
+      setCropSrc(null);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Échec de l'enregistrement.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService, router]);
 
   return (
-    <div className="artist-hero__cover-wrap">
-      <div
-        className={sliderClass}
-        role="region"
-        aria-label="Photos de couverture"
-        aria-live="polite"
-      >
-        {activePath ? (
-          <div className="artist-hero__cover-slide artist-hero__cover-slide--active">
-            <CreatorAssetImage
-              creatorId={creatorId}
-              path={activePath}
-              assetKind="gallery"
-              alt={`Couverture ${stageName}`}
-              fit={isCompact ? "contain" : "cover"}
-              layout="bounded"
-              className="artist-hero__cover-img"
-              priority
-              fallback={<div className="artist-hero__cover-fallback" />}
-            />
-          </div>
+    <>
+      {/* Cover fill */}
+      <div className="ahero__cover">
+        {localCoverPath ? (
+          <CreatorAssetImage
+            creatorId={creatorId}
+            path={localCoverPath}
+            assetKind="gallery"
+            alt={`Couverture ${stageName}`}
+            fit="cover"
+            layout="bounded"
+            className="ahero__cover-img"
+            priority
+            fallback={<div className="ahero__cover-default" aria-hidden="true" />}
+          />
         ) : (
-          <div className="artist-hero__cover-fallback" aria-hidden="true" />
+          <div className="ahero__cover-default" aria-hidden="true" />
         )}
 
-        <div className="artist-hero__cover-scrim" aria-hidden="true" />
+        {/* Gradient overlay */}
+        <div className="ahero__overlay" aria-hidden="true" />
 
-        {slides.length > 1 ? (
-          <div className="artist-hero__cover-dots" role="tablist" aria-label="Navigation couverture">
-            {slides.map((path, index) => (
-              <button
-                key={path}
-                type="button"
-                role="tab"
-                aria-selected={index === activeIndex}
-                aria-label={`Couverture ${index + 1}`}
-                className={`artist-hero__cover-dot${index === activeIndex ? " artist-hero__cover-dot--active" : ""}`}
-                onClick={() => setActiveIndex(index)}
-              />
-            ))}
+        {/* Loading indicator */}
+        {loading && (
+          <div className="ahero__cover-loading" aria-hidden="true">
+            <span className="ahero__cover-spin">◌</span>
           </div>
-        ) : null}
+        )}
       </div>
 
+      {/* "Gérer la couverture" button */}
       <button
-        type="button"
-        className="artist-hero__cover-edit"
-        aria-label="Gérer les photos de couverture"
-        onClick={() => setManagerOpen(true)}
+        className="ahero__btn ahero__btn--cover"
+        onClick={openCropEditor}
+        disabled={loading}
+        aria-label="Gérer la couverture"
       >
-        Gérer la couverture
+        🖼 Gérer la couverture
       </button>
 
-      <ArtistCoverManager
-        creatorId={creatorId}
-        stageName={stageName}
-        coverImages={slides}
-        open={managerOpen}
-        onOpenChange={setManagerOpen}
-        onImagesChange={() => setActiveIndex(0)}
+      {error && <p className="ahero__cover-error" role="alert">{error}</p>}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={IMAGE_UPLOAD.ALLOWED_TYPES.join(",")}
+        className="sr-only"
+        aria-hidden="true"
+        tabIndex={-1}
+        onChange={(e) => void handleFileSelect(e)}
       />
-    </div>
+
+      {/* Crop editor */}
+      {cropSrc && (
+        <CropEditorModal
+          open={cropOpen}
+          onClose={() => {
+            if (cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+            setPendingOriginalFile(null);
+            setCropOpen(false);
+          }}
+          imageSrc={cropSrc}
+          aspect={16 / 9}
+          initialCrop={{ x: localCropX, y: localCropY }}
+          initialZoom={localCropZoom}
+          title="Recadrer la couverture"
+          onSave={handleCropSave}
+        />
+      )}
+    </>
   );
 });

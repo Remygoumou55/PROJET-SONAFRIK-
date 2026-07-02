@@ -40,6 +40,15 @@ export interface ArtistProfile {
   verified_at: string | null;
   created_at: string;
   updated_at: string;
+  // Crop persistence — Hero V3.5
+  avatar_original_path: string | null;
+  avatar_crop_x: number;
+  avatar_crop_y: number;
+  avatar_crop_zoom: number;
+  cover_primary_original: string | null;
+  cover_primary_crop_x: number;
+  cover_primary_crop_y: number;
+  cover_primary_crop_zoom: number;
 }
 
 export interface Label {

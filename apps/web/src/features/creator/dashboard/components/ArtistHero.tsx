@@ -14,91 +14,145 @@ import {
 } from "@sonafrik/api/creator/presentation";
 import { formatCreatorGreeting } from "@/features/creator/lib/greeting";
 
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+export interface HeroStats {
+  streams: number;
+  validStreams: number;
+  tracksPublished: number;
+  estimatedMonthlyGnf: number;
+}
+
 interface ArtistHeroProps {
   hero: CreatorDashboardHero;
   artistProfile: ArtistProfile;
   creator: Creator;
   profileCreatedAt: string;
+  stats: HeroStats;
 }
+
+// ─── Formatters ───────────────────────────────────────────────────────────────
+
+function fmtNum(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`;
+  return String(n);
+}
+
+function fmtGnf(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M GNF`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k GNF`;
+  return `${n} GNF`;
+}
+
+function fmtMemberSince(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  } catch {
+    return "";
+  }
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export const ArtistHero = memo(function ArtistHero({
   artistProfile,
   creator,
   profileCreatedAt,
   hero,
+  stats,
 }: ArtistHeroProps) {
   const photoPath = artistProfile.profile_photo ?? artistProfile.cover_path;
-  const coverImages =
+  const primaryCoverPath =
     (artistProfile.cover_images?.length ?? 0) > 0
-      ? artistProfile.cover_images
-      : artistProfile.banner_path
-        ? [artistProfile.banner_path]
-        : [];
+      ? (artistProfile.cover_images?.[0] ?? null)
+      : (artistProfile.banner_path ?? null);
 
   const allBadges = buildHeroVitrineBadges({
     artistProfile,
     profilePercent: hero.profilePercent,
     profileCreatedAt,
   });
-
-  // V3: only "verified" badge (Artiste Émergent) — online removed per spec
   const visibleBadges = allBadges.filter((b) => b.id === "verified");
-
   const artistType = resolveArtistTypeLabel(creator);
+  const memberSince = fmtMemberSince(profileCreatedAt);
+
+  const heroStats = [
+    { icon: "🎵", value: fmtNum(stats.streams), label: "Streams" },
+    { icon: "👂", value: fmtNum(stats.validStreams), label: "Écoutes" },
+    { icon: "📀", value: String(stats.tracksPublished), label: "Morceaux" },
+    { icon: "💰", value: fmtGnf(stats.estimatedMonthlyGnf), label: "Revenus / mois" },
+  ];
 
   return (
-    <section className="artist-hero artist-hero--vitrine" aria-label="Vitrine artiste">
-      <div className="artist-hero__banner artist-hero__banner--vitrine">
-        <ArtistCoverSlider
-          creatorId={creator.id}
-          stageName={artistProfile.stage_name}
-          coverImages={coverImages}
-          variant="compact"
-        />
-      </div>
+    <section className="ahero" aria-label="Vitrine artiste">
+      {/* Cover — fills 100% of the card */}
+      <ArtistCoverSlider
+        creatorId={creator.id}
+        stageName={artistProfile.stage_name}
+        primaryCoverPath={primaryCoverPath}
+        originalPath={artistProfile.cover_primary_original}
+        cropX={artistProfile.cover_primary_crop_x}
+        cropY={artistProfile.cover_primary_crop_y}
+        cropZoom={artistProfile.cover_primary_crop_zoom}
+      />
 
-      <div className="artist-hero__body artist-hero__body--vitrine">
-        <div className="artist-hero__avatar-wrap artist-hero__avatar-wrap--vitrine">
+      {/* Content overlaid on the cover */}
+      <div className="ahero__content">
+
+        {/* Top row: greeting (left) + action buttons (right) */}
+        <div className="ahero__top">
+          <p className="ahero__greeting">
+            {formatCreatorGreeting(artistProfile.stage_name)}
+          </p>
+        </div>
+
+        {/* Bottom: avatar + identity + stats */}
+        <div className="ahero__bottom">
+          {/* Avatar */}
           <ArtistProfilePhoto
             creatorId={creator.id}
             stageName={artistProfile.stage_name}
             photoPath={photoPath}
+            originalPath={artistProfile.avatar_original_path}
+            cropX={artistProfile.avatar_crop_x}
+            cropY={artistProfile.avatar_crop_y}
+            cropZoom={artistProfile.avatar_crop_zoom}
           />
-        </div>
 
-        <div className="artist-hero__identity-block artist-hero__identity-block--vitrine">
-          <p className="artist-hero__greeting artist-hero__greeting--vitrine">
-            {formatCreatorGreeting(artistProfile.stage_name)}
-          </p>
-          <div className="artist-hero__name-row">
-            <h2 className="artist-hero__name artist-hero__name--vitrine">
-              {artistProfile.stage_name}
-            </h2>
-            <button
-              type="button"
-              className="artist-hero__follow-btn"
-              aria-label={`Suivre ${artistProfile.stage_name}`}
-            >
-              + Suivre
-            </button>
-          </div>
-          <p className="artist-hero__type artist-hero__type--vitrine">{artistType}</p>
+          {/* Identity */}
+          <div className="ahero__identity">
+            <div className="ahero__name-row">
+              <h2 className="ahero__name">{artistProfile.stage_name}</h2>
+              {visibleBadges.length > 0 && (
+                <ul className="ahero__badges" aria-label="Statut">
+                  {visibleBadges.map((badge) => (
+                    <li
+                      key={badge.id}
+                      className={`ahero__badge ahero__badge--${badge.tone}`}
+                    >
+                      {badge.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <p className="ahero__type">{artistType}</p>
+            {memberSince && (
+              <p className="ahero__since">Membre depuis {memberSince}</p>
+            )}
 
-          {visibleBadges.length > 0 && (
-            <ul
-              className="artist-hero__badges artist-hero__badges--vitrine"
-              aria-label="Statut du profil"
-            >
-              {visibleBadges.map((badge) => (
-                <li
-                  key={badge.id}
-                  className={`artist-hero__badge artist-hero__badge--${badge.tone}`}
-                >
-                  {badge.label}
-                </li>
+            {/* Stats row */}
+            <div className="ahero__stats" role="list" aria-label="Statistiques">
+              {heroStats.map((stat) => (
+                <div key={stat.label} className="ahero__stat" role="listitem">
+                  <span className="ahero__stat-icon" aria-hidden="true">{stat.icon}</span>
+                  <span className="ahero__stat-value">{stat.value}</span>
+                  <span className="ahero__stat-label">{stat.label}</span>
+                </div>
               ))}
-            </ul>
-          )}
+            </div>
+          </div>
         </div>
       </div>
     </section>

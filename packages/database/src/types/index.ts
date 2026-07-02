@@ -218,10 +218,18 @@ export type Database = {
       }
       artist_profiles: {
         Row: {
+          avatar_crop_x: number
+          avatar_crop_y: number
+          avatar_crop_zoom: number
+          avatar_original_path: string | null
           banner_path: string | null
           bio: string | null
           cover_images: string[]
           cover_path: string | null
+          cover_primary_crop_x: number
+          cover_primary_crop_y: number
+          cover_primary_crop_zoom: number
+          cover_primary_original: string | null
           cover_updated_at: string | null
           created_at: string
           creator_id: string
@@ -237,10 +245,18 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
+          avatar_crop_x?: number
+          avatar_crop_y?: number
+          avatar_crop_zoom?: number
+          avatar_original_path?: string | null
           banner_path?: string | null
           bio?: string | null
           cover_images?: string[]
           cover_path?: string | null
+          cover_primary_crop_x?: number
+          cover_primary_crop_y?: number
+          cover_primary_crop_zoom?: number
+          cover_primary_original?: string | null
           cover_updated_at?: string | null
           created_at?: string
           creator_id: string
@@ -256,10 +272,18 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
+          avatar_crop_x?: number
+          avatar_crop_y?: number
+          avatar_crop_zoom?: number
+          avatar_original_path?: string | null
           banner_path?: string | null
           bio?: string | null
           cover_images?: string[]
           cover_path?: string | null
+          cover_primary_crop_x?: number
+          cover_primary_crop_y?: number
+          cover_primary_crop_zoom?: number
+          cover_primary_original?: string | null
           cover_updated_at?: string | null
           created_at?: string
           creator_id?: string
