@@ -54,6 +54,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
   const [pendingOriginalFile, setPendingOriginalFile] = useState<File | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Signed URL for re-crop (original stored in gallery)
@@ -93,6 +94,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       return;
     }
 
+    setIsProcessing(true);
     try {
       const compressed = await compressImageFile(file, {
         maxWidth: IMAGE_UPLOAD.COVER_MAX_PX,
@@ -103,6 +105,8 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       setCropOpen(true);
     } catch {
       setError("Impossible de traiter cette image.");
+    } finally {
+      setIsProcessing(false);
     }
   }, []);
 
@@ -204,10 +208,13 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
         {/* Gradient overlay */}
         <div className="ahero__overlay" aria-hidden="true" />
 
-        {/* Loading indicator */}
-        {loading && (
-          <div className="ahero__cover-loading" aria-hidden="true">
+        {/* Loading / processing indicator */}
+        {(loading || isProcessing) && (
+          <div className="ahero__cover-loading" aria-live="polite">
             <span className="ahero__cover-spin">◌</span>
+            {isProcessing && (
+              <span className="ahero__cover-loading-hint">Analyse de l&apos;image…</span>
+            )}
           </div>
         )}
       </div>
@@ -216,7 +223,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       <button
         className="ahero__btn ahero__btn--cover"
         onClick={openCropEditor}
-        disabled={loading}
+        disabled={loading || isProcessing}
         aria-label="Gérer la couverture"
       >
         🖼 Gérer la couverture
@@ -247,8 +254,10 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
           }}
           imageSrc={cropSrc}
           aspect={16 / 9}
-          initialCrop={{ x: localCropX, y: localCropY }}
-          initialZoom={localCropZoom}
+          // New image: no saved crop → undefined triggers auto-fit + "new image" messaging
+          // Re-crop: restore saved position/zoom
+          initialCrop={pendingOriginalFile ? undefined : { x: localCropX, y: localCropY }}
+          initialZoom={pendingOriginalFile ? undefined : localCropZoom}
           title="Recadrer la couverture"
           onSave={handleCropSave}
         />

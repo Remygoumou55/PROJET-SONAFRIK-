@@ -92,15 +92,17 @@ export function CropEditorModal({
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [wasReset, setWasReset]         = useState(false);
   const [imgInfo, setImgInfo]           = useState<{ w: number; h: number } | null>(null);
+  // fitZoom: auto-calculated when no initialZoom is provided (new image)
+  const [fitZoom, setFitZoom]           = useState(1);
 
   // Sync crop/zoom to initial values each time the modal opens.
   // Intentionally NOT including initialCrop/initialZoom in deps — they're treated
   // as one-shot config at open time (parent may pass new object refs each render).
   useEffect(() => {
     if (!open) return;
-    // Access current prop values from closure at effect run time
     setCrop(initialCrop ?? { x: 0, y: 0 });
     setZoom(initialZoom ?? 1);
+    setFitZoom(1);
     setError(null);
     setWasReset(false);
     setPctArea(null);
@@ -108,13 +110,26 @@ export function CropEditorModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Read natural image dimensions for "✔ Image prête" info line
+  // Read natural image dimensions + calculate auto-fit zoom for new images
   useEffect(() => {
     if (!open || !imageSrc) { setImgInfo(null); return; }
     const img = new Image();
-    img.onload = () => setImgInfo({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onload = () => {
+      const info = { w: img.naturalWidth, h: img.naturalHeight };
+      setImgInfo(info);
+      // Auto-fit zoom: only for new images (no saved initialZoom)
+      if (initialZoom === undefined) {
+        const imgAspect = info.w / info.h;
+        const ratio = Math.min(imgAspect, aspect) / Math.max(imgAspect, aspect);
+        // When aspect mismatch > 1.8× (portrait in landscape or vice versa): zoom to fit
+        const computed = ratio < 1 / 1.8 ? Math.max(MIN_ZOOM, ratio * 1.15) : 1;
+        setFitZoom(computed);
+        setZoom(computed);
+      }
+    };
     img.onerror = () => setImgInfo(null);
     img.src = imageSrc;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, imageSrc]);
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
@@ -131,7 +146,8 @@ export function CropEditorModal({
 
   const handleReset = () => {
     setCrop(initialCrop ?? { x: 0, y: 0 });
-    setZoom(initialZoom ?? 1);
+    // For new images: reset to auto-fit zoom; for re-crops: reset to saved zoom
+    setZoom(initialZoom ?? fitZoom);
     setWasReset(true);
   };
 

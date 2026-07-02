@@ -53,6 +53,7 @@ export function ArtistProfilePhoto({
   const [pendingOriginalFile, setPendingOriginalFile] = useState<File | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch signed URL for the stored original (for re-crop without re-upload)
@@ -103,6 +104,7 @@ export function ArtistProfilePhoto({
       return;
     }
 
+    setIsProcessing(true);
     try {
       // Compress without crop — preserve original proportions for the crop editor
       const compressed = await compressImageFile(file, {
@@ -115,6 +117,8 @@ export function ArtistProfilePhoto({
       setCropOpen(true);
     } catch {
       setError("Impossible de traiter cette image.");
+    } finally {
+      setIsProcessing(false);
     }
   }, []);
 
@@ -233,8 +237,8 @@ export function ArtistProfilePhoto({
               {initials || "🎤"}
             </span>
           )}
-          {loading && (
-            <div className="ahero__avatar-loading" aria-hidden="true">
+          {(loading || isProcessing) && (
+            <div className="ahero__avatar-loading" aria-live="polite">
               <span>◌</span>
             </div>
           )}
@@ -246,7 +250,7 @@ export function ArtistProfilePhoto({
         <button
           className="ahero__btn"
           onClick={() => void openCropEditor()}
-          disabled={loading}
+          disabled={loading || isProcessing}
           aria-label="Gérer la photo de profil"
         >
           📷 Gérer l&apos;avatar
@@ -290,8 +294,10 @@ export function ArtistProfilePhoto({
           }}
           imageSrc={cropSrc}
           aspect={1}
-          initialCrop={{ x: localCropX, y: localCropY }}
-          initialZoom={localCropZoom}
+          // New image: pass undefined → auto-fit + "new image" messaging
+          // Re-crop: restore saved position/zoom
+          initialCrop={pendingOriginalFile ? undefined : { x: localCropX, y: localCropY }}
+          initialZoom={pendingOriginalFile ? undefined : localCropZoom}
           title="Recadrer l'avatar"
           onSave={handleCropSave}
         />
