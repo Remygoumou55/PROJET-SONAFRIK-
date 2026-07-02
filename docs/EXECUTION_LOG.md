@@ -11,6 +11,58 @@
 
 ---
 
+## 2026-07-02 — Audit forensique + fix Upload Engine (6 bugs)
+
+### Bugs corrigés
+- **BUG-001 P0** `CoverUploader.tsx` : fallback extension `.jpg/.png/.webp` si `file.type=""` (drag-drop navigateur)
+- **BUG-002 P0** `AudioUploader.tsx` : `decodeAudioData` → `<audio preload="metadata">` — élimine OOM sur fichiers >10MB
+- **BUG-003 P0** `AudioUploader.tsx` : `confirmAssetUpload` recevait `file.type` (potentiellement `""`) → rejet serveur ; remplacé par `effectiveMime`
+- **BUG-004 P1** `AvatarUpload.tsx` : aucune validation client → appel service avec MIME invalide ; ajout MIME + taille avant service
+- **BUG-005 P1** `ArtistIdentityForm.tsx` : bannière sans validation ni catch → TypeScript cast non validé ; ajout validation + error handling
+- **BUG-006 P2** `AudioUploader.tsx` : dead code `detectContainerFromBytes` redondant après `validateAudioAsset` ; supprimé
+
+### Fichiers touchés
+- `apps/web/src/features/creator/catalog/components/AudioUploader.tsx` — 3 corrections
+- `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` — fallback extension
+- `apps/web/src/features/identity/components/AvatarUpload.tsx` — validation client
+- `apps/web/src/features/creator/components/ArtistIdentityForm.tsx` — validation + erreur bannière
+
+### Code avant (AudioUploader — OOM)
+```before
+async function getAudioDuration(file: File): Promise<number> {
+  const arrayBuffer = await file.arrayBuffer();        // charge 100% du fichier
+  const decoded = await getAudioCtx().decodeAudioData(arrayBuffer.slice(0)); // ~10x expansion PCM
+  return decoded.duration;
+}
+```
+
+### Code après
+```after
+function getAudioDuration(url: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audio.onloadedmetadata = () => resolve(isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0);
+    audio.onerror = () => reject(new Error("Lecture des métadonnées audio impossible."));
+    audio.src = url;
+  });
+}
+```
+
+### Dette technique créée
+- Aucune
+
+### Tests à faire
+- [ ] Upload MP3 par drag-drop depuis Explorateur Windows (file.type peut être "")
+- [ ] Upload fichier >10MB depuis mobile → ne doit plus crasher
+- [ ] Upload bannière avec un PNG → message "Bannière mise à jour."
+- [ ] Upload avatar JPEG → validation passe sans erreur
+
+### Commit
+`eea7cd0` — push origin main ✅
+
+---
+
 ## 2026-07-02 — Fix Publication Wizard étape 1 (blocage critique)
 
 ### Cause racine identifiée
