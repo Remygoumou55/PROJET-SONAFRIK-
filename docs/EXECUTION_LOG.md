@@ -11,6 +11,39 @@
 
 ---
 
+## 2026-07-03 — LIVE RUNTIME: détection M4A wide-atom + instrumentation Zod (BUG-008/009/010)
+
+### Problème
+"Format de fichier non supporté" apparu à l'usage pour des fichiers valides.
+
+### Analyse forensique
+- Message exact provient de `CATALOG_ERROR_MESSAGES.asset_type_invalid` dans `packages/types/src/catalog.ts:151`
+- Uniquement lancé par `CatalogError("asset_type_invalid")` dans `catalog.service.ts` quand `catalogAssetUploadSchema.safeParse()` ou `catalogAssetConfirmSchema.safeParse()` échoue
+- Source Zod non identifiable sans runtime info → instrumentation ajoutée
+
+### Bugs corrigés
+| # | Composant | Nature | Fix |
+|---|---|---|---|
+| 008 | `detectContainerFromBytes` (shared + Deno) | M4A iPhone/GarageBand : atome "wide" (8 bytes) avant "ftyp" → container "unknown" → rejet | Vérification supplémentaire offset 12 pour "ftyp" |
+| 009 | `catalog.service.ts` | Schema Zod fail → message générique sans contexte | `console.error` avec `parsed.error.flatten()` pour tracer le champ exact |
+| 010 | `AudioUploader`, `CoverUploader` | Pas de log des inputs avant service call | `console.debug` inputs + `console.error` dans catch |
+
+### Fichiers touchés
+- `packages/shared/src/audio/audio-integrity.ts` — +4 lignes wide-atom
+- `supabase/functions/_shared/audio-integrity.ts` — mirror Deno synchronisé
+- `packages/api/src/catalog/catalog.service.ts` — log Zod errors
+- `apps/web/src/features/creator/catalog/components/AudioUploader.tsx` — log debug/error
+- `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` — log debug/error
+
+### Commits
+- `ece58dd` — BUG-008/009/010 — build/lint/typecheck: ✅ 0 erreur
+
+### Prochaine étape
+Ouvrir DevTools → onglet Console au prochain déclenchement de l'erreur.
+Le log `[CatalogService.requestAssetUploadUrl] schema fail: {...}` montrera le champ Zod exact qui rejette l'input.
+
+---
+
 ## 2026-07-02 — Certification E2E Upload Engine (7 bugs corrigés)
 
 ### Périmètre
