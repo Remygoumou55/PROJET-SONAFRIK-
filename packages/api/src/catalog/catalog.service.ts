@@ -272,7 +272,10 @@ export class CatalogService {
     expiresIn: number;
   }> {
     const parsed = catalogAssetUploadSchema.safeParse(input);
-    if (!parsed.success) throw new CatalogError("asset_type_invalid");
+    if (!parsed.success) {
+      console.error("[CatalogService.requestAssetUploadUrl] schema fail:", JSON.stringify(parsed.error.flatten()));
+      throw new CatalogError("asset_type_invalid");
+    }
 
     await this.requireUserId();
 
@@ -300,7 +303,10 @@ export class CatalogService {
     fileSizeBytes: number;
   }> {
     const parsed = catalogAssetConfirmSchema.safeParse(input);
-    if (!parsed.success) throw new CatalogError("asset_type_invalid");
+    if (!parsed.success) {
+      console.error("[CatalogService.confirmAssetUpload] schema fail:", JSON.stringify(parsed.error.flatten()));
+      throw new CatalogError("asset_type_invalid");
+    }
 
     await this.requireUserId();
 

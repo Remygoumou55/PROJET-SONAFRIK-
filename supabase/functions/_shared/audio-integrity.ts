@@ -24,6 +24,8 @@ export function detectContainerFromBytes(header: Uint8Array): DetectedContainer 
     header.length >= 12 && header[8] === 0x57 && header[9] === 0x41 && header[10] === 0x56 && header[11] === 0x45
   ) return "wav";
   if (header.length >= 8 && header[4] === 0x66 && header[5] === 0x74 && header[6] === 0x79 && header[7] === 0x70) return "m4a";
+  // M4A preceded by "wide" atom (iPhone/GarageBand): ftyp type at offset 12
+  if (header.length >= 16 && header[12] === 0x66 && header[13] === 0x74 && header[14] === 0x79 && header[15] === 0x70) return "m4a";
   if (header[0] === 0x66 && header[1] === 0x4c && header[2] === 0x61 && header[3] === 0x43) return "flac";
   return "unknown";
 }

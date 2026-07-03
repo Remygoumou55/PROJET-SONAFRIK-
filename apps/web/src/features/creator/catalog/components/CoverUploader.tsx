@@ -145,6 +145,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
 
     setState({ status: "uploading", file, previewUrl, progress: 0, width, height });
     try {
+      console.debug("[CoverUploader] upload →", { creatorId, albumId, contentType: file.type, fileSizeBytes: file.size });
       const { signedUrl } = await catalog.requestAssetUploadUrl({ creatorId, assetType: "cover", contentType: file.type, albumId });
 
       await new Promise<void>((resolve, reject) => {
@@ -165,6 +166,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
       setState({ status: "success" });
       onSuccess?.();
     } catch (err) {
+      console.error("[CoverUploader] doUpload error:", err);
       const msg = err instanceof Error ? err.message : "Échec de l'envoi de la pochette.";
       setState({ status: "error", message: msg });
       throw new Error(msg);

@@ -64,7 +64,14 @@ export function detectContainerFromBytes(header: Uint8Array): DetectedContainer 
     return "wav";
   }
 
+  // Standard MP4/M4A: "ftyp" atom type at offset 4
   if (header.length >= 8 && header[4] === 0x66 && header[5] === 0x74 && header[6] === 0x79 && header[7] === 0x70) {
+    return "m4a";
+  }
+  // M4A preceded by a "wide" atom (8 bytes, common in iPhone/GarageBand files):
+  // bytes 0-7 = [00 00 00 08 77 69 64 65], then the real ftyp atom starts at byte 8
+  // → "ftyp" type field lands at bytes 12-15
+  if (header.length >= 16 && header[12] === 0x66 && header[13] === 0x74 && header[14] === 0x79 && header[15] === 0x70) {
     return "m4a";
   }
 
