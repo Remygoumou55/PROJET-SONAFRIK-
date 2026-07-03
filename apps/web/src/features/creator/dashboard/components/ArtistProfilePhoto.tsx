@@ -7,8 +7,6 @@ import {
   IMAGE_UPLOAD,
   isAllowedImageMime,
 } from "@/lib/image/compress-image";
-
-type AllowedImageMime = ImageMime;
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
@@ -16,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import { CropEditorModal } from "./CropEditorModal";
 import type { CropResult } from "./CropEditorModal";
+
+type AllowedImageMime = ImageMime;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 

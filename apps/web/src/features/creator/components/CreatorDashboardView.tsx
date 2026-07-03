@@ -41,7 +41,7 @@ function WalletCard({ balanceGnf }: { balanceGnf: number }) {
   );
 }
 
-export function CreatorDashboardView({ data }: Props) {
+export function CreatorDashboardView({ data, careerOsEnabled = false }: Props) {
   const { context, hero, revenueStats, topTrack, catalogCounts, activities, assistantTips, careerOs, profileCreatedAt } = data;
   const creatorId = context.creator.id;
 
@@ -77,8 +77,8 @@ export function CreatorDashboardView({ data }: Props) {
         creatorId={creatorId}
       />
 
-      <div className="dash-bottom-2col">
-        <DashboardCareerProgressCard careerOs={careerOs} />
+      <div className={careerOsEnabled ? "dash-bottom-2col" : ""}>
+        {careerOsEnabled ? <DashboardCareerProgressCard careerOs={careerOs} /> : null}
         <DashboardCoachCard tips={assistantTips} activities={activities} />
       </div>
 

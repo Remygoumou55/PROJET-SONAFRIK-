@@ -278,7 +278,7 @@ export function CropEditorModal({
                 style={{
                   containerStyle: {
                     borderRadius: "0.75rem",
-                    background: "#0d0d0d",
+                    background: "var(--color-noir-profond)",
                   },
                   cropAreaStyle: {
                     border: "2px solid var(--color-vert-energie, #00d26a)",
