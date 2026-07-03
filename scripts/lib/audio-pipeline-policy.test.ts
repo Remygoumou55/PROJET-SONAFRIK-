@@ -9,15 +9,16 @@ import {
 } from "./audio-pipeline-policy";
 
 describe("audio-pipeline-policy", () => {
-  it("accepte MP3/M4A upload MIME", () => {
+  it("accepte MP3/M4A/WAV upload MIME", () => {
     expect(mimeToUploadFormat("audio/mpeg")).toBe("mp3");
-    expect(mimeToUploadFormat("audio/x-m4a")).toBe("aac");
-    expect(mimeToUploadFormat("audio/wav")).toBeNull();
+    expect(mimeToUploadFormat("audio/x-m4a")).toBe("m4a");
+    expect(mimeToUploadFormat("audio/wav")).toBe("wav");
   });
 
-  it("valide taille upload", () => {
+  it("valide taille upload (max 100 Mo)", () => {
     expect(isUploadSizeValid(1024)).toBe(true);
-    expect(isUploadSizeValid(51 * 1024 * 1024)).toBe(false);
+    expect(isUploadSizeValid(51 * 1024 * 1024)).toBe(true);
+    expect(isUploadSizeValid(101 * 1024 * 1024)).toBe(false);
   });
 
   it("détecte en-têtes MP3 ID3", () => {
@@ -46,9 +47,10 @@ describe("audio-pipeline-policy", () => {
     expect(isMimeConsistentWithContainer("audio/mpeg", "wav")).toBe(false);
   });
 
-  it("formats web playback", () => {
+  it("formats web playback (WAV inclus)", () => {
     expect(isWebPlaybackFormat("mp3")).toBe(true);
-    expect(isWebPlaybackFormat("wav")).toBe(false);
+    expect(isWebPlaybackFormat("wav")).toBe(true);
+    expect(isWebPlaybackFormat("flac")).toBe(false);
   });
 
   it("TTL stream-start documenté", () => {

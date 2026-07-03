@@ -33,7 +33,7 @@ describe("audio-integrity", () => {
     expect(r.webCompatible).toBe(true);
   });
 
-  it("marque WAV needs_review", () => {
+  it("valide WAV (lecture navigateur native)", () => {
     const wav = new Uint8Array(12);
     wav.set([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x41, 0x56, 0x45]);
     const r = validateAudioAsset({
@@ -42,6 +42,7 @@ describe("audio-integrity", () => {
       fileSizeBytes: MIN_BLOB_BYTES + 100,
       dbFormat: "wav",
     });
-    expect(r.status).toBe("needs_review");
+    expect(r.status).toBe("valid");
+    expect(r.webCompatible).toBe(true);
   });
 });

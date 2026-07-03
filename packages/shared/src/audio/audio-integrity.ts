@@ -4,7 +4,7 @@
 
 import { AUDIO_MIME_CANONICAL, AUDIO_MIME_TO_DB_FORMAT } from "../upload/upload-policy";
 
-export const WEB_PLAYBACK_FORMATS = ["mp3", "m4a", "aac"] as const;
+export const WEB_PLAYBACK_FORMATS = ["mp3", "m4a", "aac", "wav"] as const;
 export type WebPlaybackFormat = (typeof WEB_PLAYBACK_FORMATS)[number];
 
 // Derived from AUDIO_MIME_TO_DB_FORMAT — WAV excluded (not browser-native without transcoding)
@@ -14,8 +14,7 @@ export const UPLOAD_AUDIO_MIME: Record<string, WebPlaybackFormat> = Object.fromE
     .map(([mime, fmt]) => [mime, fmt as WebPlaybackFormat]),
 );
 
-// Constraint: API schema catalogAssetConfirmSchema.fileSizeBytes.max(50MB) — do not raise without also updating the Zod schema
-export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 export const MIN_BLOB_BYTES = 64;
 export const HEADER_PROBE_BYTES = 512;
 
@@ -97,6 +96,7 @@ export function isMimeConsistentWithContainer(mime: string, container: DetectedC
 export function containerMatchesDbFormat(container: DetectedContainer, dbFormat: string): boolean {
   if (container === "mp3" && dbFormat === "mp3") return true;
   if (container === "m4a" && (dbFormat === "aac" || dbFormat === "m4a")) return true;
+  if (container === "wav" && dbFormat === "wav") return true;
   return false;
 }
 
@@ -115,7 +115,7 @@ export function validateAudioAsset(input: {
     return { status: "invalid", message: "Fichier trop petit (stub ou corrompu).", container: "unknown", webCompatible: false };
   }
   if (fileSizeBytes > MAX_UPLOAD_BYTES) {
-    return { status: "invalid", message: "Fichier dépasse 50 Mo.", container: "unknown", webCompatible: false };
+    return { status: "invalid", message: `Fichier dépasse ${MAX_UPLOAD_BYTES / 1024 / 1024} Mo.`, container: "unknown", webCompatible: false };
   }
 
   const container = detectContainerFromBytes(header);
@@ -127,10 +127,11 @@ export function validateAudioAsset(input: {
     return { status: "invalid", message: "MIME incohérent avec le conteneur détecté.", container, webCompatible: false };
   }
 
-  if (container === "wav" || container === "flac" || dbFormat === "wav" || dbFormat === "flac") {
+  // FLAC: not browser-native, requires transcoding
+  if (container === "flac" || dbFormat === "flac") {
     return {
       status: "needs_review",
-      message: "Format WAV/FLAC non lisible navigateur — transcodage requis.",
+      message: "Format FLAC — transcodage requis avant diffusion.",
       container,
       webCompatible: false,
     };
@@ -145,7 +146,7 @@ export function validateAudioAsset(input: {
     };
   }
 
-  if (!isWebPlaybackFormat(dbFormat === "aac" ? "aac" : dbFormat)) {
+  if (!isWebPlaybackFormat(dbFormat)) {
     return { status: "invalid", message: "Format non compatible lecture web.", container, webCompatible: false };
   }
 

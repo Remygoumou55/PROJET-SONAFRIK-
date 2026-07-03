@@ -44,8 +44,7 @@ export const catalogAssetUploadSchema = z.object({
   contentType: z.string().min(3),
   trackId: z.string().uuid().optional(),
   albumId: z.string().uuid().optional(),
-  // WAV retiré : 30-40MB impraticables sur mobile. Pipeline WAV→MP3 prévu Phase 2.
-  format: z.enum(["mp3", "aac"]).optional(),
+  format: z.enum(["mp3", "aac", "wav"]).optional(),
   bitrateKbps: z.number().int().positive().optional(),
 });
 
@@ -53,9 +52,9 @@ export const catalogAssetConfirmSchema = z.object({
   creatorId: z.string().uuid(),
   trackId: z.string().uuid(),
   path: z.string().min(1),
-  format: z.enum(["mp3", "aac"]),
+  format: z.enum(["mp3", "aac", "wav"]),
   contentType: z.string().min(3),
-  fileSizeBytes: z.number().int().positive().max(50 * 1024 * 1024),
+  fileSizeBytes: z.number().int().positive().max(100 * 1024 * 1024),
   durationSeconds: z.number().int().min(0).optional(),
   contentHash: z.string().length(64).optional(),
 });

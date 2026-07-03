@@ -11,7 +11,7 @@ import {
 } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 
-type AudioFormat = "mp3" | "aac";
+type AudioFormat = "mp3" | "aac" | "wav";
 
 // ─── Public handle ────────────────────────────────────────────────────────────
 
@@ -54,9 +54,14 @@ function formatBytes(bytes: number): string {
 
 function resolveFormatFromFile(file: File): AudioFormat | null {
   const byMime = mimeToUploadFormat(file.type);
-  if (byMime) return byMime === "mp3" ? "mp3" : "aac";
+  if (byMime) {
+    if (byMime === "mp3") return "mp3";
+    if (byMime === "wav") return "wav";
+    return "aac"; // m4a → "aac" (DB backward compat)
+  }
   const ext = file.name.split(".").pop()?.toLowerCase();
   if (ext === "mp3") return "mp3";
+  if (ext === "wav") return "wav";
   if (ext === "m4a") return "aac";
   return null;
 }
@@ -70,7 +75,7 @@ function getAudioDuration(url: string): Promise<number> {
       resolve(isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0);
     };
     audio.onerror = () => {
-      reject(new Error("Lecture des métadonnées audio impossible. Vérifiez que le fichier est un MP3 ou M4A valide."));
+      reject(new Error("Lecture des métadonnées audio impossible. Vérifiez que le fichier est un MP3, M4A ou WAV valide."));
     };
     audio.src = url;
   });
@@ -103,14 +108,14 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
   const validate = useCallback(async (file: File): Promise<string | null> => {
     const format = resolveFormatFromFile(file);
-    if (!format) return "Format non supporté. Choisissez un fichier MP3 ou M4A.";
+    if (!format) return "Format non supporté. Choisissez un fichier MP3, M4A ou WAV.";
     if (file.size === 0) return "Fichier vide.";
     if (file.size > MAX_UPLOAD_BYTES) {
       return `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo.`;
     }
     const header = new Uint8Array(await file.slice(0, 512).arrayBuffer());
     const effectiveMime = resolveAudioUploadMime(file) ?? "audio/mpeg";
-    const precheck = validateAudioAsset({ header, mime: effectiveMime, fileSizeBytes: file.size, dbFormat: format === "mp3" ? "mp3" : "aac" });
+    const precheck = validateAudioAsset({ header, mime: effectiveMime, fileSizeBytes: file.size, dbFormat: format });
     if (precheck.status === "invalid" || precheck.status === "needs_review") return precheck.message;
     return null;
   }, []);
@@ -376,7 +381,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
           <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <p className="audio-up__drop-label">Glissez un fichier ou cliquez</p>
-        <p className="audio-up__drop-hint">MP3 · M4A — max {Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo</p>
+        <p className="audio-up__drop-hint">MP3 · M4A · WAV — max {Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo</p>
       </div>
 
       {state.status === "error" && (

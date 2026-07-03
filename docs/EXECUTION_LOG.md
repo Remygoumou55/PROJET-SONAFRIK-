@@ -48,6 +48,40 @@ Migration de tous les composants existants vers Upload Policy Enterprise v1.1.0 
 
 ---
 
+## 2026-07-03 — PHASE 2.1 ALIGNMENT: Upload Policy Enterprise → chaîne WAV + 100MB
+
+### Mission
+Aligner toute la chaîne d'upload sur Upload Policy Enterprise v1.1.0 : supprimer les 2 incohérences identifiées en audit (limite 50MB vs 100MB, WAV bloqué à chaque étape).
+
+### Fichiers touchés
+
+| Fichier | Changement |
+|---|---|
+| `packages/shared/src/audio/audio-integrity.ts` | `MAX_UPLOAD_BYTES` 50MB → 100MB · `WEB_PLAYBACK_FORMATS` + "wav" · `containerMatchesDbFormat` + cas wav · `validateAudioAsset` : sépare WAV (valid/webCompatible:true) de FLAC (needs_review) · `isWebPlaybackFormat(dbFormat)` simplifié |
+| `supabase/functions/_shared/audio-integrity.ts` | Miroir Deno : idem — 100MB, wav case, WAV → valid, FLAC → needs_review |
+| `supabase/functions/catalog-asset-signed-url/index.ts` | `AUDIO_TYPES` + `audio/wav`, `audio/wave`, `audio/x-wav` → "wav" · `MIME_BY_FORMAT` + `wav: "audio/wav"` · `format?:` + "wav" · message erreur WAV inclus |
+| `packages/api/src/catalog/schemas.ts` | `catalogAssetUploadSchema.format` + "wav" · `catalogAssetConfirmSchema.format` + "wav" · `fileSizeBytes.max` 50MB → 100MB · commentaire WAV retiré supprimé |
+| `apps/web/src/features/creator/catalog/components/AudioUploader.tsx` | `AudioFormat` + "wav" · `resolveFormatFromFile` : wav par MIME + extension · `precheck` : `dbFormat: format` (direct, sans mapping forcé → "aac") · messages utilisateur : "MP3, M4A ou WAV" |
+| `packages/shared/src/audio/audio-integrity.test.ts` | Test "marque WAV needs_review" → "valide WAV (lecture navigateur native)" |
+| `scripts/lib/audio-pipeline-policy.test.ts` | `mimeToUploadFormat("audio/x-m4a")` → "m4a" · wav → "wav" · taille 51MB → true, 101MB → false · `isWebPlaybackFormat("wav")` → true |
+
+### Invariants préservés
+- FLAC reste `needs_review` — non-natif navigateur, transcodage requis
+- m4a → "aac" dans `resolveFormatFromFile` (backward compat DB)
+- Player HTML5 `<audio>` supporte WAV nativement — aucun changement nécessaire
+- Storage Supabase : bucket `catalog-audio` accepte tout Content-Type via URL signée
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15
+- `pnpm lint` : ✅ 15/15
+- `pnpm build` : erreur préexistante `/admin/artists` + `/admin/audit` — hors-scope Phase 2.1
+
+### Dette technique
+- Aucune nouvelle dette créée
+- Dette Phase 2 résolue : schémas Zod et edge function maintenant alignés avec Upload Policy
+
+---
+
 ## 2026-07-03 — ROOT CAUSE ANALYSIS: BUG-011 VerificationPanel contentType brut (BUG-011)
 
 ### Problème

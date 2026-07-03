@@ -8,12 +8,16 @@ const AUDIO_TYPES: Record<string, string> = {
   "audio/mp4": "aac",
   "audio/m4a": "aac",
   "audio/x-m4a": "aac",
+  "audio/wav": "wav",
+  "audio/wave": "wav",
+  "audio/x-wav": "wav",
 };
 
 const MIME_BY_FORMAT: Record<string, string> = {
   mp3: "audio/mpeg",
   aac: "audio/mp4",
   m4a: "audio/mp4",
+  wav: "audio/wav",
 };
 
 const VISUAL_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -27,7 +31,7 @@ interface CatalogAssetRequest {
   albumId?: string;
   contentType?: string;
   path?: string;
-  format?: "mp3" | "aac";
+  format?: "mp3" | "aac" | "wav";
   bitrateKbps?: number;
   fileSizeBytes?: number;
   durationSeconds?: number;
@@ -89,7 +93,7 @@ Deno.serve(async (req) => {
       if (!body.contentType) return json({ error: "Content-Type requis." }, 400);
       if (body.assetType === "audio") {
         if (!AUDIO_TYPES[body.contentType]) {
-          return json({ error: "Format audio non autorisé. Formats acceptés : MP3, M4A." }, 400);
+          return json({ error: "Format audio non autorisé. Formats acceptés : MP3, M4A, WAV." }, 400);
         }
       }
       if (body.assetType === "cover" && !VISUAL_TYPES.includes(body.contentType)) {
