@@ -7,6 +7,28 @@ import type { Creator, CreatorVerification } from "@sonafrik/types";
 import { VERIFICATION_STATUS_LABELS, VERIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { useCreatorService } from "../hooks/useCreator";
 
+type VerificationMime = "image/jpeg" | "image/png" | "image/webp" | "application/pdf";
+const VERIFICATION_ALLOWED_MIMES: readonly string[] = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+];
+
+// Browser MIME for verification docs is unreliable (empty string on Android/Windows for PDFs).
+// Validate file.type first; fall back to extension rather than letting a raw cast hit Zod's strict enum.
+function resolveVerificationContentType(file: File): VerificationMime {
+  if (VERIFICATION_ALLOWED_MIMES.includes(file.type)) return file.type as VerificationMime;
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "png") return "image/png";
+  if (ext === "webp") return "image/webp";
+  if (ext === "pdf") return "application/pdf";
+  throw new Error(
+    `Format non reconnu (${file.type || ext || "?"}) — utilisez JPEG, PNG, WebP ou PDF.`,
+  );
+}
+
 export function VerificationPanel({
   creator,
   verifications: initial,
@@ -45,10 +67,11 @@ export function VerificationPanel({
   }
 
   async function uploadDoc(verificationId: string, file: File) {
+    const contentType = resolveVerificationContentType(file);
     const { signedUrl, token } = await creatorService.requestAssetUploadUrl({
       creatorId: creator.id,
       assetKind: "verification",
-      contentType: file.type as "image/jpeg" | "image/png" | "image/webp" | "application/pdf",
+      contentType,
       verificationId,
     });
 

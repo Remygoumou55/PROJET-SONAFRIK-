@@ -11,6 +11,54 @@
 
 ---
 
+## 2026-07-03 — ROOT CAUSE ANALYSIS: BUG-011 VerificationPanel contentType brut (BUG-011)
+
+### Problème
+Analyse forensique complète 9 phases : "Format de fichier non supporté" persistant après BUG-008 fix.
+
+### Root cause identifiée — BUG-011
+
+**Fichier :** `apps/web/src/features/creator/components/VerificationPanel.tsx:51` (avant fix: ligne 51)
+
+**Champ invalide :** `contentType`
+
+**Cause :** `file.type as "image/jpeg" | "image/png" | "image/webp" | "application/pdf"` — cast TypeScript pur, sans validation runtime. Sur Android / Windows (certains navigateurs), le MIME type d'un PDF est `""` ou `"application/octet-stream"` au lieu de `"application/pdf"`.
+
+**Chaîne complète :**
+```
+User → [Joindre document] → uploadDoc(verificationId, file)
+→ creatorService.requestAssetUploadUrl({ contentType: file.type = "" })
+→ creator.service.ts:237 → creatorAssetUploadSchema.safeParse()
+→ z.enum(["image/jpeg","image/png","image/webp","application/pdf"]) reçoit ""
+→ { success: false } → throw CreatorError("asset_type_invalid")
+→ "Format de fichier non supporté."
+```
+
+**Fix :** ajout `resolveVerificationContentType(file)` — valide `file.type`, fallback extension `.pdf`/`.jpg`/etc, throw descriptif si inconnu.
+
+### Comparaison payload vs schéma (BUG-011)
+
+| Champ | Avant fix | Schéma | Résultat |
+|---|---|---|---|
+| `contentType` | `""` (PDF sur Android/Windows) | `z.enum([...])` | ❌ FAIL |
+| `contentType` | `"application/pdf"` (extension .pdf) | `z.enum([...])` | ✅ PASS (après fix) |
+
+### Certification complète (autres chemins upload)
+- `catalogAssetUploadSchema.safeParse()` : tous les champs valides pour MP3/M4A/images ✅
+- `catalogAssetConfirmSchema.safeParse()` : tous les champs valides, `path` toujours retourné par edge function ✅
+- `creatorAssetUploadSchema.safeParse()` : ArtistProfilePhoto, ArtistCoverManager, ArtistCoverSlider, ArtistIdentityForm → tous valident le type avant appel ✅
+- VerificationPanel → **corrigé** ✅
+
+### Fichiers touchés
+- `apps/web/src/features/creator/components/VerificationPanel.tsx` — `resolveVerificationContentType()` + remplacement cast
+
+### Validation
+- `pnpm typecheck` : ✅ 0 erreur
+- `pnpm lint` : ✅ 0 erreur
+- `pnpm build` : ✅ 0 erreur
+
+---
+
 ## 2026-07-03 — LIVE RUNTIME: détection M4A wide-atom + instrumentation Zod (BUG-008/009/010)
 
 ### Problème
