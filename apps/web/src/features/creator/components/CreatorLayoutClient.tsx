@@ -5,9 +5,11 @@ import type { ArtistTier } from "@sonafrik/types";
 import { CreatorSidebar } from "./CreatorSidebar";
 import { CreatorMobileNav } from "./CreatorMobileNav";
 import { CreatorHeaderUtilities } from "../dashboard/components/enterprise/CreatorHeaderUtilities";
+import type { CreatorNavEntry } from "../lib/creatorNavConfig";
 
 export function CreatorLayoutClient({
-  pendingVerifications,
+  navEntries,
+  pendingVerifications: _pendingVerifications,
   userId,
   initialUnreadCount,
   stageName: _stageName,
@@ -16,6 +18,7 @@ export function CreatorLayoutClient({
   tier: _tier,
   children,
 }: {
+  navEntries: CreatorNavEntry[];
   pendingVerifications: number;
   userId: string;
   initialUnreadCount: number;
@@ -62,13 +65,10 @@ export function CreatorLayoutClient({
         </div>
       </header>
 
-      <CreatorMobileNav
-        activePath={pathname}
-        pendingVerifications={pendingVerifications}
-      />
+      <CreatorMobileNav activePath={pathname} navEntries={navEntries} />
 
       <div className="creator-workspace__frame">
-        <CreatorSidebar />
+        <CreatorSidebar navEntries={navEntries} />
         <div className="min-w-0 flex-1 creator-workspace__main">{children}</div>
       </div>
     </div>

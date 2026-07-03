@@ -26,6 +26,7 @@ import {
   type UpdateCoverGalleryInput,
   type UpdateLabelInput,
 } from "./schemas";
+import { resolveCreatorAssetUploadError } from "../shared/uploadSchemaErrors";
 
 export class CreatorService {
   private readonly repository: CreatorRepository;
@@ -235,7 +236,11 @@ export class CreatorService {
     expiresIn: number;
   }> {
     const parsed = creatorAssetUploadSchema.safeParse(input);
-    if (!parsed.success) throw new CreatorError("asset_type_invalid");
+    if (!parsed.success) {
+      const detail = JSON.stringify(parsed.error.flatten());
+      console.error("[CreatorService.requestAssetUploadUrl] schema fail:", detail);
+      throw new CreatorError(resolveCreatorAssetUploadError(parsed.error), detail);
+    }
 
     await this.requireUserId();
 
@@ -272,9 +277,9 @@ export class CreatorService {
   async removeProfilePhoto(creatorId: string): Promise<ArtistProfile> {
     const userId = await this.requireUserId();
     await this.repository.ensureCreator();
-    return this.repository.updateArtistProfileMedia(creatorId, userId, {
+    return this.repository.updateCropData(creatorId, userId, {
       profile_photo: null,
-      cover_path: null,
+      avatar_original_path: null,
     });
   }
 
@@ -303,13 +308,24 @@ export class CreatorService {
   }): Promise<ArtistProfile> {
     const userId = await this.requireUserId();
     await this.repository.ensureCreator();
-    return this.repository.updateCropData(input.creatorId, userId, {
+    const updated = await this.repository.updateCropData(input.creatorId, userId, {
       profile_photo: input.croppedPath,
       avatar_original_path: input.originalPath,
       avatar_crop_x: input.cropX,
       avatar_crop_y: input.cropY,
       avatar_crop_zoom: input.cropZoom,
     });
+
+    // A1: edge fn assetKind:"gallery" adds both paths to cover_images[] — remove them
+    const avatarPaths = new Set([input.originalPath, input.croppedPath]);
+    const cleanImages = updated.cover_images.filter(p => !avatarPaths.has(p));
+    if (cleanImages.length !== updated.cover_images.length) {
+      return this.repository.updateCropData(input.creatorId, userId, {
+        cover_images: cleanImages,
+        banner_path: cleanImages[0] ?? null,
+      });
+    }
+    return updated;
   }
 
   async saveCoverPrimaryCrop(input: {
@@ -324,7 +340,11 @@ export class CreatorService {
     await this.repository.ensureCreator();
     const profile = await this.repository.getArtistProfile(input.creatorId);
     const coverImages = profile?.cover_images ?? [];
-    const updatedImages = [input.croppedPath, ...coverImages.slice(1)];
+    // A3: filter duplicates (cropped + original both added by edge fn assetKind:"gallery")
+    const filtered = coverImages.filter(
+      p => p !== input.croppedPath && p !== input.originalPath,
+    );
+    const updatedImages = [input.croppedPath, ...filtered.slice(0, 9)];
     return this.repository.updateCropData(input.creatorId, userId, {
       cover_images: updatedImages,
       banner_path: input.croppedPath,

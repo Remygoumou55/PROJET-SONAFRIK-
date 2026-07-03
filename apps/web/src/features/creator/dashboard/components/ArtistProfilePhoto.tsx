@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { IMAGE_ACCEPT, IMAGE_POLICY, type ImageMime } from "@sonafrik/shared";
+import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
 import {
   compressImageFile,
   IMAGE_UPLOAD,
@@ -136,9 +136,8 @@ export function ArtistProfilePhoto({
 
       // Upload original (only when a new file was selected)
       if (pendingOriginalFile) {
-        const origContentType: AllowedImageMime = isAllowedImageMime(pendingOriginalFile.type)
-          ? (pendingOriginalFile.type as AllowedImageMime)
-          : "image/jpeg";
+        const origContentType: AllowedImageMime =
+          resolveImageUploadMime(pendingOriginalFile) ?? "image/jpeg";
         const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
           await creatorService.requestAssetUploadUrl({
             creatorId,
@@ -157,11 +156,11 @@ export function ArtistProfilePhoto({
         finalOriginalPath = origPath;
       }
 
-      // Upload cropped avatar
+      // Upload cropped avatar (gallery = pas de pollution cover_path via edge fn)
       const { signedUrl: cropSignedUrl, token: cropToken, path: croppedPath } =
         await creatorService.requestAssetUploadUrl({
           creatorId,
-          assetKind: "cover",
+          assetKind: "gallery",
           contentType: "image/jpeg",
         });
       const cropRes = await fetch(cropSignedUrl, {
@@ -227,7 +226,7 @@ export function ArtistProfilePhoto({
             <CreatorAssetImage
               creatorId={creatorId}
               path={localPhotoPath}
-              assetKind="cover"
+              assetKind="gallery"
               alt={stageName}
               layout="bounded"
               priority
