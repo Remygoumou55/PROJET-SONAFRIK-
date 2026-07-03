@@ -2,17 +2,16 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
+  AUDIO_ACCEPT,
+  MAX_UPLOAD_BYTES,
   mimeToUploadFormat,
+  resolveAudioUploadMime,
   sha256Hex,
   validateAudioAsset,
-  MAX_UPLOAD_BYTES,
 } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 
 type AudioFormat = "mp3" | "aac";
-
-const ACCEPTED_EXTENSIONS = ".mp3,.m4a";
-const MAX_SIZE_MB = 50;
 
 // ─── Public handle ────────────────────────────────────────────────────────────
 
@@ -62,22 +61,6 @@ function resolveFormatFromFile(file: File): AudioFormat | null {
   return null;
 }
 
-// Non-standard MIME aliases → canonical types accepted by the Storage bucket
-const MIME_CANONICAL: Record<string, string> = {
-  "audio/mp3": "audio/mpeg",
-  "audio/m4a": "audio/mp4",
-  "audio/x-m4a": "audio/mp4",
-};
-
-function resolveEffectiveMime(file: File): string {
-  const normalized = MIME_CANONICAL[file.type] ?? file.type;
-  if (normalized && mimeToUploadFormat(normalized)) return normalized;
-  const ext = file.name.split(".").pop()?.toLowerCase();
-  if (ext === "mp3") return "audio/mpeg";
-  if (ext === "m4a") return "audio/mp4";
-  return normalized || "audio/mpeg";
-}
-
 // Uses HTML5 audio metadata — never decodes the audio signal (no RAM expansion)
 function getAudioDuration(url: string): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -123,10 +106,10 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
     if (!format) return "Format non supporté. Choisissez un fichier MP3 ou M4A.";
     if (file.size === 0) return "Fichier vide.";
     if (file.size > MAX_UPLOAD_BYTES) {
-      return `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum : ${MAX_SIZE_MB} MB.`;
+      return `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo.`;
     }
     const header = new Uint8Array(await file.slice(0, 512).arrayBuffer());
-    const effectiveMime = resolveEffectiveMime(file);
+    const effectiveMime = resolveAudioUploadMime(file) ?? "audio/mpeg";
     const precheck = validateAudioAsset({ header, mime: effectiveMime, fileSizeBytes: file.size, dbFormat: format === "mp3" ? "mp3" : "aac" });
     if (precheck.status === "invalid" || precheck.status === "needs_review") return precheck.message;
     return null;
@@ -183,7 +166,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
   const doUpload = useCallback(async (file: File, durationSeconds: number, format: AudioFormat): Promise<void> => {
     setState({ status: "uploading", file, durationSeconds, format, progress: 0 });
     try {
-      const effectiveMime = resolveEffectiveMime(file);
+      const effectiveMime = resolveAudioUploadMime(file) ?? "audio/mpeg";
       console.debug("[AudioUploader] upload →", { creatorId, trackId, format, contentType: effectiveMime, fileSizeBytes: file.size });
       const { signedUrl, path } = await catalog.requestAssetUploadUrl({ creatorId, assetType: "audio", contentType: effectiveMime, trackId, format });
 
@@ -393,7 +376,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
           <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <p className="audio-up__drop-label">Glissez un fichier ou cliquez</p>
-        <p className="audio-up__drop-hint">MP3 · M4A — max {MAX_SIZE_MB} MB</p>
+        <p className="audio-up__drop-hint">MP3 · M4A — max {Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo</p>
       </div>
 
       {state.status === "error" && (
@@ -403,7 +386,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPTED_EXTENSIONS}
+        accept={AUDIO_ACCEPT}
         className="sr-only"
         aria-hidden="true"
         tabIndex={-1}

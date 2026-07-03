@@ -2,17 +2,19 @@
  * Validation intégrité assets audio — source unique (web, api, scripts, edge mirror).
  */
 
+import { AUDIO_MIME_CANONICAL, AUDIO_MIME_TO_DB_FORMAT } from "../upload/upload-policy";
+
 export const WEB_PLAYBACK_FORMATS = ["mp3", "m4a", "aac"] as const;
 export type WebPlaybackFormat = (typeof WEB_PLAYBACK_FORMATS)[number];
 
-export const UPLOAD_AUDIO_MIME: Record<string, WebPlaybackFormat> = {
-  "audio/mpeg": "mp3",
-  "audio/mp3": "mp3",
-  "audio/mp4": "aac",
-  "audio/m4a": "aac",
-  "audio/x-m4a": "aac",
-};
+// Derived from AUDIO_MIME_TO_DB_FORMAT — WAV excluded (not browser-native without transcoding)
+export const UPLOAD_AUDIO_MIME: Record<string, WebPlaybackFormat> = Object.fromEntries(
+  Object.entries(AUDIO_MIME_TO_DB_FORMAT)
+    .filter(([, fmt]) => (WEB_PLAYBACK_FORMATS as readonly string[]).includes(fmt))
+    .map(([mime, fmt]) => [mime, fmt as WebPlaybackFormat]),
+);
 
+// Constraint: API schema catalogAssetConfirmSchema.fileSizeBytes.max(50MB) — do not raise without also updating the Zod schema
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 export const MIN_BLOB_BYTES = 64;
 export const HEADER_PROBE_BYTES = 512;
@@ -29,7 +31,8 @@ export interface AudioIntegrityResult {
 }
 
 export function mimeToUploadFormat(mime: string): WebPlaybackFormat | null {
-  return UPLOAD_AUDIO_MIME[mime] ?? null;
+  const canonical = AUDIO_MIME_CANONICAL[mime] ?? mime;
+  return UPLOAD_AUDIO_MIME[canonical] ?? UPLOAD_AUDIO_MIME[mime] ?? null;
 }
 
 export function isWebPlaybackFormat(format: string): format is WebPlaybackFormat {

@@ -3,14 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { Modal } from "@sonafrik/ui";
+import { IMAGE_ACCEPT, IMAGE_POLICY, type ImageMime } from "@sonafrik/shared";
 import {
   compressImageFile,
   createImagePreviewUrl,
   IMAGE_UPLOAD,
   isAllowedImageMime,
   revokeImagePreviewUrl,
-  type AllowedImageMime,
 } from "@/lib/image/compress-image";
+
+type AllowedImageMime = ImageMime;
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import { useRouter } from "next/navigation";
@@ -43,9 +45,9 @@ export interface ArtistCoverManagerProps {
 
 /* ─── Constants ─────────────────────────────────────────────────────────────── */
 
-const MAX_MB    = IMAGE_UPLOAD.MAX_BYTES / 1024 / 1024;
+const MAX_MB    = IMAGE_POLICY.maxBytes / 1024 / 1024;
 const MAX_ITEMS = IMAGE_UPLOAD.MAX_GALLERY_ITEMS;
-const ACCEPTED  = IMAGE_UPLOAD.ALLOWED_TYPES.join(",");
+const ACCEPTED  = IMAGE_ACCEPT;
 
 const TIPS = [
   "Utilisez des images nettes et haute résolution.",
@@ -128,7 +130,7 @@ export function ArtistCoverManager({
         errs.push(`${file.name} : format non supporté (JPG, PNG, WebP).`);
         continue;
       }
-      if (file.size > IMAGE_UPLOAD.MAX_BYTES) {
+      if (file.size > IMAGE_POLICY.maxBytes) {
         errs.push(`${file.name} : trop lourd (max ${MAX_MB} Mo).`);
         continue;
       }

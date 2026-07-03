@@ -41,6 +41,7 @@ export function maskGuineanPhone(phone: string): string {
 export * from "./payment/revenueDestinations";
 export { FIELD_LIMITS } from "./fieldLimits";
 export * from "./audio/audio-integrity";
+export * from "./upload/upload-policy";
 
 // ─── Limites de longueur des champs ────────────────────────────
 // Réexport depuis fieldLimits.ts (import direct : @sonafrik/shared/field-limits)

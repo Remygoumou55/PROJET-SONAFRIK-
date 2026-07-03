@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { IMAGE_ACCEPT, IMAGE_POLICY, type ImageMime } from "@sonafrik/shared";
 import {
   compressImageFile,
   IMAGE_UPLOAD,
   isAllowedImageMime,
-  type AllowedImageMime,
 } from "@/lib/image/compress-image";
+
+type AllowedImageMime = ImageMime;
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
@@ -99,8 +101,8 @@ export function ArtistProfilePhoto({
       setError("Format non autorisé. Utilisez JPG, PNG ou WebP.");
       return;
     }
-    if (file.size > IMAGE_UPLOAD.MAX_BYTES) {
-      setError("Image trop lourde. Maximum 5 Mo.");
+    if (file.size > IMAGE_POLICY.maxBytes) {
+      setError(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
       return;
     }
 
@@ -278,7 +280,7 @@ export function ArtistProfilePhoto({
       <input
         ref={fileInputRef}
         type="file"
-        accept={IMAGE_UPLOAD.ALLOWED_TYPES.join(",")}
+        accept={IMAGE_ACCEPT}
         className="sr-only"
         aria-hidden="true"
         tabIndex={-1}

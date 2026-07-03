@@ -1,16 +1,19 @@
-/** Limites pour le téléversement d'images (client web). */
+import { IMAGE_POLICY, isImage } from "@sonafrik/shared";
+import type { ImageMime } from "@sonafrik/shared";
+
+// Dimension and gallery constants — NOT in upload-policy (application-specific layout)
 export const IMAGE_UPLOAD = {
-  MAX_BYTES: 5 * 1024 * 1024,
   MAX_GALLERY_ITEMS: 12,
   PROFILE_MAX_PX: 800,
   COVER_MAX_PX: 1920,
-  ALLOWED_TYPES: ["image/jpeg", "image/png", "image/webp"] as const,
 } as const;
 
-export type AllowedImageMime = (typeof IMAGE_UPLOAD.ALLOWED_TYPES)[number];
+/** @deprecated — use ImageMime from @sonafrik/shared */
+export type AllowedImageMime = ImageMime;
 
+/** @deprecated — use isImage from @sonafrik/shared */
 export function isAllowedImageMime(type: string): type is AllowedImageMime {
-  return (IMAGE_UPLOAD.ALLOWED_TYPES as readonly string[]).includes(type);
+  return isImage(type);
 }
 
 function loadImageFromFile(file: File): Promise<HTMLImageElement> {
@@ -59,7 +62,7 @@ export async function compressImageFile(
     maxWidth = IMAGE_UPLOAD.COVER_MAX_PX,
     maxHeight = IMAGE_UPLOAD.COVER_MAX_PX,
     quality = 0.85,
-    maxBytes = IMAGE_UPLOAD.MAX_BYTES,
+    maxBytes = IMAGE_POLICY.maxBytes,
     crop,
   } = options;
 

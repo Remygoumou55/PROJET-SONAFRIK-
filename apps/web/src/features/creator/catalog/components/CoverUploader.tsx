@@ -1,13 +1,10 @@
 "use client";
 
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { IMAGE_ACCEPT, IMAGE_POLICY, isImage } from "@sonafrik/shared";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CropEditorModal } from "../../dashboard/components/CropEditorModal";
 import type { CropResult } from "../../dashboard/components/CropEditorModal";
-
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE_BYTES = 5 * 1024 * 1024;
-const MAX_SIZE_LABEL = "5 Mo";
 
 // ─── Public handle ────────────────────────────────────────────────────────────
 
@@ -71,10 +68,10 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
 
   const validate = useCallback((file: File): string | null => {
     const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!ACCEPTED_TYPES.includes(file.type) && !extOk) {
+    if (!isImage(file.type) && !extOk) {
       return `Format non supporté (${file.type || (file.name.split(".").pop() ?? "?")}) — utilisez JPEG, PNG ou WebP.`;
     }
-    if (file.size > MAX_SIZE_BYTES) return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${MAX_SIZE_LABEL}.`;
+    if (file.size > IMAGE_POLICY.maxBytes) return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${IMAGE_POLICY.maxLabel}.`;
     return null;
   }, []);
 
@@ -305,7 +302,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <p className="cover-up__drop-label">Glissez une image ou cliquez</p>
-          <p className="cover-up__drop-hint">JPG · PNG · WebP — max {MAX_SIZE_LABEL}</p>
+          <p className="cover-up__drop-hint">JPG · PNG · WebP — max {IMAGE_POLICY.maxLabel}</p>
         </div>
 
         {state.status === "error" && (
@@ -315,7 +312,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPTED_TYPES.join(",")}
+          accept={IMAGE_ACCEPT}
           className="sr-only"
           aria-hidden="true"
           tabIndex={-1}

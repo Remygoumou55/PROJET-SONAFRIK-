@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafrik/ui";
 import type { ArtistProfile, Creator } from "@sonafrik/types";
 import { GENRE_OPTIONS } from "@sonafrik/types";
-import { FIELD_LIMITS } from "@sonafrik/shared";
+import { FIELD_LIMITS, IMAGE_ACCEPT, IMAGE_POLICY, isImage, resolveImageUploadMime } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function ArtistIdentityForm({
@@ -32,18 +32,14 @@ export function ArtistIdentityForm({
   }
 
   async function uploadBanner(file: File) {
-    const ALLOWED = ["image/jpeg", "image/png", "image/webp"] as const;
-    type BannerMime = (typeof ALLOWED)[number];
     const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!ALLOWED.includes(file.type as BannerMime) && !extOk) {
+    if (!isImage(file.type) && !extOk) {
       throw new Error("Format non autorisé. Utilisez JPEG, PNG ou WebP.");
     }
-    if (file.size > 5 * 1024 * 1024) {
-      throw new Error("Image trop lourde. Maximum 5 Mo.");
+    if (file.size > IMAGE_POLICY.maxBytes) {
+      throw new Error(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
     }
-    const contentType: BannerMime = ALLOWED.includes(file.type as BannerMime)
-      ? (file.type as BannerMime)
-      : "image/jpeg";
+    const contentType = resolveImageUploadMime(file) ?? "image/jpeg";
     const { signedUrl, token } = await creatorService.requestAssetUploadUrl({
       creatorId: creator.id,
       assetKind: "banner",
@@ -87,7 +83,7 @@ export function ArtistIdentityForm({
           <input
             ref={bannerRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={IMAGE_ACCEPT}
             className="hidden"
             onChange={async (event) => {
               const file = event.target.files?.[0];

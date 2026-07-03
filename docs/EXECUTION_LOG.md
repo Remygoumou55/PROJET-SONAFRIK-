@@ -11,6 +11,43 @@
 
 ---
 
+## 2026-07-03 — PHASE 2 MIGRATION: Upload Policy Enterprise → composants (Step 0→7)
+
+### Mission
+Migration de tous les composants existants vers Upload Policy Enterprise v1.1.0 (SSOT).
+
+### Fichiers touchés
+
+| Fichier | Changement |
+|---|---|
+| `packages/shared/src/index.ts` | `export * from "./upload/upload-policy"` — barrel activé |
+| `packages/shared/src/audio/audio-integrity.ts` | `UPLOAD_AUDIO_MIME` dérivé de `AUDIO_MIME_TO_DB_FORMAT` (filtré WebPlaybackFormat) · `mimeToUploadFormat()` utilise `AUDIO_MIME_CANONICAL` pour normalisation |
+| `apps/web/src/lib/image/compress-image.ts` | `IMAGE_UPLOAD.MAX_BYTES` → `IMAGE_POLICY.maxBytes` · `ALLOWED_TYPES` supprimé · `AllowedImageMime` = alias `ImageMime` · `isAllowedImageMime()` = wrapper `isImage()` |
+| `apps/web/src/features/creator/dashboard/components/ArtistCoverManager.tsx` | `IMAGE_UPLOAD.MAX_BYTES` → `IMAGE_POLICY.maxBytes` · `ALLOWED_TYPES.join()` → `IMAGE_ACCEPT` · `AllowedImageMime` → `ImageMime` |
+| `apps/web/src/features/creator/dashboard/components/ArtistCoverSlider.tsx` | Idem · message erreur dynamique via `IMAGE_POLICY.maxLabel` |
+| `apps/web/src/features/creator/dashboard/components/ArtistProfilePhoto.tsx` | Idem |
+| `apps/web/src/features/identity/components/AvatarUpload.tsx` | Remplace `AVATAR_*` locaux par `IMAGE_POLICY`, `isImage`, `IMAGE_ACCEPT`, `ImageMime` |
+| `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` | Remplace `ACCEPTED_TYPES`, `MAX_SIZE_*` par `IMAGE_POLICY`, `isImage`, `IMAGE_ACCEPT` |
+| `apps/web/src/features/creator/catalog/components/AudioUploader.tsx` | Supprime `MIME_CANONICAL`, `resolveEffectiveMime()` → `resolveAudioUploadMime()` · `ACCEPTED_EXTENSIONS` → `AUDIO_ACCEPT` · `MAX_SIZE_MB` supprimé |
+| `apps/web/src/features/creator/components/ArtistIdentityForm.tsx` | Supprime `ALLOWED`, `BannerMime`, `5MB` inline → `IMAGE_POLICY`, `isImage`, `resolveImageUploadMime`, `IMAGE_ACCEPT` |
+| `apps/web/src/features/creator/components/VerificationPanel.tsx` | Supprime `VerificationMime`, `VERIFICATION_ALLOWED_MIMES`, `resolveVerificationContentType()` → `resolveVerificationDocMime()`, `VERIFICATION_ACCEPT` |
+
+### Contraintes documentées (non-régressions intentionnelles)
+- `MAX_UPLOAD_BYTES = 50MB` conservé (contrainte `catalogAssetConfirmSchema.fileSizeBytes.max(50MB)`) — schémas Zod gelés
+- `AudioFormat = "mp3" | "aac"` conservé (Zod schema) — `audio/mp4` → "m4a" via AUDIO_MIME_TO_DB_FORMAT mais `resolveFormatFromFile()` mappe tout non-mp3 à "aac"
+- WAV dans `AUDIO_ACCEPT` (`.mp3,.m4a,.wav`) mais rejeté à la validation client (mimeToUploadFormat retourne null pour wav) — cohérent avec Zod schema
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15
+- `pnpm lint` : ✅ 15/15
+- `pnpm build` : ✅ 9/9
+
+### Dette technique
+- Schémas Zod (`catalogAssetConfirmSchema.format`, `fileSizeBytes.max`) à migrer vers `AUDIO_POLICY.maxBytes` en Phase 3 (nécessite coordination côté API + edge functions)
+- WAV support complet : Phase 3 (Zod + edge function + player)
+
+---
+
 ## 2026-07-03 — ROOT CAUSE ANALYSIS: BUG-011 VerificationPanel contentType brut (BUG-011)
 
 ### Problème
