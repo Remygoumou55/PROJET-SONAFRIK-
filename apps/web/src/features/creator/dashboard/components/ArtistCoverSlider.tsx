@@ -7,15 +7,15 @@ import type { CropResult } from "./CropEditorModal";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 import { useCreatorService } from "../../hooks/useCreator";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
-import { IMAGE_ACCEPT, IMAGE_POLICY, type ImageMime } from "@sonafrik/shared";
+import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
 import {
   compressImageFile,
   IMAGE_UPLOAD,
   isAllowedImageMime,
 } from "@/lib/image/compress-image";
+import { useRouter } from "next/navigation";
 
 type AllowedImageMime = ImageMime;
-import { useRouter } from "next/navigation";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -124,9 +124,8 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
 
       // Upload original (only for new files)
       if (pendingOriginalFile) {
-        const origContentType: AllowedImageMime = isAllowedImageMime(pendingOriginalFile.type)
-          ? (pendingOriginalFile.type as AllowedImageMime)
-          : "image/jpeg";
+        const origContentType: AllowedImageMime =
+          resolveImageUploadMime(pendingOriginalFile) ?? "image/jpeg";
         const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
           await creatorService.requestAssetUploadUrl({
             creatorId,

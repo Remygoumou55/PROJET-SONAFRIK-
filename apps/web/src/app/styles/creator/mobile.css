@@ -261,15 +261,6 @@
     white-space: normal;
   }
 
-  .artist-hero--vitrine .artist-hero__body--vitrine {
-    flex-wrap: wrap;
-    gap: 0.625rem;
-  }
-
-  .artist-hero--vitrine .artist-hero__badges--vitrine {
-    gap: 0.25rem;
-  }
-
   .artist-hero__cover-edit {
     font-size: 0.625rem;
     padding: 0.28rem 0.5rem;
@@ -335,11 +326,4 @@
     grid-template-columns: 1fr;
   }
 
-  .artist-hero--vitrine .artist-hero__name--vitrine {
-    font-size: 0.9375rem;
-  }
-
-  .artist-hero--vitrine .artist-hero__badge {
-    font-size: 0.5625rem;
-  }
 }
