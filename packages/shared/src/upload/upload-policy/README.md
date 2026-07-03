@@ -1,8 +1,8 @@
 # SONAFRIK — Upload Policy Enterprise
 
-> **Version :** 1.0 — Phase 1 Foundation  
+> **Version :** 1.1.0 — Phase 1.1 Foundation Hardening  
 > **Module :** `packages/shared/src/upload/upload-policy/`  
-> **Statut :** Fondation créée · Migration Phase 2 en attente
+> **Statut :** Fondation durcie · Migration Phase 2 en attente
 
 ---
 
@@ -13,14 +13,21 @@ packages/shared/src/upload/
 ├── index.ts                        ← barrel namespace upload
 └── upload-policy/
     ├── index.ts                    ← barrel public du module
-    ├── enums.ts                    ← UploadCategory, AudioFormat, ImageFormat, AssetKind, UploadErrorCode
-    ├── types.ts                    ← AudioMime, ImageMime, UploadPolicy, UploadValidationResult
-    ├── constants.ts                ← AUDIO_POLICY, IMAGE_POLICY, DOCUMENT_POLICY, UPLOAD_POLICIES
-    ├── messages.ts                 ← UPLOAD_MESSAGES, UPLOAD_ERROR_MESSAGES, UPLOAD_STATUS_MESSAGES
-    ├── helpers.ts                  ← isAudio(), isImage(), validateUploadFile(), resolveUploadMime()…
+    ├── version.ts          [1.1]   ← UPLOAD_POLICY_VERSION
+    ├── enums.ts                    ← UploadCategory, AssetKind, UploadErrorCode…
+    ├── types.ts                    ← AudioMime, UploadPolicy, UploadValidationResult (enrichi)
+    ├── constants.ts                ← AUDIO_POLICY, IMAGE_POLICY, ERROR_CODE_CATEGORY
+    ├── limits.ts           [1.1]   ← UPLOAD_LIMITS, MAX_AUDIO_SIZE, MAX_IMAGE_SIZE…
+    ├── accept.ts           [1.1]   ← UPLOAD_ACCEPT, AUDIO_ACCEPT, IMAGE_ACCEPT…
+    ├── messages.ts                 ← UPLOAD_MESSAGES, UPLOAD_ERROR_MESSAGES
+    ├── helpers.ts                  ← isAudio(), validateUploadFile(), resolveUploadMime()…
+    ├── events.ts           [1.1]   ← UploadEvent, UploadStartedEvent, UploadFailedEvent…
+    ├── telemetry.ts        [1.1]   ← UploadTelemetryData, UploadTelemetryPayload
     ├── README.md                   ← cette documentation
     └── MIGRATION_PLAN.md           ← plan de migration Phase 2
 ```
+
+`[1.1]` = ajouté en Phase 1.1 Foundation Hardening
 
 ---
 
@@ -74,8 +81,15 @@ const result = validateUploadFile(
 );
 
 if (!result.valid) {
-  console.error(result.message); // ex: "Format non autorisé (audio/ogg) pour l'audio."
+  console.error(result.message);
+  console.error(result.errorCategory); // "FORMAT", "SIZE", etc.
 }
+
+// Phase 1.1 — champs enrichis
+console.log(result.status);             // "valid" | "invalid" | …
+console.log(result.normalizedMime);     // MIME résolu après normalisation
+console.log(result.normalizedExtension); // extension détectée
+console.log(result.policyVersion);      // "1.1.0"
 ```
 
 ### Obtenir la politique d'une catégorie
@@ -88,6 +102,75 @@ console.log(IMAGE_POLICY.accept);    // "image/jpeg,image/png,image/webp"
 console.log(DOCUMENT_POLICY.maxLabel); // "20 Mo"
 ```
 
+### Accéder aux limites de taille (Phase 1.1)
+
+```typescript
+import { UPLOAD_LIMITS, MAX_AUDIO_SIZE } from "@sonafrik/shared";
+
+UPLOAD_LIMITS.audio.maxBytes  // 104857600
+UPLOAD_LIMITS.image.maxMB     // 10
+MAX_AUDIO_SIZE                // 104857600
+```
+
+### Attributs HTML accept (Phase 1.1)
+
+```typescript
+import { UPLOAD_ACCEPT, AUDIO_ACCEPT, VERIFICATION_ACCEPT } from "@sonafrik/shared";
+
+// Directement dans le JSX
+<input accept={AUDIO_ACCEPT} />
+<input accept={VERIFICATION_ACCEPT} />  // images + PDF
+
+// Ou via le registre
+<input accept={UPLOAD_ACCEPT.audio} />
+<input accept={UPLOAD_ACCEPT.verification} />
+```
+
+### Classer les erreurs par catégorie (Phase 1.1)
+
+```typescript
+import { ERROR_CODE_CATEGORY, UploadErrorCode, UploadErrorCategory } from "@sonafrik/shared";
+
+ERROR_CODE_CATEGORY[UploadErrorCode.FORMAT_NOT_ALLOWED] // UploadErrorCategory.FORMAT
+ERROR_CODE_CATEGORY[UploadErrorCode.SIZE_EXCEEDED]      // UploadErrorCategory.SIZE
+ERROR_CODE_CATEGORY[UploadErrorCode.INTEGRITY_FAILED]   // UploadErrorCategory.STORAGE
+```
+
+### Typer les événements d'upload (Phase 1.1)
+
+```typescript
+import type { UploadEvent, UploadFailedEvent } from "@sonafrik/shared";
+import { UploadEventType } from "@sonafrik/shared";
+
+function handleEvent(event: UploadEvent) {
+  switch (event.type) {
+    case UploadEventType.FAILED:
+      console.error(event.errorCode, event.errorCategory);
+      break;
+    case UploadEventType.COMPLETED:
+      console.log(`Upload terminé en ${event.duration}ms`);
+      break;
+  }
+}
+```
+
+### Télémétrie (Phase 1.1 — types seulement)
+
+```typescript
+import type { UploadTelemetryData } from "@sonafrik/shared";
+
+const telemetry: UploadTelemetryData = {
+  uploadDuration: 1240,
+  uploadSize: file.size,
+  browserMime: file.type,
+  resolvedMime: result.normalizedMime,
+  policyVersion: result.policyVersion,
+  context: "catalog_audio",
+  outcome: "success",
+};
+// Envoi vers un service de monitoring en Phase 3+
+```
+
 ### Résoudre le MIME effectif d'un fichier
 
 ```typescript
@@ -96,31 +179,6 @@ import { resolveUploadMime } from "@sonafrik/shared";
 // Gère les cas où file.type = "" (drag-drop, Android)
 const mime = resolveUploadMime({ type: "", name: "track.mp3", size: 4200000 });
 // → "audio/mpeg"
-```
-
-### Vérifier le type d'un MIME
-
-```typescript
-import { isAudio, isImage, isDocument } from "@sonafrik/shared";
-
-isAudio("audio/mpeg")      // true
-isAudio("audio/mp3")       // true (alias)
-isImage("image/jpeg")      // true
-isDocument("text/plain")   // false
-```
-
-### Accéder aux messages officiels
-
-```typescript
-import { UPLOAD_MESSAGES, UPLOAD_ERROR_MESSAGES } from "@sonafrik/shared";
-
-// Message statique
-UPLOAD_ERROR_MESSAGES.FILE_EMPTY // "Le fichier est vide."
-UPLOAD_MESSAGES.status.SUCCESS   // "Fichier envoyé avec succès."
-
-// Message parametrique
-UPLOAD_MESSAGES.sizeExceeded("105,3 Mo", "100 Mo")
-// → "Fichier trop lourd (105,3 Mo). Maximum autorisé : 100 Mo."
 ```
 
 ---
@@ -155,12 +213,17 @@ import { IMAGE_POLICY, validateUploadFile, UploadCategory } from "@sonafrik/shar
 const result = validateUploadFile(file, UploadCategory.IMAGE);
 if (!result.valid) setError(result.message);
 
-// ✅ Accept depuis la politique
-<input accept={IMAGE_POLICY.accept} />
+// ✅ Accept depuis les constantes centralisées
+import { IMAGE_ACCEPT } from "@sonafrik/shared";
+<input accept={IMAGE_ACCEPT} />
 
-// ✅ Message depuis la bibliothèque
+// ✅ Messages depuis la bibliothèque
 import { UPLOAD_MESSAGES } from "@sonafrik/shared";
 UPLOAD_MESSAGES.error.FILE_EMPTY
+
+// ✅ Limites depuis UPLOAD_LIMITS
+import { UPLOAD_LIMITS } from "@sonafrik/shared";
+const maxBytes = UPLOAD_LIMITS.audio.maxBytes;
 ```
 
 ---
@@ -195,12 +258,69 @@ La politique côté client ne remplace pas la validation Zod côté service. Les
 sont complémentaires : la politique valide côté UI pour feedback immédiat, Zod valide
 les types au niveau de l'API avant de contacter Supabase.
 
+### 5. Utiliser `UploadValidationStatus` pour les états complexes
+
+```typescript
+import { UploadValidationStatus } from "@sonafrik/shared";
+
+// NEEDS_REVIEW = fichier valide mais nécessite une vérification manuelle
+// NEEDS_TRANSCODING = fichier valide mais nécessite un transcodage serveur
+if (result.status === UploadValidationStatus.NEEDS_TRANSCODING) {
+  showWarning("Ce fichier sera converti au format MP3.");
+}
+```
+
 ---
 
-## Evolution future (Phase 3+)
+## Changelog
 
+### 1.1.0 — 2026-07-03 (Phase 1.1 Foundation Hardening)
+
+**Nouveaux fichiers :**
+- `version.ts` — `UPLOAD_POLICY_VERSION`, constantes de version sémantique
+- `limits.ts` — `UPLOAD_LIMITS`, `MAX_AUDIO_SIZE`, `MAX_IMAGE_SIZE`, `MAX_DOCUMENT_SIZE`
+- `accept.ts` — `UPLOAD_ACCEPT`, `AUDIO_ACCEPT`, `IMAGE_ACCEPT`, `DOCUMENT_ACCEPT`, `VERIFICATION_ACCEPT`
+- `events.ts` — `UploadEvent` union discriminée + interfaces par type d'événement
+- `telemetry.ts` — `UploadTelemetryData`, `UploadNetworkMetrics`, `UploadTelemetryPayload`
+
+**Enums ajoutés dans `enums.ts` :**
+- `UploadErrorCategory` — catégories de haut niveau (FORMAT, SIZE, VALIDATION, NETWORK, STORAGE, SECURITY, UNKNOWN)
+- `UploadContext` — contexte métier d'upload (CATALOG_AUDIO, ARTIST_AVATAR, VERIFICATION_DOCUMENT…)
+- `UploadEventType` — types d'événements (STARTED, PROGRESS, COMPLETED, FAILED, CANCELLED, RETRY)
+- `UploadValidationStatus` — statut enrichi (VALID, INVALID, NEEDS_REVIEW, NEEDS_TRANSCODING)
+
+**Types ajoutés dans `types.ts` :**
+- `UploadWarning` — avertissement non bloquant `{ code, message }`
+- `UploadValidationResult` — champs enrichis optionnels : `status`, `normalizedMime`, `normalizedExtension`, `policyVersion`, `errorCategory`, `warnings`, `metadata`
+
+**Constantes ajoutées dans `constants.ts` :**
+- `ERROR_CODE_CATEGORY` — mapping `UploadErrorCode → UploadErrorCategory`
+
+**Helpers mis à jour dans `helpers.ts` :**
+- `validateUploadFile()` — retourne désormais `status`, `errorCategory`, `policyVersion`, `normalizedMime`, `normalizedExtension`
+
+**Rétrocompatibilité :** tous les champs Phase 1 (`valid`, `errorCode`, `message`) restent inchangés.
+
+### 1.0.0 — 2026-07-02 (Phase 1 Foundation)
+
+- Création du module complet : enums, types, constants, messages, helpers
+- Politiques officielles : AUDIO (100 Mo), IMAGE (10 Mo), DOCUMENT (20 Mo)
+- Normalisation MIME, mapping extension → MIME, validation complète
+
+---
+
+## Roadmap
+
+### Phase 2 — Migration (prochaine)
+- Connecter les 14 composants/services existants à ce module
+- Supprimer toutes les définitions locales de formats/tailles/messages
+- Voir `MIGRATION_PLAN.md` pour le plan détaillé
+
+### Phase 3+ — Extensions futures
 - **Limites par AssetKind** : pochette album ≠ bannière artiste ≠ avatar
 - **Résolution minimale** : images ≥ 500×500px pour pochettes
 - **Durée audio** : limites min/max par type de release
 - **Quotas par artiste** : limite mensuelle de stockage
 - **Formats supplémentaires** : AAC natif, AIFF pour le studio pro
+- **Intégration télémétrie** : connexion Posthog/Sentry avec `UploadTelemetryData`
+- **Event emitter** : connexion `UploadEvent` aux composants React

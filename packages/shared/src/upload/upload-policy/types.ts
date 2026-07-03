@@ -4,7 +4,7 @@
  * Aucun `any`. TypeScript strict.
  */
 
-import type { UploadCategory, UploadErrorCode } from "./enums";
+import type { UploadCategory, UploadErrorCategory, UploadErrorCode, UploadValidationStatus } from "./enums";
 
 // ─── MIME types officiels ─────────────────────────────────────────────────────
 
@@ -53,11 +53,31 @@ export interface UploadPolicy {
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
-/** Résultat d'une validation de fichier contre la politique d'upload */
+/** Avertissement non bloquant associé à un résultat de validation */
+export interface UploadWarning {
+  readonly code: string;
+  readonly message: string;
+}
+
+/**
+ * Résultat d'une validation de fichier contre la politique d'upload.
+ *
+ * Phase 1.1 : champs enrichis ajoutés (tous optionnels — rétrocompatible).
+ * Les champs Phase 1 `valid`, `errorCode`, `message` restent inchangés.
+ */
 export interface UploadValidationResult {
+  // ─── Phase 1 (stable) ────────────────────────────────────────────────────
   readonly valid: boolean;
   readonly errorCode?: UploadErrorCode;
   readonly message?: string;
+  // ─── Phase 1.1 (enrichi, optionnel) ──────────────────────────────────────
+  readonly status?: UploadValidationStatus;
+  readonly normalizedMime?: string;
+  readonly normalizedExtension?: string;
+  readonly policyVersion?: string;
+  readonly errorCategory?: UploadErrorCategory;
+  readonly warnings?: UploadWarning[];
+  readonly metadata?: Record<string, unknown>;
 }
 
 /**

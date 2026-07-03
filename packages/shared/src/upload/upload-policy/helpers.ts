@@ -12,11 +12,12 @@ import {
   AUDIO_MIME_CANONICAL,
   AUDIO_POLICY,
   DOCUMENT_POLICY,
+  ERROR_CODE_CATEGORY,
   IMAGE_EXT_TO_MIME,
   IMAGE_POLICY,
   UPLOAD_POLICIES,
 } from "./constants";
-import { UploadCategory, UploadErrorCode } from "./enums";
+import { UploadCategory, UploadErrorCode, UploadValidationStatus } from "./enums";
 import {
   UPLOAD_ERROR_MESSAGES,
   UPLOAD_FORMAT_HINTS,
@@ -24,6 +25,7 @@ import {
   uploadSizeExceededMessage,
 } from "./messages";
 import type { AllowedMime, UploadFileDescriptor, UploadValidationResult } from "./types";
+import { UPLOAD_POLICY_VERSION } from "./version";
 
 // ─── Formatage ────────────────────────────────────────────────────────────────
 
@@ -130,43 +132,62 @@ export function validateUploadFile(
   file: UploadFileDescriptor,
   category: UploadCategory,
 ): UploadValidationResult {
-  const policy = UPLOAD_POLICIES[category];
+  const policy     = UPLOAD_POLICIES[category];
+  const resolvedExt = resolveExtension(file.name);
 
   if (file.size <= 0) {
+    const errorCode = UploadErrorCode.FILE_EMPTY;
     return {
       valid: false,
-      errorCode: UploadErrorCode.FILE_EMPTY,
+      status: UploadValidationStatus.INVALID,
+      errorCode,
+      errorCategory: ERROR_CODE_CATEGORY[errorCode],
       message: UPLOAD_ERROR_MESSAGES.FILE_EMPTY,
+      policyVersion: UPLOAD_POLICY_VERSION,
     };
   }
 
   if (file.size > policy.maxBytes) {
+    const errorCode = UploadErrorCode.SIZE_EXCEEDED;
     return {
       valid: false,
-      errorCode: UploadErrorCode.SIZE_EXCEEDED,
+      status: UploadValidationStatus.INVALID,
+      errorCode,
+      errorCategory: ERROR_CODE_CATEGORY[errorCode],
       message: uploadSizeExceededMessage(formatFileSize(file.size), policy.maxLabel),
+      policyVersion: UPLOAD_POLICY_VERSION,
     };
   }
 
-  const normalizedMime  = normalizeMime(file.type);
-  const mimeAllowed     = isAllowedMime(file.type, category) || isAllowedMime(normalizedMime, category);
-  const extAllowed      = isAllowedExtension(file.name, category);
+  const resolvedNormalizedMime = normalizeMime(file.type);
+  const mimeAllowed = isAllowedMime(file.type, category) || isAllowedMime(resolvedNormalizedMime, category);
+  const extAllowed  = isAllowedExtension(file.name, category);
 
   if (!mimeAllowed && !extAllowed) {
-    const received = file.type || resolveExtension(file.name) || "?";
+    const received = file.type || resolvedExt || "?";
     const hint =
-      category === UploadCategory.AUDIO    ? UPLOAD_FORMAT_HINTS.AUDIO
-      : category === UploadCategory.IMAGE  ? UPLOAD_FORMAT_HINTS.IMAGE
+      category === UploadCategory.AUDIO   ? UPLOAD_FORMAT_HINTS.AUDIO
+      : category === UploadCategory.IMAGE ? UPLOAD_FORMAT_HINTS.IMAGE
       : UPLOAD_FORMAT_HINTS.DOCUMENT;
-
+    const errorCode = UploadErrorCode.FORMAT_NOT_ALLOWED;
     return {
       valid: false,
-      errorCode: UploadErrorCode.FORMAT_NOT_ALLOWED,
+      status: UploadValidationStatus.INVALID,
+      errorCode,
+      errorCategory: ERROR_CODE_CATEGORY[errorCode],
       message: uploadFormatNotAllowedMessage(received, category, hint),
+      policyVersion: UPLOAD_POLICY_VERSION,
     };
   }
 
-  return { valid: true };
+  const effectiveMime = resolveUploadMime(file);
+  return {
+    valid: true,
+    status: UploadValidationStatus.VALID,
+    normalizedMime: effectiveMime ?? undefined,
+    normalizedExtension: resolvedExt ?? undefined,
+    policyVersion: UPLOAD_POLICY_VERSION,
+  };
 }
 
 // ─── Helpers spécialisés ──────────────────────────────────────────────────────

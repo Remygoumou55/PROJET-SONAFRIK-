@@ -9,7 +9,7 @@
  * - Mapping extension → MIME
  */
 
-import { UploadCategory } from "./enums";
+import { UploadCategory, UploadErrorCategory, UploadErrorCode } from "./enums";
 import type { UploadPolicy } from "./types";
 
 // ─── Politiques officielles ───────────────────────────────────────────────────
@@ -121,4 +121,19 @@ export const ALL_EXT_TO_MIME: Readonly<Record<string, string>> = {
   ...AUDIO_EXT_TO_MIME,
   ...IMAGE_EXT_TO_MIME,
   ...DOCUMENT_EXT_TO_MIME,
+};
+
+// ─── Phase 1.1 ────────────────────────────────────────────────────────────────
+
+/** Mapping UploadErrorCode → UploadErrorCategory (pour les logs et la télémétrie) */
+export const ERROR_CODE_CATEGORY: Readonly<Record<UploadErrorCode, UploadErrorCategory>> = {
+  [UploadErrorCode.FORMAT_NOT_ALLOWED]: UploadErrorCategory.FORMAT,
+  [UploadErrorCode.UNKNOWN_FORMAT]:     UploadErrorCategory.FORMAT,
+  [UploadErrorCode.SIZE_EXCEEDED]:      UploadErrorCategory.SIZE,
+  [UploadErrorCode.MIME_MISMATCH]:      UploadErrorCategory.VALIDATION,
+  [UploadErrorCode.FILE_EMPTY]:         UploadErrorCategory.VALIDATION,
+  [UploadErrorCode.FILE_TOO_SMALL]:     UploadErrorCategory.VALIDATION,
+  [UploadErrorCode.DURATION_INVALID]:   UploadErrorCategory.VALIDATION,
+  [UploadErrorCode.NEEDS_TRANSCODING]:  UploadErrorCategory.VALIDATION,
+  [UploadErrorCode.INTEGRITY_FAILED]:   UploadErrorCategory.STORAGE,
 };

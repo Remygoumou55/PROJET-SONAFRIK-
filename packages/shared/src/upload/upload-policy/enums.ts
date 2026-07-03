@@ -58,3 +58,46 @@ export enum UploadErrorCode {
   NEEDS_TRANSCODING  = "NEEDS_TRANSCODING",
   INTEGRITY_FAILED   = "INTEGRITY_FAILED",
 }
+
+// ─── Phase 1.1 ────────────────────────────────────────────────────────────────
+
+/** Catégories de haut niveau pour classifier les erreurs d'upload */
+export enum UploadErrorCategory {
+  FORMAT     = "FORMAT",
+  SIZE       = "SIZE",
+  VALIDATION = "VALIDATION",
+  NETWORK    = "NETWORK",
+  STORAGE    = "STORAGE",
+  SECURITY   = "SECURITY",
+  UNKNOWN    = "UNKNOWN",
+}
+
+/** Contexte métier dans lequel l'upload est initié */
+export enum UploadContext {
+  CATALOG_AUDIO         = "catalog_audio",
+  CATALOG_COVER         = "catalog_cover",
+  ARTIST_AVATAR         = "artist_avatar",
+  ARTIST_COVER          = "artist_cover",
+  ARTIST_GALLERY        = "artist_gallery",
+  ARTIST_BANNER         = "artist_banner",
+  VERIFICATION_DOCUMENT = "verification_document",
+  LABEL_LOGO            = "label_logo",
+}
+
+/** Types d'événements du cycle de vie d'un upload */
+export enum UploadEventType {
+  STARTED   = "upload:started",
+  PROGRESS  = "upload:progress",
+  COMPLETED = "upload:completed",
+  FAILED    = "upload:failed",
+  CANCELLED = "upload:cancelled",
+  RETRY     = "upload:retry",
+}
+
+/** Statut de validation enrichi retourné par validateUploadFile */
+export enum UploadValidationStatus {
+  VALID             = "valid",
+  INVALID           = "invalid",
+  NEEDS_REVIEW      = "needs_review",
+  NEEDS_TRANSCODING = "needs_transcoding",
+}
