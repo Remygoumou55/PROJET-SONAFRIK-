@@ -11,6 +11,37 @@
 
 ---
 
+## 2026-07-03 — MISSION D : ARTIST WORKSPACE EXPERIENCE — AUDIT 1 + REMEDIATION 1
+
+### AUDIT 1 — Forensic complet ✅
+
+**Périmètre :** Dashboard, Hero, Avatar (display), Cover (display), KPIs, Cards, Navigation, Sidebar, Loading, CSS complet creator — 39 fichiers audités.
+
+**Anomalies identifiées :**
+
+| ID | Sévérité | Fichier | Description |
+|---|---|---|---|
+| C-001 | CRITIQUE | `page.tsx:56-63` | `CreatorDashboardBoundary` avale les redirections Next.js → crash `/creator` |
+| M-001 | MAJEURE | `ActivityFeed.tsx` | Composant orphelin, jamais rendu |
+| M-002 | MAJEURE | `DashboardQuickCards.tsx` | Composant orphelin, jamais rendu |
+| M-003 | MAJEURE | `SparklineChart.tsx` | Composant orphelin, jamais rendu |
+| M-004 | MAJEURE | `hero.css:1-675` | ~675 lignes CSS mortes (ancien système `.artist-hero`) |
+| M-005 | MAJEURE | `vitrine.css` | 225 lignes CSS mortes (`.artist-hero--vitrine` jamais utilisé) |
+| N-001 | MINEURE | `cover-studio.css:44` | Hex `#f87171` hardcodé |
+| N-002 | MINEURE | `ArtistCoverSlider.tsx:17` | Type alias entre deux blocs d'imports |
+| N-003 | MINEURE | `panels.css` | CSS orphelin des composants morts |
+| N-004 | MINEURE | Dual `fmtGnf` | Formateur dupliqué dans ArtistHero + CreatorDashboardView |
+
+**Livrables :** `docs/FORENSIC_AUDIT_REPORT.md` ✅ · `docs/ARTIST_WORKSPACE_MASTER_REMEDIATION_PLAN.md` ✅
+
+### REMEDIATION 1 — Correction CRITIQUE ✅
+
+**Fichier :** `apps/web/src/app/(creator)/creator/page.tsx` lignes 56–63
+**Fix :** Re-throw si `digest.startsWith("NEXT_REDIRECT")` — redirections Next.js propagent correctement
+**Validation :** build 9/9 ✅ · lint 15/15 ✅ · typecheck 15/15 ✅
+
+---
+
 ## 2026-07-03 — MISSION C : ARTIST PROFILE AUDIT + REMEDIATION PLAN
 
 ### Phase 1 — Audit complet ✅ (lecture seule)
@@ -35,9 +66,16 @@ Domaine audité : Profil Artiste & Identité (Hero, Avatar, Cover, CropEditor, A
 - Stratégie LOT 1 (A1+A2+A3+A4) : corrections dans `creator.service.ts` + `ArtistProfilePhoto.tsx` (assetKind "cover" → "gallery") SANS modifier l'Edge Function
 - Stratégie LOT 2 (A5+A6+A7) : qualité code + accessibilité
 
-### Phase 3 — EN ATTENTE VALIDATION LOT 1
+### Phase 3 — LOT 1 EXÉCUTÉ ✅ (commit 5f91e66)
 
-Aucun code modifié dans cette mission. Arrêt conforme aux instructions.
+**Fichiers modifiés :**
+- `packages/api/src/creator/creator.service.ts` — saveAvatarCrop (A1+A2 cleanup), removeProfilePhoto (A2+A4), saveCoverPrimaryCrop (A3)
+- `apps/web/src/features/creator/dashboard/components/ArtistProfilePhoto.tsx` — assetKind "cover"→"gallery" (A2)
+- `apps/web/src/features/creator/components/CreatorLayoutClient.tsx` — pendingVerifications→_pendingVerifications (pre-existing build error)
+
+**Validation :** typecheck 15/15 ✅ · lint ✅ · build 9/9 ✅ · git push ✅
+
+**En attente validation LOT 1 avant LOT 2.**
 
 ---
 

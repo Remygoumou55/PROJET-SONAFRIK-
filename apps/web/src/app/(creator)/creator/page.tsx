@@ -13,7 +13,7 @@ async function CreatorDashboardContent() {
 
   const [data, careerOsEnabled] = await Promise.all([
     createCreatorService(supabase).getDashboardDataForContext(context),
-    createListenerService(supabase).isFeatureEnabled("career_os"),
+    createListenerService(supabase).isFeatureEnabled("career_os").catch(() => false),
   ]);
 
   return <CreatorDashboard data={data} careerOsEnabled={careerOsEnabled} />;
@@ -56,7 +56,13 @@ export default function CreatorDashboardPage() {
 async function CreatorDashboardBoundary() {
   try {
     return await CreatorDashboardContent();
-  } catch {
+  } catch (e) {
+    // Next.js redirect() throws a NEXT_REDIRECT error — must re-throw or the redirect is swallowed
+    const digest = (e as { digest?: string })?.digest;
+    if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
+      throw e;
+    }
+    console.error("[CreatorDashboard] crash:", e);
     return <CreatorDashboardError />;
   }
 }
