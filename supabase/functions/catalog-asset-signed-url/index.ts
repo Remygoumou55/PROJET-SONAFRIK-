@@ -80,6 +80,9 @@ Deno.serve(async (req) => {
     }
 
     if (body.action === "confirm") {
+      if (body.assetType === "cover") {
+        return await handleCoverConfirm(adminClient, body, user.id, json);
+      }
       return await handleConfirm(adminClient, body, user.id, json);
     }
 
@@ -106,7 +109,9 @@ Deno.serve(async (req) => {
 
       if (error) return json({ error: error.message }, 500);
 
-      await persistAsset(adminClient, body, builtPath, user.id);
+      if (body.assetType !== "cover") {
+        await persistAsset(adminClient, body, builtPath, user.id);
+      }
 
       return json({
         signedUrl: data.signedUrl,
@@ -142,6 +147,38 @@ Deno.serve(async (req) => {
     return json({ error: message }, 500);
   }
 });
+
+async function handleCoverConfirm(
+  client: ReturnType<typeof createClient>,
+  body: CatalogAssetRequest,
+  userId: string,
+  json: (body: Record<string, unknown>, status?: number) => Response,
+): Promise<Response> {
+  if (!body.albumId || !body.path) {
+    return json({ error: "Paramètres confirm invalides." }, 400);
+  }
+
+  const { data: blob, error: dlErr } = await client.storage
+    .from("catalog-visuals")
+    .download(body.path);
+
+  if (dlErr || !blob) {
+    return json({ error: "Pochette introuvable en Storage." }, 422);
+  }
+
+  if (blob.size < MIN_BLOB_BYTES) {
+    return json({ error: "Fichier pochette vide ou corrompu." }, 422);
+  }
+
+  const { error } = await client
+    .from("albums")
+    .update({ cover_path: body.path, updated_by: userId })
+    .eq("id", body.albumId);
+
+  if (error) return json({ error: error.message }, 500);
+
+  return json({ path: body.path, ok: true });
+}
 
 async function handleConfirm(
   client: ReturnType<typeof createClient>,

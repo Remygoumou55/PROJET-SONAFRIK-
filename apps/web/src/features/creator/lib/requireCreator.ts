@@ -5,11 +5,12 @@ import { createCreatorService } from "@sonafrik/api/creator";
 import type { CreatorContext } from "@sonafrik/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { assertBypassForbiddenOnVercel, isDevBypassActive } from "@/lib/auth/guards";
+import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
 
 // ── DEV BYPASS ────────────────────────────────────────────────────────────────
 const DEV_MOCK_CREATOR: CreatorContext = {
   creator: {
-    id: "dev-creator-id",
+    id: DEV_MOCK_CREATOR_ID,
     owner_id: "dev-mock-id",
     label_id: null,
     status: "active",
@@ -19,7 +20,7 @@ const DEV_MOCK_CREATOR: CreatorContext = {
     deleted_at: null,
   },
   artistProfile: {
-    creator_id: "dev-creator-id",
+    creator_id: DEV_MOCK_CREATOR_ID,
     stage_name: "Dev Artiste",
     slug: "dev-artiste",
     bio: "Profil de test pour contrôle visuel",

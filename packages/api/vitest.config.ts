@@ -15,6 +15,9 @@ export default defineConfig({
       "src/tips/**/*.test.ts",
       "src/admin/**/*.test.ts",
       "src/social/**/*.test.ts",
+      "src/creator/**/*.test.ts",
+      "src/catalog/**/*.test.ts",
+      "src/shared/**/*.test.ts",
     ],
     coverage: {
       provider: "v8",

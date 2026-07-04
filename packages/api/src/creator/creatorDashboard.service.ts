@@ -93,21 +93,33 @@ export class CreatorDashboardService {
       this.featureFlags.isFeatureEnabled("career_os").catch(() => false),
     ]);
 
-    const revenueProjectionGnf = computeRevenueProjection(streamStats.week_streams, revenueStats);
+    const safeStreamStats = streamStats ?? EMPTY_STREAM_STATS;
+    const safeAudienceStats = audienceStats ?? EMPTY_AUDIENCE;
+    const safeRevenueStats = revenueStats ?? EMPTY_REVENUE;
+    const safeCatalogCounts = catalogCounts ?? {
+      tracksPublished: 0,
+      albumsPublished: 0,
+      playlistsCount: 0,
+    };
+
+    const revenueProjectionGnf = computeRevenueProjection(
+      safeStreamStats.week_streams,
+      safeRevenueStats,
+    );
 
     return buildCreatorDashboardData(
       {
         context,
-        streamStats,
-        timeline,
-        audienceStats,
-        revenueStats,
-        topTrack: topTracks[0] ?? null,
-        catalogCounts,
-        playlistsCount: catalogCounts.playlistsCount,
-        paymentConfigured,
+        streamStats: safeStreamStats,
+        timeline: timeline ?? [],
+        audienceStats: safeAudienceStats,
+        revenueStats: safeRevenueStats,
+        topTrack: topTracks?.[0] ?? null,
+        catalogCounts: safeCatalogCounts,
+        playlistsCount: safeCatalogCounts.playlistsCount,
+        paymentConfigured: paymentConfigured ?? false,
         inspirationArtists: [],
-        monthlyRevenue,
+        monthlyRevenue: monthlyRevenue ?? [],
         revenueProjectionGnf,
       },
       { includeCareerOs: careerOsEnabled },

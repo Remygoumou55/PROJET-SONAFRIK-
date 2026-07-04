@@ -141,6 +141,9 @@ export const CATALOG_ERROR_MESSAGES: Record<string, string> = {
   creator_not_found: "Espace créateur introuvable.",
   album_not_found: "Album introuvable.",
   track_not_found: "Morceau introuvable.",
+  track_not_editable: "Ce morceau ne peut plus être modifié.",
+  track_delete_failed: "Impossible de supprimer ce morceau.",
+  album_delete_failed: "Impossible de supprimer cette sortie.",
   track_create_failed: "Impossible de créer le morceau. Connectez-vous avec votre compte artiste.",
   invalid_album: "Données album invalides.",
   invalid_track: "Données morceau invalides.",
@@ -149,6 +152,9 @@ export const CATALOG_ERROR_MESSAGES: Record<string, string> = {
   publish_submit_failed: "Impossible de soumettre à publication.",
   asset_upload_failed: "Échec du téléversement de l'asset.",
   asset_type_invalid: "Format de fichier non supporté.",
+  invalid_creator_id: "Identifiant créateur invalide. Reconnectez-vous ou rechargez la page.",
+  invalid_content_type: "Format de fichier non supporté.",
+  invalid_upload_payload: "Paramètres de téléversement invalides.",
   unknown: "Une erreur est survenue. Réessayez.",
 };
 

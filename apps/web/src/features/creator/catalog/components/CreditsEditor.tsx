@@ -21,10 +21,10 @@ interface CreditEntry {
 interface Props {
   trackId: string;
   stageName: string;
-  onClose: () => void;
+  onSaved?: () => void;
 }
 
-export function CreditsEditor({ trackId, stageName, onClose }: Props) {
+export function CreditsEditor({ trackId, stageName, onSaved }: Props) {
   const catalog = useCatalogService();
   const [credits, setCredits] = useState<CreditEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,8 +48,9 @@ export function CreditsEditor({ trackId, stageName, onClose }: Props) {
               : [{ uid: "principal-0", contributorName: stageName, role: "artiste_principal" as TrackCreditRole, contributorProfileId: null }],
           );
         }
-      } catch {
+      } catch (loadErr) {
         if (!cancelled) {
+          setError(loadErr instanceof Error ? loadErr.message : "Impossible de charger les crédits.");
           setCredits([{ uid: "principal-0", contributorName: stageName, role: "artiste_principal", contributorProfileId: null }]);
         }
       } finally {
@@ -91,9 +92,9 @@ export function CreditsEditor({ trackId, stageName, onClose }: Props) {
             contributorProfileId: null,
           })),
       });
-      onClose();
-    } catch {
-      setError("Impossible de sauvegarder les crédits. Réessayez.");
+      onSaved?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de sauvegarder les crédits. Réessayez.");
     } finally {
       setSaving(false);
     }
@@ -172,9 +173,6 @@ export function CreditsEditor({ trackId, stageName, onClose }: Props) {
         <Button size="sm" onClick={save} disabled={saving}>
           {saving ? "Sauvegarde…" : "Sauvegarder les crédits"}
         </Button>
-        <button onClick={onClose} className="text-xs hover:underline" style={{ color: "var(--color-texte-desactive)" }}>
-          Annuler
-        </button>
       </div>
     </div>
   );

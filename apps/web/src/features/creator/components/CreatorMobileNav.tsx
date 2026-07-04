@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { memo } from "react";
-import {
-  buildCreatorNavEntries,
-  getCreatorNavLinks,
-} from "../lib/creatorNavConfig";
+import { getCreatorNavLinks, type CreatorNavEntry } from "../lib/creatorNavConfig";
 
 interface CreatorMobileNavProps {
   activePath: string;
-  pendingVerifications?: number;
+  navEntries: CreatorNavEntry[];
 }
 
 function isActive(href: string, activePath: string, exact?: boolean): boolean {
@@ -17,11 +14,8 @@ function isActive(href: string, activePath: string, exact?: boolean): boolean {
   return activePath === href || activePath.startsWith(`${href}/`);
 }
 
-function CreatorMobileNavView({
-  activePath,
-  pendingVerifications = 0,
-}: CreatorMobileNavProps) {
-  const links = getCreatorNavLinks(buildCreatorNavEntries(pendingVerifications));
+function CreatorMobileNavView({ activePath, navEntries }: CreatorMobileNavProps) {
+  const links = getCreatorNavLinks(navEntries);
 
   return (
     <nav className="creator-mobile-nav" aria-label="Navigation espace artiste">

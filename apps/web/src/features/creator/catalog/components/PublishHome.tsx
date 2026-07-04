@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PublicationWizard } from "./PublicationWizard";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -35,28 +36,28 @@ const QUICK_ITEMS = [
 const WHY_ITEMS = [
   {
     icon: "💰",
-    iconBg: "rgba(0,210,106,0.12)",
+    iconClass: "pub-home-why__icon--vert",
     color: "var(--color-vert-energie)",
     title: "Revenus équitables",
-    desc: "Gardez 65% de vos revenus. Nous respectons les artistes.",
+    desc: "Gardez 90 % de vos revenus. Nous respectons les artistes.",
   },
   {
     icon: "📊",
-    iconBg: "rgba(168,85,247,0.12)",
+    iconClass: "pub-home-why__icon--violet",
     color: "var(--color-accent-violet)",
     title: "Analytics avancées",
     desc: "Suivez votre audience et vos performances en temps réel.",
   },
   {
     icon: "🌍",
-    iconBg: "rgba(59,130,246,0.12)",
+    iconClass: "pub-home-why__icon--info",
     color: "var(--color-info)",
     title: "Distribution mondiale",
     desc: "Votre musique disponible sur SONAFRIK partout dans le monde.",
   },
   {
     icon: "💳",
-    iconBg: "rgba(249,115,22,0.12)",
+    iconClass: "pub-home-why__icon--orange",
     color: "var(--color-accent-orange)",
     title: "Paiements rapides",
     desc: "Retirez vos revenus facilement et rapidement.",
@@ -72,6 +73,7 @@ export function PublishHome({
   creatorId: string;
   stageName: string;
 }) {
+  const router = useRouter();
   const [wizardOpen, setWizardOpen] = useState(false);
 
   if (wizardOpen) {
@@ -79,7 +81,10 @@ export function PublishHome({
       <PublicationWizard
         creatorId={creatorId}
         stageName={stageName}
-        onComplete={() => { setWizardOpen(false); window.location.reload(); }}
+        onComplete={() => {
+          setWizardOpen(false);
+          router.push("/creator/catalog/tracks");
+        }}
         onCancel={() => setWizardOpen(false)}
       />
     );
@@ -154,8 +159,7 @@ export function PublishHome({
             {WHY_ITEMS.map((item) => (
               <div key={item.title} className="pub-home-why__item">
                 <div
-                  className="pub-home-why__item-icon"
-                  style={{ background: item.iconBg }}
+                  className={`pub-home-why__item-icon ${item.iconClass}`}
                   aria-hidden="true"
                 >
                   <span>{item.icon}</span>

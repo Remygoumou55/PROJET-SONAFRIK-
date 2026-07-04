@@ -33,7 +33,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 1.25rem;
-  border: 1px solid rgba(0, 210, 106, 0.15);
+  border: 1px solid var(--color-vert-energie-border);
   background: linear-gradient(
     135deg,
     #0b1c10 0%,
@@ -57,8 +57,8 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 0.875rem;
-  background: rgba(0, 210, 106, 0.12);
-  border: 1px solid rgba(0, 210, 106, 0.25);
+  background: var(--color-vert-energie-bg);
+  border: 1px solid var(--color-vert-energie-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -273,6 +273,11 @@
   font-size: 1.125rem;
   margin-bottom: 0.75rem;
 }
+
+.pub-home-why__icon--vert { background: var(--color-vert-energie-bg); }
+.pub-home-why__icon--violet { background: var(--color-accent-violet-bg); }
+.pub-home-why__icon--info { background: var(--color-info-bg); }
+.pub-home-why__icon--orange { background: var(--color-accent-orange-bg); }
 
 .pub-home-why__item-title {
   margin: 0 0 0.375rem;

@@ -8,6 +8,7 @@ import type { CoverUploaderHandle } from "./CoverUploader";
 import { useCatalogService } from "../hooks/useCatalog";
 import type { Genre } from "@sonafrik/types";
 import { FIELD_LIMITS } from "@sonafrik/shared/field-limits";
+import { IMAGE_POLICY } from "@sonafrik/shared";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -51,14 +52,20 @@ const LANG_OPTIONS = [
 ];
 
 const VERIF_ITEMS = [
-  "Analyse audio",
-  "Vérification pochette",
-  "Vérification métadonnées",
-  "Génération ISRC",
-  "Préparation des conversions",
-  "Contrôle qualité",
-  "Préparation streaming",
+  { label: "Fichier audio chargé", check: (ctx: ChecklistContext) => ctx.audioReady },
+  { label: "Pochette chargée", check: (ctx: ChecklistContext) => ctx.coverReady },
+  { label: "Genre sélectionné", check: (ctx: ChecklistContext) => Boolean(ctx.genreId) },
+  { label: "Crédits renseignés", check: (ctx: ChecklistContext) => ctx.creditsReady },
+  { label: "Date de sortie définie", check: (ctx: ChecklistContext) => Boolean(ctx.releaseDate) },
 ];
+
+interface ChecklistContext {
+  audioReady: boolean;
+  coverReady: boolean;
+  genreId: string;
+  creditsReady: boolean;
+  releaseDate: string;
+}
 
 const STEP_LABELS = ["Créer", "Fichiers", "Informations", "Publication"];
 
@@ -104,22 +111,21 @@ function TipsPanel({ tips }: { tips: { icon: string; text: string }[] }) {
   );
 }
 
-// ─── Step 3 — Auto-verifications ──────────────────────────────────────────────
+// ─── Step 3 — Publication checklist ───────────────────────────────────────────
 
-function AutoVerifications({ done }: { done: number }) {
+function PublicationChecklist({ ctx }: { ctx: ChecklistContext }) {
   return (
     <div className="pub-wiz__verifs">
-      <p className="pub-wiz__verifs-title">Vérifications automatiques</p>
+      <p className="pub-wiz__verifs-title">Checklist publication</p>
       <ul className="pub-wiz__verifs-list">
-        {VERIF_ITEMS.map((item, i) => {
-          const isDone = i < done;
-          const isActive = i === done;
+        {VERIF_ITEMS.map((item) => {
+          const isDone = item.check(ctx);
           return (
-            <li key={item} className={`pub-wiz__verif${isDone ? " pub-wiz__verif--done" : isActive ? " pub-wiz__verif--active" : ""}`}>
+            <li key={item.label} className={`pub-wiz__verif${isDone ? " pub-wiz__verif--done" : ""}`}>
               <span className="pub-wiz__verif-dot" aria-hidden="true">
-                {isDone ? "✔" : isActive ? "⋯" : "○"}
+                {isDone ? "✔" : "○"}
               </span>
-              <span>{item}</span>
+              <span>{item.label}</span>
             </li>
           );
         })}
@@ -143,7 +149,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
   const [coverReady, setCoverReady] = useState(false);
   const [uploading2, setUploading2] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [verifDone, setVerifDone] = useState(0);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [meta, setMeta] = useState<MetadataForm>({
     genreId: "",
     language: "fr",
@@ -157,35 +163,53 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const verifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const checklistCtx: ChecklistContext = {
+    audioReady,
+    coverReady,
+    genreId: meta.genreId,
+    creditsReady: Boolean(meta.auteur.trim() && meta.compositeur.trim()),
+    releaseDate: meta.releaseDate,
+  };
 
   // Load genres when step 3 is active
   useEffect(() => {
     if (step !== 3) return;
-    void catalog.getGenres().then((list) => setGenres(list.filter((g) => g.is_active)));
+    void catalog
+      .getGenres()
+      .then((list) => setGenres(list.filter((g) => g.is_active)))
+      .catch(() => setError("Impossible de charger les genres. Réessayez."));
   }, [step, catalog]);
 
-  // Auto-verifications animation when step 3 is active
+  // Load cover preview for step 4 summary
   useEffect(() => {
-    if (step !== 3) return;
-    setVerifDone(0);
-    let count = 0;
-    function tick() {
-      count += 1;
-      setVerifDone(count);
-      if (count < VERIF_ITEMS.length) {
-        verifTimerRef.current = setTimeout(tick, 550);
+    if (step !== 4 || !release) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const album = await catalog.getAlbum(release.albumId);
+        if (!album.cover_path) return;
+        const { signedUrl } = await catalog.requestCoverReadUrl({
+          creatorId,
+          path: album.cover_path,
+        });
+        if (!cancelled) setCoverPreviewUrl(signedUrl);
+      } catch {
+        if (!cancelled) setCoverPreviewUrl(null);
       }
-    }
-    verifTimerRef.current = setTimeout(tick, 600);
-    return () => { if (verifTimerRef.current) clearTimeout(verifTimerRef.current); };
-  }, [step]);
+    })();
+    return () => { cancelled = true; };
+  }, [step, release, catalog, creatorId]);
 
   // ── Step 1 — Créer le morceau ──
 
   const handleCreateRelease = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (titleInput.trim().length < 2) return;
+    if (release) {
+      setStep(2);
+      return;
+    }
     setCreating(true);
     setError(null);
     try {
@@ -200,7 +224,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
     } finally {
       setCreating(false);
     }
-  }, [catalog, titleInput]);
+  }, [catalog, titleInput, release]);
 
   // ── Step 2 — Upload automatique audio + pochette ──
 
@@ -209,10 +233,8 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
     setUploading2(true);
     setError(null);
     try {
-      await Promise.all([
-        audioRef.current.triggerUpload(),
-        coverRef.current.triggerUpload(),
-      ]);
+      await audioRef.current.triggerUpload();
+      await coverRef.current.triggerUpload();
       setStep(3);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'envoi. Réessayez.");
@@ -225,28 +247,30 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
 
   const handleSaveMeta = useCallback(async () => {
     if (!release) return;
+    if (!meta.genreId) {
+      setError("Sélectionnez un genre avant de continuer.");
+      return;
+    }
     setSavingMeta(true);
     setError(null);
     try {
-      const genreIds = meta.genreId ? [meta.genreId] : undefined;
-      await Promise.all([
-        catalog.updateTrack(release.trackId, {
-          language: meta.language.length === 2 ? meta.language : undefined,
-          explicit: meta.explicit,
-          genreIds,
-        }),
-        catalog.setTrackCredits({
-          trackId: release.trackId,
-          credits: [
-            meta.auteur.trim() ? { contributorName: meta.auteur.trim(), role: "auteur" as const, displayOrder: 0 } : null,
-            meta.compositeur.trim() ? { contributorName: meta.compositeur.trim(), role: "compositeur" as const, displayOrder: 1 } : null,
-            meta.producteur.trim() ? { contributorName: meta.producteur.trim(), role: "producteur" as const, displayOrder: 2 } : null,
-          ].filter(Boolean) as { contributorName: string; role: "auteur" | "compositeur" | "producteur"; displayOrder: number }[],
-        }),
-        meta.releaseDate
-          ? catalog.updateAlbum(release.albumId, { releaseDate: meta.releaseDate })
-          : Promise.resolve(),
-      ]);
+      const genreIds = [meta.genreId];
+      await catalog.updateTrack(release.trackId, {
+        language: meta.language.length === 2 ? meta.language : undefined,
+        explicit: meta.explicit,
+        genreIds,
+      });
+      await catalog.setTrackCredits({
+        trackId: release.trackId,
+        credits: [
+          meta.auteur.trim() ? { contributorName: meta.auteur.trim(), role: "auteur" as const, displayOrder: 0 } : null,
+          meta.compositeur.trim() ? { contributorName: meta.compositeur.trim(), role: "compositeur" as const, displayOrder: 1 } : null,
+          meta.producteur.trim() ? { contributorName: meta.producteur.trim(), role: "producteur" as const, displayOrder: 2 } : null,
+        ].filter(Boolean) as { contributorName: string; role: "auteur" | "compositeur" | "producteur"; displayOrder: number }[],
+      });
+      if (meta.releaseDate) {
+        await catalog.updateAlbum(release.albumId, { releaseDate: meta.releaseDate });
+      }
       setStep(4);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de sauvegarder. Réessayez.");
@@ -344,7 +368,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
             {/* Audio card */}
             <div className="pub-wiz__card">
               <h3 className="pub-wiz__card-title">🎵 Fichier audio</h3>
-              <p className="pub-wiz__card-sub">MP3 · M4A — max 50 Mo</p>
+              <p className="pub-wiz__card-sub">MP3 · M4A · WAV — max 100 Mo</p>
               <AudioUploader
                 ref={audioRef}
                 trackId={release.trackId}
@@ -357,7 +381,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
             {/* Cover card */}
             <div className="pub-wiz__card">
               <h3 className="pub-wiz__card-title">🖼 Pochette</h3>
-              <p className="pub-wiz__card-sub">JPG · PNG · WebP — max 5 Mo</p>
+              <p className="pub-wiz__card-sub">JPG · PNG · WebP — max {IMAGE_POLICY.maxLabel}</p>
               <CoverUploader
                 ref={coverRef}
                 albumId={release.albumId}
@@ -374,7 +398,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
                 {[
                   "MP3 320 kbps recommandé",
                   "JPG · PNG · WebP",
-                  "Image minimum 3000×3000",
+                  "Minimum 1400×1400 px (recommandé 3000×3000)",
                   "Bonne qualité = meilleure visibilité",
                 ].map((tip) => (
                   <li key={tip} className="pub-wiz__tips-item pub-wiz__tips-item--check">
@@ -410,10 +434,12 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
 
               <div className="pub-wiz__form-grid">
                 <label className="pub-wiz__label">
-                  Genre
+                  Genre <span className="pub-wiz__required" aria-hidden="true">*</span>
                   <select
                     className="pub-wiz__select"
                     value={meta.genreId}
+                    required
+                    aria-required="true"
                     onChange={(e) => setMeta((m) => ({ ...m, genreId: e.target.value }))}
                   >
                     <option value="">Sélectionner un genre</option>
@@ -500,7 +526,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
               </button>
               <button
                 className="pub-wiz__btn pub-wiz__btn--primary"
-                disabled={savingMeta}
+                disabled={savingMeta || !meta.genreId}
                 onClick={() => void handleSaveMeta()}
               >
                 {savingMeta ? "Sauvegarde…" : "Continuer →"}
@@ -509,7 +535,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
           </div>
 
           <div className="pub-wiz__aside">
-            <AutoVerifications done={verifDone} />
+            <PublicationChecklist ctx={checklistCtx} />
             <div className="pub-wiz__aside-summary">
               <p className="pub-wiz__aside-title">Résumé</p>
               <p className="pub-wiz__aside-row"><span>Titre</span><span>{release.title}</span></p>
@@ -580,7 +606,16 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
             <div className="pub-wiz__aside-summary">
               <p className="pub-wiz__aside-title">Aperçu du morceau</p>
               <div className="pub-wiz__preview-track">
-                <div className="pub-wiz__preview-cover" aria-hidden="true">🎵</div>
+                {coverPreviewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={coverPreviewUrl}
+                    alt=""
+                    className="pub-wiz__preview-cover pub-wiz__preview-cover--img"
+                  />
+                ) : (
+                  <div className="pub-wiz__preview-cover" aria-hidden="true">🎵</div>
+                )}
                 <div>
                   <p className="pub-wiz__preview-title">{release.title}</p>
                   <p className="pub-wiz__preview-artist">{stageName}</p>

@@ -22,8 +22,8 @@
   gap: 0;
   padding: 1.25rem 1.5rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
 }
 
 .pub-wiz__step {
@@ -44,14 +44,14 @@
   font-size: 0.75rem;
   font-weight: 700;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.12);
+  border: 2px solid var(--color-admin-border-subtle);
   color: var(--color-texte-desactive);
   background: var(--color-noir-profond);
   transition: all 0.2s ease;
 }
 
 .pub-wiz__step--done .pub-wiz__step-dot {
-  background: rgba(0, 210, 106, 0.15);
+  background: var(--color-vert-energie-bg);
   border-color: var(--color-vert-energie);
   color: var(--color-vert-energie);
 }
@@ -60,7 +60,7 @@
   background: var(--color-vert-energie);
   border-color: var(--color-vert-energie);
   color: var(--color-noir-profond);
-  box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.2);
+  box-shadow: 0 0 0 3px var(--color-vert-energie-ring);
 }
 
 .pub-wiz__step-label {
@@ -84,7 +84,7 @@
 .pub-wiz__step-line {
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-admin-card-border);
   margin: 0 0.5rem;
   transition: background 0.3s ease;
 }
@@ -97,7 +97,7 @@
 .pub-wiz__error {
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(206, 17, 38, 0.08);
+  background: var(--color-erreur-banner);
   border: 1px solid rgba(206, 17, 38, 0.25);
   color: #f87171;
   font-size: 0.875rem;
@@ -133,8 +133,8 @@
 .pub-wiz__card {
   padding: 1.5rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-admin-card-border);
+  background: var(--color-admin-card-bg);
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
@@ -739,6 +739,12 @@
   margin: 0;
 }
 
+.cover-up__warning {
+  font-size: 0.6875rem;
+  color: var(--color-avertissement);
+  margin: 0.25rem 0 0;
+}
+
 .cover-up__progress {
   display: flex;
   flex-direction: column;
@@ -1008,13 +1014,24 @@
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 0.625rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.pub-wiz__preview-cover--img {
+  object-fit: cover;
+  display: block;
+}
+
+.pub-wiz__required {
+  color: var(--color-erreur);
+  margin-left: 0.125rem;
 }
 
 .pub-wiz__preview-title {
@@ -1144,6 +1161,18 @@
 @media (max-width: 640px) {
   .pub-wiz__progress {
     padding: 0.875rem 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .pub-wiz__progress::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pub-wiz__step {
+    flex: 0 0 auto;
+    min-width: 2.5rem;
   }
 
   .pub-wiz__step-label {

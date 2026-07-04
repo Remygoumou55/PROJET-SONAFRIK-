@@ -1,11 +1,13 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { Album, CatalogContext, Genre, Track, TrackAppearance, TrackCredit } from "@sonafrik/types";
+import type { Album, CatalogContext, Genre, Track, TrackAppearance, TrackCredit, TrackFile } from "@sonafrik/types";
+import { CATALOG_ERROR_MESSAGES } from "@sonafrik/types";
 import { CatalogError } from "./errors";
 import { CatalogRepository } from "./catalog.repository";
 import { PublicationIntegrationService } from "../publication/integration";
 import {
   catalogAssetUploadSchema,
   catalogAssetConfirmSchema,
+  catalogCoverConfirmSchema,
   createAlbumSchema,
   createTrackSchema,
   setTrackCreditsSchema,
@@ -13,12 +15,18 @@ import {
   updateTrackSchema,
   type CatalogAssetUploadInput,
   type CatalogAssetConfirmInput,
+  type CatalogCoverConfirmInput,
   type CreateAlbumInput,
   type CreateTrackInput,
   type SetTrackCreditsInput,
   type UpdateAlbumInput,
   type UpdateTrackInput,
 } from "./schemas";
+import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
+import {
+  resolveCatalogAssetConfirmError,
+  resolveCatalogAssetUploadError,
+} from "../shared/uploadSchemaErrors";
 
 function isDevBypass(): boolean {
   return (
@@ -69,7 +77,7 @@ export class CatalogService {
       }
     }
 
-    if (isDevBypass()) return "dev-creator-id";
+    if (isDevBypass()) return DEV_MOCK_CREATOR_ID;
     throw new CatalogError("unauthorized");
   }
 
@@ -163,20 +171,108 @@ export class CatalogService {
     return album;
   }
 
+  async getTrackFiles(trackId: string): Promise<TrackFile[]> {
+    await this.requireUserId();
+    return this.repository.getTrackFiles(trackId);
+  }
+
+  async assertAlbumReadyForSubmit(albumId: string): Promise<void> {
+    const creatorId = await this.requireCreatorId();
+    const album = await this.repository.getAlbum(albumId);
+    if (!album || album.creator_id !== creatorId) {
+      throw new CatalogError("album_not_found");
+    }
+    if (!album.cover_path?.trim()) {
+      throw new CatalogError(
+        "publish_submit_failed",
+        "Ajoutez une pochette avant de soumettre.",
+      );
+    }
+
+    const tracks = await this.repository.listTracks(creatorId, albumId);
+
+    if (tracks.length === 0) {
+      throw new CatalogError("publish_submit_failed", "Ajoutez au moins un morceau avant de soumettre.");
+    }
+
+    for (const track of tracks) {
+      const files = await this.repository.getTrackFiles(track.id);
+      const primary = files.find((file) => file.is_primary);
+      if (!primary || primary.integrity_status !== "valid") {
+        throw new CatalogError(
+          "publish_submit_failed",
+          `Le morceau « ${track.title} » doit avoir un fichier audio validé avant soumission.`,
+        );
+      }
+    }
+  }
+
   async submitAlbum(albumId: string): Promise<void> {
+    await this.assertAlbumReadyForSubmit(albumId);
+
     const integration = new PublicationIntegrationService(this.client);
     try {
       await integration.submitAlbum(albumId, async () => {
         await this.repository.submitAlbum(albumId);
       });
-    } catch {
-      throw new CatalogError("publish_submit_failed");
+    } catch (err) {
+      if (err instanceof CatalogError) throw err;
+      throw new CatalogError(
+        "publish_submit_failed",
+        err instanceof Error ? err.message : undefined,
+      );
     }
   }
 
   async listTracks(albumId?: string): Promise<Track[]> {
     const creatorId = await this.requireCreatorId();
     return this.repository.listTracks(creatorId, albumId);
+  }
+
+  async listTracksPage(options?: {
+    limit?: number;
+    offset?: number;
+    search?: string;
+    status?: string;
+  }): Promise<{
+    tracks: Track[];
+    total: number;
+  }> {
+    const creatorId = await this.requireCreatorId();
+    const limit = options?.limit ?? 50;
+    const offset = options?.offset ?? 0;
+    const filters = { search: options?.search, status: options?.status };
+    const [tracks, total] = await Promise.all([
+      this.repository.listCreatorTracksPaginated(creatorId, limit, offset, filters),
+      this.repository.countCreatorTracks(creatorId, filters),
+    ]);
+    return { tracks, total };
+  }
+
+  async getTrackGenreIds(trackId: string): Promise<string[]> {
+    await this.requireUserId();
+    return this.repository.getTrackGenreIds(trackId);
+  }
+
+  async getAlbum(albumId: string): Promise<Album> {
+    const creatorId = await this.requireCreatorId();
+    const album = await this.repository.getAlbum(albumId);
+    if (!album || album.creator_id !== creatorId) throw new CatalogError("album_not_found");
+    return album;
+  }
+
+  async requestCoverReadUrl(input: { creatorId: string; path: string }): Promise<{ signedUrl: string }> {
+    await this.requireUserId();
+    const { data, error } = await this.client.functions.invoke("catalog-asset-signed-url", {
+      body: {
+        action: "read",
+        assetType: "cover",
+        creatorId: input.creatorId,
+        path: input.path,
+      },
+    });
+    if (error || !data?.signedUrl) throw new CatalogError("asset_upload_failed");
+    return { signedUrl: data.signedUrl as string };
   }
 
   async createTrack(input: CreateTrackInput): Promise<Track> {
@@ -244,8 +340,57 @@ export class CatalogService {
       await integration.submitTrack(trackId, async () => {
         await this.repository.submitTrack(trackId);
       });
-    } catch {
-      throw new CatalogError("publish_submit_failed");
+    } catch (err) {
+      if (err instanceof CatalogError) throw err;
+      throw new CatalogError(
+        "publish_submit_failed",
+        err instanceof Error ? err.message : undefined,
+      );
+    }
+  }
+
+  async getTrack(trackId: string): Promise<Track> {
+    await this.requireUserId();
+    const creatorId = await this.requireCreatorId();
+    const track = await this.repository.getTrack(trackId);
+    if (!track) throw new CatalogError("track_not_found");
+    if (track.creator_id !== creatorId) throw new CatalogError("unauthorized");
+    return track;
+  }
+
+  async deleteTrack(trackId: string): Promise<void> {
+    const userId = await this.requireUserId();
+    const track = await this.getTrack(trackId);
+    if (track.publication_status !== "draft" && track.publication_status !== "rejected") {
+      throw new CatalogError("track_not_editable");
+    }
+    try {
+      await this.repository.softDeleteTrack(trackId, userId);
+      await this.repository.logAudit("catalog.track.deleted", "tracks", trackId);
+    } catch (err) {
+      throw new CatalogError(
+        "track_delete_failed",
+        err instanceof Error ? err.message : undefined,
+      );
+    }
+  }
+
+  async deleteAlbum(albumId: string): Promise<void> {
+    const userId = await this.requireUserId();
+    const creatorId = await this.requireCreatorId();
+    const album = await this.repository.getAlbum(albumId);
+    if (!album || album.creator_id !== creatorId) throw new CatalogError("album_not_found");
+    if (album.publication_status !== "draft" && album.publication_status !== "rejected") {
+      throw new CatalogError("track_not_editable");
+    }
+    try {
+      await this.repository.softDeleteAlbum(albumId, userId);
+      await this.repository.logAudit("catalog.album.deleted", "albums", albumId);
+    } catch (err) {
+      throw new CatalogError(
+        "album_delete_failed",
+        err instanceof Error ? err.message : undefined,
+      );
     }
   }
 
@@ -273,8 +418,17 @@ export class CatalogService {
   }> {
     const parsed = catalogAssetUploadSchema.safeParse(input);
     if (!parsed.success) {
-      console.error("[CatalogService.requestAssetUploadUrl] schema fail:", JSON.stringify(parsed.error.flatten()));
-      throw new CatalogError("asset_type_invalid");
+      const detail = JSON.stringify(parsed.error.flatten());
+      if (process.env.NODE_ENV === "development") {
+        console.error("[CatalogService.requestAssetUploadUrl] schema fail:", detail);
+      }
+      const code = resolveCatalogAssetUploadError(parsed.error);
+      throw new CatalogError(
+        code,
+        process.env.NODE_ENV === "development"
+          ? `${CATALOG_ERROR_MESSAGES[code]} [dev: ${detail}]`
+          : undefined,
+      );
     }
 
     await this.requireUserId();
@@ -292,8 +446,43 @@ export class CatalogService {
       },
     });
 
-    if (error || !data?.signedUrl) throw new CatalogError("asset_upload_failed");
+    if (error) {
+      throw new CatalogError(
+        "asset_upload_failed",
+        error.message || undefined,
+      );
+    }
+    if (!data?.signedUrl) {
+      const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
+      throw new CatalogError("asset_upload_failed", remoteMsg);
+    }
     return data as { signedUrl: string; path: string; token: string; expiresIn: number };
+  }
+
+  async confirmCoverUpload(input: CatalogCoverConfirmInput): Promise<{ path: string }> {
+    const parsed = catalogCoverConfirmSchema.safeParse(input);
+    if (!parsed.success) throw new CatalogError("invalid_album");
+
+    await this.requireUserId();
+
+    const { data, error } = await this.client.functions.invoke("catalog-asset-signed-url", {
+      body: {
+        action: "confirm",
+        assetType: "cover",
+        creatorId: parsed.data.creatorId,
+        albumId: parsed.data.albumId,
+        path: parsed.data.path,
+      },
+    });
+
+    if (error) {
+      throw new CatalogError("asset_upload_failed", error.message || undefined);
+    }
+    if (!data?.path) {
+      const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
+      throw new CatalogError("asset_upload_failed", remoteMsg);
+    }
+    return { path: data.path as string };
   }
 
   async confirmAssetUpload(input: CatalogAssetConfirmInput): Promise<{
@@ -304,8 +493,17 @@ export class CatalogService {
   }> {
     const parsed = catalogAssetConfirmSchema.safeParse(input);
     if (!parsed.success) {
-      console.error("[CatalogService.confirmAssetUpload] schema fail:", JSON.stringify(parsed.error.flatten()));
-      throw new CatalogError("asset_type_invalid");
+      const detail = JSON.stringify(parsed.error.flatten());
+      if (process.env.NODE_ENV === "development") {
+        console.error("[CatalogService.confirmAssetUpload] schema fail:", detail);
+      }
+      const code = resolveCatalogAssetConfirmError(parsed.error);
+      throw new CatalogError(
+        code,
+        process.env.NODE_ENV === "development"
+          ? `${CATALOG_ERROR_MESSAGES[code]} [dev: ${detail}]`
+          : undefined,
+      );
     }
 
     await this.requireUserId();
@@ -325,7 +523,13 @@ export class CatalogService {
       },
     });
 
-    if (error || !data?.integrityStatus) throw new CatalogError("asset_upload_failed");
+    if (error) {
+      throw new CatalogError("asset_upload_failed", error.message || undefined);
+    }
+    if (!data?.integrityStatus) {
+      const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
+      throw new CatalogError("asset_upload_failed", remoteMsg);
+    }
     return data as {
       integrityStatus: string;
       message: string;

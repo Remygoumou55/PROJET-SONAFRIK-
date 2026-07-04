@@ -128,6 +128,57 @@ export class CatalogRepository {
     );
   }
 
+  async countCreatorTracks(
+    creatorId: string,
+    options?: { search?: string; status?: string },
+  ): Promise<number> {
+    let query = this.client
+      .from("tracks")
+      .select("*", { count: "exact", head: true })
+      .eq("creator_id", creatorId)
+      .is("deleted_at", null);
+
+    if (options?.search?.trim()) {
+      query = query.ilike("title", `%${options.search.trim()}%`);
+    }
+    if (options?.status && options.status !== "all") {
+      query = query.eq("publication_status", options.status);
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+    return count ?? 0;
+  }
+
+  async listCreatorTracksPaginated(
+    creatorId: string,
+    limit: number,
+    offset: number,
+    options?: { search?: string; status?: string },
+  ): Promise<Track[]> {
+    let query = this.client
+      .from("tracks")
+      .select("*")
+      .eq("creator_id", creatorId)
+      .is("deleted_at", null)
+      .order("updated_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (options?.search?.trim()) {
+      query = query.ilike("title", `%${options.search.trim()}%`);
+    }
+    if (options?.status && options.status !== "all") {
+      query = query.eq("publication_status", options.status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? []).map((row) => ({
+      ...(row as Track),
+      metadata: (row.metadata as Record<string, unknown>) ?? {},
+    }));
+  }
+
   async listTracks(creatorId: string, albumId?: string, limit = 100, offset = 0): Promise<Track[]> {
     let query = this.client
       .from("tracks")
@@ -218,6 +269,16 @@ export class CatalogRepository {
       ...(data as Track),
       metadata: (data.metadata as Record<string, unknown>) ?? {},
     };
+  }
+
+  async getTrackGenreIds(trackId: string): Promise<string[]> {
+    const { data, error } = await this.client
+      .from("track_genres")
+      .select("genre_id")
+      .eq("track_id", trackId);
+
+    if (error) throw error;
+    return (data ?? []).map((row) => row.genre_id as string);
   }
 
   async setTrackGenres(trackId: string, genreIds: string[]): Promise<void> {
@@ -328,7 +389,7 @@ export class CatalogRepository {
 
     const [albumsRes, profilesRes] = await Promise.all([
       albumIds.length
-        ? this.client.from("albums").select("id, cover_url").in("id", albumIds)
+        ? this.client.from("albums").select("id, cover_path").in("id", albumIds)
         : { data: [], error: null },
       mainCreatorIds.length
         ? this.client.from("artist_profiles").select("creator_id, stage_name").in("creator_id", mainCreatorIds)
@@ -336,8 +397,8 @@ export class CatalogRepository {
     ]);
 
     const coverByAlbumId = new Map(
-      ((albumsRes.data ?? []) as unknown as Array<{ id: string; cover_url: string | null }>).map(
-        (a) => [a.id, a.cover_url],
+      ((albumsRes.data ?? []) as unknown as Array<{ id: string; cover_path: string | null }>).map(
+        (a) => [a.id, a.cover_path],
       ),
     );
     const nameByCreatorId = new Map(
@@ -355,6 +416,38 @@ export class CatalogRepository {
       mainArtistCreatorId: c.tracks.creator_id,
       creditRole: c.role as TrackCreditRole,
     }));
+  }
+
+  async softDeleteTrack(trackId: string, userId: string): Promise<void> {
+    const { data, error } = await this.client
+      .from("tracks")
+      .update({ deleted_at: new Date().toISOString(), updated_by: userId })
+      .eq("id", trackId)
+      .in("publication_status", ["draft", "rejected"])
+      .select("id")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error("Impossible de supprimer ce morceau.");
+  }
+
+  async softDeleteAlbum(albumId: string, userId: string): Promise<void> {
+    const { data, error } = await this.client
+      .from("albums")
+      .update({ deleted_at: new Date().toISOString(), updated_by: userId })
+      .eq("id", albumId)
+      .in("publication_status", ["draft", "rejected"])
+      .select("id")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error("Impossible de supprimer cette sortie.");
+
+    await this.client
+      .from("tracks")
+      .update({ deleted_at: new Date().toISOString(), updated_by: userId })
+      .eq("album_id", albumId)
+      .in("publication_status", ["draft", "rejected"]);
   }
 
   buildSlug(title: string, suffix: string): string {

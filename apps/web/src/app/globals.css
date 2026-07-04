@@ -87,6 +87,13 @@
   --overlay-vert-soft: rgb(0 210 106 / 0.13);
   --overlay-erreur-soft: rgb(255 68 68 / 0.13);
   --overlay-vert-nav: rgb(0 210 106 / 0.09);
+  --color-vert-energie-bg: rgb(0 210 106 / 0.15);
+  --color-vert-energie-ring: rgb(0 210 106 / 0.2);
+  --color-vert-energie-border: rgb(0 210 106 / 0.25);
+  --color-erreur-banner: rgb(206 17 38 / 0.08);
+  --color-accent-violet-bg: rgb(168 85 247 / 0.12);
+  --color-info-bg: rgb(59 130 246 / 0.12);
+  --color-accent-orange-bg: rgb(249 115 22 / 0.12);
 
   --font-sans: var(--font-montserrat), Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;

@@ -27,6 +27,9 @@ export function CatalogDashboard({ context }: { context: CatalogContext }) {
             <Link href="/creator/catalog/tracks" className={buttonVariants({ variant: "outline", size: "sm" })}>
               Gérer mes morceaux
             </Link>
+            <Link href="/creator/catalog/tracks/new" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Publier un morceau
+            </Link>
           </div>
         </CardContent>
       </Card>

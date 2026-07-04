@@ -1,0 +1,546 @@
+{
+  "allPass": false,
+  "results": [
+    {
+      "key": "tracks@desktop",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Desktop (1920×1080)",
+      "viewportId": "desktop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks-new@desktop",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Desktop (1920×1080)",
+      "viewportId": "desktop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "releases@desktop",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Desktop (1920×1080)",
+      "viewportId": "desktop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks@laptop",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Laptop (1440×900)",
+      "viewportId": "laptop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks-new@laptop",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Laptop (1440×900)",
+      "viewportId": "laptop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "releases@laptop",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Laptop (1440×900)",
+      "viewportId": "laptop",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks@tablet-portrait",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Tablet Portrait (768×1024)",
+      "viewportId": "tablet-portrait",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks-new@tablet-portrait",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Tablet Portrait (768×1024)",
+      "viewportId": "tablet-portrait",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "releases@tablet-portrait",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Tablet Portrait (768×1024)",
+      "viewportId": "tablet-portrait",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks@tablet-landscape",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Tablet Landscape (1024×768)",
+      "viewportId": "tablet-landscape",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks-new@tablet-landscape",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Tablet Landscape (1024×768)",
+      "viewportId": "tablet-landscape",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "releases@tablet-landscape",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Tablet Landscape (1024×768)",
+      "viewportId": "tablet-landscape",
+      "pass": true,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [],
+      "screenshot": null
+    },
+    {
+      "key": "tracks@mobile-large",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Mobile Large (430×932)",
+      "viewportId": "mobile-large",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=430px"
+        }
+      ],
+      "screenshot": "tracks@mobile-large.png"
+    },
+    {
+      "key": "tracks-new@mobile-large",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Mobile Large (430×932)",
+      "viewportId": "mobile-large",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=430px"
+        }
+      ],
+      "screenshot": "tracks-new@mobile-large.png"
+    },
+    {
+      "key": "releases@mobile-large",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Mobile Large (430×932)",
+      "viewportId": "mobile-large",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=430px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=430px"
+        }
+      ],
+      "screenshot": "releases@mobile-large.png"
+    },
+    {
+      "key": "tracks@mobile-standard",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Mobile Standard (390×844)",
+      "viewportId": "mobile-standard",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=390px"
+        }
+      ],
+      "screenshot": "tracks@mobile-standard.png"
+    },
+    {
+      "key": "tracks-new@mobile-standard",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Mobile Standard (390×844)",
+      "viewportId": "mobile-standard",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=390px"
+        }
+      ],
+      "screenshot": "tracks-new@mobile-standard.png"
+    },
+    {
+      "key": "releases@mobile-standard",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Mobile Standard (390×844)",
+      "viewportId": "mobile-standard",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=390px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=390px"
+        }
+      ],
+      "screenshot": "releases@mobile-standard.png"
+    },
+    {
+      "key": "tracks@mobile-small",
+      "page": "/creator/catalog/tracks",
+      "pageSlug": "tracks",
+      "viewport": "Mobile Small (320×568)",
+      "viewportId": "mobile-small",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=320px"
+        }
+      ],
+      "screenshot": "tracks@mobile-small.png"
+    },
+    {
+      "key": "tracks-new@mobile-small",
+      "page": "/creator/catalog/tracks/new",
+      "pageSlug": "tracks-new",
+      "viewport": "Mobile Small (320×568)",
+      "viewportId": "mobile-small",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/tracks/new",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "wizard:creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=320px"
+        }
+      ],
+      "screenshot": "tracks-new@mobile-small.png"
+    },
+    {
+      "key": "releases@mobile-small",
+      "page": "/creator/catalog/releases",
+      "pageSlug": "releases",
+      "viewport": "Mobile Small (320×568)",
+      "viewportId": "mobile-small",
+      "pass": false,
+      "status": 200,
+      "finalUrl": "http://localhost:3000/creator/catalog/releases",
+      "anomalies": [
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=402px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=510px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=603px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=722px > viewport=320px"
+        },
+        {
+          "type": "element-exceeds-viewport",
+          "component": "creator-mobile-nav__pill",
+          "detail": "right=866px > viewport=320px"
+        }
+      ],
+      "screenshot": "releases@mobile-small.png"
+    }
+  ]
+}

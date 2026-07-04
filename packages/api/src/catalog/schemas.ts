@@ -59,6 +59,12 @@ export const catalogAssetConfirmSchema = z.object({
   contentHash: z.string().length(64).optional(),
 });
 
+export const catalogCoverConfirmSchema = z.object({
+  creatorId: z.string().uuid(),
+  albumId: z.string().uuid(),
+  path: z.string().min(1),
+});
+
 export const trackCreditItemSchema = z.object({
   contributorName: z.string().trim().min(1).max(100),
   role: z.enum([
@@ -86,5 +92,6 @@ export type CreateTrackInput = z.infer<typeof createTrackSchema>;
 export type UpdateTrackInput = z.infer<typeof updateTrackSchema>;
 export type CatalogAssetUploadInput = z.infer<typeof catalogAssetUploadSchema>;
 export type CatalogAssetConfirmInput = z.infer<typeof catalogAssetConfirmSchema>;
+export type CatalogCoverConfirmInput = z.infer<typeof catalogCoverConfirmSchema>;
 export type TrackCreditItem = z.infer<typeof trackCreditItemSchema>;
 export type SetTrackCreditsInput = z.infer<typeof setTrackCreditsSchema>;

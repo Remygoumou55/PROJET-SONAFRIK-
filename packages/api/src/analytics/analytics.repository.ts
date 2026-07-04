@@ -16,6 +16,7 @@ export class AnalyticsRepository {
       p_creator_id: creatorId,
     });
     if (error) throw error;
+    if (data == null) throw new Error("get_creator_stream_stats_empty");
     return data as unknown as CreatorStreamStats;
   }
 
@@ -60,6 +61,7 @@ export class AnalyticsRepository {
       p_creator_id: creatorId,
     });
     if (error) throw error;
+    if (data == null) throw new Error("get_creator_audience_stats_empty");
     return data as unknown as CreatorAudienceStats;
   }
 
@@ -68,6 +70,7 @@ export class AnalyticsRepository {
       p_creator_id: creatorId,
     });
     if (error) throw error;
+    if (data == null) throw new Error("get_creator_revenue_stats_empty");
     return data as unknown as CreatorRevenueStats;
   }
 }

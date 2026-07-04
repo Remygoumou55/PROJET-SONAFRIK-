@@ -172,7 +172,6 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
     setState({ status: "uploading", file, durationSeconds, format, progress: 0 });
     try {
       const effectiveMime = resolveAudioUploadMime(file) ?? "audio/mpeg";
-      console.debug("[AudioUploader] upload →", { creatorId, trackId, format, contentType: effectiveMime, fileSizeBytes: file.size });
       const { signedUrl, path } = await catalog.requestAssetUploadUrl({ creatorId, assetType: "audio", contentType: effectiveMime, trackId, format });
 
       await new Promise<void>((resolve, reject) => {
@@ -198,7 +197,6 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
       setState({ status: "success", durationSeconds });
       onSuccess?.(Math.round(durationSeconds));
     } catch (err) {
-      console.error("[AudioUploader] doUpload error:", err);
       const msg = err instanceof Error ? err.message : "Échec de l'envoi du fichier audio.";
       setState({ status: "error", message: msg });
       throw new Error(msg);

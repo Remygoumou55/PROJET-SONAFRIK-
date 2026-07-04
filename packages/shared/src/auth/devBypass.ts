@@ -33,3 +33,6 @@ export function assertBypassForbiddenOnVercel(): void {
 }
 
 export const DEV_MOCK_USER_ID = "dev-mock-id";
+
+/** UUID fixe valide pour Zod — uploads creator/catalog en local control. */
+export const DEV_MOCK_CREATOR_ID = "00000000-0000-4000-a000-000000000002";

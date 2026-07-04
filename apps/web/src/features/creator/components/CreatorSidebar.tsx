@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { buildCreatorNavEntries } from "../lib/creatorNavConfig";
+import type { CreatorNavEntry } from "../lib/creatorNavConfig";
 
 function isNavActive(href: string, exact: boolean | undefined, pathname: string): boolean {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function CreatorSidebar() {
+interface CreatorSidebarProps {
+  navEntries: CreatorNavEntry[];
+}
+
+export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
   const pathname = usePathname();
-  const entries = buildCreatorNavEntries();
 
   return (
     <aside className="cs-sidebar" role="navigation" aria-label="Navigation artiste">
@@ -23,7 +26,7 @@ export function CreatorSidebar() {
       </div>
 
       <nav className="cs-nav" aria-label="Menu artiste">
-        {entries.map((entry, i) => {
+        {navEntries.map((entry, i) => {
           if ("type" in entry && entry.type === "section") {
             return <div key={`sep-${i}`} className="cs-nav-sep" role="separator" aria-hidden="true" />;
           }
@@ -38,6 +41,11 @@ export function CreatorSidebar() {
             >
               <span className="cs-nav-icon" aria-hidden="true">{entry.icon}</span>
               <span>{entry.label}</span>
+              {entry.badge && entry.badge > 0 ? (
+                <span className="cs-nav-badge" aria-label={`${entry.badge} en attente`}>
+                  {entry.badge}
+                </span>
+              ) : null}
             </Link>
           );
         })}

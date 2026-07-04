@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayoutClient";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
+import { buildCreatorNavEntries } from "@/features/creator/lib/creatorNavConfig";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
@@ -21,10 +22,13 @@ async function CreatorGuard({ children }: { children: React.ReactNode }) {
   const avatarPath =
     context.artistProfile.profile_photo ?? context.artistProfile.cover_path;
 
+  const navEntries = buildCreatorNavEntries(context.pendingVerifications);
+
   return (
     <PerformanceProvider flags={performanceFlags}>
       <DevAuthBootstrap />
       <CreatorLayoutClient
+        navEntries={navEntries}
         pendingVerifications={context.pendingVerifications}
         userId={context.creator.owner_id}
         initialUnreadCount={unreadCount}

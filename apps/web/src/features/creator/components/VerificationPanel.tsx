@@ -56,7 +56,7 @@ export function VerificationPanel({
 
     const res = await fetch(signedUrl, {
       method: "PUT",
-      headers: { "Content-Type": file.type, ...(token ? { "x-upsert": "true" } : {}) },
+      headers: { "Content-Type": contentType, ...(token ? { "x-upsert": "true" } : {}) },
       body: file,
     });
 
