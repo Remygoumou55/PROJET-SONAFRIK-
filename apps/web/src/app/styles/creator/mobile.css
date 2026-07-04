@@ -192,54 +192,6 @@
     line-height: 1.35;
   }
 
-  .dash-objective__inner {
-    padding: 0.875rem;
-  }
-
-  .dash-objective__aside {
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .dash-objective__title {
-    font-size: 0.9375rem;
-    overflow-wrap: anywhere;
-  }
-
-  .dash-objective__why,
-  .dash-objective__reward {
-    font-size: 0.75rem;
-  }
-
-  .dash-quick-actions__grid {
-    gap: 0.5rem;
-  }
-
-  .dash-quick-actions__card {
-    min-height: auto;
-    padding: 0.875rem;
-  }
-
-  .dash-quick-actions__label {
-    font-size: 0.8125rem;
-    overflow-wrap: anywhere;
-  }
-
-  .dash-quick-actions__desc {
-    font-size: 0.6875rem;
-    line-height: 1.35;
-  }
-
-  .dash-stats__card,
-  .dash-career-level {
-    min-height: auto;
-    padding: 0.75rem;
-  }
-
-  .dash-stats__value {
-    font-size: 1.125rem;
-  }
-
   .identity-shell__layout {
     gap: 1.25rem;
     padding: 1.25rem 1rem 2rem;

@@ -11,6 +11,48 @@
 
 ---
 
+## 2026-07-04 — OFFICIAL ARTIST WORKSPACE RUNTIME CERTIFICATION V1.0
+
+### Mission
+Certification officielle 11 phases du Workspace Artiste — audit forensique runtime complet, correction tous bugs, validation build/lint/typecheck 100%.
+
+### Périmètre
+`apps/web/src/app/(creator)/` · `apps/web/src/features/creator/` — seulement
+
+### Anomalies identifiées et corrigées
+
+| ID | Sévérité | Fichier | Description | Fix |
+|---|---|---|---|---|
+| C-001 | MINEURE | `mobile.css:195-242` | 48 lignes CSS mortes — overrides mobiles pour classes supprimées (dash-objective, dash-quick-actions, dash-stats residuelles de B-005 incomplet) | Supprimées |
+| C-002 | MINEURE | `ArtistIdentityForm.tsx` | Prop `creator: Creator` déclarée et passée depuis la page mais jamais déstructurée ni utilisée | Retiré de la signature type + de `identity/page.tsx` |
+| C-003 | MINEURE | `CropEditorModal.tsx:284` | `var(--color-vert-energie, #00d26a)` — fallback hex viole la règle CSS token | Réduit à `var(--color-vert-energie)` |
+
+### Faux positifs (non-bugs confirmés)
+- `labels` sans policy DELETE → soft-delete via UPDATE (intentionnel)
+- `works`/`track_credits` avec `{public}` role → USING/WITH CHECK utilisent `auth.uid()` correctement
+- `catalog-visuals` bucket public → intentionnel pour pochettes publiques
+- `DYNAMIC_SERVER_USAGE` log build → comportement normal route dynamique
+
+### Audit DB Supabase
+- RLS activé sur 6 tables creator (artist_profiles, creator_roles, creator_verifications, creators, label_members, labels) ✅
+- Buckets storage : creator-assets (20MB, privé) · avatars (10MB, privé) · catalog-visuals (10MB, public) · catalog-audio (100MB, privé) ✅
+- Zéro import cross-silo (listener/admin → creator) ✅
+- Zéro Supabase direct dans composants React ✅
+- Zéro hex hardcodé dans features/creator ✅
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15
+- `pnpm lint` : ✅ 15/15
+- `pnpm build` : ✅ 9/9
+
+### Fichiers touchés (certification uniquement)
+- `apps/web/src/app/styles/creator/mobile.css` — C-001 : -48 lignes CSS mortes
+- `apps/web/src/features/creator/components/ArtistIdentityForm.tsx` — C-002 : import Creator retiré, prop retirée
+- `apps/web/src/app/(creator)/creator/identity/page.tsx` — C-002 : `creator={context.creator}` retiré
+- `apps/web/src/features/creator/dashboard/components/CropEditorModal.tsx` — C-003 : hex fallback retiré
+
+---
+
 ## 2026-07-03 — MISSION D : ARTIST WORKSPACE EXPERIENCE — AUDIT 1 + REMEDIATION 1
 
 ### AUDIT 1 — Forensic complet ✅

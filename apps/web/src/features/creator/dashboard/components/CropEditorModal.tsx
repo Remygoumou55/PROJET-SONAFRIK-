@@ -281,7 +281,7 @@ export function CropEditorModal({
                     background: "var(--color-noir-profond)",
                   },
                   cropAreaStyle: {
-                    border: "2px solid var(--color-vert-energie, #00d26a)",
+                    border: "2px solid var(--color-vert-energie)",
                     boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.72)",
                   },
                 }}

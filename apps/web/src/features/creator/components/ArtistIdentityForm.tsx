@@ -1,23 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafrik/ui";
-import type { ArtistProfile, Creator } from "@sonafrik/types";
+import type { ArtistProfile } from "@sonafrik/types";
 import { GENRE_OPTIONS } from "@sonafrik/types";
-import { FIELD_LIMITS, IMAGE_ACCEPT, IMAGE_POLICY, isImage, resolveImageUploadMime } from "@sonafrik/shared";
+import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function ArtistIdentityForm({
-  creator,
   profile,
 }: {
-  creator: Creator;
   profile: ArtistProfile;
 }) {
   const router = useRouter();
   const creatorService = useCreatorService();
-  const bannerRef = useRef<HTMLInputElement>(null);
   const [stageName, setStageName] = useState(profile.stage_name);
   const [bio, setBio] = useState(profile.bio ?? "");
   const [genres, setGenres] = useState<string[]>(profile.genres);
@@ -29,28 +27,6 @@ export function ArtistIdentityForm({
     setGenres((current) =>
       current.includes(genre) ? current.filter((g) => g !== genre) : [...current, genre].slice(0, 8),
     );
-  }
-
-  async function uploadBanner(file: File) {
-    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!isImage(file.type) && !extOk) {
-      throw new Error("Format non autorisé. Utilisez JPEG, PNG ou WebP.");
-    }
-    if (file.size > IMAGE_POLICY.maxBytes) {
-      throw new Error(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
-    }
-    const contentType = resolveImageUploadMime(file) ?? "image/jpeg";
-    const { signedUrl, token } = await creatorService.requestAssetUploadUrl({
-      creatorId: creator.id,
-      assetKind: "banner",
-      contentType,
-    });
-    const res = await fetch(signedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": contentType, ...(token ? { "x-upsert": "true" } : {}) },
-      body: file,
-    });
-    if (!res.ok) throw new Error(`Erreur envoi bannière (${res.status}).`);
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -77,33 +53,14 @@ export function ArtistIdentityForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Bannière artiste</CardTitle>
+          <CardTitle>Photo & couverture</CardTitle>
         </CardHeader>
-        <CardContent>
-          <input
-            ref={bannerRef}
-            type="file"
-            accept={IMAGE_ACCEPT}
-            className="hidden"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              setLoading(true);
-              setMessage(null);
-              try {
-                await uploadBanner(file);
-                router.refresh();
-                setMessage("Bannière mise à jour.");
-              } catch (err) {
-                setMessage(err instanceof Error ? err.message : "Erreur lors de l'envoi de la bannière.");
-              } finally {
-                setLoading(false);
-                event.target.value = "";
-              }
-            }}
-          />
-          <Button type="button" variant="outline" size="sm" onClick={() => bannerRef.current?.click()}>
-            Téléverser bannière (URL signée)
+        <CardContent className="space-y-3">
+          <p className="text-texte-secondaire text-sm">
+            Modifiez votre avatar et votre bannière depuis la vue d&apos;ensemble — recadrage et aperçu en direct.
+          </p>
+          <Button type="button" variant="outline" size="sm" asChild>
+            <Link href="/creator">Gérer photo et couverture</Link>
           </Button>
         </CardContent>
       </Card>
