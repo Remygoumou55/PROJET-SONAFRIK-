@@ -176,28 +176,31 @@ export function TrackList({
 
       {sorted.length === 0 ? (
         <Card>
-          <CardContent className="space-y-4 py-10 text-center">
-            <p className="text-texte-secondaire text-sm">
-              {total === 0 && !initialSearch && statusFilter === "all"
-                ? "Vous n'avez pas encore publié de morceau."
-                : "Aucun morceau ne correspond à votre recherche."}
-            </p>
+          <CardContent className="space-y-2 py-10 text-center">
             {total === 0 && !initialSearch && statusFilter === "all" ? (
-              <Link href="/creator/catalog/tracks/new" className={buttonVariants({ variant: "primary", size: "sm" })}>
-                Publier mon premier morceau
-              </Link>
+              <>
+                <p className="text-texte-principal text-sm font-medium">Aucune publication pour le moment</p>
+                <p className="text-texte-secondaire text-sm">
+                  Lorsque vous publierez votre premier morceau, il apparaîtra automatiquement ici.
+                </p>
+              </>
             ) : (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setSearchInput("");
-                  applyFilters("", "all");
-                }}
-              >
-                Réinitialiser les filtres
-              </Button>
+              <>
+                <p className="text-texte-secondaire text-sm">
+                  Aucune publication ne correspond à votre recherche.
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSearchInput("");
+                    applyFilters("", "all");
+                  }}
+                >
+                  Réinitialiser les filtres
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>
