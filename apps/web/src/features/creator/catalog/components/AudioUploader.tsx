@@ -9,6 +9,7 @@ import {
   sha256Hex,
   validateAudioAsset,
 } from "@sonafrik/shared";
+import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useCatalogService } from "../hooks/useCatalog";
 
 type AudioFormat = "mp3" | "aac" | "wav";
@@ -16,7 +17,7 @@ type AudioFormat = "mp3" | "aac" | "wav";
 // ─── Public handle ────────────────────────────────────────────────────────────
 
 export interface AudioUploaderHandle {
-  triggerUpload: () => Promise<void>;
+  triggerUpload: (creatorIdOverride?: string) => Promise<void>;
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -168,30 +169,30 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
   // ── Upload ───────────────────────────────────────────────────────────────────
 
-  const doUpload = useCallback(async (file: File, durationSeconds: number, format: AudioFormat): Promise<void> => {
+  const doUpload = useCallback(async (
+    file: File,
+    durationSeconds: number,
+    format: AudioFormat,
+    creatorIdOverride?: string,
+  ): Promise<void> => {
+    const effectiveCreatorId = creatorIdOverride ?? creatorId;
     setState({ status: "uploading", file, durationSeconds, format, progress: 0 });
     try {
       const effectiveMime = resolveAudioUploadMime(file) ?? "audio/mpeg";
-      const { signedUrl, path } = await catalog.requestAssetUploadUrl({ creatorId, assetType: "audio", contentType: effectiveMime, trackId, format });
+      const { signedUrl, path } = await catalog.requestAssetUploadUrl({ creatorId: effectiveCreatorId, assetType: "audio", contentType: effectiveMime, trackId, format });
 
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", signedUrl, true);
-        xhr.setRequestHeader("Content-Type", effectiveMime);
-        xhr.upload.onprogress = (ev) => {
-          if (ev.lengthComputable) {
-            setState((prev) => prev.status === "uploading" ? { ...prev, progress: Math.round((ev.loaded / ev.total) * 100) } : prev);
-          }
-        };
-        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`Erreur serveur (${xhr.status})`));
-        xhr.onerror = () => reject(new Error("Connexion perdue pendant l'envoi."));
-        xhr.send(file);
+      await uploadAssetToSignedUrl(signedUrl, file, {
+        contentType: effectiveMime,
+        onProgress: (pct) =>
+          setState((prev) =>
+            prev.status === "uploading" ? { ...prev, progress: pct } : prev,
+          ),
       });
 
       setState({ status: "validating", fileName: file.name });
       const contentHash = await sha256Hex(await file.arrayBuffer());
       // Use effectiveMime (normalized) — file.type may be "" for drag-dropped files
-      const confirm = await catalog.confirmAssetUpload({ creatorId, trackId, path, format, contentType: effectiveMime, fileSizeBytes: file.size, durationSeconds: Math.round(durationSeconds), contentHash });
+      const confirm = await catalog.confirmAssetUpload({ creatorId: effectiveCreatorId, trackId, path, format, contentType: effectiveMime, fileSizeBytes: file.size, durationSeconds: Math.round(durationSeconds), contentHash });
       if (confirm.integrityStatus === "invalid") throw new Error(confirm.message || "Fichier rejeté après validation serveur.");
 
       setState({ status: "success", durationSeconds });
@@ -206,11 +207,11 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
   // ── Imperative handle ─────────────────────────────────────────────────────────
 
   useImperativeHandle(ref, () => ({
-    triggerUpload: async () => {
+    triggerUpload: async (creatorIdOverride?: string) => {
       const s = stateRef.current;
       if (s.status === "success") return;
       if (s.status !== "ready") throw new Error("Aucun fichier audio sélectionné.");
-      await doUpload(s.file, s.durationSeconds, s.format);
+      await doUpload(s.file, s.durationSeconds, s.format, creatorIdOverride);
     },
   }), [doUpload]);
 

@@ -16,6 +16,14 @@ export type TrackCreditRole =
   | "mixage"
   | "mastering";
 
+/** Cover Engine v1.1 — business artwork state (albums.cover_status). */
+export type CoverStatus = "AUTO_GENERATED" | "USER_REPLACED";
+
+export const COVER_STATUS = {
+  AUTO_GENERATED: "AUTO_GENERATED",
+  USER_REPLACED: "USER_REPLACED",
+} as const satisfies Record<string, CoverStatus>;
+
 export interface Genre {
   id: string;
   name: string;
@@ -38,6 +46,7 @@ export interface Album {
   upc: string | null;
   description: string | null;
   cover_path: string | null;
+  cover_status: CoverStatus;
   release_date: string | null;
   publication_status: PublicationStatus;
   rejection_reason: string | null;
@@ -150,7 +159,7 @@ export const CATALOG_ERROR_MESSAGES: Record<string, string> = {
   invalid_isrc: "Code ISRC invalide.",
   invalid_upc: "Code UPC invalide (12-14 chiffres).",
   publish_submit_failed: "Impossible de soumettre à publication.",
-  asset_upload_failed: "Échec du téléversement de l'asset.",
+  asset_upload_failed: "Impossible d'enregistrer votre fichier. Réessayez.",
   asset_type_invalid: "Format de fichier non supporté.",
   invalid_creator_id: "Identifiant créateur invalide. Reconnectez-vous ou rechargez la page.",
   invalid_content_type: "Format de fichier non supporté.",

@@ -408,7 +408,7 @@ export const CREATOR_ERROR_MESSAGES: Record<string, string> = {
   invalid_team_member:        "Membre d'équipe invalide.",
   verification_not_found:     "Vérification introuvable.",
   verification_submit_failed: "Impossible de soumettre la vérification.",
-  asset_upload_failed:        "Échec du téléversement de l'asset.",
+  asset_upload_failed:        "Impossible d'enregistrer votre fichier. Réessayez.",
   asset_type_invalid:         "Format de fichier non supporté.",
   invalid_creator_id:         "Identifiant créateur invalide. Reconnectez-vous ou rechargez la page.",
   invalid_content_type:       "Format de fichier non supporté.",

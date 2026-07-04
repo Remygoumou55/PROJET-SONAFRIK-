@@ -1,14 +1,25 @@
 "use client";
 
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { generateDefaultArtwork } from "@sonafrik/api/catalog";
 import { IMAGE_ACCEPT, IMAGE_POLICY, isImage, resolveImageUploadMime } from "@sonafrik/shared";
+import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CatalogCropModal, type CatalogCropResult } from "./CatalogCropModal";
 
 // ─── Public handle ────────────────────────────────────────────────────────────
 
+export type EnsureCoverContext = {
+  trackTitle: string;
+  artistName: string;
+  creatorId?: string;
+};
+
 export interface CoverUploaderHandle {
+  /** Uploads the user-selected cover when a valid preview exists. */
   triggerUpload: () => Promise<void>;
+  /** Ensures album has a cover: user image, or auto-generated fallback. */
+  ensureCover: (ctx: EnsureCoverContext) => Promise<{ source: "user" | "auto" }>;
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -21,6 +32,7 @@ interface Props {
   onFileReady?: () => void;
   onFileCleared?: () => void;
   onSuccess?: () => void;
+  onCoverDefined?: (source: "user" | "auto") => void;
 }
 
 // ─── Cover dimension policy (catalog publication) ─────────────────────────────
@@ -28,20 +40,45 @@ interface Props {
 const COVER_MIN_DIMENSION = 1400;
 const COVER_RECOMMENDED = 3000;
 
+const ADVISORY_SMALL =
+  "Votre image est de qualité insuffisante. SONAFRIK utilisera temporairement une pochette automatique. Vous pourrez la remplacer quand vous le souhaiterez.";
+
+const ADVISORY_CORRUPT =
+  "Impossible de lire cette image. SONAFRIK utilisera temporairement une pochette automatique. Vous pourrez la remplacer quand vous le souhaiterez.";
+
 function coverDimensionWarning(width: number, height: number): string | null {
   const minDim = Math.min(width, height);
   if (minDim >= COVER_RECOMMENDED) return null;
-  return `Recommandé : ${COVER_RECOMMENDED}×${COVER_RECOMMENDED} px (actuel : ${width}×${height}).`;
+  if (minDim >= COVER_MIN_DIMENSION) {
+    return `Recommandé : ${COVER_RECOMMENDED}×${COVER_RECOMMENDED} px (actuel : ${width}×${height}).`;
+  }
+  return null;
 }
 
 // ─── State machine ────────────────────────────────────────────────────────────
 
 type UploadState =
   | { status: "idle" }
-  | { status: "preview"; file: File; previewUrl: string; width: number; height: number; dimensionWarning: string | null }
-  | { status: "uploading"; file: File; previewUrl: string; progress: number; width: number; height: number; dimensionWarning: string | null }
-  | { status: "success" }
-  | { status: "error"; message: string };
+  | {
+      status: "preview";
+      file: File;
+      previewUrl: string;
+      width: number;
+      height: number;
+      dimensionWarning: string | null;
+    }
+  | {
+      status: "uploading";
+      file: File;
+      previewUrl: string;
+      progress: number;
+      width: number;
+      height: number;
+      dimensionWarning: string | null;
+    }
+  | { status: "success"; source: "user" | "auto" }
+  | { status: "advisory"; message: string }
+  | { status: "error"; message: string; blocking: boolean };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -61,7 +98,15 @@ function getImageDimensions(url: string): Promise<{ width: number; height: numbe
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function CoverUploader(
-  { albumId, creatorId, uploadMode = "manual", onFileReady, onFileCleared, onSuccess },
+  {
+    albumId,
+    creatorId,
+    uploadMode = "manual",
+    onFileReady,
+    onFileCleared,
+    onSuccess,
+    onCoverDefined,
+  },
   ref,
 ) {
   const catalog = useCatalogService();
@@ -76,113 +121,181 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const originalFileRef = useRef<File | null>(null);
 
-  // ── Validate ─────────────────────────────────────────────────────────────────
+  const uploadUserPreview = useCallback(async (creatorIdOverride?: string): Promise<void> => {
+    const effectiveCreatorId = creatorIdOverride ?? creatorId;
+    const s = stateRef.current;
+    if (s.status !== "preview") throw new Error("Aucune pochette sélectionnée.");
+    const { file, previewUrl, width, height } = s;
+
+    setState({
+      status: "uploading",
+      file,
+      previewUrl,
+      progress: 0,
+      width,
+      height,
+      dimensionWarning: s.dimensionWarning ?? null,
+    });
+
+    try {
+      const contentType = resolveImageUploadMime(file) ?? "image/jpeg";
+      const { signedUrl, path } = await catalog.requestAssetUploadUrl({
+        creatorId: effectiveCreatorId,
+        assetType: "cover",
+        contentType,
+        albumId,
+      });
+
+      await uploadAssetToSignedUrl(signedUrl, file, {
+        contentType,
+        onProgress: (pct) =>
+          setState((prev) =>
+            prev.status === "uploading" ? { ...prev, progress: pct } : prev,
+          ),
+      });
+
+      await catalog.confirmCoverUpload({ creatorId: effectiveCreatorId, albumId, path });
+      await catalog.applyCoverArtworkState(albumId, "user");
+
+      URL.revokeObjectURL(previewUrl);
+      setState({ status: "success", source: "user" });
+      onCoverDefined?.("user");
+      onSuccess?.();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Échec de l'envoi de la pochette.";
+      setState({ status: "error", message: msg, blocking: true });
+      throw new Error(msg);
+    }
+  }, [catalog, creatorId, albumId, onSuccess, onCoverDefined]);
+
+  const uploadAutoCover = useCallback(
+    async (ctx: EnsureCoverContext): Promise<void> => {
+      const effectiveCreatorId = ctx.creatorId ?? creatorId;
+      const { blob, contentType } = await generateDefaultArtwork({
+        trackTitle: ctx.trackTitle,
+        artistName: ctx.artistName,
+      });
+
+      await catalog.uploadCoverBlob({
+        creatorId: effectiveCreatorId,
+        albumId,
+        blob,
+        contentType,
+        source: "auto",
+      });
+
+      setState({ status: "success", source: "auto" });
+      onCoverDefined?.("auto");
+      onSuccess?.();
+    },
+    [catalog, creatorId, albumId, onSuccess, onCoverDefined],
+  );
+
+  const ensureCover = useCallback(
+    async (ctx: EnsureCoverContext): Promise<{ source: "user" | "auto" }> => {
+      const s = stateRef.current;
+      if (s.status === "success") return { source: s.source };
+
+      if (s.status === "preview") {
+        await uploadUserPreview(ctx.creatorId);
+        return { source: "user" };
+      }
+
+      await uploadAutoCover(ctx);
+      return { source: "auto" };
+    },
+    [uploadUserPreview, uploadAutoCover],
+  );
+
+  // ── Validate (blocking only) ─────────────────────────────────────────────────
 
   const validate = useCallback((file: File): string | null => {
     const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
     if (!isImage(file.type) && !extOk) {
       return `Format non supporté (${file.type || (file.name.split(".").pop() ?? "?")}) — utilisez JPEG, PNG ou WebP.`;
     }
-    if (file.size > IMAGE_POLICY.maxBytes) return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${IMAGE_POLICY.maxLabel}.`;
+    if (file.size > IMAGE_POLICY.maxBytes) {
+      return `Fichier trop lourd (${formatBytes(file.size)}). Maximum ${IMAGE_POLICY.maxLabel}.`;
+    }
     return null;
   }, []);
 
-  // ── File selection → open crop editor ─────────────────────────────────────────
+  const openCrop = useCallback(
+    (file: File) => {
+      if (cropSrc) URL.revokeObjectURL(cropSrc);
+      const url = URL.createObjectURL(file);
+      setCropSrc(url);
+      setCropOpen(true);
+    },
+    [cropSrc],
+  );
 
-  const openCrop = useCallback((file: File) => {
-    if (cropSrc) URL.revokeObjectURL(cropSrc);
-    const url = URL.createObjectURL(file);
-    setCropSrc(url);
-    setCropOpen(true);
-  }, [cropSrc]);
+  const handleFile = useCallback(
+    (file: File) => {
+      const error = validate(file);
+      if (error) {
+        setState({ status: "error", message: error, blocking: true });
+        return;
+      }
+      originalFileRef.current = file;
+      openCrop(file);
+    },
+    [validate, openCrop],
+  );
 
-  const handleFile = useCallback((file: File) => {
-    const error = validate(file);
-    if (error) { setState({ status: "error", message: error }); return; }
-    originalFileRef.current = file;
-    openCrop(file);
-  }, [validate, openCrop]);
+  const handleCropSave = useCallback(
+    async (result: CatalogCropResult) => {
+      const croppedFile = new File([result.croppedBlob], "cover.jpg", { type: "image/jpeg" });
+      const previewUrl = URL.createObjectURL(croppedFile);
+      const { width, height } = await getImageDimensions(previewUrl);
 
-  // ── Upload ────────────────────────────────────────────────────────────────────
+      if (width === 0 || height === 0) {
+        URL.revokeObjectURL(previewUrl);
+        setState({ status: "advisory", message: ADVISORY_CORRUPT });
+        onFileCleared?.();
+        return;
+      }
 
-  const doUpload = useCallback(async (): Promise<void> => {
-    const s = stateRef.current;
-    if (s.status !== "preview") throw new Error("Aucune pochette sélectionnée.");
-    const { file, previewUrl, width, height } = s;
+      const minDim = Math.min(width, height);
+      if (minDim < COVER_MIN_DIMENSION) {
+        URL.revokeObjectURL(previewUrl);
+        setState({ status: "advisory", message: ADVISORY_SMALL });
+        onFileCleared?.();
+        return;
+      }
 
-    setState({ status: "uploading", file, previewUrl, progress: 0, width, height, dimensionWarning: s.dimensionWarning ?? null });
-    try {
-      const contentType = resolveImageUploadMime(file) ?? "image/jpeg";
-      const { signedUrl, path } = await catalog.requestAssetUploadUrl({
-        creatorId,
-        assetType: "cover",
-        contentType,
-        albumId,
-      });
+      const prev = stateRef.current;
+      if (prev.status === "preview" || prev.status === "uploading") {
+        URL.revokeObjectURL(prev.previewUrl);
+      }
 
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", signedUrl, true);
-        xhr.setRequestHeader("Content-Type", contentType);
-        xhr.upload.onprogress = (ev) => {
-          if (ev.lengthComputable) {
-            setState((prev) => prev.status === "uploading" ? { ...prev, progress: Math.round((ev.loaded / ev.total) * 100) } : prev);
-          }
-        };
-        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error(`Erreur serveur (${xhr.status})`));
-        xhr.onerror = () => reject(new Error("Connexion perdue pendant l'envoi."));
-        xhr.send(file);
-      });
+      const dimensionWarning = coverDimensionWarning(width, height);
+      const nextState = {
+        status: "preview" as const,
+        file: croppedFile,
+        previewUrl,
+        width,
+        height,
+        dimensionWarning,
+      };
+      stateRef.current = nextState;
+      setState(nextState);
+      onFileReady?.();
 
-      await catalog.confirmCoverUpload({ creatorId, albumId, path });
-
-      URL.revokeObjectURL(previewUrl);
-      setState({ status: "success" });
-      onSuccess?.();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Échec de l'envoi de la pochette.";
-      setState({ status: "error", message: msg });
-      throw new Error(msg);
-    }
-  }, [catalog, creatorId, albumId, onSuccess]);
-
-  // ── Crop saved → preview (and optional immediate upload) ─────────────────────
-
-  const handleCropSave = useCallback(async (result: CatalogCropResult) => {
-    const croppedFile = new File([result.croppedBlob], "cover.jpg", { type: "image/jpeg" });
-    const previewUrl = URL.createObjectURL(croppedFile);
-    const { width, height } = await getImageDimensions(previewUrl);
-
-    const minDim = Math.min(width, height);
-    if (minDim < COVER_MIN_DIMENSION) {
-      URL.revokeObjectURL(previewUrl);
-      setState({
-        status: "error",
-        message: `Pochette trop petite (${width}×${height}). Minimum ${COVER_MIN_DIMENSION}×${COVER_MIN_DIMENSION} px.`,
-      });
-      return;
-    }
-
-    const prev = stateRef.current;
-    if (prev.status === "preview" || prev.status === "uploading") URL.revokeObjectURL(prev.previewUrl);
-
-    const dimensionWarning = coverDimensionWarning(width, height);
-    const nextState = { status: "preview" as const, file: croppedFile, previewUrl, width, height, dimensionWarning };
-    stateRef.current = nextState;
-    setState(nextState);
-    onFileReady?.();
-
-    if (uploadMode === "immediate") {
-      await doUpload();
-    }
-  }, [onFileReady, uploadMode, doUpload]);
+      if (uploadMode === "immediate") {
+        await uploadUserPreview();
+      }
+    },
+    [onFileReady, uploadMode, uploadUserPreview, onFileCleared],
+  );
 
   const handleCropClose = useCallback(() => {
     setCropOpen(false);
-    if (cropSrc) { URL.revokeObjectURL(cropSrc); setCropSrc(null); }
+    if (cropSrc) {
+      URL.revokeObjectURL(cropSrc);
+      setCropSrc(null);
+    }
   }, [cropSrc]);
-
-  // ── Thumbnail click → re-crop from original ────────────────────────────────────
 
   const handleThumbnailClick = useCallback(() => {
     if (stateRef.current.status !== "preview") return;
@@ -190,43 +303,45 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     openCrop(src);
   }, [openCrop]);
 
-  // ── Input / Drop ──────────────────────────────────────────────────────────────
-
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
-    e.target.value = "";
-  }, [handleFile]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  }, [handleFile]);
-
-  // ── Imperative handle ─────────────────────────────────────────────────────────
-
-  useImperativeHandle(ref, () => ({
-    triggerUpload: async () => {
-      const s = stateRef.current;
-      if (s.status === "success") return;
-      await doUpload();
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleFile(file);
+      e.target.value = "";
     },
-  }), [doUpload]);
+    [handleFile],
+  );
 
-  // ── Reset ─────────────────────────────────────────────────────────────────────
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    },
+    [handleFile],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      triggerUpload: uploadUserPreview,
+      ensureCover,
+    }),
+    [uploadUserPreview, ensureCover],
+  );
 
   const reset = useCallback(() => {
     const s = stateRef.current;
     if (s.status === "preview" || s.status === "uploading") URL.revokeObjectURL(s.previewUrl);
-    if (cropSrc) { URL.revokeObjectURL(cropSrc); setCropSrc(null); }
+    if (cropSrc) {
+      URL.revokeObjectURL(cropSrc);
+      setCropSrc(null);
+    }
     originalFileRef.current = null;
     setState({ status: "idle" });
     onFileCleared?.();
   }, [cropSrc, onFileCleared]);
-
-  // ── Crop modal (rendered at root to persist across state changes) ──────────────
 
   const cropModal = cropSrc ? (
     <CatalogCropModal
@@ -239,21 +354,17 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     />
   ) : null;
 
-  // ── Success ────────────────────────────────────────────────────────────────────
-
   if (state.status === "success") {
     return (
       <>
         {cropModal}
         <div className="cover-up__success">
           <span className="cover-up__success-icon">✓</span>
-          <span>Pochette validée</span>
+          <span>{state.source === "auto" ? "Pochette automatique appliquée" : "Pochette validée"}</span>
         </div>
       </>
     );
   }
-
-  // ── Preview / Uploading ────────────────────────────────────────────────────────
 
   if (state.status === "preview" || state.status === "uploading") {
     const isUploading = state.status === "uploading";
@@ -271,11 +382,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             title="Cliquer pour recadrer"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={state.previewUrl}
-              alt="Aperçu de la pochette"
-              className="cover-up__thumb"
-            />
+            <img src={state.previewUrl} alt="Aperçu de la pochette" className="cover-up__thumb" />
             {!isUploading && (
               <div className="cover-up__thumb-overlay" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -295,7 +402,9 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             </p>
 
             {state.dimensionWarning ? (
-              <p className="cover-up__warning" role="status">{state.dimensionWarning}</p>
+              <p className="cover-up__warning" role="status">
+                {state.dimensionWarning}
+              </p>
             ) : null}
 
             {isUploading ? (
@@ -316,8 +425,6 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     );
   }
 
-  // ── Idle / Error — Drop zone ───────────────────────────────────────────────────
-
   return (
     <>
       {cropModal}
@@ -327,7 +434,10 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
           tabIndex={0}
           onClick={() => inputRef.current?.click()}
           onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
-          onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={`cover-up__drop${isDragOver ? " cover-up__drop--over" : ""}`}
@@ -340,11 +450,24 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <p className="cover-up__drop-label">Glissez une image ou cliquez</p>
-          <p className="cover-up__drop-hint">JPG · PNG · WebP — max {IMAGE_POLICY.maxLabel}</p>
+          <p className="cover-up__drop-hint">
+            Optionnel — JPG · PNG · WebP · max {IMAGE_POLICY.maxLabel}
+          </p>
+          <p className="cover-up__drop-hint cover-up__drop-hint--soft">
+            Sans image, SONAFRIK créera une pochette automatique pour vous.
+          </p>
         </div>
 
+        {state.status === "advisory" && (
+          <p className="cover-up__advisory" role="status">
+            {state.message}
+          </p>
+        )}
+
         {state.status === "error" && (
-          <p className="cover-up__error" role="alert">{state.message}</p>
+          <p className="cover-up__error" role="alert">
+            {state.message}
+          </p>
         )}
 
         <input

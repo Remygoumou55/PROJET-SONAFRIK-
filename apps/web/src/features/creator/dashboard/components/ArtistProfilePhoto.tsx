@@ -11,6 +11,7 @@ import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 import { useRouter } from "next/navigation";
+import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import { CropEditorModal } from "./CropEditorModal";
 import type { CropResult } from "./CropEditorModal";
@@ -144,15 +145,10 @@ export function ArtistProfilePhoto({
             assetKind: "gallery",
             contentType: origContentType,
           });
-        const origRes = await fetch(origSignedUrl, {
-          method: "PUT",
-          headers: {
-            "Content-Type": origContentType,
-            ...(origToken ? { "x-upsert": "true" } : {}),
-          },
-          body: pendingOriginalFile,
+        await uploadAssetToSignedUrl(origSignedUrl, pendingOriginalFile, {
+          contentType: origContentType,
+          token: origToken,
         });
-        if (!origRes.ok) throw new Error("Échec de l'envoi de l'original.");
         finalOriginalPath = origPath;
       }
 
@@ -163,15 +159,10 @@ export function ArtistProfilePhoto({
           assetKind: "gallery",
           contentType: "image/jpeg",
         });
-      const cropRes = await fetch(cropSignedUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "image/jpeg",
-          ...(cropToken ? { "x-upsert": "true" } : {}),
-        },
-        body: croppedFile,
+      await uploadAssetToSignedUrl(cropSignedUrl, croppedFile, {
+        contentType: "image/jpeg",
+        token: cropToken,
       });
-      if (!cropRes.ok) throw new Error("Échec de l'envoi du recadrage.");
 
       // Save to DB
       await creatorService.saveAvatarCrop({

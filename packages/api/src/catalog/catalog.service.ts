@@ -3,7 +3,6 @@ import type { Album, CatalogContext, Genre, Track, TrackAppearance, TrackCredit,
 import { CATALOG_ERROR_MESSAGES } from "@sonafrik/types";
 import { CatalogError } from "./errors";
 import { CatalogRepository } from "./catalog.repository";
-import { PublicationIntegrationService } from "../publication/integration";
 import {
   catalogAssetUploadSchema,
   catalogAssetConfirmSchema,
@@ -24,9 +23,15 @@ import {
 } from "./schemas";
 import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
 import {
+  coverStatusFromSource,
+  type CoverSource,
+} from "./artwork";
+import { coverSourceSchema } from "./schemas";
+import {
   resolveCatalogAssetConfirmError,
   resolveCatalogAssetUploadError,
 } from "../shared/uploadSchemaErrors";
+import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
 
 function isDevBypass(): boolean {
   return (
@@ -185,7 +190,7 @@ export class CatalogService {
     if (!album.cover_path?.trim()) {
       throw new CatalogError(
         "publish_submit_failed",
-        "Ajoutez une pochette avant de soumettre.",
+        "La pochette n'est pas encore définie. Revenez à l'étape Fichiers du wizard.",
       );
     }
 
@@ -210,6 +215,7 @@ export class CatalogService {
   async submitAlbum(albumId: string): Promise<void> {
     await this.assertAlbumReadyForSubmit(albumId);
 
+    const { PublicationIntegrationService } = await import("../publication/integration");
     const integration = new PublicationIntegrationService(this.client);
     try {
       await integration.submitAlbum(albumId, async () => {
@@ -335,6 +341,7 @@ export class CatalogService {
   }
 
   async submitTrack(trackId: string): Promise<void> {
+    const { PublicationIntegrationService } = await import("../publication/integration");
     const integration = new PublicationIntegrationService(this.client);
     try {
       await integration.submitTrack(trackId, async () => {
@@ -449,7 +456,7 @@ export class CatalogService {
     if (error) {
       throw new CatalogError(
         "asset_upload_failed",
-        error.message || undefined,
+        await extractFunctionInvokeMessageAsync(error),
       );
     }
     if (!data?.signedUrl) {
@@ -476,13 +483,89 @@ export class CatalogService {
     });
 
     if (error) {
-      throw new CatalogError("asset_upload_failed", error.message || undefined);
+      throw new CatalogError(
+        "asset_upload_failed",
+        await extractFunctionInvokeMessageAsync(error),
+      );
     }
     if (!data?.path) {
       const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
       throw new CatalogError("asset_upload_failed", remoteMsg);
     }
     return { path: data.path as string };
+  }
+
+  private async confirmCoverUploadWithRetry(
+    input: CatalogCoverConfirmInput,
+    maxAttempts = 3,
+  ): Promise<{ path: string }> {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        return await this.confirmCoverUpload(input);
+      } catch (err) {
+        lastError = err;
+        const msg = err instanceof Error ? err.message : "";
+        const retryable =
+          msg.includes("Pochette introuvable") || msg.includes("introuvable en Storage");
+        if (!retryable || attempt === maxAttempts) throw err;
+        await new Promise((resolve) => setTimeout(resolve, attempt * 400));
+      }
+    }
+    throw lastError;
+  }
+
+  async applyCoverArtworkState(albumId: string, source: CoverSource): Promise<void> {
+    const parsed = coverSourceSchema.safeParse(source);
+    if (!parsed.success) throw new CatalogError("invalid_album");
+
+    const userId = await this.requireUserId();
+    await this.repository.patchAlbumCoverArtworkState(albumId, userId, {
+      source: parsed.data,
+      status: coverStatusFromSource(parsed.data),
+    });
+  }
+
+  /** @deprecated Prefer applyCoverArtworkState — kept for Artwork Runtime callers. */
+  async setCoverSource(albumId: string, source: CoverSource): Promise<void> {
+    await this.applyCoverArtworkState(albumId, source);
+  }
+
+  async uploadCoverBlob(input: {
+    creatorId: string;
+    albumId: string;
+    blob: Blob;
+    contentType?: string;
+    source: CoverSource;
+  }): Promise<{ path: string }> {
+    const contentType = input.contentType ?? "image/jpeg";
+    const { signedUrl, path } = await this.requestAssetUploadUrl({
+      creatorId: input.creatorId,
+      assetType: "cover",
+      contentType,
+      albumId: input.albumId,
+    });
+
+    const uploadResponse = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: input.blob,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new CatalogError(
+        "asset_upload_failed",
+        `Erreur serveur (${uploadResponse.status}) lors de l'envoi de la pochette.`,
+      );
+    }
+
+    const confirmed = await this.confirmCoverUploadWithRetry({
+      creatorId: input.creatorId,
+      albumId: input.albumId,
+      path,
+    });
+    await this.applyCoverArtworkState(input.albumId, input.source);
+    return confirmed;
   }
 
   async confirmAssetUpload(input: CatalogAssetConfirmInput): Promise<{
@@ -524,7 +607,10 @@ export class CatalogService {
     });
 
     if (error) {
-      throw new CatalogError("asset_upload_failed", error.message || undefined);
+      throw new CatalogError(
+        "asset_upload_failed",
+        await extractFunctionInvokeMessageAsync(error),
+      );
     }
     if (!data?.integrityStatus) {
       const remoteMsg = typeof data?.error === "string" ? data.error : undefined;

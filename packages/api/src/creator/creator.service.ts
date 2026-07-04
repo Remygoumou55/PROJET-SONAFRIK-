@@ -27,6 +27,7 @@ import {
   type UpdateLabelInput,
 } from "./schemas";
 import { resolveCreatorAssetUploadError } from "../shared/uploadSchemaErrors";
+import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
 
 export class CreatorService {
   private readonly repository: CreatorRepository;
@@ -255,7 +256,13 @@ export class CreatorService {
       },
     });
 
-    if (error || !data?.signedUrl) throw new CreatorError("asset_upload_failed");
+    if (error) {
+      throw new CreatorError("asset_upload_failed", await extractFunctionInvokeMessageAsync(error));
+    }
+    if (!data?.signedUrl) {
+      const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
+      throw new CreatorError("asset_upload_failed", remoteMsg);
+    }
     return data as { signedUrl: string; path: string; token: string; expiresIn: number };
   }
 

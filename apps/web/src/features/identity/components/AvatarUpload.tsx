@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Avatar, Button } from "@sonafrik/ui";
 import { IMAGE_ACCEPT, IMAGE_POLICY, isImage, type ImageMime } from "@sonafrik/shared";
+import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useIdentityService } from "../hooks/useIdentity";
 
 type AvatarMime = ImageMime;
@@ -46,26 +47,15 @@ export function AvatarUpload({ displayName, initialUrl, onUploaded }: AvatarUplo
     try {
       const { signedUrl, token } = await identity.requestAvatarUploadUrl(contentType);
 
-      const uploadResponse = await fetch(signedUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": contentType,
-          ...(token ? { "x-upsert": "true" } : {}),
-        },
-        body: file,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("upload_failed");
-      }
+      await uploadAssetToSignedUrl(signedUrl, file, { contentType, token });
 
       const readUrl = await identity.getAvatarSignedUrl();
       if (readUrl) {
         setPreviewUrl(readUrl);
         onUploaded?.(readUrl);
       }
-    } catch {
-      setError(`Échec du téléversement. Réessayez avec JPEG, PNG ou WebP (max ${IMAGE_POLICY.maxLabel}).`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Impossible d'enregistrer votre photo. Réessayez.`);
     } finally {
       setLoading(false);
       if (inputRef.current) inputRef.current.value = "";
