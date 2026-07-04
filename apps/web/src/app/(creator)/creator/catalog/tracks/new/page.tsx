@@ -1,4 +1,4 @@
-import { PublicationWizardPage } from "@/features/creator/catalog/components/PublicationWizardPage";
+import PublicationWizardPage from "@/features/creator/catalog/components/PublicationWizardPage";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 
 export default async function CatalogPublishPage() {

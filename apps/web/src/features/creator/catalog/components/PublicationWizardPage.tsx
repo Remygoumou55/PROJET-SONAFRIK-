@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { PublicationWizard } from "./PublicationWizard";
 
-export function PublicationWizardPage({
+export default function PublicationWizardPage({
   creatorId,
   stageName,
 }: {
