@@ -11,6 +11,87 @@
 
 ---
 
+## 2026-07-05 — SRTSP v1.1 ENTERPRISE CERTIFICATION + FREEZE
+
+### Mission
+Certification Enterprise SRTSP v1.1 — robustesse, contrats, transport, observabilité. Aucune modification métier.
+
+### Améliorations
+- `TransportManager` + interface `SrtspTransportLayer`
+- `buildSrtspEventContract` — contrats v1.1 (type, metadata)
+- `EventJournal` + `getMetrics()` API
+- `EventGuard` — filtrage données sensibles
+- `EventQueue` — timeout + retry journalisés
+- Stubs WebSocket / SSE testables
+- Tests **17/17** ✅
+
+### Statut
+🟢 CERTIFICATION ENTERPRISE → 🧊 FREEZE (`packages/core/realtime/FREEZE.md`)
+
+---
+
+## 2026-07-05 — SRTSP v1.0 — Infrastructure Real-Time Synchronization
+
+### Mission
+Création du programme officiel SONAFRIK Real-Time Synchronization Program (SRTSP) — fondation permanente de synchronisation temps réel.
+
+### Package créé
+- `packages/core/realtime/` → `@sonafrik/realtime` v1.0.0
+
+### Composants
+- EventBus · EventRegistry · SynchronizationEngine · SubscriptionManager · EventDispatcher
+- DeduplicationStore · EventQueue · OfflineBuffer · EventGuard · SrtspMonitor
+- Transport adapters (noop, polling, supabase stub)
+- React : SrtspProvider, useRealtime, useSynchronization, useEventSubscription, useLiveQuery
+
+### Intégration web (sans modifier modules certifiés)
+- `apps/web/src/features/shared/srtsp/` — RootSrtspShell + ldse-bridge
+- `RootLdseShell.tsx` — enveloppe SRTSP + LDSE
+
+### Documentation
+- `docs/realtime/` — 9 fichiers (REALTIME_ARCHITECTURE, EVENTS, EVENT_BUS, …)
+
+### Validation
+- Tests SRTSP : **14/14** ✅
+- Build web production ✅
+- Modules certifiés (Wizard, Mes publications) : **non modifiés**
+
+### Tests à faire
+- [ ] Vérifier bridge LDSE→SRTSP en dev (publishCreatorLdseEvent → snapshot SRTSP)
+- [ ] Phase 2 : brancher SupabaseTransportAdapter
+
+---
+
+## 2026-07-05 — CERTIFICATION ENTERPRISE + FREEZE DÉFINITIF — Mes publications
+
+### Mission
+Finalisation Enterprise du module « Mes publications » (`/creator/catalog/tracks`) — dernière étape avant freeze définitif.
+
+### Fichiers touchés
+- `packages/api/src/catalog/catalog.repository.ts` — ordre requête filter → order → range
+- `packages/api/src/catalog/publication-library/lifecycle.test.ts` — +2 tests (archivé)
+- `supabase/migrations/20260705120000_publication_library_creator_indexes.sql` — indexes liste créateur
+- `apps/web/src/features/creator/publications/hooks/usePublicationsLdseRefresh.ts` — creatorId pour extension Real-Time
+- `apps/web/src/features/creator/publications/components/PublicationCard.tsx` — imports consolidés
+- `apps/web/src/features/creator/publications/components/PublicationsLibrary.tsx` — passe creatorId au hook LDSE
+- `apps/web/src/app/styles/creator/publications.css` — CSS mort `.pub-detail__readonly` supprimé
+
+### Validation
+- Tests publication-library : **11/11** ✅
+- typecheck + lint + build production ✅
+- Indexes DB confirmés : `idx_tracks_creator_library`, `idx_tracks_creator_library_title`
+
+### Statut
+🟢 **CERTIFICATION ENTERPRISE** → 🧊 **FREEZE DÉFINITIF**
+
+Modification future autorisée uniquement : bug critique prouvé ou faille sécurité.
+
+### Tests à faire
+- [ ] Test manuel : filtres statut + tri + pagination + fiche détail + actions par statut
+- [ ] Test responsive desktop / tablet / mobile
+
+---
+
 ## 2026-07-05 — AUDIT CERTIFICATION V1.0 + REMÉDIATION — Module Wallet / Finance
 
 ### Mission

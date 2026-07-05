@@ -1,0 +1,55 @@
+{
+  "name": "@sonafrik/realtime",
+  "version": "1.1.0",
+  "private": true,
+  "description": "SONAFRIK Real-Time Synchronization Program (SRTSP) — Event Bus & Sync Engine",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "default": "./dist/registry/index.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/transport-manager.d.ts",
+      "default": "./dist/transport/transport-manager.js"
+    },
+    "./events": {
+      "types": "./dist/registry/domain-events.d.ts",
+      "default": "./dist/registry/domain-events.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.25.36"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.20",
+    "@types/react": "19.1.6",
+    "eslint": "^9.28.0",
+    "react": "^19.1.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.6"
+  }
+}

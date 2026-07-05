@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
     "@sonafrik/types",
     "@sonafrik/api",
     "@sonafrik/database",
+    "@sonafrik/realtime",
   ],
   images: {
     formats: ["image/avif", "image/webp"],
@@ -50,7 +51,6 @@ const nextConfig: NextConfig = {
     // Tree-shaking — @sonafrik/ui/types/api/shared exclus : barrel optimizer casse les exports runtime en dev
     optimizePackageImports: [
       "@sentry/nextjs",
-      "@sonafrik/shared",
       "@radix-ui/react-dialog",
       "@radix-ui/react-dropdown-menu",
       "@radix-ui/react-tabs",
@@ -74,43 +74,7 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://*.supabase.co";
-    const supabaseOrigin = supabaseUrl.startsWith("http") ? new URL(supabaseUrl).origin : supabaseUrl;
-    const supabaseWss    = supabaseOrigin.replace("https://", "wss://");
-    const isProd = process.env.NODE_ENV === "production";
-    // CSP prod : unsafe-inline requis par Next.js 15 (scripts inline) + Tailwind + Vercel Analytics.
-    // Roadmap post-beta : nonces script-src (middleware) + style-src sans unsafe-inline.
-    const scriptSrc = isProd
-      ? `'self' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`
-      : `'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`;
-    const csp = [
-      "default-src 'self'",
-      `script-src ${scriptSrc}`,
-      "style-src 'self' 'unsafe-inline'",
-      "style-src-attr 'self' 'unsafe-inline'",
-      `img-src 'self' data: blob: ${supabaseOrigin} https://lh3.googleusercontent.com`,
-      `media-src 'self' blob: ${supabaseOrigin}`,
-      `connect-src 'self' ${supabaseOrigin} ${supabaseWss} https://accounts.google.com https://vitals.vercel-insights.com`,
-      "frame-src https://accounts.google.com",
-      "frame-ancestors 'none'",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; ");
-
     return [
-      {
-        source: "/:path*",
-        headers: [
-          { key: "X-DNS-Prefetch-Control", value: "on" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
-          { key: "Content-Security-Policy", value: csp },
-        ],
-      },
       {
         // Pages auth et onboarding — non indexables par les moteurs de recherche
         source: "/(auth|onboarding)/:path*",
