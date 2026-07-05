@@ -156,7 +156,7 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(13,13,13,0.8)" }}
+      style={{ backgroundColor: "var(--overlay-modal-backdrop)" }}
       onClick={onClose}
     >
       <div
@@ -195,7 +195,7 @@ export const TopupModal = memo(function TopupModal({ onClose, onSuccess }: Topup
                     onClick={() => { setAmountGnf(a); setCustomAmount(""); }}
                     className="rounded-xl py-2 text-xs font-semibold transition-all"
                     style={{
-                      backgroundColor: amountGnf === a && !customAmount ? "rgba(0,210,106,0.13)" : "var(--color-elevated)",
+                      backgroundColor: amountGnf === a && !customAmount ? "var(--overlay-vert-soft)" : "var(--color-elevated)",
                       border:          `1.5px solid ${amountGnf === a && !customAmount ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
                       color:           amountGnf === a && !customAmount ? "var(--color-vert-energie)" : "var(--color-texte-principal)",
                     }}

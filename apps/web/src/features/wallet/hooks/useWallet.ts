@@ -185,10 +185,14 @@ export function usePayoutPageData() {
   });
 
   const reloadAccounts = useCallback(async () => {
-    const data = await service.getPayoutAccounts().catch(() => [] as PayoutAccount[]);
-    setAccounts(data);
-    ldseCache.set(cacheKey, { accounts: data, withdrawals }, 30_000);
-  }, [service, cacheKey, withdrawals]);
+    const [accs, wds] = await Promise.all([
+      service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
+      service.getWithdrawals().catch(() => [] as Withdrawal[]),
+    ]);
+    setAccounts(accs);
+    setWithdrawals(wds);
+    ldseCache.set(cacheKey, { accounts: accs, withdrawals: wds }, 30_000);
+  }, [service, cacheKey]);
 
   const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
     try {

@@ -94,6 +94,7 @@ export const PayoutPage = memo(function PayoutPage({
               ))}
             </select>
             <input
+              aria-label="Nom du compte"
               style={inputStyle}
               placeholder="Nom du compte (ex: Mon Orange Money)"
               value={accountForm.displayName}
@@ -101,6 +102,7 @@ export const PayoutPage = memo(function PayoutPage({
               required
             />
             <input
+              aria-label="Titulaire du compte"
               style={inputStyle}
               placeholder="Titulaire du compte"
               value={accountForm.accountHolderName}
@@ -109,6 +111,7 @@ export const PayoutPage = memo(function PayoutPage({
             />
             {["orange_money", "mtn_momo", "wave"].includes(accountForm.type) && (
               <input
+                aria-label="Numéro de téléphone"
                 style={inputStyle}
                 placeholder="Numéro de téléphone (+224…)"
                 value={accountForm.phoneNumber ?? ""}
@@ -154,7 +157,7 @@ export const PayoutPage = memo(function PayoutPage({
             {accounts.map((acc) => (
               <div key={acc.id} className="flex items-center justify-between rounded-xl p-4" style={{ backgroundColor: "var(--color-card)" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-vert-energie)" }}>
+                  <div aria-hidden="true" className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: "var(--color-elevated)", color: "var(--color-vert-energie)" }}>
                     {acc.type === "orange_money" ? "🟠" : acc.type === "mtn_momo" ? "🟡" : acc.type === "wave" ? "🔵" : "🏦"}
                   </div>
                   <div>
@@ -269,11 +272,11 @@ export const PayoutPage = memo(function PayoutPage({
                   className="text-xs px-2 py-1 rounded-full font-medium"
                   style={{
                     backgroundColor:
-                      w.status === "completed"  ? "rgba(0,210,106,0.13)" :
-                      w.status === "failed"     ? "rgba(255,68,68,0.13)" :
-                      w.status === "cancelled"  ? "rgba(85,85,85,0.13)" :
-                      w.status === "approved"   ? "rgba(59,130,246,0.13)" :
-                                                  "rgba(255,194,14,0.13)",
+                      w.status === "completed"  ? "var(--overlay-vert-soft)" :
+                      w.status === "failed"     ? "var(--overlay-erreur-soft)" :
+                      w.status === "cancelled"  ? "var(--overlay-neutre-soft)" :
+                      w.status === "approved"   ? "var(--overlay-bleu-soft)" :
+                                                  "var(--overlay-or-soft)",
                     color:
                       w.status === "completed"  ? "var(--color-vert-energie)" :
                       w.status === "failed"     ? "var(--color-erreur)" :

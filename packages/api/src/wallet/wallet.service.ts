@@ -76,11 +76,7 @@ export class WalletService {
       throw new WalletError("WALLET_NOT_FOUND", "Portefeuille introuvable");
     }
 
-    const { data: profile } = await this.client
-      .from("profiles")
-      .select("is_premium, premium_expires_at, created_at")
-      .eq("id", userId)
-      .single();
+    const profile = await this.repo.getProfilePremiumData(userId);
 
     // premium_expires_at doit être non-null et futur — null = jamais acheté, pas "illimité"
     const isPremium = !!(
@@ -116,8 +112,7 @@ export class WalletService {
 
   async getBalance(): Promise<number> {
     const userId = await this.requireUserId();
-    const { data } = await this.client.rpc("get_wallet_balance", { p_user_id: userId });
-    return (data as number) ?? 0;
+    return this.repo.getBalanceByRpc(userId);
   }
 
   async getLedger(limit?: number, offset?: number): Promise<WalletLedgerEntry[]> {

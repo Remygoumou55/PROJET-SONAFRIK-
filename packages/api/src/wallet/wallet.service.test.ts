@@ -18,6 +18,8 @@ function createMockClient(overrides: {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
+      is: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
       single: vi.fn(),
       range: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
@@ -41,7 +43,7 @@ function createMockClient(overrides: {
 
     if (table === "wallets") {
       chain.single.mockResolvedValue({
-        data: overrides.wallet ?? { id: "w1", user_id: "u1", balance_gnf: 100_000, currency: "GNF", total_credited_gnf: 0, total_debited_gnf: 0, created_at: "", updated_at: "" },
+        data: overrides.wallet !== undefined ? overrides.wallet : { id: "w1", user_id: "u1", balance_gnf: 100_000, currency: "GNF", total_credited_gnf: 0, total_debited_gnf: 0, created_at: "", updated_at: "" },
         error: null,
       });
     }
@@ -206,5 +208,61 @@ describe("WalletService", () => {
       payoutAccountId: "44444444-4444-4444-8444-444444444444",
       amountGnf: 10_000,
     })).rejects.toMatchObject({ code: "INSUFFICIENT_BALANCE" });
+  });
+
+  it("requestWithdrawal retourne l'identifiant de retrait créé", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: "wd-abc-123", error: null });
+    const service = new WalletService(createMockClient({ rpc }));
+
+    const result = await service.requestWithdrawal({
+      payoutAccountId: "44444444-4444-4444-8444-444444444444",
+      amountGnf: 10_000,
+    });
+
+    expect(result).toBe("wd-abc-123");
+    expect(rpc).toHaveBeenCalledWith("request_withdrawal", {
+      p_payout_account_id: "44444444-4444-4444-8444-444444444444",
+      p_amount_gnf: 10_000,
+    });
+  });
+
+  it("addPayoutAccount délègue au RPC et retourne l'identifiant", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: "acc-xyz-456", error: null });
+    const service = new WalletService(createMockClient({ rpc }));
+
+    const result = await service.addPayoutAccount({
+      type: "orange_money",
+      displayName: "Mon OM",
+      accountHolderName: "Rémy G",
+      phoneNumber: "+224600000000",
+      isDefault: true,
+    });
+
+    expect(result).toBe("acc-xyz-456");
+    expect(rpc).toHaveBeenCalledWith("add_payout_account", expect.objectContaining({
+      p_type: "orange_money",
+      p_display_name: "Mon OM",
+    }));
+  });
+
+  it("removePayoutAccount soft-supprime le compte via le repository", async () => {
+    const service = new WalletService(createMockClient({}));
+    await expect(service.removePayoutAccount("acc-to-delete")).resolves.toBeUndefined();
+  });
+
+  it("getWalletContext lève WALLET_NOT_FOUND si le portefeuille est absent", async () => {
+    const service = new WalletService(createMockClient({ wallet: null }));
+    await expect(service.getWalletContext()).rejects.toMatchObject({ code: "WALLET_NOT_FOUND" });
+  });
+
+  it("getWalletPageData agrège contexte et plans en un seul appel", async () => {
+    const service = new WalletService(createMockClient({
+      profile: { is_premium: false, premium_expires_at: null, created_at: new Date().toISOString() },
+      wallet: { id: "w1", user_id: "u1", balance_gnf: 0, currency: "GNF", total_credited_gnf: 0, total_debited_gnf: 0, created_at: "", updated_at: "" },
+    }));
+
+    const { context, plans } = await service.getWalletPageData();
+    expect(context.wallet.id).toBe("w1");
+    expect(plans.length).toBeGreaterThan(0);
   });
 });

@@ -95,4 +95,22 @@ export class WalletRepository {
       .eq("id", accountId);
     if (error) throw error;
   }
+
+  async getProfilePremiumData(userId: string): Promise<{
+    is_premium: boolean | null;
+    premium_expires_at: string | null;
+    created_at: string | null;
+  } | null> {
+    const { data } = await this.client
+      .from("profiles")
+      .select("is_premium, premium_expires_at, created_at")
+      .eq("id", userId)
+      .single();
+    return data ?? null;
+  }
+
+  async getBalanceByRpc(userId: string): Promise<number> {
+    const { data } = await this.client.rpc("get_wallet_balance", { p_user_id: userId });
+    return (data as number) ?? 0;
+  }
 }

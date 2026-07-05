@@ -87,6 +87,15 @@
   --overlay-vert-soft: rgb(0 210 106 / 0.13);
   --overlay-erreur-soft: rgb(255 68 68 / 0.13);
   --overlay-vert-nav: rgb(0 210 106 / 0.09);
+  --overlay-blanc-60: rgb(255 255 255 / 0.60);
+  --overlay-blanc-55: rgb(255 255 255 / 0.55);
+  --overlay-blanc-13: rgb(255 255 255 / 0.13);
+  --overlay-or-soft: rgb(255 194 14 / 0.13);
+  --overlay-or-medium: rgb(255 194 14 / 0.20);
+  --overlay-erreur-25: rgb(255 68 68 / 0.25);
+  --overlay-neutre-soft: rgb(85 85 85 / 0.13);
+  --overlay-bleu-soft: rgb(59 130 246 / 0.13);
+  --overlay-modal-backdrop: rgb(13 13 13 / 0.80);
   --color-vert-energie-bg: rgb(0 210 106 / 0.15);
   --color-vert-energie-ring: rgb(0 210 106 / 0.2);
   --color-vert-energie-border: rgb(0 210 106 / 0.25);

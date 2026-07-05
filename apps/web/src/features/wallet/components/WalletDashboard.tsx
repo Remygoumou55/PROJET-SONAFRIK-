@@ -65,7 +65,7 @@ export const WalletDashboard = memo(function WalletDashboard({
         className="rounded-2xl p-6"
         style={{ background: "linear-gradient(135deg, var(--color-vert-profond) 0%, var(--color-vert-energie) 100%)" }}
       >
-        <p className="text-sm font-medium mb-1" style={{ color: "rgba(255, 255, 255, 0.60)" }}>Solde disponible</p>
+        <p className="text-sm font-medium mb-1" style={{ color: "var(--overlay-blanc-60)" }}>Solde disponible</p>
         <p className="text-3xl font-bold tracking-tight" style={{ color: "var(--color-texte-principal)" }}>
           {formatGnf(wallet.balance_gnf)}
         </p>
@@ -75,7 +75,7 @@ export const WalletDashboard = memo(function WalletDashboard({
             onClick={topupEnabled ? onTopup : undefined}
             disabled={!topupEnabled}
             className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-60"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+            style={{ backgroundColor: "var(--overlay-blanc-13)", color: "var(--color-texte-principal)" }}
             title={topupEnabled ? undefined : "Orange Money GN — intégration en cours"}
           >
             {topupEnabled ? "Recharger" : "Recharger bientôt"}
@@ -84,7 +84,7 @@ export const WalletDashboard = memo(function WalletDashboard({
             <Link
               href="/wallet/payout"
               className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all"
-              style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+              style={{ backgroundColor: "var(--overlay-blanc-13)", color: "var(--color-texte-principal)" }}
             >
               Retirer
             </Link>
@@ -92,14 +92,14 @@ export const WalletDashboard = memo(function WalletDashboard({
             <Link
               href="/wallet/payout"
               className="flex-1 py-2 rounded-xl text-sm font-semibold text-center transition-all opacity-80"
-              style={{ backgroundColor: "rgba(255, 255, 255, 0.13)", color: "var(--color-texte-principal)" }}
+              style={{ backgroundColor: "var(--overlay-blanc-13)", color: "var(--color-texte-principal)" }}
             >
               Configurer retrait
             </Link>
           )}
         </div>
         {!topupEnabled && (
-          <p className="text-xs mt-3" style={{ color: "rgba(255, 255, 255, 0.55)" }}>
+          <p className="text-xs mt-3" style={{ color: "var(--overlay-blanc-55)" }}>
             Recharge Mobile Money bientôt disponible — Orange Money GN en cours d&apos;intégration.
           </p>
         )}
@@ -132,7 +132,7 @@ export const WalletDashboard = memo(function WalletDashboard({
           {isPremium && (
             <span
               className="px-3 py-1 rounded-full text-xs font-bold"
-              style={{ backgroundColor: "rgba(0,210,106,0.13)", color: "var(--color-vert-energie)" }}
+              style={{ backgroundColor: "var(--overlay-vert-soft)", color: "var(--color-vert-energie)" }}
             >
               PREMIUM
             </span>
@@ -199,7 +199,7 @@ export const WalletDashboard = memo(function WalletDashboard({
                 <div className="flex items-center justify-between gap-1">
                   <p className="font-semibold text-sm" style={{ color: "var(--color-texte-principal)" }}>{plan.label}</p>
                   {plan.billingPeriod === "annual" && annualSavings != null && annualSavings > 0 && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: "rgba(255,194,14,0.13)", color: "var(--color-or-solaire)" }}>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ backgroundColor: "var(--overlay-or-soft)", color: "var(--color-or-solaire)" }}>
                       −{annualSavings}%
                     </span>
                   )}

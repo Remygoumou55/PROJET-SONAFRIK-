@@ -14,7 +14,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
   return (
     <div className="space-y-6">
       {/* Info revenue pool */}
-      <div className="rounded-xl p-4" style={{ backgroundColor: "var(--color-card)", border: "1px solid rgba(255,194,14,0.2)" }}>
+      <div className="rounded-xl p-4" style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--overlay-or-medium)" }}>
         <p className="text-sm font-medium" style={{ color: "var(--color-or-solaire)" }}>Revenue Pool Artistes</p>
         <p className="text-3xl font-bold mt-1" style={{ color: "var(--color-texte-principal)" }}>{REVENUE_POOL_PERCENT}%</p>
         <p className="text-xs mt-1" style={{ color: "var(--color-texte-secondaire)" }}>
@@ -43,7 +43,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
           className="rounded-xl p-4 text-sm"
           style={{
             backgroundColor: "var(--color-card)",
-            border: "1px solid rgba(255,77,79,0.25)",
+            border: "1px solid var(--overlay-erreur-25)",
             color: "var(--color-erreur)",
           }}
           role="alert"
@@ -90,7 +90,7 @@ export const RoyaltiesPage = memo(function RoyaltiesPage() {
                 <span
                   className="text-xs px-2 py-1 rounded-full font-medium"
                   style={{
-                    backgroundColor: r.status === "paid" ? "rgba(0,210,106,0.13)" : "rgba(255,194,14,0.13)",
+                    backgroundColor: r.status === "paid" ? "var(--overlay-vert-soft)" : "var(--overlay-or-soft)",
                     color: r.status === "paid" ? "var(--color-vert-energie)" : "var(--color-or-solaire)",
                   }}
                 >

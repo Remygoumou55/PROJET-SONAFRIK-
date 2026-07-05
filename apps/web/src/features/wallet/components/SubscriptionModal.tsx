@@ -51,7 +51,7 @@ export const SubscriptionModal = memo(function SubscriptionModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(13,13,13,0.8)" }}
+      style={{ backgroundColor: "var(--overlay-modal-backdrop)" }}
       onClick={onClose}
     >
       <div
@@ -91,14 +91,14 @@ export const SubscriptionModal = memo(function SubscriptionModal({
                     onClick={() => setSelectedPlan(plan)}
                     className="w-full rounded-xl p-4 text-left transition-all"
                     style={{
-                      backgroundColor: isSelected ? "rgba(0,210,106,0.13)" : "var(--color-elevated)",
+                      backgroundColor: isSelected ? "var(--overlay-vert-soft)" : "var(--color-elevated)",
                       border: `2px solid ${isSelected ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
                     }}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-semibold" style={{ color: "var(--color-texte-principal)" }}>{plan.label}</span>
                       {plan.billingPeriod === "annual" && annualSavings != null && annualSavings > 0 && (
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(255,194,14,0.13)", color: "var(--color-or-solaire)" }}>
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "var(--overlay-or-soft)", color: "var(--color-or-solaire)" }}>
                           −{annualSavings}%
                         </span>
                       )}

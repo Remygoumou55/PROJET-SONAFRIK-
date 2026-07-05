@@ -27,7 +27,7 @@ export const PaymentProviderSelector = memo(function PaymentProviderSelector({
           onClick={() => onSelect(provider)}
           className="rounded-xl p-3 text-left text-sm transition-all"
           style={{
-            backgroundColor: selected === provider ? "rgba(0,210,106,0.13)" : "var(--color-elevated)",
+            backgroundColor: selected === provider ? "var(--overlay-vert-soft)" : "var(--color-elevated)",
             border: `1.5px solid ${selected === provider ? "var(--color-vert-energie)" : "var(--color-bordure)"}`,
             color: "var(--color-texte-principal)",
           }}
