@@ -31,7 +31,13 @@ import {
   resolveCatalogAssetConfirmError,
   resolveCatalogAssetUploadError,
 } from "../shared/uploadSchemaErrors";
+import {
+  MetadataAutomaticEngine,
+  wizardUserMetadataSchema,
+  type WizardUserMetadataInput,
+} from "./metadata";
 import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
+import { uploadAssetToSignedUrl } from "../shared/uploadRuntime";
 
 function isDevBypass(): boolean {
   return (
@@ -214,6 +220,7 @@ export class CatalogService {
 
   async submitAlbum(albumId: string): Promise<void> {
     await this.assertAlbumReadyForSubmit(albumId);
+    await this.applyPublicationAutomaticMetadata(albumId);
 
     const { PublicationIntegrationService } = await import("../publication/integration");
     const integration = new PublicationIntegrationService(this.client);
@@ -268,7 +275,7 @@ export class CatalogService {
   }
 
   async requestCoverReadUrl(input: { creatorId: string; path: string }): Promise<{ signedUrl: string }> {
-    await this.requireUserId();
+    await this.requireCreatorId();
     const { data, error } = await this.client.functions.invoke("catalog-asset-signed-url", {
       body: {
         action: "read",
@@ -277,7 +284,16 @@ export class CatalogService {
         path: input.path,
       },
     });
-    if (error || !data?.signedUrl) throw new CatalogError("asset_upload_failed");
+    if (error) {
+      throw new CatalogError(
+        "asset_upload_failed",
+        await extractFunctionInvokeMessageAsync(error),
+      );
+    }
+    if (!data?.signedUrl) {
+      const remoteMsg = typeof data?.error === "string" ? data.error : undefined;
+      throw new CatalogError("asset_upload_failed", remoteMsg);
+    }
     return { signedUrl: data.signedUrl as string };
   }
 
@@ -417,6 +433,78 @@ export class CatalogService {
     await this.repository.logAudit("catalog.track.credits_updated", "track_credits", parsed.data.trackId);
   }
 
+  /**
+   * MAE — Étape 3 Publication Wizard.
+   * L'utilisateur ne fournit que genre + langue ; le reste est généré automatiquement.
+   */
+  async saveWizardUserMetadata(input: WizardUserMetadataInput): Promise<void> {
+    const parsed = wizardUserMetadataSchema.safeParse(input);
+    if (!parsed.success) throw new CatalogError("invalid_track");
+
+    const creatorId = await this.requireCreatorId();
+    const userId = await this.requireUserId();
+    const stageName = await this.repository.getArtistStageName(creatorId);
+
+    const engine = new MetadataAutomaticEngine({
+      creatorId,
+      userId,
+      stageName,
+      validatedAt: new Date(),
+    });
+
+    const { trackUpdate } = engine.buildWizardTrackPatch(parsed.data);
+    const mergedTrackUpdate = {
+      ...trackUpdate,
+      ...(parsed.data.explicit === true ? { explicit: true } : {}),
+    };
+    await this.updateTrack(parsed.data.trackId, mergedTrackUpdate);
+
+    const lyrics = parsed.data.lyrics?.trim();
+    if (lyrics) {
+      await this.repository.patchTrackMetadata(parsed.data.trackId, userId, {
+        wizard_lyrics_draft: lyrics,
+      });
+    }
+
+    await this.repository.logAudit("catalog.wizard.metadata_saved", "tracks", parsed.data.trackId, {
+      genreId: parsed.data.genreId,
+      language: parsed.data.language,
+      ...engine.buildSystemIdentity(),
+    });
+  }
+
+  private async applyPublicationAutomaticMetadata(albumId: string): Promise<void> {
+    const creatorId = await this.requireCreatorId();
+    const userId = await this.requireUserId();
+    const stageName = await this.repository.getArtistStageName(creatorId);
+    const validatedAt = new Date();
+
+    const engine = new MetadataAutomaticEngine({
+      creatorId,
+      userId,
+      stageName,
+      validatedAt,
+    });
+
+    const { albumUpdate, publishedAtIso } = engine.buildPublicationAlbumPatch(validatedAt);
+    await this.updateAlbum(albumId, albumUpdate);
+
+    const tracks = await this.repository.listTracks(creatorId, albumId);
+    const credits = engine.buildAutomaticCredits();
+
+    await Promise.all(
+      tracks.map(async (track) => {
+        await this.setTrackCredits({ trackId: track.id, credits });
+      }),
+    );
+
+    await this.repository.patchAlbumMetadata(albumId, userId, {
+      mae_publication_applied_at: publishedAtIso,
+      mae_creator_id: creatorId,
+      mae_user_id: userId,
+    });
+  }
+
   async requestAssetUploadUrl(input: CatalogAssetUploadInput): Promise<{
     signedUrl: string;
     path: string;
@@ -495,7 +583,7 @@ export class CatalogService {
     return { path: data.path as string };
   }
 
-  private async confirmCoverUploadWithRetry(
+  async confirmCoverUploadWithRetry(
     input: CatalogCoverConfirmInput,
     maxAttempts = 3,
   ): Promise<{ path: string }> {
@@ -526,11 +614,6 @@ export class CatalogService {
     });
   }
 
-  /** @deprecated Prefer applyCoverArtworkState — kept for Artwork Runtime callers. */
-  async setCoverSource(albumId: string, source: CoverSource): Promise<void> {
-    await this.applyCoverArtworkState(albumId, source);
-  }
-
   async uploadCoverBlob(input: {
     creatorId: string;
     albumId: string;
@@ -546,17 +629,11 @@ export class CatalogService {
       albumId: input.albumId,
     });
 
-    const uploadResponse = await fetch(signedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": contentType },
-      body: input.blob,
-    });
-
-    if (!uploadResponse.ok) {
-      throw new CatalogError(
-        "asset_upload_failed",
-        `Erreur serveur (${uploadResponse.status}) lors de l'envoi de la pochette.`,
-      );
+    try {
+      await uploadAssetToSignedUrl(signedUrl, input.blob, { contentType });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : undefined;
+      throw new CatalogError("asset_upload_failed", msg);
     }
 
     const confirmed = await this.confirmCoverUploadWithRetry({

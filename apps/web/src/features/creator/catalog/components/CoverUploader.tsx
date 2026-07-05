@@ -3,6 +3,11 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { generateDefaultArtwork } from "@sonafrik/api/catalog";
 import { IMAGE_ACCEPT, IMAGE_POLICY, isImage, resolveImageUploadMime } from "@sonafrik/shared";
+import {
+  SmartCoverEngine,
+  SMART_COVER_MESSAGES,
+  mapCoverErrorToUserMessage,
+} from "@sonafrik/shared/cover";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useCatalogService } from "../hooks/useCatalog";
 import { CatalogCropModal, type CatalogCropResult } from "./CatalogCropModal";
@@ -16,9 +21,7 @@ export type EnsureCoverContext = {
 };
 
 export interface CoverUploaderHandle {
-  /** Uploads the user-selected cover when a valid preview exists. */
   triggerUpload: () => Promise<void>;
-  /** Ensures album has a cover: user image, or auto-generated fallback. */
   ensureCover: (ctx: EnsureCoverContext) => Promise<{ source: "user" | "auto" }>;
 }
 
@@ -27,7 +30,8 @@ export interface CoverUploaderHandle {
 interface Props {
   albumId: string;
   creatorId: string;
-  /** manual = wizard (upload via ref). immediate = upload right after crop (ReleaseList). */
+  /** legacy = recadrage modal obligatoire (TrackEditor, ReleaseList). smart = Smart Cover Engine (wizard étape 2). */
+  coverEngine?: "legacy" | "smart";
   uploadMode?: "manual" | "immediate";
   onFileReady?: () => void;
   onFileCleared?: () => void;
@@ -35,7 +39,7 @@ interface Props {
   onCoverDefined?: (source: "user" | "auto") => void;
 }
 
-// ─── Cover dimension policy (catalog publication) ─────────────────────────────
+// ─── Legacy dimension policy ──────────────────────────────────────────────────
 
 const COVER_MIN_DIMENSION = 1400;
 const COVER_RECOMMENDED = 3000;
@@ -59,6 +63,7 @@ function coverDimensionWarning(width: number, height: number): string | null {
 
 type UploadState =
   | { status: "idle" }
+  | { status: "processing"; message: string }
   | {
       status: "preview";
       file: File;
@@ -66,6 +71,7 @@ type UploadState =
       width: number;
       height: number;
       dimensionWarning: string | null;
+      notice: string | null;
     }
   | {
       status: "uploading";
@@ -75,12 +81,11 @@ type UploadState =
       width: number;
       height: number;
       dimensionWarning: string | null;
+      notice: string | null;
     }
-  | { status: "success"; source: "user" | "auto" }
+  | { status: "success"; source: "user" | "auto"; message: string }
   | { status: "advisory"; message: string }
   | { status: "error"; message: string; blocking: boolean };
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
@@ -101,6 +106,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
   {
     albumId,
     creatorId,
+    coverEngine = "legacy",
     uploadMode = "manual",
     onFileReady,
     onFileCleared,
@@ -111,6 +117,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
 ) {
   const catalog = useCatalogService();
   const inputRef = useRef<HTMLInputElement>(null);
+  const isSmart = coverEngine === "smart";
 
   const [state, setState] = useState<UploadState>({ status: "idle" });
   const stateRef = useRef(state);
@@ -125,7 +132,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     const effectiveCreatorId = creatorIdOverride ?? creatorId;
     const s = stateRef.current;
     if (s.status !== "preview") throw new Error("Aucune pochette sélectionnée.");
-    const { file, previewUrl, width, height } = s;
+    const { file, previewUrl, width, height, dimensionWarning, notice } = s;
 
     setState({
       status: "uploading",
@@ -134,7 +141,8 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
       progress: 0,
       width,
       height,
-      dimensionWarning: s.dimensionWarning ?? null,
+      dimensionWarning: dimensionWarning ?? null,
+      notice: notice ?? null,
     });
 
     try {
@@ -154,19 +162,27 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
           ),
       });
 
-      await catalog.confirmCoverUpload({ creatorId: effectiveCreatorId, albumId, path });
+      await catalog.confirmCoverUploadWithRetry({ creatorId: effectiveCreatorId, albumId, path });
       await catalog.applyCoverArtworkState(albumId, "user");
 
       URL.revokeObjectURL(previewUrl);
-      setState({ status: "success", source: "user" });
+      setState({
+        status: "success",
+        source: "user",
+        message: isSmart ? SMART_COVER_MESSAGES.ready : "Pochette validée",
+      });
       onCoverDefined?.("user");
       onSuccess?.();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Échec de l'envoi de la pochette.";
+      const msg = isSmart
+        ? mapCoverErrorToUserMessage(err, IMAGE_POLICY.maxLabel)
+        : err instanceof Error
+          ? err.message
+          : "Échec de l'envoi de la pochette.";
       setState({ status: "error", message: msg, blocking: true });
       throw new Error(msg);
     }
-  }, [catalog, creatorId, albumId, onSuccess, onCoverDefined]);
+  }, [catalog, creatorId, albumId, onSuccess, onCoverDefined, isSmart]);
 
   const uploadAutoCover = useCallback(
     async (ctx: EnsureCoverContext): Promise<void> => {
@@ -184,11 +200,15 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
         source: "auto",
       });
 
-      setState({ status: "success", source: "auto" });
+      setState({
+        status: "success",
+        source: "auto",
+        message: isSmart ? SMART_COVER_MESSAGES.ready : "Pochette automatique appliquée",
+      });
       onCoverDefined?.("auto");
       onSuccess?.();
     },
-    [catalog, creatorId, albumId, onSuccess, onCoverDefined],
+    [catalog, creatorId, albumId, onSuccess, onCoverDefined, isSmart],
   );
 
   const ensureCover = useCallback(
@@ -207,9 +227,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     [uploadUserPreview, uploadAutoCover],
   );
 
-  // ── Validate (blocking only) ─────────────────────────────────────────────────
-
-  const validate = useCallback((file: File): string | null => {
+  const validateLegacy = useCallback((file: File): string | null => {
     const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
     if (!isImage(file.type) && !extOk) {
       return `Format non supporté (${file.type || (file.name.split(".").pop() ?? "?")}) — utilisez JPEG, PNG ou WebP.`;
@@ -219,6 +237,58 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     }
     return null;
   }, []);
+
+  const applyPreview = useCallback(
+    (file: File, previewUrl: string, width: number, height: number, dimensionWarning: string | null, notice: string | null) => {
+      const prev = stateRef.current;
+      if (prev.status === "preview" || prev.status === "uploading") {
+        URL.revokeObjectURL(prev.previewUrl);
+      }
+
+      const nextState = {
+        status: "preview" as const,
+        file,
+        previewUrl,
+        width,
+        height,
+        dimensionWarning,
+        notice,
+      };
+      stateRef.current = nextState;
+      setState(nextState);
+      onFileReady?.();
+    },
+    [onFileReady],
+  );
+
+  const processSmartCover = useCallback(
+    async (file: File) => {
+      originalFileRef.current = file;
+      setState({ status: "processing", message: SMART_COVER_MESSAGES.processing });
+      try {
+        const result = await SmartCoverEngine.processAutomatic(file);
+        const previewUrl = URL.createObjectURL(result.file);
+        applyPreview(
+          result.file,
+          previewUrl,
+          result.width,
+          result.height,
+          null,
+          result.advisory ?? (result.wasOptimized ? SMART_COVER_MESSAGES.optimized : null),
+        );
+        if (uploadMode === "immediate") {
+          await uploadUserPreview();
+        }
+      } catch (err) {
+        setState({
+          status: "error",
+          message: mapCoverErrorToUserMessage(err, IMAGE_POLICY.maxLabel),
+          blocking: true,
+        });
+      }
+    },
+    [applyPreview, uploadMode, uploadUserPreview],
+  );
 
   const openCrop = useCallback(
     (file: File) => {
@@ -230,9 +300,9 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     [cropSrc],
   );
 
-  const handleFile = useCallback(
+  const handleFileLegacy = useCallback(
     (file: File) => {
-      const error = validate(file);
+      const error = validateLegacy(file);
       if (error) {
         setState({ status: "error", message: error, blocking: true });
         return;
@@ -240,10 +310,21 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
       originalFileRef.current = file;
       openCrop(file);
     },
-    [validate, openCrop],
+    [validateLegacy, openCrop],
   );
 
-  const handleCropSave = useCallback(
+  const handleFile = useCallback(
+    (file: File) => {
+      if (isSmart) {
+        void processSmartCover(file);
+        return;
+      }
+      handleFileLegacy(file);
+    },
+    [isSmart, processSmartCover, handleFileLegacy],
+  );
+
+  const handleCropSaveLegacy = useCallback(
     async (result: CatalogCropResult) => {
       const croppedFile = new File([result.croppedBlob], "cover.jpg", { type: "image/jpeg" });
       const previewUrl = URL.createObjectURL(croppedFile);
@@ -264,30 +345,47 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
         return;
       }
 
-      const prev = stateRef.current;
-      if (prev.status === "preview" || prev.status === "uploading") {
-        URL.revokeObjectURL(prev.previewUrl);
-      }
-
-      const dimensionWarning = coverDimensionWarning(width, height);
-      const nextState = {
-        status: "preview" as const,
-        file: croppedFile,
-        previewUrl,
-        width,
-        height,
-        dimensionWarning,
-      };
-      stateRef.current = nextState;
-      setState(nextState);
-      onFileReady?.();
+      applyPreview(croppedFile, previewUrl, width, height, coverDimensionWarning(width, height), null);
 
       if (uploadMode === "immediate") {
         await uploadUserPreview();
       }
     },
-    [onFileReady, uploadMode, uploadUserPreview, onFileCleared],
+    [applyPreview, uploadMode, uploadUserPreview, onFileCleared],
   );
+
+  const handleCropSaveSmart = useCallback(
+    async (result: CatalogCropResult) => {
+      setState({ status: "processing", message: SMART_COVER_MESSAGES.processing });
+      try {
+        const processed = await SmartCoverEngine.processManualCrop(
+          result.croppedBlob,
+          originalFileRef.current?.name ?? "cover",
+        );
+        const previewUrl = URL.createObjectURL(processed.file);
+        applyPreview(
+          processed.file,
+          previewUrl,
+          processed.width,
+          processed.height,
+          null,
+          processed.advisory ?? SMART_COVER_MESSAGES.optimized,
+        );
+        if (uploadMode === "immediate") {
+          await uploadUserPreview();
+        }
+      } catch (err) {
+        setState({
+          status: "error",
+          message: mapCoverErrorToUserMessage(err, IMAGE_POLICY.maxLabel),
+          blocking: true,
+        });
+      }
+    },
+    [applyPreview, uploadMode, uploadUserPreview],
+  );
+
+  const handleCropSave = isSmart ? handleCropSaveSmart : handleCropSaveLegacy;
 
   const handleCropClose = useCallback(() => {
     setCropOpen(false);
@@ -297,11 +395,18 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     }
   }, [cropSrc]);
 
-  const handleThumbnailClick = useCallback(() => {
-    if (stateRef.current.status !== "preview") return;
-    const src = originalFileRef.current ?? stateRef.current.file;
+  const handleAdjustCrop = useCallback(() => {
+    const src = originalFileRef.current ?? (stateRef.current.status === "preview" ? stateRef.current.file : null);
+    if (!src) return;
     openCrop(src);
   }, [openCrop]);
+
+  const handleThumbnailClick = useCallback(() => {
+    if (!isSmart && stateRef.current.status === "preview") {
+      const src = originalFileRef.current ?? stateRef.current.file;
+      openCrop(src);
+    }
+  }, [isSmart, openCrop]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -349,7 +454,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
       open={cropOpen}
       onClose={handleCropClose}
       imageSrc={cropSrc}
-      title="Recadrer la pochette"
+      title={isSmart ? "Ajuster le cadrage" : "Recadrer la pochette"}
       onSave={handleCropSave}
     />
   ) : null;
@@ -360,7 +465,19 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
         {cropModal}
         <div className="cover-up__success">
           <span className="cover-up__success-icon">✓</span>
-          <span>{state.source === "auto" ? "Pochette automatique appliquée" : "Pochette validée"}</span>
+          <span>{state.message}</span>
+        </div>
+      </>
+    );
+  }
+
+  if (state.status === "processing") {
+    return (
+      <>
+        {cropModal}
+        <div className="cover-up__processing" aria-busy="true" aria-live="polite">
+          <span className="cover-up__processing-spin" aria-hidden="true">◌</span>
+          <span>{state.message}</span>
         </div>
       </>
     );
@@ -374,32 +491,43 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
       <>
         {cropModal}
         <div className="cover-up__preview">
-          <button
-            className="cover-up__thumb-btn"
-            onClick={handleThumbnailClick}
-            disabled={isUploading}
-            aria-label="Cliquer pour recadrer la pochette"
-            title="Cliquer pour recadrer"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={state.previewUrl} alt="Aperçu de la pochette" className="cover-up__thumb" />
-            {!isUploading && (
-              <div className="cover-up__thumb-overlay" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M2 11L5 8l3 3 3-4 3 4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                  <path d="M11 2L14 5M13 1l2 2-8 8H5v-2L13 1Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-                </svg>
-                Recadrer
-              </div>
-            )}
-          </button>
+          {isSmart ? (
+            <div className="cover-up__thumb-static">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={state.previewUrl} alt="Aperçu de la pochette" className="cover-up__thumb" />
+            </div>
+          ) : (
+            <button
+              className="cover-up__thumb-btn"
+              onClick={handleThumbnailClick}
+              disabled={isUploading}
+              aria-label="Cliquer pour recadrer la pochette"
+              title="Cliquer pour recadrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={state.previewUrl} alt="Aperçu de la pochette" className="cover-up__thumb" />
+              {!isUploading && (
+                <div className="cover-up__thumb-overlay" aria-hidden="true">
+                  Recadrer
+                </div>
+              )}
+            </button>
+          )}
 
           <div className="cover-up__info">
-            <p className="cover-up__filename">{state.file.name}</p>
-            <p className="cover-up__meta">
-              {state.width > 0 ? `${state.width}×${state.height} · ` : ""}
-              {formatBytes(state.file.size)}
-            </p>
+            {!isSmart && <p className="cover-up__filename">{state.file.name}</p>}
+            {!isSmart && (
+              <p className="cover-up__meta">
+                {state.width > 0 ? `${state.width}×${state.height} · ` : ""}
+                {formatBytes(state.file.size)}
+              </p>
+            )}
+
+            {state.notice ? (
+              <p className="cover-up__notice" role="status">
+                {state.notice}
+              </p>
+            ) : null}
 
             {state.dimensionWarning ? (
               <p className="cover-up__warning" role="status">
@@ -407,15 +535,21 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
               </p>
             ) : null}
 
+            {isSmart && !isUploading ? (
+              <button type="button" className="cover-up__adjust" onClick={handleAdjustCrop}>
+                Ajuster le cadrage
+              </button>
+            ) : null}
+
             {isUploading ? (
               <div className="cover-up__progress">
                 <div className="cover-up__progress-track">
                   <div className="cover-up__progress-fill" style={{ width: `${progress}%` }} />
                 </div>
-                <span className="cover-up__progress-label">{progress}% envoyé…</span>
+                <span className="cover-up__progress-label">Envoi en cours…</span>
               </div>
             ) : (
-              <button className="cover-up__change" onClick={reset}>
+              <button type="button" className="cover-up__change" onClick={reset}>
                 Changer
               </button>
             )}
@@ -440,7 +574,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
           }}
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
-          className={`cover-up__drop${isDragOver ? " cover-up__drop--over" : ""}`}
+          className={`cover-up__drop${isDragOver ? " cover-up__drop--over" : ""}${isSmart ? " cover-up__drop--smart" : ""}`}
           aria-label="Zone de dépôt de la pochette"
         >
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
@@ -449,13 +583,19 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             <path d="M4 22l7-5 5 4 4-3 8 5" stroke="var(--color-texte-desactive)" strokeWidth="1.5" strokeLinejoin="round" />
             <path d="M16 4v8M13 7l3-3 3 3" stroke="var(--color-vert-energie)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <p className="cover-up__drop-label">Glissez une image ou cliquez</p>
+          <p className="cover-up__drop-label">
+            {isSmart ? "Choisir une image" : "Glissez une image ou cliquez"}
+          </p>
           <p className="cover-up__drop-hint">
-            Optionnel — JPG · PNG · WebP · max {IMAGE_POLICY.maxLabel}
+            {isSmart
+              ? "SONAFRIK optimise automatiquement votre pochette."
+              : `Optionnel — JPG · PNG · WebP · max ${IMAGE_POLICY.maxLabel}`}
           </p>
-          <p className="cover-up__drop-hint cover-up__drop-hint--soft">
-            Sans image, SONAFRIK créera une pochette automatique pour vous.
-          </p>
+          {!isSmart && (
+            <p className="cover-up__drop-hint cover-up__drop-hint--soft">
+              Sans image, SONAFRIK créera une pochette automatique pour vous.
+            </p>
+          )}
         </div>
 
         {state.status === "advisory" && (

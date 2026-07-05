@@ -1,6 +1,5 @@
-// Moteur d'upload centralisé — unique point d'entrée pour tous les uploads SONAFRIK.
-// XHR (progress), retry exponentiel, erreurs utilisateur traduits.
-// Source canonique : packages/api/src/shared/uploadRuntime.ts (même logique).
+// Moteur d'upload centralisé — XHR + progress + retry exponentiel.
+// Browser-only (XHR, Blob). Utilisé par CatalogService et les composants web.
 
 type UploadErrorCode = "network" | "permission" | "server" | "unknown";
 

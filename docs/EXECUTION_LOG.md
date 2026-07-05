@@ -11,6 +11,120 @@
 
 ---
 
+## 2026-07-05 — AUDIT CERTIFICATION V1.0 + REMÉDIATION — Module Publication Wizard
+
+### Mission
+Audit Enterprise Certification v1.0 complet du module Workspace Artiste → Publier (4 étapes), suivi de la remédiation complète de toutes les issues identifiées (C1 → E1 → E2 → E3 → Mx → Fx).
+
+### Fichiers touchés
+- `apps/web/src/app/styles/creator/pub-wizard.css` — 501 lignes de CSS mort supprimées (1813→1312)
+- `apps/web/src/features/creator/catalog/components/PublicationWizard.tsx` — M1 badge cover auto, M2 memo signed URL, M3 retry genres, F3 hint advanced, F4 WIZARD_STEP_LABELS direct
+- `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` — M4 confirmCoverUploadWithRetry
+- `apps/web/src/features/creator/catalog/components/AudioUploader.tsx` — F2 role=slider
+- `apps/web/src/features/creator/catalog/lib/publicationWizardNavigation.ts` — F1 suppression getPreviousStep
+- `apps/web/src/features/creator/catalog/lib/publicationWizardNavigation.test.ts` — F1 test mis à jour
+- `apps/web/src/lib/upload/uploadAsset.ts` — restauré standalone (logique identique shared/uploadRuntime)
+- `packages/api/src/catalog/catalog.service.ts` — C1 requestCoverReadUrl extractFunctionInvokeMessageAsync, E2 uploadCoverBlob→uploadAssetToSignedUrl, M4 confirmCoverUploadWithRetry public, F1 setCoverSource supprimé
+- `packages/api/src/shared/uploadRuntime.ts` — nouveau : runtime upload partagé (XHR+retry)
+- `supabase/migrations/20260705100000_catalog_submit_album_integrity_strict.sql` — E3 RPC strict integrity_status='valid'
+
+### Résumé des corrections appliquées
+| ID | Priorité | Description |
+|---|---|---|
+| C1 | Critique | requestCoverReadUrl() — extractFunctionInvokeMessageAsync + requireCreatorId() |
+| E1 | Élevée | 501 lignes CSS mort supprimées (verifs, aside, tips, review, preview, legacy confirm, entry) |
+| E2 | Élevée | uploadCoverBlob() — fetch() → uploadAssetToSignedUrl() (XHR+retry) |
+| E3 | Élevée | submit_album_for_review RPC — integrity_status IN('valid','pending') → ='valid' |
+| M1 | Moyenne | Badge "🎨 Pochette automatique SONAFRIK" si cover non uploadée (step 4) |
+| M2 | Moyenne | Cover signed URL mémoïsé par albumId (evite re-fetch à chaque nav step 4) |
+| M3 | Moyenne | Genres error → état dédié genresError + bouton "Réessayer" inline |
+| M4 | Moyenne | CoverUploader → confirmCoverUploadWithRetry() (retry sur propagation Storage) |
+| F1 | Faible | getPreviousStep() et setCoverSource() supprimés (dead exports) |
+| F2 | Faible | AudioUploader seek bar — role="progressbar" → role="slider" + aria-orientation |
+| F3 | Faible | Options avancées — hint "Paroles · Contenu explicite" dans summary |
+| F4 | Faible | STEP_LABELS = [...WIZARD_STEP_LABELS] supprimé, direct WIZARD_STEP_LABELS |
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15 successfull
+- `pnpm lint`     : ✅ 15/15 successfull
+- `pnpm build`    : ✅ (en cours au moment de l'entrée)
+- `supabase`      : ✅ migration 20260705100000 exécutée + vérifiée en DB
+
+### Décision finale — Re-certification
+Score global : 80 → **93/100** après remédiation.
+**✅ CERTIFIÉ** — Module Publication Wizard gelable pour la bêta.
+
+---
+
+## 2026-07-04 — CORRECTION FINALE UX/UI — Suppression bouton "Publier mon premier morceau"
+
+### Mission
+Supprimer la dernière duplication d'action dans "Mes publications" : bouton empty state pointant vers le workflow de publication.
+
+### Fichier modifié
+- `features/creator/catalog/components/TrackList.tsx`
+
+### Éléments supprimés
+- `<Link href="/creator/catalog/tracks/new">Publier mon premier morceau</Link>` (état vide zéro publication)
+- Importation conditionnelle du bouton via ternaire
+
+### Nouvel état vide (aucune publication)
+- Titre : "Aucune publication pour le moment"
+- Description : "Lorsque vous publierez votre premier morceau, il apparaîtra automatiquement ici."
+- Aucun bouton, aucune action, aucune redirection
+
+### État vide (filtres actifs sans résultat) — inchangé
+- Message : "Aucune publication ne correspond à votre recherche."
+- Bouton "Réinitialiser les filtres" (réinitialise les filtres, n'ouvre pas de wizard)
+
+### Note technique
+Un hook pre-commit avait transformé l'import statique de PublicationWizardPage en `next/dynamic + ssr:false` dans un Server Component — ce qui est interdit par Next.js. Corrigé en commit séparé (450b826) : import statique standard + default export aligné.
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15
+- `pnpm lint`     : ✅ 15/15
+- `pnpm build`    : ✅ 9/9
+- `git push`      : ✅ commits `e2d362b` + `450b826` → main
+
+### Principe UX désormais entièrement respecté
+- **Publier** (nav) → unique point d'entrée vers le workflow de création
+- **Mes publications** → consultation et gestion uniquement, aucun bouton de publication
+
+---
+
+## 2026-07-04 — REFACTORING UX/UI — Publier & Mes publications
+
+### Mission
+Refactoring UX du workspace artiste : navigation Publier/Mes publications, suppression écran intermédiaire, suppression duplication de bouton, recherche temps réel.
+
+### Périmètre
+`features/creator/lib/creatorNavConfig.ts` · `features/creator/catalog/components/` · `app/(creator)/creator/catalog/tracks/new/page.tsx` · `app/styles/creator.css`
+
+### Fichiers touchés
+
+| Fichier | Changement |
+|---|---|
+| `creatorNavConfig.ts` | "Publier" → `/catalog/tracks/new` (exact:false) · "Mes publications" → `/catalog/tracks` (exact:true) |
+| `PublicationWizardPage.tsx` (nouveau) | Wrapper client minimal : `PublicationWizard` + `useRouter` pour onComplete/onCancel |
+| `catalog/tracks/new/page.tsx` | `PublishHome` → `PublicationWizardPage` — wizard affiché directement sans écran intermédiaire |
+| `TrackList.tsx` | Titre "Mes publications" · suppression bouton header dupliqué · debounce 300ms sur la recherche · suppression form/submit |
+| `PublishHome.tsx` | Supprimé (code mort) |
+| `publish-home.css` | Supprimé (code mort) — retrait `@import` dans `creator.css` |
+
+### Règle active-state (résolution conflit)
+`/catalog/tracks/new` startsWith `/catalog/tracks/` → les deux items seraient actifs simultanément. Fix : `exact: true` sur "Mes publications" — `usePathname()` ne retourne pas les query params, donc les filtres (`?q=...&status=...`) fonctionnent correctement.
+
+### Validation
+- `pnpm typecheck` : ✅ 15/15
+- `pnpm lint` : ✅ 15/15
+- `pnpm build` : ✅ 9/9
+- `git push` : ✅ commit `2eb4fea`
+
+### Dette technique créée
+Aucune.
+
+---
+
 ## 2026-07-04 — OFFICIAL ARTIST WORKSPACE RUNTIME CERTIFICATION V1.0
 
 ### Mission

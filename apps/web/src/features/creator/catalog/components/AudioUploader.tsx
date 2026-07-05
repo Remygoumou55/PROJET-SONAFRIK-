@@ -315,7 +315,8 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
           <div
             className="audio-up__seek"
             onClick={handleSeek}
-            role="progressbar"
+            role="slider"
+            aria-orientation="horizontal"
             aria-label="Avancement de la lecture"
             aria-valuenow={Math.round(currentTime)}
             aria-valuemin={0}
