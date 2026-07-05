@@ -11,6 +11,51 @@
 
 ---
 
+## 2026-07-05 — AUDIT CERTIFICATION V1.0 + REMÉDIATION — Module Wallet / Finance
+
+### Mission
+Audit Enterprise Certification v1.0 du module Wallet / Finance (portefeuille, retraits, royalties, abonnements premium), suivi de la remédiation complète de toutes les issues identifiées.
+
+### Fichiers touchés
+- `apps/web/src/app/globals.css` — 9 nouveaux tokens `--overlay-*` (blanc-60/55/13, or-soft/medium, erreur-25, neutre-soft, bleu-soft, modal-backdrop)
+- `apps/web/src/features/wallet/components/WalletDashboard.tsx` — E1: 7 rgba() → tokens
+- `apps/web/src/features/wallet/components/PayoutPage.tsx` — E1: 5 rgba() → tokens, M3: aria-hidden emoji + aria-label inputs
+- `apps/web/src/features/wallet/components/SubscriptionModal.tsx` — E1: 3 rgba() → tokens
+- `apps/web/src/features/wallet/components/TopupModal.tsx` — E1: 2 rgba() → tokens
+- `apps/web/src/features/wallet/components/PaymentProviderSelector.tsx` — E1: 1 rgba() → token
+- `apps/web/src/features/wallet/components/RoyaltiesPage.tsx` — E1: 4 rgba() → tokens
+- `apps/web/src/features/wallet/hooks/useWallet.ts` — M2: stale closure reloadAccounts corrigée
+- `packages/api/src/wallet/wallet.repository.ts` — E2: +getProfilePremiumData, +getBalanceByRpc
+- `packages/api/src/wallet/wallet.service.ts` — E2: délègue profiles query + getBalance au repo
+- `packages/api/src/wallet/wallet.service.test.ts` — M1: 5 tests manquants + fix mock wallet:null
+- `packages/shared/src/publication-wizard/session.ts` — suppression import WizardStep inutilisé (lint)
+
+### Résumé des corrections appliquées
+| ID | Priorité | Description |
+|---|---|---|
+| E1 | Élevée | 19 rgba() hardcodés dans 6 composants → 9 tokens `--overlay-*` dans globals.css |
+| E2 | Élevée | Profiles query + getBalance RPC déplacés dans WalletRepository |
+| M1 | Moyenne | 5 tests manquants (requestWithdrawal happy path, addPayoutAccount, removePayoutAccount, getWalletContext WALLET_NOT_FOUND, getWalletPageData) |
+| M2 | Moyenne | Stale closure reloadAccounts — re-fetch parallèle accounts+withdrawals |
+| M3 | Moyenne | aria-hidden emoji icons + aria-label inputs formulaire PayoutPage |
+
+### Correction audit F1 (annulée)
+Initial audit incorrectly flagged `.wallet-chip-grid` and `.wallet-mono-field` as dead CSS.
+Both classes ARE used: `TopupModal.tsx:190` et `AdminPayoutBatchPanel.tsx:77,89`.
+
+### Validation
+- `pnpm test` (API)   : ✅ 340/340 (49 fichiers)
+- `pnpm typecheck`    : ✅ 15/15 successful
+- `pnpm lint`         : ✅ 15/15 successful (+ fix import inutilisé shared)
+- `pnpm build`        : ✅ 9/9 successful (50/50 pages web)
+- Git commit          : ✅ df55e30 → main
+
+### Décision finale — Re-certification
+Score global : 65/100 (baseline corrigée) → **92/100** après remédiation.
+**✅ CERTIFIÉ** — Module Wallet / Finance gelable pour la bêta.
+
+---
+
 ## 2026-07-05 — AUDIT CERTIFICATION V1.0 + REMÉDIATION — Module Publication Wizard
 
 ### Mission
