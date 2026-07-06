@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 import { useInView } from "@/hooks/useInView";
+import { usePageVisible } from "@/hooks/usePageVisible";
 import type { LandingPublicStats } from "@/lib/landing/constants";
 
 const POLL_MS = 30_000;
@@ -37,6 +38,7 @@ function StatColumn({
 
 export function LiveStats() {
   const { ref, inView } = useInView<HTMLDivElement>(0.15);
+  const pageVisible = usePageVisible();
   const [stats, setStats] = useState<LandingPublicStats | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -54,10 +56,11 @@ export function LiveStats() {
   }, []);
 
   useEffect(() => {
+    if (!inView || !pageVisible) return;
     void load();
     const id = setInterval(() => void load(), POLL_MS);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, inView, pageVisible]);
 
   const shellClass =
     "mb-12 border-y border-vert-energie/15 bg-vert-energie/5 px-4 py-4 min-h-[72px]";

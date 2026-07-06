@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 import { useInView } from "@/hooks/useInView";
+import { usePageVisible } from "@/hooks/usePageVisible";
 
 const POLL_MS = 60_000;
 
 export function RoyaltiesCounter() {
   const { ref, inView } = useInView<HTMLDivElement>(0.3);
+  const pageVisible = usePageVisible();
   const [monthly, setMonthly] = useState(0);
   const [visible, setVisible] = useState(false);
   const display = useAnimatedNumber(monthly, inView && visible);
@@ -32,10 +34,11 @@ export function RoyaltiesCounter() {
   }, []);
 
   useEffect(() => {
+    if (!inView || !pageVisible) return;
     void load();
     const id = setInterval(() => void load(), POLL_MS);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, inView, pageVisible]);
 
   if (!visible) return null;
 

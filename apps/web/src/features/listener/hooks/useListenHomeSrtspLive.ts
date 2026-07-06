@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { shouldRefreshListenerDiscovery } from "@sonafrik/realtime/adapters";
 import type { HomepageData } from "../components/HomepageContentSections";
 import { fetchHomepageDataClient } from "../lib/fetchHomepageDataClient";
@@ -28,13 +28,16 @@ export function useListenHomeSrtspLive(params: UseListenHomeSrtspLiveParams) {
     shouldInvalidate: (event) => shouldRefreshListenerDiscovery(event),
   });
 
+  const refreshRef = useRef(liveQuery.refresh);
+  refreshRef.current = liveQuery.refresh;
+
   useEffect(() => {
     const handler = () => {
-      void liveQuery.refresh();
+      void refreshRef.current();
     };
     window.addEventListener(HOME_INVALIDATE_EVENT, handler);
     return () => window.removeEventListener(HOME_INVALIDATE_EVENT, handler);
-  }, [liveQuery]);
+  }, []);
 
   return liveQuery;
 }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createListenerService } from "@sonafrik/api/listener";
 import { SRTSP_DOMAIN_EVENTS } from "@sonafrik/realtime/events";
 import { useEventSubscription } from "@sonafrik/realtime/react";
+import { usePageVisible } from "@/hooks/usePageVisible";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export interface ReactionCount {
@@ -31,6 +32,7 @@ function mergeReactionRows(rows: { emoji: string; count: number }[]): ReactionCo
 export function useTrackReactions(trackId: string | null) {
   const [reactions, setReactions] = useState<ReactionCount[]>(emptyReactions);
   const [liveListeners, setLiveListeners] = useState(0);
+  const pageVisible = usePageVisible();
 
   const listener = useMemo(() => createListenerService(getSupabaseBrowserClient()), []);
 
@@ -66,9 +68,10 @@ export function useTrackReactions(trackId: string | null) {
       return;
     }
     refreshAll();
+    if (!pageVisible) return;
     const id = window.setInterval(refreshAll, POLL_MS);
     return () => window.clearInterval(id);
-  }, [trackId, refreshAll]);
+  }, [trackId, refreshAll, pageVisible]);
 
   useEventSubscription(
     [...LIVE_EVENTS],

@@ -90,8 +90,11 @@ export function useAdminLiveRefresh(options?: Options) {
 
   useEffect(() => {
     if (mode !== "polling") return;
-    publishSnapshotInvalidate();
-    const id = window.setInterval(publishSnapshotInvalidate, FALLBACK_POLL_MS);
+    const tick = () => {
+      if (document.visibilityState === "visible") publishSnapshotInvalidate();
+    };
+    tick();
+    const id = window.setInterval(tick, FALLBACK_POLL_MS);
     return () => window.clearInterval(id);
   }, [mode, publishSnapshotInvalidate]);
 
