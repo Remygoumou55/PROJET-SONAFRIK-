@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createListenerService } from "@sonafrik/api/listener";
 import { SRTSP_DOMAIN_EVENTS } from "@sonafrik/realtime/events";

@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getAdminHubInvalidateEvents, shouldRefreshAdminHub } from "@sonafrik/realtime/adapters";
 import { useEventSubscription, useSrtspOptional } from "@sonafrik/realtime/react";

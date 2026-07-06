@@ -1,3 +1,5 @@
+"use client";
+
 import type { AudioQualityKbps } from "@sonafrik/types";
 import { useNetworkAware } from "@/lib/networkAware";
 import { useQualityPreference } from "@/lib/qualityPreferenceContext";

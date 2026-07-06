@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ANIMATED_NUMBER_DURATION_DEFAULT_MS,
   CDC_UI_ANIMATION_MAX_MS,
