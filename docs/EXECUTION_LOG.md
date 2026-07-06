@@ -11,6 +11,39 @@
 
 ---
 
+## 2026-07-06 — Vague I — Déplacement silos backend (I1 + I2 + I3)
+
+### Fichiers déplacés
+- `packages/api/src/catalog/*` → `packages/api/src/creator/catalog/` (I1)
+- `packages/api/src/analytics/*` → `packages/api/src/creator/analytics/` (I3)
+- `packages/api/src/rights/*` → `packages/api/src/creator/rights/` (I2)
+
+### Shims backward-compat créés (Vague I4)
+- `catalog/index.ts` → `export * from "../creator/catalog"`
+- `analytics/index.ts` → `export * from "../creator/analytics"`
+- `rights/index.ts` → `export * from "../creator/rights"`
+- Les imports web `@sonafrik/api/catalog` etc. restent fonctionnels **sans modification côté web**
+
+### Imports depth corrigés dans fichiers déplacés
+- `creator/catalog/catalog.repository.ts` — `../common` → `../../common`
+- `creator/catalog/catalog.service.ts` — `../shared` → `../../shared`, `../publication` → `../../publication`
+- `creator/creatorDashboard.service.ts` — `../analytics` → `./analytics`
+- `publication/integration/publication-integration.service.ts` — `../../catalog` → `../../creator/catalog`
+
+### package.json exports ajoutés
+- `./creator/catalog`, `./creator/analytics`, `./creator/rights`
+
+### Validation
+- `pnpm --filter @sonafrik/api typecheck` ✅
+- `pnpm --filter web typecheck` ✅
+- Git push ✅ (1b3d1e2)
+
+### Dette restante Vague I
+- Shims à supprimer dans +1 mois (I4 fin) : `catalog/index.ts`, `analytics/index.ts`, `rights/index.ts`
+- Vague J : Tokens CSS SSOT (rgba() audit + ESLint rule)
+
+---
+
 ## 2026-07-06 — Vague H — Découpage CSS + Composants (H1 + H2 partiel)
 
 ### Fichiers CSS (H1)
