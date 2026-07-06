@@ -1,0 +1,362 @@
+/* ===== Admin Dashboard — Command grid + Priorities + Timeline + Coach + Health + Charts + Musical ===== */
+
+/* --- Command grid (main + aside) --- */
+.admin-human-command-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .admin-human-command-grid {
+    grid-template-columns: 1fr 340px;
+  }
+}
+
+.admin-human-command-grid__main,
+.admin-human-command-grid__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Priorities --- */
+.admin-human-priorities {
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255, 140, 0, 0.06);
+  border: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.admin-human-priorities__list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-human-priority {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-admin-border-subtle);
+}
+
+.admin-human-priority--critical {
+  border-color: rgba(255, 68, 68, 0.35);
+}
+
+.admin-human-priority--warning {
+  border-color: rgba(255, 140, 0, 0.35);
+}
+
+.admin-human-priority__label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-human-priority__count {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-human-priority__action {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-vert-energie);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* --- Timeline --- */
+.admin-human-timeline {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
+}
+
+.admin-human-timeline__list {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.admin-human-timeline__item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-admin-border-subtle);
+}
+
+.admin-human-timeline__item:last-child {
+  border-bottom: none;
+}
+
+.admin-human-timeline__dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--color-vert-energie);
+  flex-shrink: 0;
+}
+
+.admin-human-timeline__item--warning .admin-human-timeline__dot {
+  background: var(--color-or-solaire);
+}
+
+.admin-human-timeline__item--danger .admin-human-timeline__dot {
+  background: var(--color-erreur);
+}
+
+.admin-human-timeline__item--success .admin-human-timeline__dot {
+  background: var(--color-vert-energie);
+  box-shadow: 0 0 8px rgba(0, 210, 106, 0.5);
+}
+
+.admin-human-timeline__label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.admin-human-timeline__time {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-human-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-vert-energie);
+  text-decoration: none;
+}
+
+/* --- Coach --- */
+.admin-human-coach {
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(255, 194, 14, 0.1), rgba(13, 13, 13, 0.8));
+  border: 1px solid rgba(255, 194, 14, 0.25);
+}
+
+.admin-human-coach__badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-or-solaire);
+  margin-bottom: 8px;
+}
+
+.admin-human-coach__list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-human-coach__tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-human-coach__tip-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.coach-insight-cta {
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.coach-insight-cta:hover {
+  opacity: 0.75;
+}
+
+/* --- Health --- */
+.admin-human-health {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
+}
+
+.admin-human-health__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-human-health__badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: rgba(255, 68, 68, 0.15);
+  color: var(--color-erreur);
+}
+
+.admin-human-health__badge--ok {
+  background: rgba(0, 210, 106, 0.15);
+  color: var(--color-vert-energie);
+}
+
+.admin-human-health__list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.admin-human-health__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-admin-border-subtle);
+}
+
+.admin-human-health__row:last-child {
+  border-bottom: none;
+}
+
+.admin-human-health__status {
+  color: var(--color-erreur);
+  font-size: 10px;
+}
+
+.admin-human-health__status--ok {
+  color: var(--color-vert-energie);
+}
+
+.admin-human-health__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-human-health__label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-human-health__detail {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-human-health__latency {
+  font-size: 11px;
+  color: var(--color-vert-energie);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Charts --- */
+.admin-human-charts {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid var(--color-admin-card-border);
+}
+
+.admin-human-chart-caption {
+  margin: 8px 0 16px;
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+  line-height: 1.5;
+}
+
+/* --- Musical --- */
+.admin-human-musical {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--color-admin-card-border);
+  background: var(--color-admin-card-bg);
+}
+
+.admin-human-musical__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (min-width: 640px) {
+  .admin-human-musical__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .admin-human-musical__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-human-musical__card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-admin-border-subtle);
+}
+
+.admin-human-musical__card--gold {
+  border-color: rgba(255, 194, 14, 0.35);
+  background: rgba(255, 194, 14, 0.05);
+}
+
+.admin-human-musical__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-admin-text-muted);
+}
+
+.admin-human-musical__value {
+  margin: 8px 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.admin-human-musical__hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}

@@ -4,6 +4,7 @@ import { RealtimeShell } from "@/features/shared/rendering/RealtimeShell";
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import "@/app/styles/identity.css";
+import "@/app/styles/identity-profile.css";
 import "@/app/styles/identity-account.css";
 
 /**
