@@ -34,9 +34,30 @@
 - Git push ✅ (56c8c7f)
 
 ### Dette Vague H restante
-- AdminRevenueClient.tsx (388L) — extract charts → H2 suite
-- AdminWithdrawalsClient.tsx (370L) — extract batch panel → H2 suite
-- listener.repository.ts (648L) — split read/write → H3
+- AdminRevenueClient.tsx (388L) — tabs trop couplés aux handlers, gain marginal → skip (documenté)
+
+---
+
+## 2026-07-06 — Vague H — H2 suite (AdminWithdrawals) + H3 (listener.repository)
+
+### H2 — AdminWithdrawalsClient split
+- `AdminWithdrawalsClient.tsx` (370L → 148L) — state + handlers + JSX uniquement
+- `adminWithdrawalsColumns.tsx` (161L, CRÉÉ) — `buildAdminWithdrawalsColumns`, types `SelectedWithdrawal`, `WithdrawalRow`, `WithdrawalFilter`, constantes `LARGE_WITHDRAWAL_GNF`, `OVERDUE_HOURS`, `FILTERS`
+- Pattern identique à `adminArtistsColumns.tsx`
+
+### H3 — listener.repository.ts split (648L → 3 fichiers)
+- `listener.repository.ts` (90L) — façade mince, compose via arrow props, **aucun changement dans listener.service.ts**
+- `listener.artist.repository.ts` (276L, CRÉÉ) — `ListenerArtistRepository`: profil artiste, catalog browsing, geo + filterDiscovery/Trending
+- `listener.track.repository.ts` (360L, CRÉÉ) — `ListenerTrackRepository`: tracks, albums, discovery, activité utilisateur, réactions, lyrics
+- Surface publique `ListenerRepository` préservée (delegation via `Parameters<>`)
+
+### Validation H2+H3
+- `pnpm --filter @sonafrik/api typecheck` ✅
+- `pnpm --filter web typecheck` ✅
+- Git push ✅ (974e4a1 H2 + 71c1005 H3)
+
+### Vague H — bilan final
+Tous les fichiers ≥400L réduits. AdminRevenueClient.tsx (388L) skippé — handlers couplés aux tabs, gain nul sans refactor complet.
 
 ---
 
