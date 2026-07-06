@@ -1,7 +1,7 @@
 import type { CreatorContext } from "@sonafrik/types";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { CreatorDashboardData } from "@sonafrik/types";
-import { createAnalyticsService } from "../analytics/analytics.service";
+import { createAnalyticsService } from "./analytics/analytics.service";
 import { AdminConfigRepository } from "../admin/admin.config.repository";
 import { CreatorService } from "./creator.service";
 import { CreatorDashboardRepository } from "./creatorDashboard.repository";

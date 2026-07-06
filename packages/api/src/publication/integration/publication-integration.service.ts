@@ -3,7 +3,7 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import { createPersistenceContainer } from "@sonafrik/persistence";
 import { createSupabaseClientPort } from "@sonafrik/persistence/adapters/supabase";
 import { createMetadataApplicationService } from "../../metadata/application/services";
-import { CatalogRepository } from "../../catalog/catalog.repository";
+import { CatalogRepository } from "../../creator/catalog/catalog.repository";
 import { PublicationOrchestrator } from "../orchestrator";
 import {
   buildPipelineConfig,

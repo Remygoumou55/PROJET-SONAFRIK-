@@ -1,13 +1,2 @@
-export { RightsError } from "./errors";
-export { RightsService, createRightsService } from "./rights.service";
-export { RightsRepository } from "./rights.repository";
-export type {
-  CreateWorkInput,
-  UpdateWorkInput,
-  AddContributorInput,
-  SetOwnershipInput,
-  CreateContractInput,
-  CreateClaimInput,
-  WorkIdInput,
-  CreatorWorksInput,
-} from "./schemas";
+// Shim backward-compat — Vague I. Supprimer après migration complète.
+export * from "../creator/rights";

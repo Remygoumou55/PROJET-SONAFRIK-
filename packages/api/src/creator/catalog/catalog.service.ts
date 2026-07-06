@@ -30,7 +30,7 @@ import { coverSourceSchema } from "./schemas";
 import {
   resolveCatalogAssetConfirmError,
   resolveCatalogAssetUploadError,
-} from "../shared/uploadSchemaErrors";
+} from "../../shared/uploadSchemaErrors";
 import {
   MetadataAutomaticEngine,
   wizardUserMetadataSchema,
@@ -38,8 +38,8 @@ import {
 } from "./metadata";
 import { linesToPlainLyrics, plainLyricsToLines } from "./metadata/lyrics";
 import type { PublicationLibrarySort, PublicationSearchField } from "./publication-library";
-import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
-import { uploadAssetToSignedUrl } from "../shared/uploadRuntime";
+import { extractFunctionInvokeMessageAsync } from "../../shared/invoke-errors";
+import { uploadAssetToSignedUrl } from "../../shared/uploadRuntime";
 
 function toCatalogError(
   err: unknown,
@@ -216,7 +216,7 @@ export class CatalogService {
     await this.assertAlbumReadyForSubmit(albumId);
     await this.applyPublicationAutomaticMetadata(albumId);
 
-    const { PublicationIntegrationService } = await import("../publication/integration");
+    const { PublicationIntegrationService } = await import("../../publication/integration");
     const integration = new PublicationIntegrationService(this.client);
     try {
       await integration.submitAlbum(albumId, async () => {
@@ -368,7 +368,7 @@ export class CatalogService {
   }
 
   async submitTrack(trackId: string): Promise<void> {
-    const { PublicationIntegrationService } = await import("../publication/integration");
+    const { PublicationIntegrationService } = await import("../../publication/integration");
     const integration = new PublicationIntegrationService(this.client);
     try {
       await integration.submitTrack(trackId, async () => {

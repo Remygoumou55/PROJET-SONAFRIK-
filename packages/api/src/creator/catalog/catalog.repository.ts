@@ -1,7 +1,7 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
 import type { Album, Genre, Track, TrackAppearance, TrackCredit, TrackCreditRole, TrackFile } from "@sonafrik/types";
-import { enrichTrackCreditsWithCreatorIds } from "../common/profile-creator.helpers";
+import { enrichTrackCreditsWithCreatorIds } from "../../common/profile-creator.helpers";
 import type { TrackCreditItem } from "./schemas";
 import { COVER_SOURCE_METADATA_KEY, type CoverSource, type CoverStatus } from "./artwork";
 import {
