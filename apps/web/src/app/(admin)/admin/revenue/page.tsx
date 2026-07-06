@@ -1,6 +1,12 @@
+import nextDynamic from "next/dynamic";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
-import { AdminRevenueClient } from "@/features/admin/components/AdminRevenueClient";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+
+const AdminRevenueClient = nextDynamic(
+  () => import("@/features/admin/components/AdminRevenueClient").then((m) => ({ default: m.AdminRevenueClient })),
+  { loading: () => <AdminPageSkeleton variant="cards" /> },
+);
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Revenus — Admin SONAFRIK" };

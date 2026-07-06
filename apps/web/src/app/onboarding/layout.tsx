@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { AmbientBackgroundGlow } from "@/components/shared/AmbientBackgroundGlow";
+import "@/app/styles/onboarding-journey.css";
+import "@/app/styles/identity-account.css";
 
 export default function OnboardingLayout({ children }: { children: ReactNode }) {
   return (

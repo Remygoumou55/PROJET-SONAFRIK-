@@ -5,6 +5,7 @@ import { RealtimeShell } from "@/features/shared/rendering/RealtimeShell";
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { getCachedListenFeatureFlags } from "@/lib/listen/get-cached-listen-feature-flags";
+import "@/app/styles/listen-home-bundle.css";
 
 /**
  * Layout async sans Suspense manuel — loading.tsx du segment gère le skeleton.

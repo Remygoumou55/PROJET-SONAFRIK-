@@ -1,7 +1,16 @@
-import { AdminAnalyticsClient } from "@/features/admin/components/AdminAnalyticsClient";
+import nextDynamic from "next/dynamic";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { isValidContentName } from "@/lib/content-filter";
 import type { AdminAnalyticsDashboard } from "@sonafrik/api/admin";
+
+const AdminAnalyticsClient = nextDynamic(
+  () =>
+    import("@/features/admin/components/AdminAnalyticsClient").then((m) => ({
+      default: m.AdminAnalyticsClient,
+    })),
+  { loading: () => <AdminPageSkeleton variant="cards" /> },
+);
 
 export const metadata = { title: "Analytiques — Admin SONAFRIK" };
 export const dynamic = "force-dynamic";

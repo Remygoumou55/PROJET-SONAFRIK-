@@ -1,8 +1,14 @@
-import { AdminAwardsClient } from "@/features/admin/components/AdminAwardsClient";
+import nextDynamic from "next/dynamic";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { requireAdminFeatureFlag } from "@/features/admin/lib/requireAdminFeatureFlag";
 import { isValidContentName } from "@/lib/content-filter";
 import type { AdminAwardsDashboard } from "@sonafrik/api/admin";
+
+const AdminAwardsClient = nextDynamic(
+  () => import("@/features/admin/components/AdminAwardsClient").then((m) => ({ default: m.AdminAwardsClient })),
+  { loading: () => <AdminPageSkeleton variant="list" /> },
+);
 
 export const metadata = { title: "Awards — Admin SONAFRIK" };
 export const dynamic = "force-dynamic";

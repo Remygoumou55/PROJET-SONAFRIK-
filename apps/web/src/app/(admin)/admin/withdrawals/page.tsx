@@ -1,9 +1,18 @@
+import nextDynamic from "next/dynamic";
 import { createPayoutService } from "@sonafrik/api/payout";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
-import { AdminWithdrawalsClient } from "@/features/admin/components/AdminWithdrawalsClient";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { getSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase/server";
 import { isDevBypassActive } from "@/lib/auth/guards";
+
+const AdminWithdrawalsClient = nextDynamic(
+  () =>
+    import("@/features/admin/components/AdminWithdrawalsClient").then((m) => ({
+      default: m.AdminWithdrawalsClient,
+    })),
+  { loading: () => <AdminPageSkeleton variant="list" /> },
+);
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Retraits — Admin SONAFRIK" };

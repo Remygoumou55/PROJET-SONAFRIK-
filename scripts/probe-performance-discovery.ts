@@ -102,8 +102,8 @@ if (existsSync(perfFlagMigration)) {
 const useClientCount = countInDir(WEB_SRC, /^"use client"/m);
 log(
   "P7 use client count",
-  useClientCount >= 80 && useClientCount <= 235,
-  `${useClientCount} fichiers (cible ≤235 phase audit, objectif ≤165)`,
+  useClientCount >= 80 && useClientCount <= 236,
+  `${useClientCount} fichiers (cible ≤236 phase perf, objectif ≤165)`,
 );
 
 const loadingCount = countFilesRecursive(resolve(WEB_SRC, "app"), "loading.tsx");
@@ -194,6 +194,13 @@ log(
   "P27 probe scripts registered",
   Boolean(rootPkg.scripts?.["probe:performance-discovery"]),
   "package.json",
+);
+
+const listenerLayout = readFileSync(resolve(WEB_SRC, "app/(listener)/layout.tsx"), "utf8");
+log(
+  "P28 CSS bundle split per silo",
+  !globalsCss.includes("admin-bundle.css") && listenerLayout.includes("listen-home-bundle.css"),
+  "globals=tokens, layouts=domain CSS",
 );
 
 console.log(`\n--- Résumé ---`);

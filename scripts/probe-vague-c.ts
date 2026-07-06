@@ -147,26 +147,32 @@ function staticChecks() {
   );
 
   const globalsCss = read("apps/web/src/app/globals.css");
+  const layoutBundles = [
+    "apps/web/src/app/(listener)/layout.tsx",
+    "apps/web/src/app/(creator)/layout.tsx",
+    "apps/web/src/app/(admin)/layout.tsx",
+    "apps/web/src/app/(wallet)/layout.tsx",
+    "apps/web/src/app/(identity)/layout.tsx",
+  ];
+  const bundlesInLayouts = layoutBundles.every((rel) => read(rel).includes("@/app/styles/"));
   log(
-    "C12 domain CSS registry (globals.css)",
-    globalsCss.includes("admin-bundle.css") && globalsCss.includes("creator.css"),
-    "admin + creator bundles enregistrés",
+    "C12 domain CSS registry (layout bundles)",
+    bundlesInLayouts && !globalsCss.includes("admin-bundle.css"),
+    "bundles par silo dans layouts, globals = tokens",
   );
 
-  const layoutCssViolations: string[] = [];
+  const orphanLayoutCss: string[] = [];
   for (const rel of [
-    "apps/web/src/app/(admin)/layout.tsx",
-    "apps/web/src/app/(creator)/layout.tsx",
     "apps/web/src/app/lancement/page.tsx",
   ]) {
     if (read(rel).includes('@/app/styles/')) {
-      layoutCssViolations.push(rel);
+      orphanLayoutCss.push(rel);
     }
   }
   log(
-    "C13 pas d'import CSS orphelin layout/page",
-    layoutCssViolations.length === 0,
-    layoutCssViolations.length ? layoutCssViolations.join(", ") : "globals.css seul registre",
+    "C13 pas d'import CSS orphelin page",
+    orphanLayoutCss.length === 0,
+    orphanLayoutCss.length ? orphanLayoutCss.join(", ") : "CSS via layouts route-group",
   );
 }
 

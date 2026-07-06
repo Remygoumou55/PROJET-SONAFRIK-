@@ -1,6 +1,15 @@
+import nextDynamic from "next/dynamic";
 import { getAdminServiceWithServiceRole } from "@/features/admin/lib/getAdminService";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
-import { AdminBusinessRulesCenter } from "@/features/admin/components/AdminBusinessRulesCenter";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
+
+const AdminBusinessRulesCenter = nextDynamic(
+  () =>
+    import("@/features/admin/components/AdminBusinessRulesCenter").then((m) => ({
+      default: m.AdminBusinessRulesCenter,
+    })),
+  { loading: () => <AdminPageSkeleton variant="grid" /> },
+);
 
 export const metadata = { title: "Config Règles — Admin SONAFRIK" };
 

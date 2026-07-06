@@ -1,9 +1,14 @@
+import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import type { AdminUsersFilter } from "@sonafrik/types";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
 import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
-import { AdminUsersClient } from "@/features/admin/components/AdminUsersClient";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+
+const AdminUsersClient = nextDynamic(
+  () => import("@/features/admin/components/AdminUsersClient").then((m) => ({ default: m.AdminUsersClient })),
+  { loading: () => <AdminPageSkeleton variant="list" rows={10} /> },
+);
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Utilisateurs — Admin SONAFRIK" };

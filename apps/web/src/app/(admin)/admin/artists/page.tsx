@@ -1,9 +1,14 @@
+import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import type { AdminArtistsFilter } from "@sonafrik/types";
-import { AdminArtistsClient } from "@/features/admin/components/AdminArtistsClient";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
 import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+
+const AdminArtistsClient = nextDynamic(
+  () => import("@/features/admin/components/AdminArtistsClient").then((m) => ({ default: m.AdminArtistsClient })),
+  { loading: () => <AdminPageSkeleton variant="list" rows={10} /> },
+);
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Artistes — Admin SONAFRIK" };

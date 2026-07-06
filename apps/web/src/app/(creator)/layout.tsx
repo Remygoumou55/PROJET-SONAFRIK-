@@ -8,6 +8,7 @@ import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
 import { isDevBypassActive } from "@/lib/auth/guards";
+import "@/app/styles/creator.css";
 
 /**
  * Layout async sans Suspense manuel — loading.tsx du segment gère le skeleton.

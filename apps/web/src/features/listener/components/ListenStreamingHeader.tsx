@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { getInitials } from "@/lib/utils";
 import { HeaderFilters } from "./HeaderFilters";
-import { SmartSearchBar } from "./SmartSearchBar";
+import { ListenSearchBarSlot } from "./ListenSearchBarSlot";
 
 interface ListenStreamingHeaderProps {
   fullName: string | null;
@@ -24,7 +24,7 @@ export function ListenStreamingHeader({ fullName, unreadNotifications }: ListenS
 
       <div className="header-center">
         <div className="header-search-slot">
-          <SmartSearchBar />
+          <ListenSearchBarSlot />
         </div>
         <Suspense fallback={<FiltersSkeleton />}>
           <HeaderFilters />

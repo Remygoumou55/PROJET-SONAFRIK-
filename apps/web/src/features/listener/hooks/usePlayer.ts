@@ -27,8 +27,7 @@ export function usePlayer() {
           await refreshAfterValidListen(trackId);
         }
         return isValid;
-      } catch (err) {
-        console.warn("[Player] Complétion session échouée", err);
+      } catch {
         return false;
       } finally {
         completingRef.current = false;

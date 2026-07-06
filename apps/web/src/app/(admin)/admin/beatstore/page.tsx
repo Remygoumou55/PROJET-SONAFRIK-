@@ -1,7 +1,16 @@
-import { AdminBeatStoreClient } from "@/features/admin/components/AdminBeatStoreClient";
+import nextDynamic from "next/dynamic";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { requireAdminFeatureFlag } from "@/features/admin/lib/requireAdminFeatureFlag";
 import { isValidContentName } from "@/lib/content-filter";
+
+const AdminBeatStoreClient = nextDynamic(
+  () =>
+    import("@/features/admin/components/AdminBeatStoreClient").then((m) => ({
+      default: m.AdminBeatStoreClient,
+    })),
+  { loading: () => <AdminPageSkeleton variant="grid" /> },
+);
 
 export const metadata = { title: "Beat Store — Admin SONAFRIK" };
 export const dynamic = "force-dynamic";
