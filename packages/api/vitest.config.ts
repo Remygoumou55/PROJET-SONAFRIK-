@@ -5,7 +5,7 @@ export default defineConfig({
     globals: false,
     environment: "node",
     include: [
-      "src/metadata/**/*.test.ts",
+      "src/auth/**/*.test.ts",
       "src/publication/**/*.test.ts",
       "src/streaming/**/*.test.ts",
       "src/wallet/**/*.test.ts",

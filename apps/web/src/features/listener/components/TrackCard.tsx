@@ -12,6 +12,7 @@ interface TrackCardProps {
   gradientSeed?: number;
   isActive?: boolean;
   isNew?: boolean;
+  priority?: boolean;
   onPlay?: () => void;
 }
 
@@ -23,6 +24,7 @@ export const TrackCard = memo(function TrackCard({
   gradientSeed = 0,
   isActive = false,
   isNew = false,
+  priority = false,
   onPlay,
 }: TrackCardProps) {
   return (
@@ -40,6 +42,7 @@ export const TrackCard = memo(function TrackCard({
           artistName={artistName ?? title}
           gradientSeed={gradientSeed}
           imgSizes="160px"
+          priority={priority}
         />
         <div className="listen-track-card-play-overlay" aria-hidden="true">
           <span className="listen-track-card-play-btn">

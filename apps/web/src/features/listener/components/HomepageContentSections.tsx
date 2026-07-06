@@ -7,7 +7,6 @@ import { CARD_GRADIENTS } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
 import { HomepageTrendingSection } from "./HomepageTrendingRow";
 import { MediaCard } from "./HomepageMediaCard";
-import { DiscoveriesSection } from "./DiscoveriesSection";
 import { ListenDiscoverModeSlot } from "./ListenDiscoverModeSlot";
 
 const TopGuineaSection = dynamic(
@@ -170,8 +169,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
           </Link>
         </div>
       )}
-
-      {discoveryTracks.length > 0 ? <DiscoveriesSection tracks={discoveryTracks} /> : null}
 
       <ListenDiscoverModeSlot />
 

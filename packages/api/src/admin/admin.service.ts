@@ -188,6 +188,10 @@ export class AdminService {
     return this.repository.getCockpitData();
   }
 
+  async listAuditLogs(options?: { limit?: number; offset?: number; actionQuery?: string }) {
+    return this.repository.listAuditLogs(options);
+  }
+
   async getRevenueDashboardData(): Promise<AdminRevenueDashboardData> {
     return this.repository.getRevenueDashboardData();
   }

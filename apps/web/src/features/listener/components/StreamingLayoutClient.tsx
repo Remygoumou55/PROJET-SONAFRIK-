@@ -8,7 +8,10 @@ import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBoo
 import { ListenFeaturesProvider } from "../lib/listenFeaturesContext";
 import { PlayerProvider } from "../lib/playerContext";
 import { PlayerMuteProvider } from "../lib/playerMuteContext";
+import { useAfterFCP } from "../hooks/useAfterFCP";
+import { ListenerProgressiveRealtimeShell } from "./ListenerProgressiveRealtimeShell";
 import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
+import { ListenerSidebarPlaceholder } from "./ListenerSidebarPlaceholder";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
 import { ValidListenToast } from "./ValidListenToast";
 
@@ -26,6 +29,10 @@ interface StreamingLayoutClientProps {
   listenFeatures: ListenFeatureFlags;
 }
 
+/**
+ * Layer 2–4 — shell client progressif.
+ * Player + nav mobile immédiats ; sidebar, player chrome, SRTSP/LDSE après FCP.
+ */
 export function StreamingLayoutClient({
   children,
   userId,
@@ -34,34 +41,42 @@ export function StreamingLayoutClient({
   sidebarDataPromise,
   listenFeatures,
 }: StreamingLayoutClientProps) {
+  const chromeReady = useAfterFCP();
+
   return (
     <QualityPreferenceProvider value={audioQualityPreference}>
       <ListenFeaturesProvider flags={listenFeatures}>
         <DevAuthBootstrap />
         <PlayerProvider>
-        <PlayerMuteProvider>
-        <div
-          className="has-global-player md:flex md:h-screen md:overflow-hidden"
-          style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
-        >
-          <ListenerSidebarAsync
-            userId={userId}
-            initialUnreadCount={initialUnreadCount}
-            sidebarDataPromise={sidebarDataPromise}
-          />
-          <main
-            className="flex-1 overflow-y-auto md:pb-[88px] md:min-h-screen"
-            style={{
-              paddingBottom: "var(--listener-player-offset)",
-            }}
-          >
-            {children}
-          </main>
-        </div>
-        <MobileBottomNav />
-        <GlobalPlayer />
-        <ValidListenToast />
-        </PlayerMuteProvider>
+          <PlayerMuteProvider>
+            <ListenerProgressiveRealtimeShell runtimeReady={chromeReady}>
+              <div
+                className="has-global-player md:flex md:h-screen md:overflow-hidden"
+                style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
+              >
+                {chromeReady ? (
+                  <ListenerSidebarAsync
+                    userId={userId}
+                    initialUnreadCount={initialUnreadCount}
+                    sidebarDataPromise={sidebarDataPromise}
+                  />
+                ) : (
+                  <ListenerSidebarPlaceholder />
+                )}
+                <main
+                  className="flex-1 overflow-y-auto md:pb-[88px] md:min-h-screen"
+                  style={{
+                    paddingBottom: "var(--listener-player-offset)",
+                  }}
+                >
+                  {children}
+                </main>
+              </div>
+              <MobileBottomNav />
+              {chromeReady ? <GlobalPlayer /> : null}
+              {chromeReady ? <ValidListenToast /> : null}
+            </ListenerProgressiveRealtimeShell>
+          </PlayerMuteProvider>
         </PlayerProvider>
       </ListenFeaturesProvider>
     </QualityPreferenceProvider>

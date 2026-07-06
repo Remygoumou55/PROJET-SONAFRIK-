@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { REAL_LISTEN_THRESHOLD_PERCENT } from "@sonafrik/types";
 import type {
   AudioErrorType,
+  PlayerActions,
   PlayerContextValue,
   PlayerStateCoreExtended,
   QueueState,
@@ -12,7 +13,8 @@ import type {
 } from "./playerTypes";
 import type { StreamCompleteMode } from "@sonafrik/shared/streaming";
 import { INITIAL_PLAYER_STATE, INITIAL_QUEUE_STATE } from "./playerTypes";
-import { usePlayerQueueControls } from "./usePlayerQueueControls";
+import { createPlayerQueueActions } from "./usePlayerQueueControls";
+import { useStablePlayerActions } from "./useStablePlayerActions";
 import {
   buildCompletePayload,
   clearAudioElement,
@@ -51,20 +53,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const clearHeartbeat = useCallback(() => {
-    heartbeatCtl.clear();
-  }, [heartbeatCtl]);
+  const stableActions = useStablePlayerActions((): PlayerActions => {
+    const resolveDurationSeconds = (): number =>
+      resolveTrackDurationSeconds(audioRef.current, activeDurationRef);
 
-  const startHeartbeat = useCallback(() => {
-    heartbeatCtl.start();
-  }, [heartbeatCtl]);
-
-  const resolveDurationSeconds = useCallback((): number => {
-    return resolveTrackDurationSeconds(audioRef.current, activeDurationRef);
-  }, []);
-
-  const takeCompletePayload = useCallback(
-    (mode: StreamCompleteMode = "manual"): StreamCompletePayload | null => {
+    const takeCompletePayload = (mode: StreamCompleteMode = "manual"): StreamCompletePayload | null => {
       const sessionId = activeSessionIdRef.current;
       if (!sessionId) return null;
 
@@ -77,260 +70,243 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         resolveDurationSeconds(),
         mode,
       );
-    },
-    [resolveDurationSeconds],
-  );
-
-  const play = useCallback(
-    (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number, autoPlay = false) => {
-      const generation = ++loadGenerationRef.current;
-      clearHeartbeat();
-      accumulatedListenSecondsRef.current = 0;
-      activeSessionIdRef.current = sessionId;
-      activeDurationRef.current = duration;
-
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-      }
-      const audio = audioRef.current;
-      clearAudioElement(audio);
-
-      audio.preload = "auto";
-      audio.volume = volumeRef.current;
-
-      positionRef.current = 0;
-      setCurrentPosition(0);
-
-      setState((prev) => ({
-        ...prev,
-        currentTrack: track,
-        sessionId,
-        signedUrl,
-        isPlaying: false,
-        isLoading: true,
-        duration,
-        audioError: null,
-      }));
-
-      const startPlayback = () => {
-        if (generation !== loadGenerationRef.current) return;
-        void audio.play()
-          .then(() => {
-            if (generation !== loadGenerationRef.current) return;
-            startHeartbeat();
-            setState((prev) => ({ ...prev, isPlaying: true, isLoading: false, audioError: null }));
-          })
-          .catch((err: unknown) => {
-            if (generation !== loadGenerationRef.current) return;
-            console.error("[Player] Reprise audio échouée", err);
-            setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
-          });
-      };
-
-      audio.onloadedmetadata = () => {
-        if (generation !== loadGenerationRef.current) return;
-        if (audio.duration > 0 && isFinite(audio.duration)) {
-          setState((prev) => ({ ...prev, duration: audio.duration }));
-        }
-      };
-
-      audio.oncanplay = () => {
-        if (generation !== loadGenerationRef.current) return;
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          duration: (audio.duration > 0 && isFinite(audio.duration)) ? audio.duration : prev.duration,
-        }));
-        if (autoPlay) startPlayback();
-      };
-
-      audio.ontimeupdate = () => {
-        if (generation !== loadGenerationRef.current) return;
-        positionRef.current = audio.currentTime;
-        setCurrentPosition(audio.currentTime);
-      };
-
-      audio.onended = () => {
-        if (generation !== loadGenerationRef.current) return;
-        clearHeartbeat();
-        setState((prev) => ({ ...prev, isPlaying: false }));
-        const payload = takeCompletePayload("natural");
-        if (payload) {
-          onCompleteCallbackRef.current?.({ ...payload, advanceQueue: true });
-        }
-      };
-
-      audio.onerror = () => {
-        if (generation !== loadGenerationRef.current) return;
-        const mediaErr = audio.error;
-        // Ignorer les erreurs transitoires lors d'un changement de piste
-        if (mediaErr?.code === MediaError.MEDIA_ERR_ABORTED) return;
-        // Code 4 (SRC_NOT_SUPPORTED) = souvent JSON 403/404 Supabase, pas un vrai codec — retry via "expired"
-        const errorType: AudioErrorType =
-          mediaErr?.code === MediaError.MEDIA_ERR_DECODE ? "codec" :
-          mediaErr?.code === MediaError.MEDIA_ERR_NETWORK ? "network" :
-          "expired";
-        const errorMsg =
-          errorType === "codec"
-            ? "Ce morceau ne peut pas être lu (fichier corrompu ou format incompatible)."
-            : errorType === "network"
-              ? "Erreur réseau — vérifiez votre connexion."
-              : "Lecture interrompue. Nouvelle tentative…";
-        if (process.env.NODE_ENV === "development") {
-          console.error("[Player] Erreur audio", errorType, mediaErr?.code);
-        }
-        clearHeartbeat();
-        setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: errorMsg }));
-        onErrorCallbackRef.current?.(errorType, audio.currentTime);
-      };
-
-      audio.src = signedUrl;
-      audio.load();
-    },
-    [clearHeartbeat, startHeartbeat, takeCompletePayload],
-  );
-
-  const pause = useCallback(() => {
-    audioRef.current?.pause();
-    clearHeartbeat();
-    setState((prev) => ({ ...prev, isPlaying: false }));
-  }, [clearHeartbeat]);
-
-  const resume = useCallback(() => {
-    if (!audioRef.current) return;
-    const audio = audioRef.current;
-    const generation = loadGenerationRef.current;
-
-    const startPlayback = () => {
-      if (generation !== loadGenerationRef.current) return;
-      void audio.play()
-        .then(() => {
-          if (generation !== loadGenerationRef.current) return;
-          startHeartbeat();
-          setState((prev) => ({ ...prev, isPlaying: true, isLoading: false, audioError: null }));
-        })
-        .catch((err: unknown) => {
-          if (generation !== loadGenerationRef.current) return;
-          console.error("[Player] Reprise audio échouée", err);
-        });
     };
 
-    setState((prev) => ({ ...prev, isLoading: true, audioError: null }));
+    const queueActions = createPlayerQueueActions(
+      setQueueState,
+      shuffledOrderRef,
+      accumulatedListenSecondsRef,
+    );
 
-    if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      startPlayback();
-    } else {
-      audio.addEventListener("canplay", startPlayback, { once: true });
-    }
-  }, [startHeartbeat]);
+    return {
+      ...queueActions,
 
-  const stop = useCallback(() => {
-    clearHeartbeat();
-    const payload = takeCompletePayload("manual");
-    if (payload) {
-      onCompleteCallbackRef.current?.(payload);
-    }
-    activeDurationRef.current = 0;
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-    }
-    setState(INITIAL_PLAYER_STATE);
-    positionRef.current = 0;
-    setCurrentPosition(0);
-  }, [clearHeartbeat, takeCompletePayload]);
+      play: (track: TrackWithMeta, signedUrl: string, sessionId: string, duration: number, autoPlay = false) => {
+        const generation = ++loadGenerationRef.current;
+        heartbeatCtl.clear();
+        accumulatedListenSecondsRef.current = 0;
+        activeSessionIdRef.current = sessionId;
+        activeDurationRef.current = duration;
 
-  const setVolume = useCallback((volume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, volume));
-    volumeRef.current = clampedVolume;
-    if (audioRef.current) audioRef.current.volume = clampedVolume;
-    setState((prev) => ({ ...prev, volume: clampedVolume }));
-  }, []);
+        if (!audioRef.current) {
+          audioRef.current = new Audio();
+        }
+        const audio = audioRef.current;
+        clearAudioElement(audio);
 
-  const seek = useCallback((positionSeconds: number) => {
-    if (!audioRef.current) return;
-    const clamped = Math.max(0, Math.min(positionSeconds, audioRef.current.duration || 0));
-    audioRef.current.currentTime = clamped;
-    positionRef.current = clamped;
-    setCurrentPosition(clamped);
-  }, []);
+        audio.preload = "auto";
+        audio.volume = volumeRef.current;
 
-  // Lit la position depuis le ref — pas de subscription au re-render cycle
-  const getPosition = useCallback(() => positionRef.current, []);
+        positionRef.current = 0;
+        setCurrentPosition(0);
 
-  const getAccumulatedListenSeconds = useCallback(() => {
-    return accumulatedListenSecondsRef.current;
-  }, []);
+        setState((prev) => ({
+          ...prev,
+          currentTrack: track,
+          sessionId,
+          signedUrl,
+          isPlaying: false,
+          isLoading: true,
+          duration,
+          audioError: null,
+        }));
 
-  const restartCurrentTrack = useCallback(() => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = 0;
-    accumulatedListenSecondsRef.current = 0;
-    positionRef.current = 0;
-    setCurrentPosition(0);
-  }, []);
+        const startPlayback = () => {
+          if (generation !== loadGenerationRef.current) return;
+          void audio
+            .play()
+            .then(() => {
+              if (generation !== loadGenerationRef.current) return;
+              heartbeatCtl.start();
+              setState((prev) => ({ ...prev, isPlaying: true, isLoading: false, audioError: null }));
+            })
+            .catch((err: unknown) => {
+              if (generation !== loadGenerationRef.current) return;
+              console.error("[Player] Reprise audio échouée", err);
+              setState((prev) => ({ ...prev, isPlaying: false, isLoading: false }));
+            });
+        };
 
-  const onHeartbeat = useCallback((cb: (pos: number) => void) => {
-    onHeartbeatCallbackRef.current = cb;
-  }, []);
+        audio.onloadedmetadata = () => {
+          if (generation !== loadGenerationRef.current) return;
+          if (audio.duration > 0 && isFinite(audio.duration)) {
+            setState((prev) => ({ ...prev, duration: audio.duration }));
+          }
+        };
 
-  const onComplete = useCallback((cb: (payload: StreamCompletePayload) => void) => {
-    onCompleteCallbackRef.current = cb;
-  }, []);
+        audio.oncanplay = () => {
+          if (generation !== loadGenerationRef.current) return;
+          setState((prev) => ({
+            ...prev,
+            isLoading: false,
+            duration: audio.duration > 0 && isFinite(audio.duration) ? audio.duration : prev.duration,
+          }));
+          if (autoPlay) startPlayback();
+        };
 
-  const onError = useCallback((cb: (type: AudioErrorType, positionSeconds: number) => void) => {
-    onErrorCallbackRef.current = cb;
-  }, []);
+        audio.ontimeupdate = () => {
+          if (generation !== loadGenerationRef.current) return;
+          positionRef.current = audio.currentTime;
+          setCurrentPosition(audio.currentTime);
+        };
 
-  const clearAudioError = useCallback(() => {
-    setState((prev) => ({ ...prev, audioError: null }));
-  }, []);
+        audio.onended = () => {
+          if (generation !== loadGenerationRef.current) return;
+          heartbeatCtl.clear();
+          setState((prev) => ({ ...prev, isPlaying: false }));
+          const payload = takeCompletePayload("natural");
+          if (payload) {
+            onCompleteCallbackRef.current?.({ ...payload, advanceQueue: true });
+          }
+        };
 
-  const { setQueue, addToQueue, removeFromQueue, clearQueue, advanceQueue, retreatQueue, toggleShuffle, cycleRepeat } = usePlayerQueueControls(
-    setQueueState,
-    shuffledOrderRef,
-    accumulatedListenSecondsRef,
+        audio.onerror = () => {
+          if (generation !== loadGenerationRef.current) return;
+          const mediaErr = audio.error;
+          if (mediaErr?.code === MediaError.MEDIA_ERR_ABORTED) return;
+          const errorType: AudioErrorType =
+            mediaErr?.code === MediaError.MEDIA_ERR_DECODE
+              ? "codec"
+              : mediaErr?.code === MediaError.MEDIA_ERR_NETWORK
+                ? "network"
+                : "expired";
+          const errorMsg =
+            errorType === "codec"
+              ? "Ce morceau ne peut pas être lu (fichier corrompu ou format incompatible)."
+              : errorType === "network"
+                ? "Erreur réseau — vérifiez votre connexion."
+                : "Lecture interrompue. Nouvelle tentative…";
+          if (process.env.NODE_ENV === "development") {
+            console.error("[Player] Erreur audio", errorType, mediaErr?.code);
+          }
+          heartbeatCtl.clear();
+          setState((prev) => ({ ...prev, isPlaying: false, isLoading: false, audioError: errorMsg }));
+          onErrorCallbackRef.current?.(errorType, audio.currentTime);
+        };
+
+        audio.src = signedUrl;
+        audio.load();
+      },
+
+      pause: () => {
+        audioRef.current?.pause();
+        heartbeatCtl.clear();
+        setState((prev) => ({ ...prev, isPlaying: false }));
+      },
+
+      resume: () => {
+        if (!audioRef.current) return;
+        const audio = audioRef.current;
+        const generation = loadGenerationRef.current;
+
+        const startPlayback = () => {
+          if (generation !== loadGenerationRef.current) return;
+          void audio
+            .play()
+            .then(() => {
+              if (generation !== loadGenerationRef.current) return;
+              heartbeatCtl.start();
+              setState((prev) => ({ ...prev, isPlaying: true, isLoading: false, audioError: null }));
+            })
+            .catch((err: unknown) => {
+              if (generation !== loadGenerationRef.current) return;
+              console.error("[Player] Reprise audio échouée", err);
+            });
+        };
+
+        setState((prev) => ({ ...prev, isLoading: true, audioError: null }));
+
+        if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+          startPlayback();
+        } else {
+          audio.addEventListener("canplay", startPlayback, { once: true });
+        }
+      },
+
+      stop: () => {
+        heartbeatCtl.clear();
+        const payload = takeCompletePayload("manual");
+        if (payload) {
+          onCompleteCallbackRef.current?.(payload);
+        }
+        activeDurationRef.current = 0;
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.src = "";
+        }
+        setState(INITIAL_PLAYER_STATE);
+        positionRef.current = 0;
+        setCurrentPosition(0);
+      },
+
+      setVolume: (volume: number) => {
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        volumeRef.current = clampedVolume;
+        if (audioRef.current) audioRef.current.volume = clampedVolume;
+        setState((prev) => ({ ...prev, volume: clampedVolume }));
+      },
+
+      seek: (positionSeconds: number) => {
+        if (!audioRef.current) return;
+        const clamped = Math.max(0, Math.min(positionSeconds, audioRef.current.duration || 0));
+        audioRef.current.currentTime = clamped;
+        positionRef.current = clamped;
+        setCurrentPosition(clamped);
+      },
+
+      getPosition: () => positionRef.current,
+
+      getAccumulatedListenSeconds: () => accumulatedListenSecondsRef.current,
+
+      restartCurrentTrack: () => {
+        if (!audioRef.current) return;
+        audioRef.current.currentTime = 0;
+        accumulatedListenSecondsRef.current = 0;
+        positionRef.current = 0;
+        setCurrentPosition(0);
+      },
+
+      takeCompletePayload,
+
+      onHeartbeat: (cb: (pos: number) => void) => {
+        onHeartbeatCallbackRef.current = cb;
+      },
+
+      onComplete: (cb: (payload: StreamCompletePayload) => void) => {
+        onCompleteCallbackRef.current = cb;
+      },
+
+      onError: (cb: (type: AudioErrorType, positionSeconds: number) => void) => {
+        onErrorCallbackRef.current = cb;
+      },
+
+      clearAudioError: () => {
+        setState((prev) => ({ ...prev, audioError: null }));
+      },
+    };
+  });
+
+  const contextValue = useMemo<PlayerContextValue>(
+    () => ({
+      ...state,
+      ...queueState,
+      ...stableActions,
+    }),
+    [state, queueState, stableActions],
   );
 
   useEffect(() => {
     return () => {
-      clearHeartbeat();
+      heartbeatCtl.clear();
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
       }
     };
-  }, [clearHeartbeat]);
+  }, [heartbeatCtl]);
 
   return (
-    <PlayerContext.Provider
-      value={{
-        ...state,
-        ...queueState,
-        play,
-        pause,
-        resume,
-        stop,
-        setVolume,
-        seek,
-        getPosition,
-        getAccumulatedListenSeconds,
-        restartCurrentTrack,
-        takeCompletePayload,
-        onHeartbeat,
-        onComplete,
-        onError,
-        clearAudioError,
-        setQueue,
-        addToQueue,
-        removeFromQueue,
-        clearQueue,
-        advanceQueue,
-        retreatQueue,
-        toggleShuffle,
-        cycleRepeat,
-      }}
-    >
+    <PlayerContext.Provider value={contextValue}>
       <PlayerPositionContext.Provider value={currentPosition}>
         {children}
       </PlayerPositionContext.Provider>

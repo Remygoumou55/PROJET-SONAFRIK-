@@ -25,6 +25,7 @@ function nextWithNonce(request: NextRequest, nonce: string): NextResponse {
   const csp = buildContentSecurityPolicy(nonce, isProd);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
   // Next.js parse le CSP de la requête pour injecter le nonce sur les scripts SSR.
   requestHeaders.set("Content-Security-Policy", csp);
   const response = NextResponse.next({ request: { headers: requestHeaders } });

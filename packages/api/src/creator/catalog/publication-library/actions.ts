@@ -44,6 +44,10 @@ export function getPublicationEditHref(trackId: string): string {
   return `/creator/catalog/tracks/${trackId}/edit`;
 }
 
+export function getPublicationConsultHref(trackId: string): string {
+  return `/creator/catalog/tracks/${trackId}`;
+}
+
 export function getPublicationCoverHref(trackId: string): string {
   return `/creator/catalog/tracks/${trackId}/edit#cover`;
 }

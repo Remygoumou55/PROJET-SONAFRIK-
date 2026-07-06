@@ -17,6 +17,7 @@ export class AuthRepository {
     return data as Profile | null;
   }
 
+  /** @deprecated Préférer completeOnboardingRpc — assigne rôles + provisionne creator atomiquement. */
   async updateProfileOnboarding(
     userId: string,
     accountType: AccountType,
@@ -40,6 +41,20 @@ export class AuthRepository {
 
     if (error) throw error;
     return data as Profile;
+  }
+
+  /** RPC SECURITY DEFINER — profil + rôle + ensure_creator_for_current_user (artistes). */
+  async completeOnboardingRpc(fullName: string, accountType: AccountType): Promise<Profile> {
+    const { data, error } = await this.client.rpc("complete_onboarding", {
+      p_full_name: fullName,
+      p_account_type: accountType,
+    });
+
+    if (error) throw error;
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      throw new Error("complete_onboarding: empty profile response");
+    }
+    return data as unknown as Profile;
   }
 
   async assignRole(userId: string, accountType: AccountType): Promise<void> {

@@ -1,11 +1,24 @@
-# Core Web Vitals Report — SONAFRIK MVP
+# Core Web Vitals Report — SONAFRIK
 
-> **Date :** 26 juin 2026 · **Statut :** 🔵 SEUILS DÉFINIS — **mesures non exécutées**  
-> **Décision :** ❌ REFUSÉ
+> **Date :** 26 juin 2026 · **Mis à jour PCI :** 6 juillet 2026  
+> **Statut :** 🟢 GEC certifiée — budgets opérationnels → [`PERFORMANCE_CONTINUOUS_IMPROVEMENT.md`](../PERFORMANCE_CONTINUOUS_IMPROVEMENT.md)
 
 ---
 
-## Seuils MVP officiels
+## Budgets PCI (opérationnels — post-GEC)
+
+| Métrique | Budget cible | Objectif ambitieux |
+|---|---|---|
+| **LCP** | **≤ 3,5 s** | ≤ 2,5 s |
+| **CLS** | ≤ 0,10 | ≤ 0,05 |
+| **INP** | ≤ 200 ms | ≤ 150 ms |
+| **TBT** | ≤ 300 ms | ≤ 200 ms |
+
+Baseline certifiée : `reports/global-certification/gec-official-closure/`
+
+---
+
+## Seuils MVP historiques (pré-PCI)
 
 | Métrique | Bon (Google) | **Cible SONAFRIK MVP** | Pénalité certification |
 |---|---|---|---|

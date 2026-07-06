@@ -1,30 +1,55 @@
-import { Suspense } from "react";
-import Link from "next/link";
 import { CreatorDashboard } from "@/features/creator/components/CreatorDashboard";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { formatCreatorGreeting } from "@/features/creator/lib/greeting";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createCreatorService } from "@sonafrik/api/creator";
 import { createListenerService } from "@sonafrik/api/listener";
-import CreatorPageLoading from "./loading";
+import { HeroCard } from "@/features/creator/dashboard/components/HeroCard";
+import Link from "next/link";
 
-async function CreatorDashboardContent() {
-  const context = await requireCreatorContext();
-  const supabase = await getSupabaseServerClient();
-  const stageName = context.artistProfile.stage_name || "Artiste";
+export default async function CreatorDashboardPage() {
+  try {
+    const context = await requireCreatorContext();
+    const supabase = await getSupabaseServerClient();
+    const stageName = context.artistProfile.stage_name || "Artiste";
 
-  const [data, careerOsEnabled] = await Promise.all([
-    createCreatorService(supabase).getDashboardDataForContext(context),
-    createListenerService(supabase).isFeatureEnabled("career_os").catch(() => false),
-  ]);
+    const [data, careerOsEnabled] = await Promise.all([
+      createCreatorService(supabase).getDashboardDataForContext(context),
+      createListenerService(supabase).isFeatureEnabled("career_os").catch(() => false),
+    ]);
 
-  return (
-    <CreatorDashboard
-      data={data}
-      careerOsEnabled={careerOsEnabled}
-      greeting={formatCreatorGreeting(stageName)}
-    />
-  );
+    const greeting = formatCreatorGreeting(stageName);
+
+    return (
+      <div className="creator-dashboard">
+        <HeroCard
+          hero={data.hero}
+          artistProfile={data.context.artistProfile}
+          creator={data.context.creator}
+          profileCreatedAt={data.profileCreatedAt}
+          greeting={greeting}
+          stats={{
+            streams: data.streamStats.total_streams,
+            validStreams: data.streamStats.valid_streams,
+            tracksPublished: data.catalogCounts.tracksPublished,
+            estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
+          }}
+        />
+        <CreatorDashboard
+          data={data}
+          careerOsEnabled={careerOsEnabled}
+          greeting={greeting}
+          hideHero
+        />
+      </div>
+    );
+  } catch (e) {
+    const digest = (e as { digest?: string })?.digest;
+    if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
+      throw e;
+    }
+    return <CreatorDashboardError />;
+  }
 }
 
 function CreatorDashboardError() {
@@ -51,26 +76,4 @@ function CreatorDashboardError() {
       </Link>
     </div>
   );
-}
-
-export default function CreatorDashboardPage() {
-  return (
-    <Suspense fallback={<CreatorPageLoading />}>
-      <CreatorDashboardBoundary />
-    </Suspense>
-  );
-}
-
-async function CreatorDashboardBoundary() {
-  try {
-    return await CreatorDashboardContent();
-  } catch (e) {
-    // Next.js redirect() throws a NEXT_REDIRECT error — must re-throw or the redirect is swallowed
-    const digest = (e as { digest?: string })?.digest;
-    if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
-      throw e;
-    }
-    console.error("[CreatorDashboard] crash:", e);
-    return <CreatorDashboardError />;
-  }
 }

@@ -1,0 +1,248 @@
+﻿{
+  "trace": "listen-shell-forensic-0.trace.json",
+  "lcpCutoffMs": 1182.2,
+  "timeline": {
+    "navigationStart": 0,
+    "firstContentfulPaint": 248.99,
+    "firstEvaluateScript": 226.008,
+    "chunk2060Evaluate": 315.201,
+    "chunk2060V8Run": 323.168,
+    "mainAppEvaluate": 240.531,
+    "listenerLayoutEvaluate": 541.922,
+    "finalLcpImg": 1182.183
+  },
+  "totalAttributedMs": 409.2,
+  "topModules": [
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "evalMs": 81.6,
+      "compileMs": 7.9,
+      "v8RunMs": 73.6,
+      "totalMs": 163,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/app/(wallet)/layout-f37d039b87d01816.js",
+      "evalMs": 38.2,
+      "compileMs": 0.2,
+      "v8RunMs": 37.8,
+      "totalMs": 76.3,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/app/(listener)/layout-56eedb63bbd71d4b.js",
+      "evalMs": 16.1,
+      "compileMs": 0.8,
+      "v8RunMs": 15.2,
+      "totalMs": 32.2,
+      "count": 1
+    },
+    {
+      "url": "/listen",
+      "evalMs": 15.9,
+      "compileMs": 10,
+      "v8RunMs": 3.2,
+      "totalMs": 29.1,
+      "count": 38
+    },
+    {
+      "url": "/_next/static/chunks/9617-26d6ee87403e14e5.js",
+      "evalMs": 9.8,
+      "compileMs": 9.6,
+      "v8RunMs": 0.1,
+      "totalMs": 19.5,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/5143f5d5-7a64eae2f85fc914.js",
+      "evalMs": 9.2,
+      "compileMs": 8.8,
+      "v8RunMs": 0.2,
+      "totalMs": 18.3,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/app/(listener)/listen/page-ace3098a923faa6f.js",
+      "evalMs": 6.2,
+      "compileMs": 2.3,
+      "v8RunMs": 3.8,
+      "totalMs": 12.3,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/1312-7d406af080b776a0.js",
+      "evalMs": 3.3,
+      "compileMs": 3,
+      "v8RunMs": 0.1,
+      "totalMs": 6.4,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/9558-c0799b81006d2cba.js",
+      "evalMs": 2.9,
+      "compileMs": 2.3,
+      "v8RunMs": 0.1,
+      "totalMs": 5.3,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/804.3c12cd055340639e.js",
+      "evalMs": 2.7,
+      "compileMs": 0.9,
+      "v8RunMs": 1.6,
+      "totalMs": 5.2,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/9936-c8bdf8b863117e2b.js",
+      "evalMs": 3,
+      "compileMs": 2,
+      "v8RunMs": 0.2,
+      "totalMs": 5.1,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/app/error-8b15cd10bf9e745a.js",
+      "evalMs": 2.5,
+      "compileMs": 0.2,
+      "v8RunMs": 2.2,
+      "totalMs": 4.9,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/6892-d1a109b14a3c3c9f.js",
+      "evalMs": 2.4,
+      "compileMs": 2.1,
+      "v8RunMs": 0.1,
+      "totalMs": 4.6,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/f6eaeca0-8961aea9768e96f8.js",
+      "evalMs": 2.1,
+      "compileMs": 1.9,
+      "v8RunMs": 0.1,
+      "totalMs": 4.1,
+      "count": 1
+    },
+    {
+      "url": "/_next/static/chunks/3860-567c712c3e065970.js",
+      "evalMs": 1.9,
+      "compileMs": 1.6,
+      "v8RunMs": 0.1,
+      "totalMs": 3.6,
+      "count": 1
+    }
+  ],
+  "topFunctions": [
+    {
+      "key": "w @ /_next/static/chunks/2060-28b7f50c638c8259.js",
+      "ms": 91.8,
+      "count": 18
+    },
+    {
+      "key": "(anonymous) @ /_next/static/chunks/9617-26d6ee87403e14e5.js",
+      "ms": 14.4,
+      "count": 90
+    },
+    {
+      "key": "next @ ",
+      "ms": 6.1,
+      "count": 560
+    },
+    {
+      "key": "entries @ ",
+      "ms": 6,
+      "count": 221
+    },
+    {
+      "key": "cc @ /_next/static/chunks/5143f5d5-7a64eae2f85fc914.js",
+      "ms": 4.9,
+      "count": 31
+    },
+    {
+      "key": "l @ /_next/static/chunks/webpack-859c25c46cc1d48c.js",
+      "ms": 2.4,
+      "count": 19
+    },
+    {
+      "key": "(anonymous) @ /_next/static/chunks/5143f5d5-7a64eae2f85fc914.js",
+      "ms": 1.9,
+      "count": 20
+    },
+    {
+      "key": "$RV @ /listen",
+      "ms": 1.1,
+      "count": 1
+    },
+    {
+      "key": "(anonymous) @ /listen",
+      "ms": 0.2,
+      "count": 1
+    },
+    {
+      "key": "S @ /_next/static/chunks/2060-28b7f50c638c8259.js",
+      "ms": 0.1,
+      "count": 1
+    },
+    {
+      "key": "(anonymous) @ /_next/static/chunks/2060-28b7f50c638c8259.js",
+      "ms": 0.1,
+      "count": 1
+    },
+    {
+      "key": "e @ /_next/static/chunks/2060-28b7f50c638c8259.js",
+      "ms": 0.1,
+      "count": 1
+    },
+    {
+      "key": "(anonymous) @ /_next/static/chunks/f6eaeca0-8961aea9768e96f8.js",
+      "ms": 0.1,
+      "count": 1
+    }
+  ],
+  "longTasksBeforeLcp": [
+    {
+      "name": "RunTask",
+      "startMs": 558.5,
+      "durMs": 375.3,
+      "url": null
+    },
+    {
+      "name": "RunTask",
+      "startMs": 1157.4,
+      "durMs": 88.1,
+      "url": null
+    },
+    {
+      "name": "RunTask",
+      "startMs": 315.2,
+      "durMs": 84.1,
+      "url": null
+    },
+    {
+      "name": "EvaluateScript",
+      "startMs": 315.2,
+      "durMs": 81.6,
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js"
+    },
+    {
+      "name": "v8.run",
+      "startMs": 323.2,
+      "durMs": 73.6,
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js"
+    },
+    {
+      "name": "RunTask",
+      "startMs": 978,
+      "durMs": 70.4,
+      "url": null
+    },
+    {
+      "name": "RunTask",
+      "startMs": 1085.3,
+      "durMs": 57.3,
+      "url": null
+    }
+  ]
+}

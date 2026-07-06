@@ -174,6 +174,50 @@ export class ListenerTrackRepository {
     };
   }
 
+  async getPublishedTrackById(trackId: string): Promise<TrackWithMeta | null> {
+    const { data, error } = await this.client
+      .from("tracks")
+      .select(
+        "id, title, duration_seconds, track_number, creator_id, publication_status, album_id, albums!inner(cover_path)",
+      )
+      .eq("id", trackId)
+      .eq("publication_status", "published")
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    const raw = data as unknown as {
+      id: string;
+      title: string;
+      duration_seconds: number | null;
+      track_number: number | null;
+      creator_id: string;
+      album_id: string;
+      albums: { cover_path: string | null } | null;
+    };
+
+    const { data: profile } = await this.client
+      .from("artist_profiles")
+      .select("stage_name")
+      .eq("creator_id", raw.creator_id)
+      .maybeSingle();
+
+    const coverPath = raw.albums?.cover_path ?? null;
+
+    return {
+      id: raw.id,
+      title: raw.title,
+      duration_seconds: raw.duration_seconds,
+      track_number: raw.track_number,
+      creator_id: raw.creator_id,
+      album_id: raw.album_id,
+      publication_status: "published",
+      artist_name: (profile?.stage_name as string | undefined) ?? "Artiste",
+      cover_url: coverPath,
+    } as TrackWithMeta;
+  }
+
   async getPublishedAlbumTracks(albumId: string, artistName: string | null, coverUrl: string | null): Promise<TrackWithMeta[]> {
     const { data, error } = await this.client
       .from("tracks")

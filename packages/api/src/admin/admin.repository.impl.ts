@@ -185,6 +185,10 @@ export class AdminRepository {
     return this.dashboard.getCockpitData();
   }
 
+  listAuditLogs(options?: { limit?: number; offset?: number; actionQuery?: string }) {
+    return this.dashboard.listAuditLogs(options);
+  }
+
   listUnreadAdminAlerts(limit = 10): Promise<AdminAlert[]> {
     return this.dashboard.listUnreadAdminAlerts(limit);
   }

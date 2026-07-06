@@ -11,6 +11,7 @@ import { PlayerControls } from "./PlayerControls";
 import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
+import { FavoriteButton } from "@/features/shared/social/components/FavoriteButton";
 
 const ShareButton = dynamic(
   () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
@@ -155,8 +156,9 @@ export const GlobalPlayer = memo(function GlobalPlayer() {
                 <p className="gp-artist">{currentTrack.artist_name ?? "Artiste"}</p>
               </div>
             </div>
-            <div onClick={(e) => e.stopPropagation()}>
+            <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-1">
               <LikeButton trackId={currentTrack.id} size="sm" />
+              <FavoriteButton entityType="track" entityId={currentTrack.id} size="sm" />
             </div>
             {whatsappShare ? (
               <div onClick={(e) => e.stopPropagation()}>

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { createPublicCachedQuery } from "@/lib/cache";
 import type { Metadata } from "next";
 import type { ListenMusicCategory } from "@sonafrik/types";
@@ -7,8 +6,9 @@ import { requireIdentityContext } from "@/features/identity/lib/requireIdentity"
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { HomepageHero } from "@/features/listener/components/HomepageHero";
 import { ListenStreamingHeader } from "@/features/listener/components/ListenStreamingHeader";
+import { DiscoveriesSection } from "@/features/listener/components/DiscoveriesSection";
 import { HomepageContentLive } from "@/features/listener/components/HomepageContentLive";
-import { ContentSkeleton } from "@/features/listener/components/HomepageContentSections";
+import { ListenTrackDeepLink } from "@/features/listener/components/ListenTrackDeepLink";
 import type { HomepageData } from "@/features/listener/components/HomepageContentSections";
 import { fetchHomepageData } from "@/features/listener/lib/fetchHomepageData";
 
@@ -27,34 +27,29 @@ function createHomepageLoader(category: ListenMusicCategory) {
   );
 }
 
-async function HomepageContentFetcher({
-  category,
-  promise,
-}: {
-  category: string;
-  promise: Promise<HomepageData>;
-}) {
-  const content = await promise;
-  return <HomepageContentLive category={category} initialData={content} />;
-}
-
 export default async function ListenPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; track?: string }>;
 }) {
   const params = await searchParams;
   const category = parseListenMusicCategory(params.category);
-  const contentPromise = createHomepageLoader(category)();
-  const { profile, unreadNotifications } = await requireIdentityContext();
+  const deepLinkTrackId = params.track?.trim() || null;
+
+  const [content, { profile, unreadNotifications }] = await Promise.all([
+    createHomepageLoader(category)(),
+    requireIdentityContext(),
+  ]);
 
   return (
     <div className="listen-page" style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100%" }}>
       <ListenStreamingHeader fullName={profile.full_name} unreadNotifications={unreadNotifications} />
       <HomepageHero fullName={profile.full_name} />
-      <Suspense fallback={<ContentSkeleton />}>
-        <HomepageContentFetcher category={category} promise={contentPromise} />
-      </Suspense>
+      {deepLinkTrackId ? <ListenTrackDeepLink trackId={deepLinkTrackId} /> : null}
+      {content.discoveryTracks.length > 0 ? (
+        <DiscoveriesSection tracks={content.discoveryTracks} />
+      ) : null}
+      <HomepageContentLive category={category} initialData={content} />
     </div>
   );
 }

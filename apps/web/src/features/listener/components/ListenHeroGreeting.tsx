@@ -1,15 +1,13 @@
-"use client";
-
-import { useDayMode } from "../hooks/useDayMode";
-import { ProverbeJour } from "./ProverbeJour";
+import { getDayMode } from "../hooks/useDayMode.utils";
 import { NightModeBanner } from "./NightModeBanner";
+import { ProverbeJour } from "./ProverbeJour";
 
 interface ListenHeroGreetingProps {
   fullName: string | null;
 }
 
 export function ListenHeroGreeting({ fullName }: ListenHeroGreetingProps) {
-  const { greeting, emoji } = useDayMode();
+  const { greeting, emoji } = getDayMode(new Date().getHours());
   const firstName = fullName?.split(" ")[0] ?? "là";
 
   return (

@@ -8,7 +8,7 @@ export function DashboardPremiumCard() {
         <div className="dash-premium__body">
           <p className="dash-premium__title">Boostez votre carrière avec SONAFRIK Premium</p>
           <p className="dash-premium__text">
-            Accédez aux analytics avancées, aux outils de promotion et aux revenus prioritaires.
+            Gérez votre portefeuille, suivez vos revenus et préparez vos retraits artiste.
           </p>
         </div>
         <Link href="/wallet" className="dash-premium__cta">

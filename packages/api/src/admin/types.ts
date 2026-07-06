@@ -128,6 +128,8 @@ export type AdminAuditActivityItem = {
   action: string;
   created_at: string;
   metadata: Record<string, unknown> | null;
+  actor_id?: string | null;
+  entity_type?: string | null;
 };
 
 export type AdminAlert = {

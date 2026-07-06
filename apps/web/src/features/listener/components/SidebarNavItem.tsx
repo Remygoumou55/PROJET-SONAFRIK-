@@ -4,6 +4,9 @@ import Link from "next/link";
 import { memo } from "react";
 import { usePerformanceFlags } from "@/lib/performance/performance-context";
 import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
+import { useAfterLCP } from "../hooks/useAfterLCP";
+
+const WALLET_HREF = "/wallet";
 
 export const LISTENER_NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" as const },
@@ -80,12 +83,15 @@ export const SidebarNavItem = memo(function SidebarNavItem({
   isActive,
 }: SidebarNavItemProps) {
   const { routePrefetchEnabled } = usePerformanceFlags();
-  const { prefetchOnHover } = useSmartPrefetch([href], { enabled: routePrefetchEnabled, idle: false });
+  const lcpReady = useAfterLCP();
+  const deferWalletPrefetch = href === WALLET_HREF && !lcpReady;
+  const prefetchEnabled = routePrefetchEnabled && !deferWalletPrefetch;
+  const { prefetchOnHover } = useSmartPrefetch([href], { enabled: prefetchEnabled, idle: false });
 
   return (
     <Link
       href={href}
-      prefetch={routePrefetchEnabled}
+      prefetch={prefetchEnabled}
       className={`ls-nav-item${isActive ? " ls-nav-item--active" : ""}`}
       aria-current={isActive ? "page" : undefined}
       onMouseEnter={() => prefetchOnHover(href)}

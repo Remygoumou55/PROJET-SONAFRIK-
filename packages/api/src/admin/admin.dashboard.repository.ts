@@ -9,6 +9,7 @@ import {
 } from "./admin.dashboard.utils";
 import type {
   AdminAlert,
+  AdminAuditActivityItem,
   AdminCockpitData,
   AdminDashboardKpis,
   AdminHealthCheck,
@@ -174,6 +175,42 @@ export class AdminDashboardRepository {
       recentActivity,
       monthlyRevenue,
     };
+  }
+
+  async listAuditLogs(options?: {
+    limit?: number;
+    offset?: number;
+    actionQuery?: string;
+  }): Promise<{ entries: AdminAuditActivityItem[]; total: number }> {
+    const limit = Math.min(Math.max(options?.limit ?? 50, 1), 200);
+    const offset = Math.max(options?.offset ?? 0, 0);
+    const actionQuery = options?.actionQuery?.trim();
+
+    let query = this.client
+      .from("audit_logs")
+      .select("id, action, created_at, metadata, actor_id, entity_type", { count: "exact" })
+      .not("action", "ilike", "Identity.%")
+      .not("action", "ilike", "GoTrue%")
+      .not("action", "ilike", "auth.%")
+      .order("created_at", { ascending: false });
+
+    if (actionQuery) {
+      query = query.ilike("action", `%${actionQuery}%`);
+    }
+
+    const { data, error, count } = await query.range(offset, offset + limit - 1);
+    if (error) throw error;
+
+    const entries = (data ?? []).map((row) => ({
+      id: row.id as string,
+      action: row.action as string,
+      created_at: row.created_at as string,
+      metadata: (row.metadata as Record<string, unknown> | null) ?? null,
+      actor_id: (row.actor_id as string | null) ?? null,
+      entity_type: (row.entity_type as string | null) ?? null,
+    }));
+
+    return { entries, total: count ?? entries.length };
   }
 
   async listUnreadAdminAlerts(limit = 10): Promise<AdminAlert[]> {

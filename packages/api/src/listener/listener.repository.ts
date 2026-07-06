@@ -38,6 +38,9 @@ export class ListenerRepository {
   getPublishedAlbumTracks = (...args: Parameters<ListenerTrackRepository["getPublishedAlbumTracks"]>) =>
     this.track.getPublishedAlbumTracks(...args);
 
+  getPublishedTrackById = (...args: Parameters<ListenerTrackRepository["getPublishedTrackById"]>) =>
+    this.track.getPublishedTrackById(...args);
+
   getTrackCreditsForTracks = (...args: Parameters<ListenerTrackRepository["getTrackCreditsForTracks"]>) =>
     this.track.getTrackCreditsForTracks(...args);
 

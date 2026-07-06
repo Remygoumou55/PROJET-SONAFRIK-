@@ -92,3 +92,26 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key-for-ci-build' }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: pnpm test:e2e:smoke
+
+  finance-sandbox:
+    name: Finance Sandbox E2E
+    runs-on: ubuntu-latest
+    needs: quality
+    # Exécuté uniquement si les secrets Supabase sont configurés (staging linked DB)
+    if: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' && secrets.NEXT_PUBLIC_SUPABASE_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Finance sandbox chain (topup → payout → withdrawal)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SANDBOX_FINANCE_EMAIL: ${{ secrets.SANDBOX_FINANCE_EMAIL }}
+          SANDBOX_FINANCE_PASSWORD: ${{ secrets.SANDBOX_FINANCE_PASSWORD }}
+        run: pnpm run:finance-sandbox-e2e

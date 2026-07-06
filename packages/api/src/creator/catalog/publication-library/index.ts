@@ -26,6 +26,7 @@ export {
   getPublicationContinueHref,
   getPublicationCoverHref,
   getPublicationEditHref,
+  getPublicationConsultHref,
   getPublicationResubmitHref,
   type PublicationActionDef,
   type PublicationActionId,

@@ -82,7 +82,6 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { href: "/admin/live-control", icon: "🎛️", label: "Live Control", badge: "live" },
       { href: "/admin/fraud", icon: "🛡️", label: "Fraude", badge: "alert" },
-      { href: "/admin/rights", icon: "©️", label: "Droits", badge: null },
       { href: "/admin/flags", icon: "🚩", label: "Flags", badge: null },
     ],
   },

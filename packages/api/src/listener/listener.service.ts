@@ -76,6 +76,10 @@ export class ListenerService {
     return this.repository.getPublishedAlbumTracks(albumId, artistName, coverUrl);
   }
 
+  getPublishedTrackById(trackId: string) {
+    return this.repository.getPublishedTrackById(trackId);
+  }
+
   getTrackCreditsForTracks(trackIds: string[]) {
     return this.repository.getTrackCreditsForTracks(trackIds);
   }

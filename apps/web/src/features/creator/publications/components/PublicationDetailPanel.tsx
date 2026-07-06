@@ -11,9 +11,13 @@ import {
 import { CoverImage } from "@/components/CoverImage";
 import { PublicationStatusBadge } from "./PublicationStatusBadge";
 import { PublicationContextualActions } from "./PublicationContextualActions";
-async function sharePublication(track: Track): Promise<void> {
+async function sharePublication(track: Track, albumId?: string | null): Promise<void> {
   const text = `Écoutez « ${track.title} » sur SONAFRIK`;
-  const url = typeof window !== "undefined" ? window.location.origin : "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const url =
+    albumId && track.publication_status === "published"
+      ? `${origin}/listen/album/${albumId}`
+      : origin;
   if (typeof navigator !== "undefined" && navigator.share) {
     await navigator.share({ title: track.title, text, url });
     return;
@@ -52,11 +56,11 @@ export function PublicationDetailPanel({
 
   const handleShare = useCallback(async (t: Track) => {
     try {
-      await sharePublication(t);
+      await sharePublication(t, album?.id ?? t.album_id);
     } catch {
       /* annulation partage utilisateur */
     }
-  }, []);
+  }, [album?.id]);
 
   if (!track) return null;
 

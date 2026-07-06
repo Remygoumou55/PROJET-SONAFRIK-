@@ -44,13 +44,76 @@ export class CatalogRepository {
   async getGenres(): Promise<Genre[]> {
     const { data, error } = await this.client
       .from("genres")
-      .select("*")
+      .select(
+        "id, name, slug, description, sort_order, is_active, created_at, updated_at, deleted_at",
+      )
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("sort_order");
 
     if (error) throw error;
     return (data ?? []) as Genre[];
+  }
+
+  /** Agrégats catalogue — head count uniquement (évite listAlbums + listTracks complets). */
+  async getCatalogContextAggregates(creatorId: string): Promise<{
+    albumsCount: number;
+    singlesCount: number;
+    tracksCount: number;
+    pendingReview: number;
+    publishedCount: number;
+  }> {
+    const albumsBase = () =>
+      this.client
+        .from("albums")
+        .select("id", { count: "exact", head: true })
+        .eq("creator_id", creatorId)
+        .is("deleted_at", null);
+
+    const tracksBase = () =>
+      this.client
+        .from("tracks")
+        .select("id", { count: "exact", head: true })
+        .eq("creator_id", creatorId)
+        .is("deleted_at", null);
+
+    const [
+      albumsEpRes,
+      singlesRes,
+      tracksRes,
+      pendingAlbumsRes,
+      pendingTracksRes,
+      publishedAlbumsRes,
+      publishedTracksRes,
+    ] = await Promise.all([
+      albumsBase().in("release_type", ["album", "ep"]),
+      albumsBase().eq("release_type", "single"),
+      tracksBase(),
+      albumsBase().eq("publication_status", "pending_review"),
+      tracksBase().eq("publication_status", "pending_review"),
+      albumsBase().eq("publication_status", "published"),
+      tracksBase().eq("publication_status", "published"),
+    ]);
+
+    for (const res of [
+      albumsEpRes,
+      singlesRes,
+      tracksRes,
+      pendingAlbumsRes,
+      pendingTracksRes,
+      publishedAlbumsRes,
+      publishedTracksRes,
+    ]) {
+      if (res.error) throw res.error;
+    }
+
+    return {
+      albumsCount: albumsEpRes.count ?? 0,
+      singlesCount: singlesRes.count ?? 0,
+      tracksCount: tracksRes.count ?? 0,
+      pendingReview: (pendingAlbumsRes.count ?? 0) + (pendingTracksRes.count ?? 0),
+      publishedCount: (publishedAlbumsRes.count ?? 0) + (publishedTracksRes.count ?? 0),
+    };
   }
 
   async listAlbums(creatorId: string, limit = 50, offset = 0): Promise<Album[]> {
@@ -172,7 +235,7 @@ export class CatalogRepository {
   ): Promise<number> {
     let query = this.client
       .from("tracks")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact", head: true })
       .eq("creator_id", creatorId)
       .is("deleted_at", null);
 

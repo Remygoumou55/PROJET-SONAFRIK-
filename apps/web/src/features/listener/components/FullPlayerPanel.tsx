@@ -5,6 +5,7 @@ import { memo, useEffect, useState } from "react";
 import Link from "next/link";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
+import { FavoriteButton } from "@/features/shared/social/components/FavoriteButton";
 import { usePlayer } from "../hooks/usePlayer";
 import { usePlayerContext } from "../lib/playerContext";
 import { usePlayerMute, volumeIcon } from "../lib/playerMuteContext";
@@ -114,7 +115,10 @@ export const FullPlayerPanel = memo(function FullPlayerPanel({
             <p className="fpp-artist">{artistLabel}</p>
             <TrackListenStats trackId={currentTrack.id} />
           </div>
-          <LikeButton trackId={currentTrack.id} size="md" />
+          <div className="flex items-center gap-2">
+            <LikeButton trackId={currentTrack.id} size="md" />
+            <FavoriteButton entityType="track" entityId={currentTrack.id} size="md" />
+          </div>
         </div>
 
         <FullPlayerProgress />

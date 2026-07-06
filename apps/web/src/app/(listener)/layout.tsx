@@ -1,7 +1,7 @@
 import { StreamingLayoutClient } from "@/features/listener/components/StreamingLayoutClient";
+import { ListenerLayoutShell } from "@/features/listener/components/ListenerLayoutShell";
 import { requireIdentityContext, redirectIfOnboardingIncomplete } from "@/features/identity/lib/requireIdentity";
 import { getListenSidebarData } from "@/features/listener/lib/getListenSidebarData";
-import { RealtimeShell } from "@/features/shared/rendering/RealtimeShell";
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { getCachedListenFeatureFlags } from "@/lib/listen/get-cached-listen-feature-flags";
@@ -22,20 +22,18 @@ export default async function StreamingLayout({ children }: { children: React.Re
   const sidebarDataPromise = getListenSidebarData(context.profile.id);
 
   return (
-    <RealtimeShell>
-      <link rel="prefetch" href="/library" as="document" />
-      <link rel="prefetch" href="/search" as="document" />
+    <ListenerLayoutShell>
       <PerformanceProvider flags={performanceFlags}>
         <StreamingLayoutClient
-        userId={context.profile.id}
-        initialUnreadCount={context.unreadNotifications}
-        audioQualityPreference={context.preferences.audio_quality}
-        sidebarDataPromise={sidebarDataPromise}
-        listenFeatures={listenFeatures}
-      >
-        {children}
-      </StreamingLayoutClient>
-    </PerformanceProvider>
-    </RealtimeShell>
+          userId={context.profile.id}
+          initialUnreadCount={context.unreadNotifications}
+          audioQualityPreference={context.preferences.audio_quality}
+          sidebarDataPromise={sidebarDataPromise}
+          listenFeatures={listenFeatures}
+        >
+          {children}
+        </StreamingLayoutClient>
+      </PerformanceProvider>
+    </ListenerLayoutShell>
   );
 }

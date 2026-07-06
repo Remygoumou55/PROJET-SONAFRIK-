@@ -7,14 +7,16 @@
  * Nécessite SUPABASE_SERVICE_ROLE_KEY + .env.local
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const envPath = resolve(__dirname, "../apps/web/.env.local");
-for (const line of readFileSync(envPath, "utf8").split("\n")) {
-  const m = line.match(/^([^#=]+)=(.*)$/);
-  if (m) process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
+if (existsSync(envPath) && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  for (const line of readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m) process.env[m[1]!.trim()] = m[2]!.trim().replace(/^["']|["']$/g, "");
+  }
 }
 
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;

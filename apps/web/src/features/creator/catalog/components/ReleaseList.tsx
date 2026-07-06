@@ -42,10 +42,45 @@ export function ReleaseList({
   const [error, setError] = useState<string | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [albumAudioReady, setAlbumAudioReady] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (liveAlbums) setAlbums(liveAlbums);
   }, [liveAlbums]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const deletable = albums.filter(
+      (a) => isDeletable(a.publication_status) && a.release_type === "single",
+    );
+    if (!deletable.length) return;
+
+    void (async () => {
+      const next: Record<string, boolean> = {};
+      await Promise.all(
+        deletable.map(async (album) => {
+          try {
+            const tracks = await catalog.listTracks(album.id);
+            const track = tracks[0];
+            if (!track) {
+              next[album.id] = false;
+              return;
+            }
+            const files = await catalog.getTrackFiles(track.id);
+            const primary = files.find((f) => f.is_primary);
+            next[album.id] = Boolean(primary && primary.integrity_status === "valid");
+          } catch {
+            next[album.id] = false;
+          }
+        }),
+      );
+      if (!cancelled) setAlbumAudioReady(next);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [albums, catalog]);
 
   async function createRelease(event: React.FormEvent) {
     event.preventDefault();
@@ -215,10 +250,15 @@ export function ReleaseList({
                 </button>
                 {isDeletable(album.publication_status) && album.release_type === "single" ? (
                   <>
+                    {albumAudioReady[album.id] === false ? (
+                      <p className="text-xs w-full" style={{ color: "var(--color-avertissement)" }}>
+                        Ajoutez un fichier audio validé depuis Mes publications ou le wizard avant de soumettre.
+                      </p>
+                    ) : null}
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={submittingId === album.id}
+                      disabled={submittingId === album.id || albumAudioReady[album.id] === false}
                       onClick={() => void submit(album.id)}
                     >
                       {submittingId === album.id ? "Envoi…" : "Soumettre à publication"}

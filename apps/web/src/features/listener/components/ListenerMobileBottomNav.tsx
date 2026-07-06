@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useMemo } from "react";
-import { usePathname } from "next/navigation";
+import { memo, useEffect, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { usePerformanceFlags } from "@/lib/performance/performance-context";
-import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
+import { prefetchRoute, useSmartPrefetch } from "@/lib/performance/smart-prefetch";
+import { useAfterLCP } from "../hooks/useAfterLCP";
+
+const WALLET_HREF = "/wallet";
 
 const NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" },
   { href: "/search", label: "Explorer", icon: "search" },
   { href: "/library", label: "Bibliothèque", icon: "library" },
-  { href: "/wallet", label: "Wallet", icon: "wallet" },
+  { href: WALLET_HREF, label: "Wallet", icon: "wallet" },
   { href: "/profile", label: "Profil", icon: "profile" },
 ] as const;
 
@@ -68,9 +71,20 @@ const NavIcon = memo(function NavIcon({ icon, size = 22 }: { icon: string; size?
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { routePrefetchEnabled } = usePerformanceFlags();
-  const navHrefs = useMemo(() => NAV_ITEMS.map((item) => item.href), []);
-  const { prefetchOnHover } = useSmartPrefetch(navHrefs, { enabled: routePrefetchEnabled });
+  const lcpReady = useAfterLCP();
+
+  const prefetchHrefs = useMemo(
+    () => NAV_ITEMS.map((item) => item.href).filter((href) => href !== WALLET_HREF || lcpReady),
+    [lcpReady],
+  );
+  const { prefetchOnHover } = useSmartPrefetch(prefetchHrefs, { enabled: routePrefetchEnabled });
+
+  useEffect(() => {
+    if (!lcpReady || !routePrefetchEnabled) return;
+    prefetchRoute(router, WALLET_HREF);
+  }, [lcpReady, routePrefetchEnabled, router]);
 
   return (
     <nav
@@ -85,12 +99,17 @@ export function MobileBottomNav() {
     >
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(item.href, pathname);
+        const deferWalletPrefetch = item.href === WALLET_HREF && !lcpReady;
+        const linkPrefetch = routePrefetchEnabled && !deferWalletPrefetch;
+
         return (
           <Link
             key={item.href}
             href={item.href}
-            prefetch={routePrefetchEnabled}
-            onTouchStart={() => prefetchOnHover(item.href)}
+            prefetch={linkPrefetch}
+            onTouchStart={() => {
+              if (!deferWalletPrefetch) prefetchOnHover(item.href);
+            }}
             className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-lg transition-colors"
             style={{ color: isActive ? "var(--color-vert-energie)" : "var(--color-texte-desactive)" }}
           >

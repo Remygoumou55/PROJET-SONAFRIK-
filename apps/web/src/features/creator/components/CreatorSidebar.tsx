@@ -1,10 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { headers } from "next/headers";
 import { getCreatorNavLinks, type CreatorNavEntry } from "../lib/creatorNavConfig";
-import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
 
 function isNavActive(href: string, exact: boolean | undefined, pathname: string): boolean {
   if (exact) return pathname === href;
@@ -15,19 +11,16 @@ interface CreatorSidebarProps {
   navEntries: CreatorNavEntry[];
 }
 
-export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
-  const pathname = usePathname();
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const links = getCreatorNavLinks(navEntries);
-  const navHrefs = useMemo(() => links.map((link) => link.href), [links]);
-  const { prefetchOnHover } = useSmartPrefetch(navHrefs);
-
-  useEffect(() => {
-    setPendingHref(null);
-  }, [pathname]);
+export async function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
+  const pathname = (await headers()).get("x-pathname") ?? "";
 
   return (
-    <aside className="cs-sidebar" role="navigation" aria-label="Navigation artiste">
+    <aside
+      className="cs-sidebar"
+      style={{ display: "none" }}
+      role="navigation"
+      aria-label="Navigation artiste"
+    >
       <div className="cs-logo">
         <span className="cs-logo-brand">
           SON<span className="cs-logo-accent">A</span>FRIK
@@ -50,7 +43,6 @@ export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
           if (!("href" in entry)) return null;
 
           const active = isNavActive(entry.href, entry.exact, pathname);
-          const pending = pendingHref === entry.href && !active;
 
           return (
             <Link
@@ -58,14 +50,8 @@ export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
               href={entry.href}
               prefetch
               scroll
-              className={`cs-nav-item${active ? " cs-nav-item--active" : ""}${pending ? " cs-nav-item--pending" : ""}`}
+              className={`cs-nav-item${active ? " cs-nav-item--active" : ""}`}
               aria-current={active ? "page" : undefined}
-              aria-busy={pending || undefined}
-              onClick={() => {
-                if (!active) setPendingHref(entry.href);
-              }}
-              onMouseEnter={() => prefetchOnHover(entry.href)}
-              onFocus={() => prefetchOnHover(entry.href)}
             >
               <span className="cs-nav-icon" aria-hidden="true">
                 {entry.icon}
@@ -84,4 +70,8 @@ export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
       <div className="cs-spacer" />
     </aside>
   );
+}
+
+export function getCreatorSidebarPrefetchHrefs(navEntries: CreatorNavEntry[]): string[] {
+  return getCreatorNavLinks(navEntries).map((link) => link.href);
 }

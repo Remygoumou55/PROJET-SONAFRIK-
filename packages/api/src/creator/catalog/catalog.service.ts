@@ -88,23 +88,8 @@ export class CatalogService {
 
   async getCatalogContext(): Promise<CatalogContext> {
     const creatorId = await this.requireCreatorId();
-    const [albums, tracks] = await Promise.all([
-      this.repository.listAlbums(creatorId),
-      this.repository.listTracks(creatorId),
-    ]);
-
-    return {
-      creatorId,
-      albumsCount: albums.filter((a) => a.release_type === "album" || a.release_type === "ep").length,
-      singlesCount: albums.filter((a) => a.release_type === "single").length,
-      tracksCount: tracks.length,
-      pendingReview:
-        albums.filter((a) => a.publication_status === "pending_review").length +
-        tracks.filter((t) => t.publication_status === "pending_review").length,
-      publishedCount:
-        albums.filter((a) => a.publication_status === "published").length +
-        tracks.filter((t) => t.publication_status === "published").length,
-    };
+    const aggregates = await this.repository.getCatalogContextAggregates(creatorId);
+    return { creatorId, ...aggregates };
   }
 
   async getGenres(): Promise<Genre[]> {

@@ -7,6 +7,7 @@ import {
   getPublicationActions,
   getPublicationContinueHref,
   getPublicationEditHref,
+  getPublicationConsultHref,
   getPublicationResubmitHref,
   type PublicationActionId,
 } from "@sonafrik/api/catalog";
@@ -69,7 +70,7 @@ export function PublicationContextualActions({
         return (
           <Link
             key={id}
-            href={getPublicationEditHref(track.id)}
+            href={getPublicationConsultHref(track.id)}
             className={buttonVariants({ variant, size: "sm" })}
           >
             {label}

@@ -71,6 +71,11 @@ const nextConfig: NextConfig = {
         destination: "/search",
         permanent: false,
       },
+      {
+        source: "/auth/aide",
+        destination: "/auth/mot-de-passe-oublie",
+        permanent: false,
+      },
     ];
   },
   async headers() {

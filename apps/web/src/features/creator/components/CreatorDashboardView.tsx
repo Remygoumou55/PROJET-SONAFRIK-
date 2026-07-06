@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { GlanceKpiGrid } from "../dashboard/components/enterprise/GlanceKpiGrid";
@@ -8,18 +7,9 @@ import { useCreatorDashboardSrtspLive } from "../dashboard/hooks/useCreatorDashb
 import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalogueCard";
 import { DashboardCareerProgressCard } from "../dashboard/components/DashboardCareerProgressCard";
 import { DashboardPremiumCard } from "../dashboard/components/DashboardPremiumCard";
+import { HeroCard } from "../dashboard/components/HeroCard";
 import { isValidContentName } from "@/lib/content-filter";
-
-const HeroCard = dynamic(
-  () => import("../dashboard/components/HeroCard").then((m) => ({ default: m.HeroCard })),
-  {
-    loading: () => (
-      <div className="ahero animate-pulse" aria-busy="true" aria-label="Chargement vitrine">
-        <div className="ahero__cover-default" style={{ minHeight: "20rem" }} />
-      </div>
-    ),
-  },
-);
+import dynamic from "next/dynamic";
 
 const WelcomeModal = dynamic(
   () => import("../dashboard/components/WelcomeModal").then((m) => ({ default: m.WelcomeModal })),
@@ -42,6 +32,7 @@ interface Props {
   data: CreatorDashboardData;
   careerOsEnabled?: boolean;
   greeting: string;
+  hideHero?: boolean;
 }
 
 function fmtGnf(n: number): string {
@@ -69,7 +60,12 @@ function WalletCard({ balanceGnf }: { balanceGnf: number }) {
   );
 }
 
-export function CreatorDashboardView({ data: initialData, careerOsEnabled = false, greeting }: Props) {
+export function CreatorDashboardView({
+  data: initialData,
+  careerOsEnabled = false,
+  greeting,
+  hideHero = false,
+}: Props) {
   const creatorId = initialData.context.creator.id;
   const userId = initialData.context.creator.owner_id;
 
@@ -92,19 +88,21 @@ export function CreatorDashboardView({ data: initialData, careerOsEnabled = fals
         profileCreatedAt={profileCreatedAt}
       />
 
-      <HeroCard
-        hero={hero}
-        artistProfile={context.artistProfile}
-        creator={context.creator}
-        profileCreatedAt={profileCreatedAt}
-        greeting={greeting}
-        stats={{
-          streams: data.streamStats.total_streams,
-          validStreams: data.streamStats.valid_streams,
-          tracksPublished: data.catalogCounts.tracksPublished,
-          estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
-        }}
-      />
+      {hideHero ? null : (
+        <HeroCard
+          hero={hero}
+          artistProfile={context.artistProfile}
+          creator={context.creator}
+          profileCreatedAt={profileCreatedAt}
+          greeting={greeting}
+          stats={{
+            streams: data.streamStats.total_streams,
+            validStreams: data.streamStats.valid_streams,
+            tracksPublished: data.catalogCounts.tracksPublished,
+            estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
+          }}
+        />
+      )}
 
       <GlanceKpiGrid data={data} />
 

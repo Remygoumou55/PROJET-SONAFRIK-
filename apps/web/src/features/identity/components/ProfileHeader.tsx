@@ -1,5 +1,6 @@
 import type { IdentityContext } from "@sonafrik/types";
 import { BecomeArtistButton } from "./BecomeArtistButton";
+import { ProfileSignOutButton } from "./ProfileSignOutButton";
 import { ProfileActivitySection } from "./ProfileActivitySection";
 import { ProfileHeroPassport } from "./ProfileHeroPassport";
 import { ProfileSectionQuickNav } from "./ProfileSectionQuickNav";
@@ -65,6 +66,8 @@ export function ProfileHeader({
       ) : null}
 
       <ProfileActivitySection activity={activity} isArtist={isArtist} />
+
+      <ProfileSignOutButton />
 
       {context.profile.account_type === "auditeur" ? (
         <aside className="identity-become-artist" aria-labelledby="become-artist-title">

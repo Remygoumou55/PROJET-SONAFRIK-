@@ -280,8 +280,47 @@ export class AdminFraudRepository {
     incidentIds: string[],
     patch: Partial<{ treated: boolean; archived: boolean; hidden: boolean }>,
   ): Promise<void> {
-    for (const incidentId of incidentIds) {
-      await this.upsertFraudReviewState(adminUserId, incidentId, patch);
-    }
+    const uniqueIds = [...new Set(incidentIds.filter(Boolean))];
+    if (uniqueIds.length === 0) return;
+
+    const existingRes = await this.client
+      .from("admin_fraud_reviews")
+      .select("incident_id, treated, archived, hidden, notes")
+      .eq("admin_user_id", adminUserId)
+      .in("incident_id", uniqueIds);
+
+    if (existingRes.error) throw existingRes.error;
+
+    const existingByIncident = new Map(
+      (existingRes.data ?? []).map((row) => {
+        const r = row as {
+          incident_id: string;
+          treated: boolean;
+          archived: boolean;
+          hidden: boolean;
+          notes: unknown;
+        };
+        return [r.incident_id, r] as const;
+      }),
+    );
+
+    const payloads = uniqueIds.map((incidentId) => {
+      const prev = existingByIncident.get(incidentId);
+      const prevNotes = Array.isArray(prev?.notes) ? (prev!.notes as string[]) : [];
+      return {
+        incident_id: incidentId,
+        admin_user_id: adminUserId,
+        treated: patch.treated ?? prev?.treated ?? false,
+        archived: patch.archived ?? prev?.archived ?? false,
+        hidden: patch.hidden ?? prev?.hidden ?? false,
+        notes: prevNotes,
+      };
+    });
+
+    const { error } = await this.client
+      .from("admin_fraud_reviews")
+      .upsert(payloads, { onConflict: "incident_id,admin_user_id" });
+
+    if (error) throw error;
   }
 }

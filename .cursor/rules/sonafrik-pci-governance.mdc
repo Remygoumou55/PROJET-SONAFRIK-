@@ -1,0 +1,49 @@
+---
+description: SONAFRIK Performance Continuous Improvement — gouvernance post-GEC, budgets, régressions, surveillance
+alwaysApply: true
+---
+
+# PCI — Performance Continuous Improvement
+
+> Entrée en vigueur : **6 juillet 2026**  
+> Source : `docs/performance/PERFORMANCE_CONTINUOUS_IMPROVEMENT.md`
+
+## État
+
+- Performance Hardening Program : 🟢 **TERMINÉ · FREEZE**
+- Global Enterprise Certification : 🟢 **CERTIFIÉE**
+- Mode actuel : **PCI** — développement métier autorisé
+- **GLOBAL FREEZE hardening ACTIF** — pas de nouveau sprint performance sans décision exceptionnelle
+
+## Règle
+
+**Performance FIRST mais Business FIRST.** Optimisations opportunistes uniquement.
+
+## Budgets (lab mobile 4G, médiane 3 runs)
+
+| Métrique | Budget | Ambitieux |
+|---|---|---|
+| LCP | ≤ 3,5 s | ≤ 2,5 s |
+| CLS | ≤ 0,10 | — |
+| INP | ≤ 200 ms | — |
+| TBT | ≤ 300 ms | — |
+
+Baseline GEC : `/listen` ~3,7 s LCP · `/lancement` 2,15 s ✅
+
+## Régressions
+
+- **P0** = interdit de fusionner
+- P1/P2/P3 = voir doc PCI
+
+## Feature importante → mini rapport PCI
+
+`pnpm build && pnpm typecheck && pnpm lint` + tests + Lighthouse pages touchées  
+Template : `docs/performance/PCI_MINI_REPORT_TEMPLATE.md`
+
+## FREEZE absolu
+
+Session Engine · Sprints 1–7 hardening · Forensics · CPU Cycles 1–3 · pas de programme multi-sprint performance
+
+## Backlog PCI autorisé
+
+bundles, imports, images, cache, prefetch, React/Next optim — commit/push normal

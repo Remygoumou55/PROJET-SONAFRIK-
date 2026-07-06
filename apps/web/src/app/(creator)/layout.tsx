@@ -1,4 +1,7 @@
+import { headers } from "next/headers";
 import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayoutClient";
+import { CreatorSidebar } from "@/features/creator/components/CreatorSidebar";
+import { CreatorWorkspaceHeader } from "@/features/creator/components/CreatorWorkspaceHeader";
 import { DevAuthBootstrap } from "@/features/identity/auth/components/DevAuthBootstrap";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { buildCreatorNavEntries } from "@/features/creator/lib/creatorNavConfig";
@@ -18,6 +21,7 @@ export default async function CreatorLayout({ children }: { children: React.Reac
   const context = await requireCreatorContext();
   const supabase = await getSupabaseServerClient();
   const notifications = createNotificationsService(supabase);
+  const pathname = (await headers()).get("x-pathname") ?? "/creator";
 
   const [performanceFlags, unreadCount] = await Promise.all([
     getCachedPerformanceFlags(),
@@ -26,28 +30,24 @@ export default async function CreatorLayout({ children }: { children: React.Reac
       : notifications.countUnread(context.creator.owner_id).catch(() => 0),
   ]);
 
-  const avatarPath =
-    context.artistProfile.profile_photo ?? context.artistProfile.cover_path;
-
   const navEntries = buildCreatorNavEntries(context.pendingVerifications);
 
   return (
     <RealtimeShell>
       <PerformanceProvider flags={performanceFlags}>
-      <DevAuthBootstrap />
-      <CreatorLayoutClient
-        navEntries={navEntries}
-        pendingVerifications={context.pendingVerifications}
-        userId={context.creator.owner_id}
-        initialUnreadCount={unreadCount}
-        stageName={context.artistProfile.stage_name || "Artiste"}
-        creatorId={context.creator.id}
-        avatarPath={avatarPath}
-        tier={context.creator.tier}
-      >
-        {children}
-      </CreatorLayoutClient>
-    </PerformanceProvider>
+        <DevAuthBootstrap />
+        <div className="min-h-dvh bg-noir-profond creator-workspace">
+          <CreatorSidebar navEntries={navEntries} />
+          <div className="creator-workspace__body">
+            <CreatorWorkspaceHeader
+              pathname={pathname}
+              userId={context.creator.owner_id}
+              initialUnreadCount={unreadCount}
+            />
+            <CreatorLayoutClient navEntries={navEntries}>{children}</CreatorLayoutClient>
+          </div>
+        </div>
+      </PerformanceProvider>
     </RealtimeShell>
   );
 }

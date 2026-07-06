@@ -47,6 +47,7 @@ export {
   getPublicationContinueHref,
   getPublicationCoverHref,
   getPublicationEditHref,
+  getPublicationConsultHref,
   getPublicationResubmitHref,
   isPublicationEditable,
   isPublicationWithdrawn,

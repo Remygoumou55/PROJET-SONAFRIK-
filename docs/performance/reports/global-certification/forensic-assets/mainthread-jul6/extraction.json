@@ -1,0 +1,264 @@
+﻿{
+  "source": "lighthouse-listen-mainthread.json",
+  "url": "http://localhost:3001/listen",
+  "fetchTime": "2026-07-06T16:21:56.344Z",
+  "lcp": 4542.856,
+  "fcp": 1310.4279999999999,
+  "tbt": 2148.4078200000004,
+  "mainThreadTotalMs": 7498.459999999862,
+  "mainThreadPhases": [
+    {
+      "phase": "Script Evaluation",
+      "ms": 2980.9799999998654,
+      "pct": 39.8
+    },
+    {
+      "phase": "Style & Layout",
+      "ms": 2046.464,
+      "pct": 27.3
+    },
+    {
+      "phase": "Other",
+      "ms": 1627.2679999999957,
+      "pct": 21.7
+    },
+    {
+      "phase": "Script Parsing & Compilation",
+      "ms": 504.9040000000001,
+      "pct": 6.7
+    },
+    {
+      "phase": "Rendering",
+      "ms": 194.12800000000027,
+      "pct": 2.6
+    },
+    {
+      "phase": "Parse HTML & CSS",
+      "ms": 144.71599999999998,
+      "pct": 1.9
+    }
+  ],
+  "bootupTotalMs": 7141.327999999979,
+  "bootupScripts": [
+    {
+      "url": "/listen",
+      "totalMs": 2827.060000000003,
+      "scriptingMs": 259.3000000000034,
+      "parseMs": 46.40399999999999,
+      "pctOfBoot": 39.6
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "totalMs": 1856.4759999999867,
+      "scriptingMs": 1668.703999999987,
+      "parseMs": 32.312,
+      "pctOfBoot": 26
+    },
+    {
+      "url": "Unattributable",
+      "totalMs": 1210.2559999999871,
+      "scriptingMs": 98.77999999999997,
+      "parseMs": 0,
+      "pctOfBoot": 16.9
+    },
+    {
+      "url": "/_next/static/chunks/5143f5d5-7a64eae2f85fc914.js",
+      "totalMs": 576.9600000000007,
+      "scriptingMs": 396.2360000000005,
+      "parseMs": 24.672,
+      "pctOfBoot": 8.1
+    },
+    {
+      "url": "/_next/static/chunks/9617-26d6ee87403e14e5.js",
+      "totalMs": 299.3480000000003,
+      "scriptingMs": 192.8680000000003,
+      "parseMs": 104.80400000000002,
+      "pctOfBoot": 4.2
+    },
+    {
+      "url": "/_next/static/chunks/app/(listener)/layout-b77b65bce8fc07c2.js",
+      "totalMs": 191.96000000000004,
+      "scriptingMs": 176.46800000000005,
+      "parseMs": 12.708,
+      "pctOfBoot": 2.7
+    },
+    {
+      "url": "/_next/static/chunks/1312-7d406af080b776a0.js",
+      "totalMs": 63.93199999999999,
+      "scriptingMs": 7.504,
+      "parseMs": 55.28399999999999,
+      "pctOfBoot": 0.9
+    },
+    {
+      "url": "/_next/static/chunks/app/(listener)/listen/page-68a47a6b955a3b22.js",
+      "totalMs": 61.908,
+      "scriptingMs": 22.912,
+      "parseMs": 38.144,
+      "pctOfBoot": 0.9
+    },
+    {
+      "url": "/_next/static/chunks/webpack-14656b4ea4988968.js",
+      "totalMs": 53.42799999999998,
+      "scriptingMs": 34.43199999999999,
+      "parseMs": 1.224,
+      "pctOfBoot": 0.7
+    }
+  ],
+  "longTasks": [
+    {
+      "url": "/listen",
+      "startMs": 1240.214,
+      "durationMs": 945,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 6851.612359999999,
+      "durationMs": 410,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/5143f5d5-7a64eae2f85fc914.js",
+      "startMs": 4290.642,
+      "durationMs": 330,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 6408.612359999999,
+      "durationMs": 238,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/9617-26d6ee87403e14e5.js",
+      "startMs": 6113.612359999999,
+      "durationMs": 220,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/app/(listener)/layout-b77b65bce8fc07c2.js",
+      "startMs": 5304.254359999999,
+      "durationMs": 175,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 6646.612359999999,
+      "durationMs": 164,
+      "beforeLcp": false
+    },
+    {
+      "url": "Unattributable",
+      "startMs": 2185.214,
+      "durationMs": 132,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/webpack-14656b4ea4988968.js",
+      "startMs": 3896.6420000000003,
+      "durationMs": 116,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 4867.642,
+      "durationMs": 90,
+      "beforeLcp": false
+    },
+    {
+      "url": "Unattributable",
+      "startMs": 880.2139999999999,
+      "durationMs": 75,
+      "beforeLcp": true
+    },
+    {
+      "url": "Unattributable",
+      "startMs": 955.2139999999999,
+      "durationMs": 75,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/9617-26d6ee87403e14e5.js",
+      "startMs": 6333.612359999999,
+      "durationMs": 75,
+      "beforeLcp": false
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 4802.642,
+      "durationMs": 65,
+      "beforeLcp": false
+    },
+    {
+      "url": "/listen",
+      "startMs": 2361.214,
+      "durationMs": 61,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 4063.6420000000003,
+      "durationMs": 60.999999999999545,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 3840.6420000000003,
+      "durationMs": 56,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/2060-28b7f50c638c8259.js",
+      "startMs": 4012.6420000000003,
+      "durationMs": 51,
+      "beforeLcp": true
+    },
+    {
+      "url": "/_next/static/chunks/1312-7d406af080b776a0.js",
+      "startMs": 5493.826359999999,
+      "durationMs": 51,
+      "beforeLcp": false
+    }
+  ],
+  "lcpPhases": [
+    {
+      "phase": "TTFB",
+      "timing": 580.2139999999999,
+      "percent": "13%"
+    },
+    {
+      "phase": "Load Delay",
+      "timing": 2010.5064250386113,
+      "percent": "44%"
+    },
+    {
+      "phase": "Load Time",
+      "timing": 567.6418519691097,
+      "percent": "12%"
+    },
+    {
+      "phase": "Render Delay",
+      "timing": 1384.493722992279,
+      "percent": "30%"
+    }
+  ],
+  "diagnostics": {
+    "numRequests": 170,
+    "numScripts": 35,
+    "numStylesheets": 2,
+    "numFonts": 0,
+    "numTasks": 2343,
+    "numTasksOver10ms": 31,
+    "numTasksOver25ms": 10,
+    "numTasksOver50ms": 5,
+    "numTasksOver100ms": 2,
+    "numTasksOver500ms": 0,
+    "rtt": 0.5449999999999982,
+    "throughput": 1358159.4200170462,
+    "maxRtt": 5.538059999999995,
+    "maxServerLatency": 199.27293999999998,
+    "totalByteWeight": 476067,
+    "totalTaskTime": 1874.615000000002,
+    "mainDocumentTransferSize": 25217
+  }
+}
