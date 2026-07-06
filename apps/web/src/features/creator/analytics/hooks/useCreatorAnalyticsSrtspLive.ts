@@ -7,7 +7,7 @@ import {
   shouldRefreshCreatorAnalytics,
 } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 import { useAnalyticsServices } from "./useAnalytics";
 
 const TIMELINE_DAYS = 30;
@@ -61,21 +61,10 @@ export function useCreatorAnalyticsSrtspLive(params: UseCreatorAnalyticsSrtspLiv
     [params.creatorId],
   );
 
-  const liveQuery = useLiveQuery(queryKey, fetchAnalytics, invalidateEvents, {
+  return useLiveQuery(queryKey, fetchAnalytics, invalidateEvents, {
     enabled: params.enabled !== false,
     initialData: params.initialData,
     skipInitialFetch: true,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!shouldRefreshCreatorAnalytics(event, { creatorId: params.creatorId })) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false,
-  );
-
-  return liveQuery;
 }

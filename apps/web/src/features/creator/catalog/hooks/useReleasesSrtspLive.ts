@@ -7,7 +7,7 @@ import {
   shouldRefreshCreatorCatalog,
 } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 import { useCatalogService } from "./useCatalog";
 
 export interface UseReleasesSrtspLiveParams {
@@ -31,21 +31,10 @@ export function useReleasesSrtspLive(params: UseReleasesSrtspLiveParams) {
     [params.creatorId],
   );
 
-  const liveQuery = useLiveQuery(queryKey, fetchReleases, invalidateEvents, {
+  return useLiveQuery(queryKey, fetchReleases, invalidateEvents, {
     enabled: params.enabled !== false,
     initialData: params.initialData,
     skipInitialFetch: true,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!shouldRefreshCreatorCatalog(event, { creatorId: params.creatorId })) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false,
-  );
-
-  return liveQuery;
 }

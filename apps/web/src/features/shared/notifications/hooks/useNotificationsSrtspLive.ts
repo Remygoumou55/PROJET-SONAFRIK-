@@ -4,7 +4,7 @@ import { useCallback, useMemo } from "react";
 import type { Notification } from "@sonafrik/types";
 import { getListenerHubInvalidateEvents, shouldRefreshListenerNotifications } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 import { useNotificationsService } from "./useNotificationsService";
 
 export interface UseNotificationsSrtspLiveParams {
@@ -28,21 +28,10 @@ export function useNotificationsSrtspLive(params: UseNotificationsSrtspLiveParam
     [scope],
   );
 
-  const liveQuery = useLiveQuery(`notifications:${params.userId}`, fetchNotifications, invalidateEvents, {
+  return useLiveQuery(`notifications:${params.userId}`, fetchNotifications, invalidateEvents, {
     enabled: params.enabled !== false,
     initialData: params.initialData,
     skipInitialFetch: true,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!shouldRefreshListenerNotifications(event, scope)) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false,
-  );
-
-  return liveQuery;
 }

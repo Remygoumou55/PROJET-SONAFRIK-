@@ -6,7 +6,7 @@ import {
   shouldRefreshWalletHub,
 } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 
 export interface UseWalletSrtspLiveQueryParams<T> {
   userId: string | null;
@@ -17,7 +17,7 @@ export interface UseWalletSrtspLiveQueryParams<T> {
   enabled?: boolean;
 }
 
-/** Wallet Hub — useLiveQuery + useEventSubscription (Phase 3.6 SSOT). */
+/** Wallet Hub — useLiveQuery SSOT (invalidation interne, Phase 3.6 / Sprint 4). */
 export function useWalletSrtspLiveQuery<T>(params: UseWalletSrtspLiveQueryParams<T>) {
   const invalidateEvents = useMemo(() => getWalletHubInvalidateEvents(), []);
 
@@ -29,22 +29,10 @@ export function useWalletSrtspLiveQuery<T>(params: UseWalletSrtspLiveQueryParams
     [params.userId],
   );
 
-  const liveQuery = useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
+  return useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
     enabled: params.enabled !== false && Boolean(params.userId),
     initialData: params.initialData,
     skipInitialFetch: params.skipInitialFetch,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!params.userId) return;
-      if (!shouldRefreshWalletHub(event, { userId: params.userId })) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false && Boolean(params.userId),
-  );
-
-  return liveQuery;
 }

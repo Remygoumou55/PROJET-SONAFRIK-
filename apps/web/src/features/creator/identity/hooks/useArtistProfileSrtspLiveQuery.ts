@@ -6,7 +6,7 @@ import {
   shouldRefreshArtistProfileHub,
 } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 
 export interface UseArtistProfileSrtspLiveQueryParams<T> {
   creatorId: string;
@@ -18,7 +18,7 @@ export interface UseArtistProfileSrtspLiveQueryParams<T> {
   enabled?: boolean;
 }
 
-/** Artist Profile Hub — useLiveQuery + useEventSubscription (Phase 3.7 SSOT). */
+/** Artist Profile Hub — useLiveQuery SSOT (invalidation interne, Phase 3.7 / Sprint 4). */
 export function useArtistProfileSrtspLiveQuery<T>(params: UseArtistProfileSrtspLiveQueryParams<T>) {
   const invalidateEvents = useMemo(() => getArtistProfileHubInvalidateEvents(), []);
   const scope = useMemo(
@@ -31,21 +31,10 @@ export function useArtistProfileSrtspLiveQuery<T>(params: UseArtistProfileSrtspL
     [scope],
   );
 
-  const liveQuery = useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
+  return useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
     enabled: params.enabled !== false,
     initialData: params.initialData,
     skipInitialFetch: params.skipInitialFetch,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!shouldRefreshArtistProfileHub(event, scope)) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false,
-  );
-
-  return liveQuery;
 }

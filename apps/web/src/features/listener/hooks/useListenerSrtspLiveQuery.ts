@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { getListenerHubInvalidateEvents } from "@sonafrik/realtime/adapters";
 import type { SrtspEvent } from "@sonafrik/realtime";
-import { useEventSubscription, useLiveQuery } from "@sonafrik/realtime/react";
+import { useLiveQuery } from "@sonafrik/realtime/react";
 
 export interface ListenerHubScope {
   userId?: string;
@@ -20,7 +20,7 @@ export interface UseListenerSrtspLiveQueryParams<T> {
   shouldInvalidate: (event: SrtspEvent, scope: ListenerHubScope) => boolean;
 }
 
-/** Workspace Auditeur — useLiveQuery + useEventSubscription (Phase 3.8 SSOT). */
+/** Workspace Auditeur — useLiveQuery SSOT (invalidation interne, Phase 3.8 / Sprint 4). */
 export function useListenerSrtspLiveQuery<T>(params: UseListenerSrtspLiveQueryParams<T>) {
   const invalidateEvents = useMemo(() => getListenerHubInvalidateEvents(), []);
   const scope = useMemo(
@@ -34,21 +34,10 @@ export function useListenerSrtspLiveQuery<T>(params: UseListenerSrtspLiveQueryPa
     [shouldInvalidateFn, scope],
   );
 
-  const liveQuery = useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
+  return useLiveQuery(params.queryKey, params.fetcher, invalidateEvents, {
     enabled: params.enabled !== false,
     initialData: params.initialData,
     skipInitialFetch: params.skipInitialFetch,
     shouldInvalidate,
   });
-
-  useEventSubscription(
-    invalidateEvents,
-    (event) => {
-      if (!shouldInvalidateFn(event, scope)) return;
-      liveQuery.refresh();
-    },
-    params.enabled !== false,
-  );
-
-  return liveQuery;
 }
