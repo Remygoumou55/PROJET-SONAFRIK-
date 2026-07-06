@@ -79,6 +79,7 @@ export function CoverImage({
           onError={() => setError(true)}
           sizes={resolvedSizes}
           priority={priority}
+          fetchPriority={priority ? "high" : "auto"}
           loading={priority ? "eager" : "lazy"}
           quality={priority ? 80 : 55}
           placeholder="blur"

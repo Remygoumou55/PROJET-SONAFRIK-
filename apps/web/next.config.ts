@@ -83,6 +83,19 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Favicon + manifest PWA — SVG unique, cache long (Sprint 5 Asset Engine)
+        source: "/favicon.svg",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/manifest.webmanifest",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=3600" },
+        ],
+      },
+      {
         // Assets statiques Next.js — cache 1 an (immutable car hash dans le nom)
         source: "/_next/static/:path*",
         headers: [

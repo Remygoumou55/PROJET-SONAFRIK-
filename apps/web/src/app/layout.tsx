@@ -52,11 +52,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: [
     { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
-    { rel: "icon", type: "image/png", sizes: "32x32", url: "/icons/icon-32.png" },
-    { rel: "icon", type: "image/png", sizes: "192x192", url: "/icons/icon-192.png" },
-    { rel: "icon", type: "image/png", sizes: "512x512", url: "/icons/icon-512.png" },
-    { rel: "apple-touch-icon", sizes: "180x180", url: "/icons/icon-180.png" },
-    { rel: "shortcut icon", url: "/favicon.ico" },
+    { rel: "apple-touch-icon", url: "/favicon.svg" },
+    { rel: "shortcut icon", url: "/favicon.svg" },
   ],
 };
 

@@ -69,6 +69,7 @@ export const CreatorAssetImage = memo(function CreatorAssetImage({
       className={`${objectClass} ${className}`.trim()}
       sizes={sizes}
       priority={priority}
+      fetchPriority={priority ? "high" : "auto"}
       loading={priority ? "eager" : "lazy"}
       quality={priority ? 75 : 55}
       onError={() => undefined}
