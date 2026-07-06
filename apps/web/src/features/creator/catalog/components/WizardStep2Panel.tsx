@@ -1,10 +1,25 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import type { RefObject } from "react";
-import { AudioUploader } from "./AudioUploader";
-import { CoverUploader } from "./CoverUploader";
 import type { AudioUploaderHandle } from "./AudioUploader";
 import type { CoverUploaderHandle } from "./CoverUploader";
+
+const AudioUploader = dynamic(
+  () => import("./AudioUploader").then((m) => ({ default: m.AudioUploader })),
+  {
+    ssr: false,
+    loading: () => <div className="pub-wiz__step-loading" aria-busy="true" />,
+  },
+);
+
+const CoverUploader = dynamic(
+  () => import("./CoverUploader").then((m) => ({ default: m.CoverUploader })),
+  {
+    ssr: false,
+    loading: () => <div className="pub-wiz__step-loading" aria-busy="true" />,
+  },
+);
 
 export interface WizardStep2PanelProps {
   hidden: boolean;

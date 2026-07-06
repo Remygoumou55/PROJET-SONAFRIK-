@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 import { WizardProgress } from "./WizardProgress";
 import { WizardPublishedSuccess } from "./WizardPublishedSuccess";
 import { WizardStep1Panel } from "./WizardStep1Panel";
-import { WizardStep3Panel } from "./WizardStep3Panel";
-import { WizardStep4Panel } from "./WizardStep4Panel";
 import { usePublicationWizardFlow } from "../hooks/usePublicationWizardFlow";
 
 const WizardStep2Panel = dynamic(
@@ -15,6 +13,30 @@ const WizardStep2Panel = dynamic(
     loading: () => (
       <div className="pub-wiz__step-loading" aria-busy="true">
         Préparation des uploaders…
+      </div>
+    ),
+  },
+);
+
+const WizardStep3Panel = dynamic(
+  () => import("./WizardStep3Panel").then((mod) => ({ default: mod.WizardStep3Panel })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="pub-wiz__step-loading" aria-busy="true">
+        Chargement des métadonnées…
+      </div>
+    ),
+  },
+);
+
+const WizardStep4Panel = dynamic(
+  () => import("./WizardStep4Panel").then((mod) => ({ default: mod.WizardStep4Panel })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="pub-wiz__step-loading" aria-busy="true">
+        Préparation de la publication…
       </div>
     ),
   },

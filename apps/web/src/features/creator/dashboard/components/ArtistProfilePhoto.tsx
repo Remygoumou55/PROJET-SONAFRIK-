@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useRef, useState } from "react";
 import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
 import {
@@ -13,8 +14,12 @@ import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { CreatorAssetImage } from "./CreatorAssetImage";
-import { CropEditorModal } from "./CropEditorModal";
 import type { CropResult } from "./CropEditorModal";
+
+const CropEditorModal = dynamic(
+  () => import("./CropEditorModal").then((m) => ({ default: m.CropEditorModal })),
+  { ssr: false },
+);
 
 type AllowedImageMime = ImageMime;
 

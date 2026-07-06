@@ -1,14 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { memo, useCallback, useRef, useState } from "react";
 import { CreatorAssetImage } from "./CreatorAssetImage";
-import { CropEditorModal } from "./CropEditorModal";
 import type { CropResult } from "./CropEditorModal";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 import { useCreatorService } from "../../hooks/useCreator";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
+
+const CropEditorModal = dynamic(
+  () => import("./CropEditorModal").then((m) => ({ default: m.CropEditorModal })),
+  { ssr: false },
+);
 import {
   compressImageFile,
   IMAGE_UPLOAD,
