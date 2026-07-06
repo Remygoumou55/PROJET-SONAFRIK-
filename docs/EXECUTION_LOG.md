@@ -11,6 +11,32 @@
 
 ---
 
+## 2026-07-06 — LDSE P0 fixes + Charte Graphique V5.0
+
+### Fichiers touchés
+- `apps/web/src/features/shared/ldse/listener/publishListenerLdseEvent.ts` — P0: smart per-event invalidation (avant: all-4 systématique)
+- `apps/web/src/features/shared/ldse/identity/publishIdentityLdseEvent.ts` — P2: suppression double-trigger invalidate
+- `apps/web/src/app/globals.css` — vertProfond #009b3a→#0e5e3a, orProfond #f4a300→#daaf37 (Charte V5.0)
+- `packages/ui/src/styles/globals.css` — mêmes tokens
+- `packages/ui/src/tokens/colors.ts` — vertProfond + orProfond mis à jour, commentaire V5.0
+- `apps/web/src/app/layout.tsx` — manifest + icons PWA (metadata)
+- `apps/web/public/manifest.webmanifest` — CRÉÉ
+- `apps/web/public/favicon.svg` — CRÉÉ (S stylisé vert-énergie)
+- `apps/mobile/app.json` — icon + splash.image + adaptiveIcon.foregroundImage
+
+### Validation
+- typecheck ✅ · lint ✅ · build prod ✅
+- Git push ✅ (ae40cb2)
+
+### Assets en attente (user-side)
+- `apps/web/public/icons/icon-{32,192,512,180}.png` + `favicon.ico` — à exporter depuis Figma
+- `apps/mobile/assets/{icon,splash-icon,adaptive-icon}.png` — idem
+
+### Dette reportée
+- `registerDomainRules.ts` : règles Listener/Identity non ajoutées — clés per-userId incompatibles avec le système de règles statiques actuel. Extension architecture requise (Vague H+).
+
+---
+
 ## 2026-07-06 — Vague D CERTIFIÉE (Typage + design tokens)
 
 ### Mission
