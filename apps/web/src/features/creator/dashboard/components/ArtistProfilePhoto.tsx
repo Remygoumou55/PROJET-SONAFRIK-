@@ -10,7 +10,7 @@ import {
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
-import { useRouter } from "next/navigation";
+import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import { CropEditorModal } from "./CropEditorModal";
@@ -43,7 +43,6 @@ export function ArtistProfilePhoto({
   cropZoom,
 }: ArtistProfilePhotoProps) {
   const creatorService = useCreatorService();
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localPhotoPath, setLocalPhotoPath] = useState(photoPath);
@@ -183,14 +182,14 @@ export function ArtistProfilePhoto({
       setPendingOriginalFile(null);
       if (cropSrc && cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
       setCropSrc(null);
-      router.refresh();
+      publishArtistProfileUpdate(creatorId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Échec de l'enregistrement. Réessayez.");
       throw err; // let CropEditorModal keep showing error
     } finally {
       setLoading(false);
     }
-  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService, router]);
+  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService]);
 
   const handleRemove = useCallback(async () => {
     setLoading(true);
@@ -200,13 +199,13 @@ export function ArtistProfilePhoto({
       invalidateCreatorAssetUrl(creatorId);
       setLocalPhotoPath(null);
       setLocalOriginalPath(null);
-      router.refresh();
+      publishArtistProfileUpdate(creatorId);
     } catch {
       setError("Impossible de supprimer la photo.");
     } finally {
       setLoading(false);
     }
-  }, [creatorId, creatorService, router]);
+  }, [creatorId, creatorService]);
 
   return (
     <>

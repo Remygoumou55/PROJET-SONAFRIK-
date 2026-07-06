@@ -60,9 +60,18 @@ test.describe("MRCDOP — routes authentifiées", () => {
   test.use({ storageState: AUTH_STATE_PATH });
 
   const authRoutes = ["/listen", "/profile", "/wallet", "/search"] as const;
+  const creatorRoutes = ["/creator/catalog/tracks/new"] as const;
 
   for (const viewport of MRCDOP_VIEWPORTS) {
     for (const route of authRoutes) {
+      test(`${route} @ ${viewport.label}px`, async ({ page }) => {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await gotoAndSettle(page, route);
+        await assertNoHorizontalOverflow(page);
+      });
+    }
+
+    for (const route of creatorRoutes) {
       test(`${route} @ ${viewport.label}px`, async ({ page }) => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await gotoAndSettle(page, route);

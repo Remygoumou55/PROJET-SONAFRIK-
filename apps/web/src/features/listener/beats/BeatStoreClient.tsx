@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import type { Beat } from "@sonafrik/types";
 import { BEAT_LICENSE_LABELS } from "@sonafrik/types";
 import { purchaseBeatAction } from "./beats.actions";
+import { BEAT_HIGHLIGHT_STYLE, OVERLAY } from "@/lib/design/overlayTokens";
 
 interface Props {
   beats: Beat[];
@@ -52,7 +53,7 @@ function BeatCard({
         border: highlighted
           ? "2px solid var(--color-or-solaire)"
           : "1px solid var(--color-elevated)",
-        boxShadow: highlighted ? "0 0 16px rgba(255,194,14,0.25)" : undefined,
+        boxShadow: highlighted ? BEAT_HIGHLIGHT_STYLE.boxShadow : undefined,
       }}
     >
       <div className="mb-3 flex items-start justify-between gap-2">
@@ -67,7 +68,7 @@ function BeatCard({
         {done ? (
           <span
             className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
-            style={{ backgroundColor: "rgba(0,210,106,0.07)", color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie)" }}
+            style={{ backgroundColor: OVERLAY.vertRow, color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie)" }}
           >
             Acheté ✓
           </span>

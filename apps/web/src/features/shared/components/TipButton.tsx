@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { TIP_AMOUNTS } from "@sonafrik/types";
 import type { TipAmount } from "@sonafrik/types";
 import { sendTipAction } from "../actions/tips.actions";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 interface Props {
   creatorId:  string;
@@ -43,7 +44,7 @@ export function TipButton({ creatorId, artistName }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         className="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
-        style={{ backgroundColor: "rgba(0,210,106,0.07)", color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie)" }}
+        style={{ backgroundColor: OVERLAY.vertRow, color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie)" }}
       >
         💸 Soutenir
       </button>
@@ -51,7 +52,7 @@ export function TipButton({ creatorId, artistName }: Props) {
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
+          style={{ backgroundColor: OVERLAY.noir75 }}
           onClick={(e) => { if (e.target === e.currentTarget) reset(); }}
         >
           <div
@@ -115,7 +116,7 @@ export function TipButton({ creatorId, artistName }: Props) {
                     onClick={submit}
                     className="flex-1 rounded-full py-2 text-sm font-semibold disabled:opacity-50"
                     style={{
-                      backgroundColor: amount ? "var(--color-vert-energie)" : "rgba(0,210,106,0.07)",
+                      backgroundColor: amount ? "var(--color-vert-energie)" : OVERLAY.vertRow,
                       color:           amount ? "var(--color-noir-profond)" : "var(--color-texte-desactive)",
                     }}
                   >

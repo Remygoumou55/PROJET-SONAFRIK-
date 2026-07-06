@@ -2,100 +2,137 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type {
-  SubscribePremiumInput,
   AddPayoutAccountInput,
   RequestWithdrawalInput,
+  SubscribePremiumInput,
   TopupWalletInput,
 } from "@sonafrik/api/wallet";
 import type {
-  WalletContext,
-  Transaction,
-  Withdrawal,
   PayoutAccount,
   RoyaltyCalculation,
+  Transaction,
+  WalletContext,
+  Withdrawal,
 } from "@sonafrik/types";
 import { ldseCache } from "@/features/shared/ldse/cache";
-import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
 import { WALLET_LDSE_EVENTS, WALLET_LDSE_KEYS } from "@/features/shared/ldse/wallet/wallet-ldse-config";
 import { publishWalletLdseEvent } from "@/features/shared/ldse/wallet/publishWalletLdseEvent";
 import { useWalletService } from "../lib/walletServiceContext";
+import { useWalletUserId } from "./useWalletUserId";
+import { useWalletSrtspLiveQuery } from "./useWalletSrtspLiveQuery";
+
+type PayoutPageBundle = { accounts: PayoutAccount[]; withdrawals: Withdrawal[] };
 
 export function useWallet() {
   const service = useWalletService();
-  const [context, setContext] = useState<WalletContext | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const userId = useWalletUserId();
 
-  const loadContext = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const ctx = await service.getWalletContext();
-      setContext(ctx);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchContext = useCallback(async (): Promise<WalletContext> => {
+    return service.getWalletContext();
   }, [service]);
 
-  useEffect(() => {
-    loadContext();
-  }, [loadContext]);
+  const {
+    data: context,
+    loading: isLoading,
+    error: liveError,
+    refresh,
+  } = useWalletSrtspLiveQuery<WalletContext>({
+    userId,
+    queryKey: userId ? `wallet-context:${userId}` : "wallet-context:pending",
+    fetcher: fetchContext,
+    enabled: Boolean(userId),
+  });
 
-  const subscribePremium = useCallback(async (input: SubscribePremiumInput) => {
-    try {
-      const result = await service.subscribePremium(input);
-      await loadContext();
-      return result;
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Échec de l'abonnement.");
-    }
-  }, [service, loadContext]);
+  const subscribePremium = useCallback(
+    async (input: SubscribePremiumInput) => {
+      try {
+        const result = await service.subscribePremium(input);
+        publishWalletLdseEvent(WALLET_LDSE_EVENTS.subscriptionChanged);
+        refresh();
+        return result;
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Échec de l'abonnement.");
+      }
+    },
+    [service, refresh],
+  );
 
-  const topupWallet = useCallback(async (input: TopupWalletInput) => {
-    try {
-      const result = await service.topupWallet(input);
-      await loadContext();
-      return result;
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Échec de la recharge.");
-    }
-  }, [service, loadContext]);
+  const topupWallet = useCallback(
+    async (input: TopupWalletInput) => {
+      try {
+        const result = await service.topupWallet(input);
+        publishWalletLdseEvent(WALLET_LDSE_EVENTS.topupCompleted);
+        refresh();
+        return result;
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Échec de la recharge.");
+      }
+    },
+    [service, refresh],
+  );
 
-  return { context, isLoading, error, subscribePremium, topupWallet, reload: loadContext };
+  return {
+    context: context ?? null,
+    isLoading: isLoading || !userId,
+    error: liveError?.message ?? null,
+    subscribePremium,
+    topupWallet,
+    reload: refresh,
+  };
 }
 
 export function useTransactions() {
   const service = useWalletService();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const userId = useWalletUserId();
 
-  useEffect(() => {
-    service.getTransactions(20)
-      .then(setTransactions)
-      .catch(() => setError("Impossible de charger les transactions."))
-      .finally(() => setIsLoading(false));
+  const fetchTransactions = useCallback(async (): Promise<Transaction[]> => {
+    return service.getTransactions(20);
   }, [service]);
 
-  return { transactions, isLoading, error };
+  const {
+    data: transactions,
+    loading: isLoading,
+    error: liveError,
+  } = useWalletSrtspLiveQuery<Transaction[]>({
+    userId,
+    queryKey: userId ? `wallet-transactions:${userId}` : "wallet-transactions:pending",
+    fetcher: fetchTransactions,
+    initialData: [],
+    enabled: Boolean(userId),
+  });
+
+  return {
+    transactions: transactions ?? [],
+    isLoading: isLoading || !userId,
+    error: liveError ? "Impossible de charger les transactions." : null,
+  };
 }
 
 export function useWithdrawals() {
   const service = useWalletService();
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const userId = useWalletUserId();
 
-  useEffect(() => {
-    service.getWithdrawals()
-      .then(setWithdrawals)
-      .catch(() => setError("Impossible de charger les retraits."))
-      .finally(() => setIsLoading(false));
+  const fetchWithdrawals = useCallback(async (): Promise<Withdrawal[]> => {
+    return service.getWithdrawals();
   }, [service]);
 
-  return { withdrawals, isLoading, error };
+  const {
+    data: withdrawals,
+    loading: isLoading,
+    error: liveError,
+  } = useWalletSrtspLiveQuery<Withdrawal[]>({
+    userId,
+    queryKey: userId ? `wallet-withdrawals:${userId}` : "wallet-withdrawals:pending",
+    fetcher: fetchWithdrawals,
+    initialData: [],
+    enabled: Boolean(userId),
+  });
+
+  return {
+    withdrawals: withdrawals ?? [],
+    isLoading: isLoading || !userId,
+    error: liveError ? "Impossible de charger les retraits." : null,
+  };
 }
 
 export function usePayoutAccounts() {
@@ -115,25 +152,33 @@ export function usePayoutAccounts() {
     }
   }, [service]);
 
-  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
 
-  const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
-    try {
-      await service.addPayoutAccount(input);
-      await reload();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
-    }
-  }, [service, reload]);
+  const addAccount = useCallback(
+    async (input: AddPayoutAccountInput) => {
+      try {
+        await service.addPayoutAccount(input);
+        await reload();
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
+      }
+    },
+    [service, reload],
+  );
 
-  const removeAccount = useCallback(async (id: string) => {
-    try {
-      await service.removePayoutAccount(id);
-      await reload();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
-    }
-  }, [service, reload]);
+  const removeAccount = useCallback(
+    async (id: string) => {
+      try {
+        await service.removePayoutAccount(id);
+        await reload();
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
+      }
+    },
+    [service, reload],
+  );
 
   return { accounts, isLoading, addAccount, removeAccount, reload };
 }
@@ -148,105 +193,101 @@ export function useRequestWithdrawal() {
   }, [service]);
 }
 
-/** Charge comptes de retrait + historique en parallèle — SSOT LDSE payout page. */
+/** Comptes de retrait + historique — consommateur SRTSP (Phase 3.6). */
 export function usePayoutPageData() {
   const service = useWalletService();
+  const userId = useWalletUserId();
   const cacheKey = WALLET_LDSE_KEYS.payoutPage;
-  const [accounts, setAccounts] = useState<PayoutAccount[]>([]);
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const reload = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const cached = ldseCache.get<{ accounts: PayoutAccount[]; withdrawals: Withdrawal[] }>(cacheKey);
-      if (cached) {
-        setAccounts(cached.accounts);
-        setWithdrawals(cached.withdrawals);
-      }
-      const [accs, wds] = await Promise.all([
-        service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
-        service.getWithdrawals().catch(() => [] as Withdrawal[]),
-      ]);
-      ldseCache.set(cacheKey, { accounts: accs, withdrawals: wds }, 30_000);
-      setAccounts(accs);
-      setWithdrawals(wds);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, cacheKey]);
-
-  useEffect(() => {
-    void reload();
-  }, [reload]);
-
-  useLdseEvent(WALLET_LDSE_EVENTS.invalidate, () => {
-    void reload();
-  });
-
-  const reloadAccounts = useCallback(async () => {
-    const [accs, wds] = await Promise.all([
+  const fetchPayoutData = useCallback(async (): Promise<PayoutPageBundle> => {
+    const cached = ldseCache.get<PayoutPageBundle>(cacheKey);
+    if (cached) return cached;
+    const [accounts, withdrawals] = await Promise.all([
       service.getPayoutAccounts().catch(() => [] as PayoutAccount[]),
       service.getWithdrawals().catch(() => [] as Withdrawal[]),
     ]);
-    setAccounts(accs);
-    setWithdrawals(wds);
-    ldseCache.set(cacheKey, { accounts: accs, withdrawals: wds }, 30_000);
+    const bundle = { accounts, withdrawals };
+    ldseCache.set(cacheKey, bundle, 30_000);
+    return bundle;
   }, [service, cacheKey]);
 
-  const addAccount = useCallback(async (input: AddPayoutAccountInput) => {
-    try {
-      await service.addPayoutAccount(input);
-      publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
-      await reloadAccounts();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
-    }
-  }, [service, reloadAccounts]);
-
-  const removeAccount = useCallback(async (id: string) => {
-    try {
-      await service.removePayoutAccount(id);
-      publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
-      await reloadAccounts();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
-    }
-  }, [service, reloadAccounts]);
-
-  return { accounts, withdrawals, isLoading, addAccount, removeAccount };
-}
-
-export function useRoyalties() {
-  const service = useWalletService();
-  const cacheKey = WALLET_LDSE_KEYS.royalties;
-  const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const reload = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const cached = ldseCache.get<RoyaltyCalculation[]>(cacheKey);
-      if (cached) setRoyalties(cached);
-      const data = await service.getRoyaltyCalculations();
-      ldseCache.set(cacheKey, data, 60_000);
-      setRoyalties(data);
-    } catch {
-      setError("Impossible de charger les royalties.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, cacheKey]);
-
-  useEffect(() => {
-    void reload();
-  }, [reload]);
-
-  useLdseEvent(WALLET_LDSE_EVENTS.invalidate, () => {
-    void reload();
+  const {
+    data,
+    loading: isLoading,
+    refresh,
+  } = useWalletSrtspLiveQuery<PayoutPageBundle>({
+    userId,
+    queryKey: userId ? `wallet-payout:${userId}` : "wallet-payout:pending",
+    fetcher: fetchPayoutData,
+    enabled: Boolean(userId),
   });
 
-  return { royalties, isLoading, error, reload };
+  const addAccount = useCallback(
+    async (input: AddPayoutAccountInput) => {
+      try {
+        await service.addPayoutAccount(input);
+        publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
+        refresh();
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible d'ajouter le compte.");
+      }
+    },
+    [service, refresh],
+  );
+
+  const removeAccount = useCallback(
+    async (id: string) => {
+      try {
+        await service.removePayoutAccount(id);
+        publishWalletLdseEvent(WALLET_LDSE_EVENTS.invalidate);
+        refresh();
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : "Impossible de supprimer le compte.");
+      }
+    },
+    [service, refresh],
+  );
+
+  return {
+    accounts: data?.accounts ?? [],
+    withdrawals: data?.withdrawals ?? [],
+    isLoading: isLoading || !userId,
+    addAccount,
+    removeAccount,
+  };
+}
+
+/** Royalties — consommateur SRTSP (Phase 3.6). */
+export function useRoyalties() {
+  const service = useWalletService();
+  const userId = useWalletUserId();
+  const cacheKey = WALLET_LDSE_KEYS.royalties;
+
+  const fetchRoyalties = useCallback(async (): Promise<RoyaltyCalculation[]> => {
+    const cached = ldseCache.get<RoyaltyCalculation[]>(cacheKey);
+    if (cached) return cached;
+    const data = await service.getRoyaltyCalculations();
+    ldseCache.set(cacheKey, data, 60_000);
+    return data;
+  }, [service, cacheKey]);
+
+  const {
+    data: royalties,
+    loading: isLoading,
+    error: liveError,
+    refresh,
+  } = useWalletSrtspLiveQuery<RoyaltyCalculation[]>({
+    userId,
+    queryKey: userId ? `wallet-royalties:${userId}` : "wallet-royalties:pending",
+    fetcher: fetchRoyalties,
+    initialData: [],
+    enabled: Boolean(userId),
+  });
+
+  return {
+    royalties: royalties ?? [],
+    isLoading: isLoading || !userId,
+    error: liveError ? "Impossible de charger les royalties." : null,
+    reload: refresh,
+  };
 }

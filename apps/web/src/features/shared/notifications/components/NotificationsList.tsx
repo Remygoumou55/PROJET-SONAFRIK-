@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import type { Notification, NotificationType } from "@sonafrik/types";
+import { useCallback, useEffect, useState } from "react";
+import type { Notification } from "@sonafrik/types";
 import { NOTIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { formatDateTime } from "@/lib/formatters";
 import { useNotificationsService } from "../hooks/useNotificationsService";
@@ -10,13 +10,7 @@ import {
 } from "@/features/shared/ldse/notifications/useNotificationsLdseCount";
 import { NOTIFICATIONS_LDSE_EVENTS } from "@/features/shared/ldse/notifications/notifications-ldse-config";
 
-const TYPE_STYLE: Record<NotificationType, { bg: string; text: string }> = {
-  stream_milestone:     { bg: "rgba(59,130,246,0.13)",  text: "var(--color-accent-bleu-clair)" },
-  royalty_paid:         { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
-  verification_updated: { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
-  rights_claim_updated: { bg: "rgba(245,158,11,0.13)",  text: "var(--color-avertissement)" },
-  system:               { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-secondaire)" },
-};
+import { NOTIFICATION_TYPE_STYLES } from "@/lib/design/overlayTokens";
 
 interface Props {
   initialNotifications: Notification[];
@@ -27,6 +21,10 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
   const service = useNotificationsService();
   const [items, setItems] = useState<Notification[]>(initialNotifications);
   const [markingAll, setMarkingAll] = useState(false);
+
+  useEffect(() => {
+    setItems(initialNotifications);
+  }, [initialNotifications]);
 
   const unreadCount = items.filter((n) => n.read_at === null).length;
 
@@ -84,7 +82,7 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
       )}
 
       {items.map((notif) => {
-        const style = TYPE_STYLE[notif.type] ?? TYPE_STYLE.system;
+        const style = NOTIFICATION_TYPE_STYLES[notif.type] ?? NOTIFICATION_TYPE_STYLES.system;
         const isUnread = notif.read_at === null;
 
         return (

@@ -22,74 +22,11 @@
 
 ## 3. Anomalies Responsive détectées
 
-- **Mobile Large (430×932)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=430px
-- **Mobile Large (430×932)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=430px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=390px
-- **Mobile Standard (390×844)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=390px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/tracks/new` · `wizard:creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=402px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=510px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=603px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=722px > viewport=320px
-- **Mobile Small (320×568)** · `/creator/catalog/releases` · `creator-mobile-nav__pill` · element-exceeds-viewport — right=866px > viewport=320px
+*Aucune.*
 
 ## 4. Captures anomalies
 
-- `responsive-screenshots/tracks@mobile-large.png` — tracks@mobile-large
-- `responsive-screenshots/tracks-new@mobile-large.png` — tracks-new@mobile-large
-- `responsive-screenshots/releases@mobile-large.png` — releases@mobile-large
-- `responsive-screenshots/tracks@mobile-standard.png` — tracks@mobile-standard
-- `responsive-screenshots/tracks-new@mobile-standard.png` — tracks-new@mobile-standard
-- `responsive-screenshots/releases@mobile-standard.png` — releases@mobile-standard
-- `responsive-screenshots/tracks@mobile-small.png` — tracks@mobile-small
-- `responsive-screenshots/tracks-new@mobile-small.png` — tracks-new@mobile-small
-- `responsive-screenshots/releases@mobile-small.png` — releases@mobile-small
+*Aucune capture (100% PASS).*
 
 ## 5. Résultat par viewport
 
@@ -99,17 +36,17 @@
 | Laptop (1440×900) | **PASS** |
 | Tablet Portrait (768×1024) | **PASS** |
 | Tablet Landscape (1024×768) | **PASS** |
-| Mobile Large (430×932) | **FAIL** |
-| Mobile Standard (390×844) | **FAIL** |
-| Mobile Small (320×568) | **FAIL** |
+| Mobile Large (430×932) | **PASS** |
+| Mobile Standard (390×844) | **PASS** |
+| Mobile Small (320×568) | **PASS** |
 
 ## 6. Résultat par page
 
 | Page | Résultat |
 |------|----------|
-| `/creator/catalog/tracks` | **FAIL** |
-| `/creator/catalog/tracks/new` | **FAIL** |
-| `/creator/catalog/releases` | **FAIL** |
+| `/creator/catalog/tracks` | **PASS** |
+| `/creator/catalog/tracks/new` | **PASS** |
+| `/creator/catalog/releases` | **PASS** |
 
 ## 7. Console (session complète)
 
@@ -119,15 +56,15 @@
 
 ## 8. Conclusion
 
-**SCENARIO 5 — RESPONSIVE CERTIFICATION REFUSED — FAIL**
+**SCENARIO 5 — RESPONSIVE CERTIFIED — PASS**
 
-9 combinaison(s) en échec sur 21.
+Aucune anomalie responsive, layout ou console bloquante détectée sur les 21 combinaisons page×viewport (3 pages × 7 viewports, wizard inclus sur `/tracks/new`).
 
 ---
 
 ## DÉCISION
 
 ```
-STATUS : SCENARIO 5 RESPONSIVE CERTIFICATION REFUSED
-RESULT : FAIL
+STATUS : SCENARIO 5 RESPONSIVE CERTIFIED
+RESULT : PASS
 ```

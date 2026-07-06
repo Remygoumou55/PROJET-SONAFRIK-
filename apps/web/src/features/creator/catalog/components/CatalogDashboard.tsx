@@ -1,8 +1,16 @@
 import type { CatalogContext } from "@sonafrik/types";
 import { buttonVariants, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import Link from "next/link";
+import { useCatalogContextSrtspLive } from "../hooks/useCatalogContextSrtspLive";
 
-export function CatalogDashboard({ context }: { context: CatalogContext }) {
+export function CatalogDashboard({ context: initialContext }: { context: CatalogContext }) {
+  const { data: liveContext } = useCatalogContextSrtspLive({
+    creatorId: initialContext.creatorId,
+    initialData: initialContext,
+  });
+
+  const context = liveContext ?? initialContext;
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

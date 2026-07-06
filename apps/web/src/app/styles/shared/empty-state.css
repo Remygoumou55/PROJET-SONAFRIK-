@@ -1,0 +1,38 @@
+/* État vide réutilisable SONAFRIK */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-bordure);
+  background: var(--color-card);
+}
+
+.empty-state__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.empty-state__title {
+  margin: 0;
+  color: var(--color-texte-principal);
+  font-size: var(--text-fluid-base);
+  font-weight: 600;
+}
+
+.empty-state__desc {
+  margin: 0;
+  max-width: 28rem;
+  color: var(--color-texte-secondaire);
+  font-size: var(--text-fluid-sm);
+  line-height: 1.55;
+}
+
+.empty-state__action {
+  margin-top: 0.5rem;
+}

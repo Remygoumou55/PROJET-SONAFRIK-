@@ -1,5 +1,3 @@
-"use client";
-
 import { memo } from "react";
 import type {
   ArtistProfile,
@@ -12,7 +10,6 @@ import {
   buildHeroVitrineBadges,
   resolveArtistTypeLabel,
 } from "@sonafrik/api/creator/presentation";
-import { formatCreatorGreeting } from "@/features/creator/lib/greeting";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -29,6 +26,7 @@ interface ArtistHeroProps {
   creator: Creator;
   profileCreatedAt: string;
   stats: HeroStats;
+  greeting: string;
 }
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
@@ -61,6 +59,7 @@ export const ArtistHero = memo(function ArtistHero({
   profileCreatedAt,
   hero,
   stats,
+  greeting,
 }: ArtistHeroProps) {
   const photoPath = artistProfile.profile_photo ?? artistProfile.cover_path;
   const primaryCoverPath =
@@ -103,7 +102,7 @@ export const ArtistHero = memo(function ArtistHero({
         {/* Top row: greeting (left) + action buttons (right) */}
         <div className="ahero__top">
           <p className="ahero__greeting">
-            {formatCreatorGreeting(artistProfile.stage_name)}
+            {greeting}
           </p>
         </div>
 

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { AdminRevenueDashboardData } from "@sonafrik/api/admin";
 import type { RoyaltyCycleStatus } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useAdminRevenueSrtspLive } from "../hooks/useAdminRevenueSrtspLive";
 import { AdminRevenueChart } from "./AdminRevenueChart";
 import { AdminConfirmModal } from "./AdminConfirmModal";
 import { triggerRoyaltyCycleAction } from "../actions/admin.actions";
@@ -45,14 +47,15 @@ interface Props {
   data: AdminRevenueDashboardData;
 }
 
-export function AdminRevenueClient({ data }: Props) {
+export function AdminRevenueClient({ data: initialData }: Props) {
+  const live = useAdminRevenueSrtspLive({ initialData });
+  const data = live.data ?? initialData;
+
   const [activeTab, setActiveTab] = useState<RevenueTab>("monthly");
   const [showCycleConfirm, setShowCycleConfirm] = useState(false);
   const [isTriggeringCycle, setIsTriggeringCycle] = useState(false);
   const [cycleError, setCycleError] = useState<string | null>(null);
   const [cycleSuccess, setCycleSuccess] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
 
   const revenueChangeNum = data.revenueChange ? parseFloat(data.revenueChange) : null;
   const trendClass =
@@ -85,7 +88,7 @@ export function AdminRevenueClient({ data }: Props) {
     setCycleSuccess(
       `Cycle déclenché — ${result.artistCount ?? 0} artiste(s), ${formatGnf(result.totalDistributed ?? 0)} distribués.`,
     );
-    startTransition(() => router.refresh());
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.snapshotInvalidate);
   };
 
   const typeTotal = Object.values(data.revenueByType).reduce((sum, value) => sum + value, 0);

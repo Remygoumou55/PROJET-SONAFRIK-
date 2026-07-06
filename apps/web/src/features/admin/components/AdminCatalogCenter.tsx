@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/formatters";
 import { adminReviewCatalogAction } from "../actions/admin-moderation.actions";
 import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { useAdminModerationMetrics } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useAdminCatalogSrtspLive } from "../hooks/useAdminCatalogSrtspLive";
 import { AdminModerationActions } from "./AdminModerationActions";
 import { AdminReasonModal } from "./AdminReasonModal";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
@@ -25,9 +26,14 @@ const RELEASE_TYPE_LABELS: Record<string, string> = {
 export function AdminCatalogCenter({ initialItems, loadError = null }: Props) {
   const { error, setError, isPending, run } = useAdminActionRunner();
   const moderationMetrics = useAdminModerationMetrics();
+  const live = useAdminCatalogSrtspLive({ initialData: { items: initialItems } });
   const [items, setItems] = useState<PendingCatalogItem[]>(initialItems);
   const [actionState, setActionState] = useState<Record<string, boolean>>({});
   const displayError = error ?? loadError;
+
+  useEffect(() => {
+    if (live.data?.items) setItems(live.data.items);
+  }, [live.data?.items]);
 
   const [rejectTarget, setRejectTarget] = useState<{
     id: string;

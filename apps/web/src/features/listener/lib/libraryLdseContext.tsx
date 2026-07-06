@@ -18,6 +18,11 @@ import {
 } from "@/features/shared/ldse/listener/listener-ldse-config";
 import { publishListenerLdseEvent } from "@/features/shared/ldse/listener/publishListenerLdseEvent";
 import { useStreamingService } from "../hooks/useStreaming";
+import {
+  getListenerHubInvalidateEvents,
+  shouldRefreshListenerLibrary,
+} from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 
 type LibraryLdseState = {
   library: LibraryItem[];
@@ -90,6 +95,14 @@ export function LibraryLdseProvider({
   useLdseEvent(LISTENER_LDSE_EVENTS.libraryInvalidate, (event) => {
     if (event.payload?.userId === userId) void loadLibrary();
   });
+
+  useEventSubscription(
+    getListenerHubInvalidateEvents(),
+    (event) => {
+      if (shouldRefreshListenerLibrary(event, { userId })) void loadLibrary();
+    },
+    true,
+  );
 
   const toggleFavorite = useCallback(
     async (entityType: Favorite["entity_type"], entityId: string) => {

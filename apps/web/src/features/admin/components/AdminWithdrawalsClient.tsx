@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
 import {
   PAYOUT_ACCOUNT_LABELS,
@@ -19,6 +18,7 @@ import {
 } from "../actions/admin-financial.actions";
 import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { useAdminWithdrawalsSrtspLive } from "../hooks/useAdminWithdrawalsSrtspLive";
 
 type WithdrawalFilter = WithdrawalStatus | "all";
 
@@ -61,8 +61,12 @@ export function AdminWithdrawalsClient({
   const [selected, setSelected] = useState<SelectedWithdrawal | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
+
+  const live = useAdminWithdrawalsSrtspLive({
+    initialData: { queue: withdrawals },
+    status: currentFilter,
+  });
+  const liveWithdrawals = live.data?.queue ?? withdrawals;
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -76,7 +80,6 @@ export function AdminWithdrawalsClient({
     }
     publishAdminLdseEvent(ADMIN_LDSE_EVENTS.withdrawalUpdated, { withdrawalId: selected.id, action: "approve" });
     setSelected(null);
-    startTransition(() => router.refresh());
   };
 
   const handleReject = async () => {
@@ -90,7 +93,6 @@ export function AdminWithdrawalsClient({
     publishAdminLdseEvent(ADMIN_LDSE_EVENTS.withdrawalUpdated, { withdrawalId: selected.id, action: "reject" });
     setSelected(null);
     setRejectReason("");
-    startTransition(() => router.refresh());
   };
 
   const columns = [
@@ -307,7 +309,7 @@ export function AdminWithdrawalsClient({
 
       <AdminTable
         columns={columns}
-        data={withdrawals as WithdrawalRow[]}
+        data={liveWithdrawals as WithdrawalRow[]}
         keyField="id"
         emptyMessage="Aucun retrait pour ce filtre."
       />

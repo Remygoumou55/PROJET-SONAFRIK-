@@ -1,5 +1,6 @@
 "use client";
 
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { useState, useCallback } from "react";
 import type { RoyaltyCycle } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
@@ -126,12 +127,12 @@ export function AdminRoyaltyPanel({ initialCycles }: Props) {
       </label>
 
       {error && (
-        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
+        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
       {success && (
-        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(0,210,106,0.13)", color: "var(--color-vert-energie)" }}>
+        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: OVERLAY.vertSoft, color: "var(--color-vert-energie)" }}>
           {success}
         </p>
       )}

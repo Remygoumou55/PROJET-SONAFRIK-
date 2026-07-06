@@ -12,6 +12,31 @@ export interface AdminNavSection {
   items: AdminNavItem[];
 }
 
+export interface AdminNavFeatureFlags {
+  beatStoreAdmin?: boolean;
+  awardsAdmin?: boolean;
+}
+
+/** Filtre les entrées post-MVP (Beat Store, Awards) selon les feature flags admin. */
+export function buildAdminNavSections(flags: AdminNavFeatureFlags = {}): AdminNavSection[] {
+  return ADMIN_NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => {
+      if (item.href === "/admin/beatstore") return flags.beatStoreAdmin === true;
+      if (item.href === "/admin/awards") return flags.awardsAdmin === true;
+      return true;
+    }),
+  })).filter((section) => section.items.length > 0);
+}
+
+export function buildAdminModuleCards(flags: AdminNavFeatureFlags = {}) {
+  return ADMIN_MODULE_CARDS.filter((card) => {
+    if (card.href === "/admin/beatstore") return flags.beatStoreAdmin === true;
+    if (card.href === "/admin/awards") return flags.awardsAdmin === true;
+    return true;
+  });
+}
+
 /** Navigation principale — 12 modules + section MVP existante (zéro régression). */
 export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {

@@ -16,6 +16,7 @@ import {
   type SrtspMetrics,
   type SrtspMonitorSnapshot,
   type SrtspPublishInput,
+  type SrtspTransportAdapter,
   type SynchronizationEngine,
 } from "../index";
 
@@ -37,15 +38,29 @@ function stableEventKey(eventName: string | string[]): string {
 export interface SrtspProviderProps {
   children: ReactNode;
   engine?: SynchronizationEngine;
+  /** Transport injecté — instancie un moteur dédié si `engine` absent. */
+  transport?: SrtspTransportAdapter;
+  /** Connecte le transport au montage (défaut: true si transport fourni). */
+  connectTransport?: boolean;
   trackBrowserOnline?: boolean;
 }
 
 export function SrtspProvider({
   children,
   engine: engineProp,
+  transport,
+  connectTransport,
   trackBrowserOnline = true,
 }: SrtspProviderProps) {
-  const engineRef = useRef(engineProp ?? getSynchronizationEngine());
+  const engineRef = useRef<SynchronizationEngine | null>(null);
+  if (!engineRef.current) {
+    engineRef.current =
+      engineProp ??
+      getSynchronizationEngine({
+        transport,
+        connectTransportOnInit: connectTransport ?? Boolean(transport),
+      });
+  }
   const engine = engineRef.current;
   const [connectionState, setConnectionState] = useState(engine.getConnectionState());
 
@@ -127,7 +142,14 @@ export function useLiveQuery<T>(
   key: string,
   fetcher: () => Promise<T>,
   invalidateOn: string | string[],
-  options?: { enabled?: boolean; initialData?: T },
+  options?: {
+    enabled?: boolean;
+    initialData?: T;
+    /** Ne pas refetch au montage si initialData fourni (SSR). */
+    skipInitialFetch?: boolean;
+    /** Filtre consommateur — ex. creatorId Mes publications. */
+    shouldInvalidate?: (event: SrtspEvent) => boolean;
+  },
 ): { data: T | undefined; loading: boolean; error: Error | null; refresh: () => void } {
   const { subscribe } = useSrtsp();
   const [data, setData] = useState<T | undefined>(options?.initialData);
@@ -136,6 +158,8 @@ export function useLiveQuery<T>(
   const mounted = useRef(true);
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
+  const shouldInvalidateRef = useRef(options?.shouldInvalidate);
+  shouldInvalidateRef.current = options?.shouldInvalidate;
   const invalidateKey = useMemo(() => stableEventKey(invalidateOn), [invalidateOn]);
 
   const refresh = useCallback(() => {
@@ -159,16 +183,25 @@ export function useLiveQuery<T>(
   useEffect(() => {
     mounted.current = true;
     if (options?.enabled === false) return;
+    if (options?.skipInitialFetch && options.initialData !== undefined) {
+      setLoading(false);
+      return () => {
+        mounted.current = false;
+      };
+    }
     refresh();
     return () => {
       mounted.current = false;
     };
-  }, [key, refresh, options?.enabled]);
+  }, [key, refresh, options?.enabled, options?.skipInitialFetch, options?.initialData]);
 
   useEffect(() => {
     if (options?.enabled === false) return;
     const names = invalidateKey.includes("|") ? invalidateKey.split("|") : invalidateKey;
-    return subscribe({ eventName: names }, () => refresh());
+    return subscribe({ eventName: names }, (event) => {
+      if (shouldInvalidateRef.current && !shouldInvalidateRef.current(event)) return;
+      refresh();
+    });
   }, [subscribe, invalidateKey, refresh, options?.enabled]);
 
   return { data, loading, error, refresh };

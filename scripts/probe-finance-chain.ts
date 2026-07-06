@@ -73,11 +73,15 @@ async function main() {
 
   const admin = createClient(URL, SERVICE, { auth: { persistSession: false } });
 
-  const { count: planCount, error: planErr } = await admin
+  const { data: activePlans, error: planErr } = await admin
     .from("subscription_plans")
-    .select("*", { count: "exact", head: true })
+    .select("id, slug, is_active")
     .eq("is_active", true);
-  log("D2-subscription-plans", !planErr && (planCount ?? 0) >= 3, `${planCount ?? 0} plans actifs`);
+  const planCount = activePlans?.length ?? 0;
+  const planDetail = planErr
+    ? `erreur: ${planErr.message}`
+    : `${planCount} plans actifs${planCount > 0 ? ` (${activePlans!.map((p) => p.slug).join(", ")})` : ""}`;
+  log("D2-subscription-plans", !planErr && planCount >= 3, planDetail);
 
   const { count: ledgerCount, error: ledgerErr } = await admin
     .from("wallet_ledger")

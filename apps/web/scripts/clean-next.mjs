@@ -36,5 +36,30 @@ function killPort(port) {
 killPort(PORT);
 
 const nextDir = join(import.meta.dirname, "..", ".next");
-rmSync(nextDir, { recursive: true, force: true });
+
+function sleep(ms) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    /* wait for Windows file handles to release */
+  }
+}
+
+function removeNextDir(dir, attempts = 5) {
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
+      return;
+    } catch (err) {
+      const code = err && typeof err === "object" && "code" in err ? String(err.code) : "";
+      if (i === attempts - 1) throw err;
+      if (code === "ENOTEMPTY" || code === "EBUSY" || code === "EPERM") {
+        sleep(500);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+removeNextDir(nextDir);
 console.log("Removed", nextDir);

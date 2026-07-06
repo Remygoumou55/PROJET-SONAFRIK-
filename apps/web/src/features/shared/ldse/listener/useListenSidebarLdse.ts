@@ -10,6 +10,11 @@ import {
   LISTENER_LDSE_EVENTS,
   LISTENER_LDSE_KEYS,
 } from "@/features/shared/ldse/listener/listener-ldse-config";
+import {
+  getListenerHubInvalidateEvents,
+  shouldRefreshListenerLibrary,
+} from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 
 /** Sidebar auditeur synchronisée LDSE — compteurs live après favoris/playlists. */
 export function useListenSidebarLdse(userId: string, initial: ListenerSidebarData) {
@@ -54,6 +59,14 @@ export function useListenSidebarLdse(userId: string, initial: ListenerSidebarDat
   useLdseEvent(LISTENER_LDSE_EVENTS.sidebarInvalidate, (event) => {
     if (event.payload?.userId === userId) void refreshCounts();
   });
+
+  useEventSubscription(
+    getListenerHubInvalidateEvents(),
+    (event) => {
+      if (shouldRefreshListenerLibrary(event, { userId })) void refreshCounts();
+    },
+    Boolean(userId),
+  );
 
   return sidebarData;
 }

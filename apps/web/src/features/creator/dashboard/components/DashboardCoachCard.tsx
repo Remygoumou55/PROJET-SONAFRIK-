@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CreatorDashboardActivity, CreatorDashboardAssistantTip } from "@sonafrik/types";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 interface Props {
   tips: CreatorDashboardAssistantTip[];
@@ -33,7 +34,7 @@ export function DashboardCoachCard({ tips, activities }: Props) {
             >
               <span
                 className="dash-coach__dot"
-                style={{ color: item.isFuture ? "rgba(255,255,255,0.3)" : item.color }}
+                style={{ color: item.isFuture ? OVERLAY.blanc30 : item.color }}
                 aria-hidden="true"
               >
                 {item.isFuture ? "○" : "✔"}

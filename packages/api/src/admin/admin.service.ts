@@ -95,6 +95,10 @@ export class AdminService {
     return this.repository.getSystemSettingAuditHistory(key, limit);
   }
 
+  async resolveProfileDisplayLabels(profileIds: string[]): Promise<Record<string, string>> {
+    return this.users.resolveProfileDisplayLabels(profileIds);
+  }
+
   async reviewCatalogItem(
     id: string,
     entityType: "album" | "track",
@@ -328,6 +332,10 @@ export class AdminService {
     await this.repository.deleteBeat(beatId).catch(() => {
       throw new AdminError("update_failed");
     });
+  }
+
+  async createBeatPreviewSignedUrl(storagePath: string): Promise<string | null> {
+    return this.repository.createBeatPreviewSignedUrl(storagePath);
   }
 }
 

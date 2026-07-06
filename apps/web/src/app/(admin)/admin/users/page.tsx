@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { AdminUsersFilter } from "@sonafrik/types";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { AdminUsersClient } from "@/features/admin/components/AdminUsersClient";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 
@@ -39,7 +40,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
       title="Utilisateurs"
       subtitle={`${data.total.toLocaleString("fr-FR")} auditeur${data.total > 1 ? "s" : ""} inscrits sur SONAFRIK`}
     >
-      <Suspense fallback={null}>
+      <Suspense fallback={<AdminPageSkeleton variant="list" rows={10} />}>
         <AdminUsersClient
           users={data.users}
           total={data.total}

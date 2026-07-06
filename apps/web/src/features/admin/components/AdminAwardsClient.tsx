@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import type { AdminAwardsDashboard } from "@sonafrik/api/admin";
 import { formatGnf } from "@sonafrik/shared";
 import { isValidContentName } from "@/lib/content-filter";
-import { useRouter } from "next/navigation";
-import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import {
   adminCloseAwardVotesAction,
   adminDistributeAwardPrizesAction,
 } from "../actions/admin-sprint5.actions";
+import { useAdminAwardsSrtspLive } from "../hooks/useAdminAwardsSrtspLive";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 
 type TabKey = "edition" | "config" | "fund" | "history";
@@ -19,53 +19,46 @@ function fmtGnf(n: number): string {
   return formatGnf(n);
 }
 
-export function AdminAwardsClient({ data }: { data: AdminAwardsDashboard }) {
-  const [activeTab, setActiveTab] = useState<TabKey>("edition");
-  const [, startTransition] = useTransition();
-  const router = useRouter();
-  const { error, isPending, run } = useAdminActionRunner();
+export function AdminAwardsClient({ data: initialData }: { data: AdminAwardsDashboard }) {
+  const live = useAdminAwardsSrtspLive({ initialData });
+  const data = live.data ?? initialData;
 
-  useRealtimeChannel(
-    "admin-awards-votes",
-    [
-      {
-        event: "*",
-        table: "award_nominees",
-        onEvent: () => {
-          startTransition(() => router.refresh());
-        },
-      },
-    ],
-    activeTab === "edition",
-  );
+  const [activeTab, setActiveTab] = useState<TabKey>("edition");
+  const { error, isPending, run } = useAdminActionRunner();
 
   const totalPrizes = data.categories.reduce((s, c) => s + Number(c.prize_amount_gnf ?? 0), 0);
   const fundCoversPrizes = data.fundBalance >= totalPrizes;
 
-  const filteredNomineesByCategory = Object.fromEntries(
-    Object.entries(data.nomineesByCategory).map(([cat, nominees]) => [
-      cat,
-      nominees
-        .filter((n) => isValidContentName(n.stageName))
-        .sort((a, b) => b.voteCount - a.voteCount),
-    ]),
+  const filteredNomineesByCategory = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(data.nomineesByCategory).map(([cat, nominees]) => [
+          cat,
+          nominees
+            .filter((n) => isValidContentName(n.stageName))
+            .sort((a, b) => b.voteCount - a.voteCount),
+        ]),
+      ),
+    [data.nomineesByCategory],
   );
 
   const handleCloseVotes = async () => {
     if (!data.activeEdition?.id) return;
-    await run(() => adminCloseAwardVotesAction({ editionId: data.activeEdition!.id }));
-    startTransition(() => router.refresh());
+    await run(() => adminCloseAwardVotesAction({ editionId: data.activeEdition!.id }), {
+      ldseEvent: { type: ADMIN_LDSE_EVENTS.snapshotInvalidate },
+    });
   };
 
   const handleDistributePrizes = async () => {
     if (!data.activeEdition?.id) return;
-    await run(() =>
-      adminDistributeAwardPrizesAction({
-        editionId: data.activeEdition!.id,
-        adminNote: "Versement déclenché depuis le back-office",
-      }),
+    await run(
+      () =>
+        adminDistributeAwardPrizesAction({
+          editionId: data.activeEdition!.id,
+          adminNote: "Versement déclenché depuis le back-office",
+        }),
+      { ldseEvent: { type: ADMIN_LDSE_EVENTS.snapshotInvalidate } },
     );
-    startTransition(() => router.refresh());
   };
 
   return (

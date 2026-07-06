@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { AlbumWithMeta, TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
+import { OVERLAY, LISTENER_ACTIVE_ROW_STYLE, LISTENER_INACTIVE_ROW_STYLE } from "@/lib/design/overlayTokens";
 import { CoverImage } from "@/components/CoverImage";
 
 interface FavoritesListProps {
@@ -87,17 +88,14 @@ export function FavoritesList({ tracks, albums, isLoading, error }: FavoritesLis
                   key={track.id}
                   onClick={() => handlePlay(track)}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors"
-                  style={{
-                    backgroundColor: isActive ? "rgba(0,210,106,0.07)" : "transparent",
-                    border: isActive ? "1px solid rgba(0,210,106,0.2)" : "1px solid transparent",
-                  }}
+                  style={isActive ? LISTENER_ACTIVE_ROW_STYLE : LISTENER_INACTIVE_ROW_STYLE}
                 >
                   <div className="w-10 h-10 rounded-lg flex-shrink-0 relative overflow-hidden">
                     <CoverImage coverPath={track.cover_url ?? null} alt={track.title} imgSizes="40px" />
                     {isActive && (
                       <div
                         className="absolute inset-0 flex items-center justify-center"
-                        style={{ background: "rgba(0,0,0,0.5)" }}
+                        style={{ background: OVERLAY.noir50 }}
                       >
                         {isPlaying ? (
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-vert-energie)">

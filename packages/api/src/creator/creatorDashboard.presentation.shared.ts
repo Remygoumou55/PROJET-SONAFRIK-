@@ -47,12 +47,14 @@ export function profileCompletionPercent(profile: {
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
-export function fmt(n: number): string {
-  return n.toLocaleString("fr-FR");
+export function fmt(n: number | null | undefined): string {
+  const value = Number(n);
+  return (Number.isFinite(value) ? value : 0).toLocaleString("fr-FR");
 }
 
-export function fmtGnf(n: number): string {
-  return `${fmt(Math.round(n))} GNF`;
+export function fmtGnf(n: number | null | undefined): string {
+  const value = Number(n);
+  return `${fmt(Number.isFinite(value) ? Math.round(value) : 0)} GNF`;
 }
 
 export function deltaPercent(current: number, previous: number): number | null {

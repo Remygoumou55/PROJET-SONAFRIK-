@@ -12,6 +12,13 @@ export const SRTSP_DOMAIN_EVENTS = {
   PUBLICATION_SUBMITTED: "publication.submitted",
   PUBLICATION_APPROVED: "publication.approved",
   PUBLICATION_REJECTED: "publication.rejected",
+  PUBLICATION_DRAFT_CREATED: "publication.draft.created",
+  PUBLICATION_DRAFT_UPDATED: "publication.draft.updated",
+  PUBLICATION_AUDIO_UPLOADED: "publication.audio.uploaded",
+  PUBLICATION_COVER_UPLOADED: "publication.cover.uploaded",
+  PUBLICATION_METADATA_COMPLETED: "publication.metadata.completed",
+  PUBLICATION_CANCELLED: "publication.cancelled",
+  PUBLICATION_DELETED: "publication.deleted",
   ALBUM_PUBLISHED: "catalog.album.published",
   CATALOG_INVALIDATE: "catalog.invalidate",
 
@@ -36,6 +43,8 @@ export const SRTSP_DOMAIN_EVENTS = {
   FAVORITE_TOGGLED: "listener.favorite.toggled",
   PLAYLIST_UPDATED: "listener.playlist.updated",
   FOLLOW_TOGGLED: "social.follow.toggled",
+  TRACK_REACTION_UPDATED: "listener.track.reaction.updated",
+  LISTENER_LIVE_UPDATED: "listener.track.live.updated",
 
   // Admin
   ADMIN_SNAPSHOT_INVALIDATE: "admin.snapshot.invalidate",
@@ -49,6 +58,14 @@ export type SrtspDomainEventName = (typeof SRTSP_DOMAIN_EVENTS)[keyof typeof SRT
 export const trackPayloadSchema = z.object({
   trackId: z.string().uuid(),
   creatorId: z.string().uuid().optional(),
+});
+
+/** Payload officiel Publication Wizard — Phase 3.1. */
+export const publicationWizardPayloadSchema = z.object({
+  albumId: z.string().uuid(),
+  trackId: z.string().uuid(),
+  creatorId: z.string().uuid(),
+  title: z.string().min(1).max(200).optional(),
 });
 
 export const creatorPayloadSchema = z.object({
@@ -120,8 +137,64 @@ export const DOMAIN_EVENT_DEFINITIONS = [
     version: 1,
     source: "publication" as const,
     destinations: ["publications", "admin", "dashboard"] as const,
-    schema: trackPayloadSchema,
+    schema: publicationWizardPayloadSchema,
     description: "Publication soumise en revue",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_DRAFT_CREATED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Brouillon publication créé (étape 1 wizard)",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_DRAFT_UPDATED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Brouillon publication mis à jour",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_AUDIO_UPLOADED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Audio uploadé via wizard",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_COVER_UPLOADED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Pochette uploadée ou générée via wizard",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_METADATA_COMPLETED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Métadonnées wizard enregistrées",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_CANCELLED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Publication wizard abandonnée",
+  },
+  {
+    name: SRTSP_DOMAIN_EVENTS.PUBLICATION_DELETED,
+    version: 1,
+    source: "publication" as const,
+    destinations: ["publications", "catalog"] as const,
+    schema: publicationWizardPayloadSchema,
+    description: "Publication supprimée (hors wizard courant)",
   },
   {
     name: SRTSP_DOMAIN_EVENTS.PUBLICATION_APPROVED,

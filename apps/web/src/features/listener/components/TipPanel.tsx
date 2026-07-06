@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import { TIP_AMOUNTS } from "@sonafrik/types";
 import type { TipAmount } from "@sonafrik/types";
 import { useTipService } from "../hooks/useTipService";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { TipsError } from "@sonafrik/api/tips";
 
 interface Props {
@@ -120,14 +121,14 @@ export const TipPanel = memo(function TipPanel({ creatorId, artistName, variant 
       {confirmation ? (
         <div
           className="rounded-lg px-3 py-2 text-xs font-semibold"
-          style={{ backgroundColor: "rgba(0,210,106,0.09)", color: "var(--color-vert-energie)" }}
+          style={{ backgroundColor: OVERLAY.vertNav, color: "var(--color-vert-energie)" }}
         >
           {confirmation}
         </div>
       ) : error ? (
         <div
           className="rounded-lg px-3 py-2 text-xs"
-          style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
+          style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}
         >
           {error}
           {error.includes("Solde insuffisant") ? (

@@ -65,6 +65,15 @@ export const catalogCoverConfirmSchema = z.object({
   path: z.string().min(1),
 });
 
+export const coverSourceSchema = z.enum(["user", "auto"]);
+
+export const coverStatusSchema = z.enum(["AUTO_GENERATED", "USER_REPLACED"]);
+
+export const coverArtworkStateSchema = z.object({
+  source: coverSourceSchema,
+  status: coverStatusSchema,
+});
+
 export const trackCreditItemSchema = z.object({
   contributorName: z.string().trim().min(1).max(100),
   role: z.enum([
@@ -93,5 +102,6 @@ export type UpdateTrackInput = z.infer<typeof updateTrackSchema>;
 export type CatalogAssetUploadInput = z.infer<typeof catalogAssetUploadSchema>;
 export type CatalogAssetConfirmInput = z.infer<typeof catalogAssetConfirmSchema>;
 export type CatalogCoverConfirmInput = z.infer<typeof catalogCoverConfirmSchema>;
+export type CoverArtworkStateInput = z.infer<typeof coverArtworkStateSchema>;
 export type TrackCreditItem = z.infer<typeof trackCreditItemSchema>;
 export type SetTrackCreditsInput = z.infer<typeof setTrackCreditsSchema>;

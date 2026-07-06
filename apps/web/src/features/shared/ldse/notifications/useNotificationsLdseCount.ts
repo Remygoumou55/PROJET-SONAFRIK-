@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getListenerHubInvalidateEvents, shouldRefreshListenerNotifications } from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 import { useNotificationsService } from "@/features/shared/notifications/hooks/useNotificationsService";
-import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 import { ldseCache } from "../cache";
 import { ldseEventBus } from "../event-bus";
 import {
@@ -11,11 +12,13 @@ import {
 } from "./notifications-ldse-config";
 import { useLdseEvent } from "../LdseProvider";
 
-/** Compteur notifications synchronisé — Realtime + Event Bus LDSE */
+/** Compteur notifications — SRTSP hub + Event Bus LDSE (sans useRealtimeChannel legacy). */
 export function useNotificationsLdseCount(userId: string, initialCount: number) {
   const cacheKey = NOTIFICATIONS_LDSE_KEYS.unreadCount(userId);
   const notifications = useNotificationsService();
   const [count, setCount] = useState(() => ldseCache.get<number>(cacheKey) ?? initialCount);
+  const invalidateEvents = useMemo(() => getListenerHubInvalidateEvents(), []);
+  const scope = useMemo(() => ({ userId }), [userId]);
 
   const refresh = useCallback(async () => {
     if (!userId) return;
@@ -24,32 +27,12 @@ export function useNotificationsLdseCount(userId: string, initialCount: number) 
     setCount(next);
   }, [cacheKey, notifications, userId]);
 
-  useRealtimeChannel(
-    `notif_ldse_${userId}`,
-    [
-      {
-        event: "INSERT",
-        table: "notifications",
-        filter: `user_id=eq.${userId}`,
-        onEvent: () => {
-          setCount((prev) => {
-            const next = prev + 1;
-            ldseCache.set(cacheKey, next, 30_000);
-            return next;
-          });
-          ldseEventBus.publish(NOTIFICATIONS_LDSE_EVENTS.created, { userId });
-        },
-      },
-      {
-        event: "UPDATE",
-        table: "notifications",
-        filter: `user_id=eq.${userId}`,
-        onEvent: () => {
-          void refresh();
-          ldseEventBus.publish(NOTIFICATIONS_LDSE_EVENTS.updated, { userId });
-        },
-      },
-    ],
+  useEventSubscription(
+    invalidateEvents,
+    (event) => {
+      if (!shouldRefreshListenerNotifications(event, scope)) return;
+      void refresh();
+    },
     !!userId,
   );
 

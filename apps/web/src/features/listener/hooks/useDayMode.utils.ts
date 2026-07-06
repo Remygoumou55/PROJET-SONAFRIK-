@@ -8,7 +8,7 @@ export function getDayMode(hour: number): ModeConfig {
       emoji: "☀️",
       greeting: "Bonjour",
       musicMood: "Musique éveillée et rythmée",
-      headerAccent: "rgba(255, 194, 14, 0.15)",
+      headerAccent: "var(--day-accent-morning)",
     };
   }
   if (hour >= 12 && hour < 18) {
@@ -18,7 +18,7 @@ export function getDayMode(hour: number): ModeConfig {
       emoji: "🎵",
       greeting: "Bon après-midi",
       musicMood: "Afrobeat et rythmes africains",
-      headerAccent: "rgba(0, 210, 106, 0.1)",
+      headerAccent: "var(--day-accent-day)",
     };
   }
   if (hour >= 18 && hour < 22) {
@@ -28,7 +28,7 @@ export function getDayMode(hour: number): ModeConfig {
       emoji: "🌆",
       greeting: "Bonsoir",
       musicMood: "Soul guinéenne et sons doux",
-      headerAccent: "rgba(120, 60, 0, 0.15)",
+      headerAccent: "var(--day-accent-evening)",
     };
   }
   return {
@@ -37,6 +37,6 @@ export function getDayMode(hour: number): ModeConfig {
     emoji: "🌙",
     greeting: "Bonne nuit",
     musicMood: "Musique douce pour la nuit",
-    headerAccent: "rgba(30, 0, 80, 0.2)",
+    headerAccent: "var(--day-accent-night)",
   };
 }

@@ -162,4 +162,12 @@ export class AdminBeatStoreRepository {
     const { error } = await this.client.rpc("admin_delete_beat", { p_beat_id: beatId });
     if (error) throw error;
   }
+
+  async createBeatPreviewSignedUrl(storagePath: string): Promise<string | null> {
+    const { data, error } = await this.client.storage
+      .from("catalog-audio")
+      .createSignedUrl(storagePath, 300);
+    if (error) throw error;
+    return data?.signedUrl ?? null;
+  }
 }

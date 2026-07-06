@@ -57,7 +57,11 @@ const DEV_MOCK_CREATOR: CreatorContext = {
 const fetchCreatorContext = cache(async () => {
   const supabase = await getSupabaseServerClient();
   const auth = createAuthService(supabase);
-  const profile = await auth.getCurrentProfile();
+
+  const profile = await Promise.race([
+    auth.getCurrentProfile(),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+  ]);
 
   if (!profile) redirect("/auth/connexion");
 
@@ -89,6 +93,8 @@ const fetchCreatorContext = cache(async () => {
 
 export async function requireCreatorContext(): Promise<CreatorContext> {
   assertBypassForbiddenOnVercel();
+  // Mode local control : mock SSR sans redirect — indépendant de la session cookies.
+  // Les uploads catalog résolvent le vrai creatorId côté client (PublicationWizard / getCatalogContext).
   if (isDevBypassActive()) return DEV_MOCK_CREATOR;
   return fetchCreatorContext();
 }

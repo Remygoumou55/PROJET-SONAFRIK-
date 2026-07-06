@@ -21,7 +21,7 @@ import {
   type UpdateAlbumInput,
   type UpdateTrackInput,
 } from "./schemas";
-import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
+import { DEV_MOCK_CREATOR_ID, isDevBypassActive } from "@sonafrik/shared/auth";
 import {
   coverStatusFromSource,
   type CoverSource,
@@ -36,16 +36,10 @@ import {
   wizardUserMetadataSchema,
   type WizardUserMetadataInput,
 } from "./metadata";
+import { linesToPlainLyrics, plainLyricsToLines } from "./metadata/lyrics";
+import type { PublicationLibrarySort, PublicationSearchField } from "./publication-library";
 import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
 import { uploadAssetToSignedUrl } from "../shared/uploadRuntime";
-
-function isDevBypass(): boolean {
-  return (
-    (process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") ||
-    process.env.NEXT_PUBLIC_BYPASS_AUTH === "true" ||
-    process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true"
-  );
-}
 
 function toCatalogError(
   err: unknown,
@@ -69,7 +63,7 @@ export class CatalogService {
     } = await this.client.auth.getUser();
     if (user) return user.id;
 
-    if (isDevBypass()) return "dev-mock-id";
+    if (isDevBypassActive()) return "dev-mock-id";
     throw new CatalogError("unauthorized");
   }
 
@@ -88,7 +82,7 @@ export class CatalogService {
       }
     }
 
-    if (isDevBypass()) return DEV_MOCK_CREATOR_ID;
+    if (isDevBypassActive()) return DEV_MOCK_CREATOR_ID;
     throw new CatalogError("unauthorized");
   }
 
@@ -247,6 +241,8 @@ export class CatalogService {
     offset?: number;
     search?: string;
     status?: string;
+    sort?: PublicationLibrarySort;
+    searchFields?: PublicationSearchField[];
   }): Promise<{
     tracks: Track[];
     total: number;
@@ -254,12 +250,27 @@ export class CatalogService {
     const creatorId = await this.requireCreatorId();
     const limit = options?.limit ?? 50;
     const offset = options?.offset ?? 0;
-    const filters = { search: options?.search, status: options?.status };
+    const filters = {
+      search: options?.search,
+      status: options?.status,
+      sort: options?.sort,
+      searchFields: options?.searchFields,
+    };
     const [tracks, total] = await Promise.all([
       this.repository.listCreatorTracksPaginated(creatorId, limit, offset, filters),
       this.repository.countCreatorTracks(creatorId, filters),
     ]);
     return { tracks, total };
+  }
+
+  async listAlbumsByIds(albumIds: string[]): Promise<Album[]> {
+    await this.requireCreatorId();
+    return this.repository.listAlbumsByIds(albumIds);
+  }
+
+  async countCreatorTracks(): Promise<number> {
+    const creatorId = await this.requireCreatorId();
+    return this.repository.countCreatorTracks(creatorId);
   }
 
   async getTrackGenreIds(trackId: string): Promise<string[]> {
@@ -461,9 +472,14 @@ export class CatalogService {
 
     const lyrics = parsed.data.lyrics?.trim();
     if (lyrics) {
-      await this.repository.patchTrackMetadata(parsed.data.trackId, userId, {
-        wizard_lyrics_draft: lyrics,
+      await this.repository.upsertTrackLyricsPending({
+        trackId: parsed.data.trackId,
+        userId,
+        language: parsed.data.language,
+        lines: plainLyricsToLines(lyrics),
       });
+    } else {
+      await this.repository.deleteTrackLyricsPending(parsed.data.trackId, parsed.data.language);
     }
 
     await this.repository.logAudit("catalog.wizard.metadata_saved", "tracks", parsed.data.trackId, {
@@ -471,6 +487,12 @@ export class CatalogService {
       language: parsed.data.language,
       ...engine.buildSystemIdentity(),
     });
+  }
+
+  async getWizardTrackLyrics(trackId: string, language: string): Promise<string> {
+    await this.requireUserId();
+    const lines = await this.repository.getTrackLyricsPending(trackId, language);
+    return linesToPlainLyrics(lines);
   }
 
   private async applyPublicationAutomaticMetadata(albumId: string): Promise<void> {

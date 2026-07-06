@@ -1,16 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { dispatchValidListen } from "../lib/validListenFeedback";
 
-/** Rafraîchit les compteurs homepage après une écoute validée (Real Listen). */
-export function useListenPageRefresh() {
-  const router = useRouter();
+const HOME_INVALIDATE_EVENT = "sonafrik:listener-home-invalidate";
 
+/** Rafraîchit l'accueil auditeur après une écoute validée — SRTSP ciblé (Phase 3.8). */
+export function useListenPageRefresh() {
   return useCallback(async (trackId: string) => {
     dispatchValidListen(trackId);
     await fetch("/api/listener/revalidate-home", { method: "POST" }).catch(() => {});
-    router.refresh();
-  }, [router]);
+    window.dispatchEvent(new CustomEvent(HOME_INVALIDATE_EVENT));
+  }, []);
 }
+
+export { HOME_INVALIDATE_EVENT };

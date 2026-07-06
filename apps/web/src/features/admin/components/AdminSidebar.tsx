@@ -4,15 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { AdminNavBadges } from "@sonafrik/api/admin";
 import { useAdminNavBadges } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
 import {
-  ADMIN_NAV_SECTIONS,
+  buildAdminNavSections,
   type AdminNavBadgeKind,
   type AdminNavItem,
+  type AdminNavFeatureFlags,
 } from "../lib/admin-nav";
 
 interface AdminSidebarProps {
   badges?: AdminNavBadges;
   onNavigate?: () => void;
+  featureFlags?: AdminNavFeatureFlags;
 }
 
 function isNavActive(pathname: string, href: string): boolean {
@@ -42,10 +45,13 @@ function resolveBadge(
   return null;
 }
 
-export function AdminSidebar({ badges, onNavigate }: AdminSidebarProps) {
+export function AdminSidebar({ badges, onNavigate, featureFlags }: AdminSidebarProps) {
   const pathname = usePathname();
   const liveBadges = useAdminNavBadges(badges);
   const resolvedBadges = liveBadges;
+  const navSections = buildAdminNavSections(featureFlags);
+  const navHrefs = navSections.flatMap((section) => section.items.map((item) => item.href));
+  const { prefetchOnHover } = useSmartPrefetch(navHrefs);
 
   return (
     <aside id="admin-sidebar-nav" className="admin-sidebar" aria-label="Navigation admin">
@@ -60,7 +66,7 @@ export function AdminSidebar({ badges, onNavigate }: AdminSidebarProps) {
         ← Retour à l&apos;app
       </Link>
 
-      {ADMIN_NAV_SECTIONS.map((section) => (
+      {navSections.map((section) => (
         <div key={section.title} className="admin-nav-section">
           <span className="admin-nav-section-title">{section.title}</span>
           {section.items.map((item) => {
@@ -70,7 +76,10 @@ export function AdminSidebar({ badges, onNavigate }: AdminSidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch
                 onClick={onNavigate}
+                onMouseEnter={() => prefetchOnHover(item.href)}
+                onFocus={() => prefetchOnHover(item.href)}
                 className={`admin-nav-item${active ? " admin-nav-item--active" : ""}`}
                 aria-current={active ? "page" : undefined}
               >

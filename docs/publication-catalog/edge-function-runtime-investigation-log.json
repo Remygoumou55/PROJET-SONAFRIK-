@@ -1,0 +1,265 @@
+[
+  {
+    "label": "AUTH_OK",
+    "at": "2026-07-04T02:43:16.982Z",
+    "httpStatus": 200,
+    "userId": "0c35d03f-a9ae-4b1d-a12c-c2fe901a2fba",
+    "email": "s12b-artist-1-1782222972289@sonafrik.test",
+    "tokenLength": 827,
+    "expiresIn": 3600
+  },
+  {
+    "label": "CREATOR_OK",
+    "at": "2026-07-04T02:43:17.484Z",
+    "httpStatus": 200,
+    "realCreatorId": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b",
+    "mockCreatorId": "00000000-0000-4000-a000-000000000002"
+  },
+  {
+    "label": "RPC_can_edit_creator",
+    "at": "2026-07-04T02:43:17.974Z",
+    "mock": {
+      "httpStatus": 200,
+      "result": "false"
+    },
+    "real": {
+      "httpStatus": 200,
+      "result": "true"
+    }
+  },
+  {
+    "label": "ALBUM_OK",
+    "at": "2026-07-04T02:43:18.198Z",
+    "albumId": "ea9d92b8-d615-48ac-bf9d-1241f67a5914",
+    "creatorId": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b"
+  },
+  {
+    "label": "PROBE_A_MOCK_CREATOR",
+    "at": "2026-07-04T02:43:19.412Z",
+    "requestUrl": "https://cxjpburiiazzvlczzupy.supabase.co/functions/v1/catalog-asset-signed-url",
+    "method": "POST",
+    "requestHeaders": {
+      "Authorization": "Bearer [JWT redacted]",
+      "Content-Type": "application/json",
+      "apikey": "[anon key redacted]"
+    },
+    "requestBody": {
+      "action": "upload",
+      "assetType": "cover",
+      "creatorId": "00000000-0000-4000-a000-000000000002",
+      "albumId": "ea9d92b8-d615-48ac-bf9d-1241f67a5914",
+      "contentType": "image/jpeg"
+    },
+    "status": 403,
+    "statusText": "Forbidden",
+    "responseHeaders": {
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+      "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a15ac81a5adca8ed-OUA",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-length": "53",
+      "content-type": "application/json",
+      "date": "Sat, 04 Jul 2026 02:43:19 GMT",
+      "endpoint-load-metrics": "application_utilization:5,named_metrics.queue_depth:5",
+      "sb-gateway-version": "1",
+      "sb-project-ref": "cxjpburiiazzvlczzupy",
+      "sb-request-id": "019f2b02-4c7a-7fae-b9f4-18418b753e1f",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=zi4bjNbAcf7fZAnN8GCjMA_KGWr.hshCxvBxbK_U_YI-1783132998.7724302-1.0.1.1-aOcj4RkJPhbtXZxjI7aj2WW8fWWqmWa4u.Av6C2yVOyjiPuyB3TqRvPGxKZ4aF5XoDiFBnoxYgI2_L_EYK_zJNzZkh.5ILQJxS7Fx_dhIApqqw37xFNAW55Ss6bXdRgT; HttpOnly; SameSite=None; Secure; Path=/; Domain=supabase.co; Expires=Sat, 04 Jul 2026 03:13:19 GMT",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "vary": "Accept-Encoding",
+      "x-deno-execution-id": "ed4a7215-6e09-4897-8ddc-2b1c9a1d0655",
+      "x-sb-edge-region": "eu-west-3",
+      "x-served-by": "supabase-edge-runtime"
+    },
+    "responseBody": {
+      "error": "Accès non autorisé."
+    },
+    "timingMs": 1214
+  },
+  {
+    "label": "PROBE_B_REAL_CREATOR",
+    "at": "2026-07-04T02:43:20.184Z",
+    "requestUrl": "https://cxjpburiiazzvlczzupy.supabase.co/functions/v1/catalog-asset-signed-url",
+    "method": "POST",
+    "requestHeaders": {
+      "Authorization": "Bearer [JWT redacted]",
+      "Content-Type": "application/json",
+      "apikey": "[anon key redacted]"
+    },
+    "requestBody": {
+      "action": "upload",
+      "assetType": "cover",
+      "creatorId": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b",
+      "albumId": "ea9d92b8-d615-48ac-bf9d-1241f67a5914",
+      "contentType": "image/jpeg"
+    },
+    "status": 200,
+    "statusText": "OK",
+    "responseHeaders": {
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+      "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a15ac8224fcaa8ed-OUA",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-length": "656",
+      "content-type": "application/json",
+      "date": "Sat, 04 Jul 2026 02:43:20 GMT",
+      "endpoint-load-metrics": "application_utilization:6,named_metrics.queue_depth:6",
+      "sb-gateway-version": "1",
+      "sb-project-ref": "cxjpburiiazzvlczzupy",
+      "sb-request-id": "019f2b02-5177-7443-b706-1a557d1e690d",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=X6JeogAvlc_RwxidYSkH__q9ydQkta3ysPDeGSBbXME-1783133000.050939-1.0.1.1-p.4JDnsWDg.V4Z1nxPSi3JCs_I40LvVuYOv2aGuxta_fCF0t00GRpUUcVfnNgIzKBEgS2oVVvGsdYTZRQlbzufWGE9LYYQpoHzJ664LLfPVNGvNK.uXhcLvdS0YEtput; HttpOnly; SameSite=None; Secure; Path=/; Domain=supabase.co; Expires=Sat, 04 Jul 2026 03:13:20 GMT",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "vary": "Accept-Encoding",
+      "x-deno-execution-id": "07f36ff7-ce5c-4dbe-b8a5-381fb2bdc846",
+      "x-sb-edge-region": "eu-west-3",
+      "x-served-by": "supabase-edge-runtime"
+    },
+    "responseBody": {
+      "signedUrl": "https://cxjpburiiazzvlczzupy.supabase.co/storage/v1/object/upload/sign/catalog-visuals/0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjc5N2VmNS0yYWMxLTRkNzgtYTBiNi1jYjdhN2E2ZTI4Y2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRhbG9nLXZpc3VhbHMvMGE3MjM5NmEtYTFiNC00ZGRjLTgyZTUtYzllNmViMjdmMzBiL3JlbGVhc2VzL2VhOWQ5MmI4LWQ2MTUtNDhhYy1iZjlkLTEyNDFmNjdhNTkxNC9jb3Zlci5qcGciLCJ1cHNlcnQiOnRydWUsInNjb3BlIjoidXBsb2FkIiwiaWF0IjoxNzgzMTMzMDAwLCJleHAiOjE3ODMxNDAyMDB9.niW5qadZPyEIpWA5dIpdfsKyQUwfSNteAFRkZgy7ucw",
+      "path": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg",
+      "token": "eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZjc5N2VmNS0yYWMxLTRkNzgtYTBiNi1jYjdhN2E2ZTI4Y2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjYXRhbG9nLXZpc3VhbHMvMGE3MjM5NmEtYTFiNC00ZGRjLTgyZTUtYzllNmViMjdmMzBiL3JlbGVhc2VzL2VhOWQ5MmI4LWQ2MTUtNDhhYy1iZjlkLTEyNDFmNjdhNTkxNC9jb3Zlci5qcGciLCJ1cHNlcnQiOnRydWUsInNjb3BlIjoidXBsb2FkIiwiaWF0IjoxNzgzMTMzMDAwLCJleHAiOjE3ODMxNDAyMDB9.niW5qadZPyEIpWA5dIpdfsKyQUwfSNteAFRkZgy7ucw",
+      "expiresIn": 3600
+    },
+    "timingMs": 772
+  },
+  {
+    "label": "STORAGE_PUT",
+    "at": "2026-07-04T02:43:20.882Z",
+    "status": 200,
+    "statusText": "OK",
+    "path": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg",
+    "bucket": "catalog-visuals",
+    "timingMs": 696
+  },
+  {
+    "label": "PROBE_C_CONFIRM_REAL",
+    "at": "2026-07-04T02:43:21.636Z",
+    "requestUrl": "https://cxjpburiiazzvlczzupy.supabase.co/functions/v1/catalog-asset-signed-url",
+    "method": "POST",
+    "requestHeaders": {
+      "Authorization": "Bearer [JWT redacted]",
+      "Content-Type": "application/json",
+      "apikey": "[anon key redacted]"
+    },
+    "requestBody": {
+      "action": "confirm",
+      "assetType": "cover",
+      "creatorId": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b",
+      "albumId": "ea9d92b8-d615-48ac-bf9d-1241f67a5914",
+      "path": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg"
+    },
+    "status": 200,
+    "statusText": "OK",
+    "responseHeaders": {
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+      "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a15ac82b1bb3a8ef-OUA",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-length": "133",
+      "content-type": "application/json",
+      "date": "Sat, 04 Jul 2026 02:43:22 GMT",
+      "endpoint-load-metrics": "application_utilization:4,named_metrics.queue_depth:4",
+      "sb-gateway-version": "1",
+      "sb-project-ref": "cxjpburiiazzvlczzupy",
+      "sb-request-id": "019f2b02-56f5-79fe-b33b-9435d38ff414",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=SblDyviaa6asIe7Ko1cebtoElgsmio93E4SSMLstFds-1783133001.4558797-1.0.1.1-YB3FS_YFNTqDTFBgcwqPZvYEMBup.Gs.XY0l.16AaRzXYCph54s1mzACOIRxJvTFcFtdp80j1TeNgouQYkLxeINkTffbcT5rUIpqZv0Lg2gS9PMt6XpzhrxeQy4G7NEC; HttpOnly; SameSite=None; Secure; Path=/; Domain=supabase.co; Expires=Sat, 04 Jul 2026 03:13:22 GMT",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "vary": "Accept-Encoding",
+      "x-deno-execution-id": "c1600d0e-84cf-43ae-929b-f29c7d5d8765",
+      "x-sb-edge-region": "eu-west-3",
+      "x-served-by": "supabase-edge-runtime"
+    },
+    "responseBody": {
+      "path": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg",
+      "ok": true
+    },
+    "timingMs": 754
+  },
+  {
+    "label": "PROBE_D_CONFIRM_MOCK_CREATOR",
+    "at": "2026-07-04T02:43:22.249Z",
+    "requestUrl": "https://cxjpburiiazzvlczzupy.supabase.co/functions/v1/catalog-asset-signed-url",
+    "method": "POST",
+    "requestHeaders": {
+      "Authorization": "Bearer [JWT redacted]",
+      "Content-Type": "application/json",
+      "apikey": "[anon key redacted]"
+    },
+    "requestBody": {
+      "action": "confirm",
+      "assetType": "cover",
+      "creatorId": "00000000-0000-4000-a000-000000000002",
+      "albumId": "ea9d92b8-d615-48ac-bf9d-1241f67a5914",
+      "path": "0a72396a-a1b4-4ddc-82e5-c9e6eb27f30b/releases/ea9d92b8-d615-48ac-bf9d-1241f67a5914/cover.jpg"
+    },
+    "status": 403,
+    "statusText": "Forbidden",
+    "responseHeaders": {
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+      "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a15ac830f8aba8ed-OUA",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-length": "53",
+      "content-type": "application/json",
+      "date": "Sat, 04 Jul 2026 02:43:22 GMT",
+      "endpoint-load-metrics": "application_utilization:4,named_metrics.queue_depth:4",
+      "sb-gateway-version": "1",
+      "sb-project-ref": "cxjpburiiazzvlczzupy",
+      "sb-request-id": "019f2b02-5aa3-710b-b266-96684d20d43b",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=yDsidnDBjSYDtwT7NA5ynzLcaUk3Bw4B2mPqpCSH.pU-1783133002.3975666-1.0.1.1-oUOBHXxRna08AtShU7ILS.nXR5y8F7AfBr6UpJAOu7zFT7dWO0hR0JcilEw6WSITAriRoF7VlYU0UgiFCOdgnOrLbj51GkeHerOi8IHskyekxATKj8BQY5lzK_2M1jJr; HttpOnly; SameSite=None; Secure; Path=/; Domain=supabase.co; Expires=Sat, 04 Jul 2026 03:13:22 GMT",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "vary": "Accept-Encoding",
+      "x-deno-execution-id": "48830c3d-8d15-447a-a88b-af2c0d860432",
+      "x-sb-edge-region": "eu-west-3",
+      "x-served-by": "supabase-edge-runtime"
+    },
+    "responseBody": {
+      "error": "Accès non autorisé."
+    },
+    "timingMs": 613
+  },
+  {
+    "label": "OPTIONS_PREFLIGHT",
+    "at": "2026-07-04T02:43:22.649Z",
+    "status": 204,
+    "statusText": "No Content",
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-headers": "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
+      "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      "access-control-allow-origin": "http://localhost:3000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a15ac8348ac2a8ed-OUA",
+      "connection": "keep-alive",
+      "date": "Sat, 04 Jul 2026 02:43:23 GMT",
+      "endpoint-load-metrics": "application_utilization:6,named_metrics.queue_depth:6",
+      "sb-gateway-version": "1",
+      "sb-project-ref": "cxjpburiiazzvlczzupy",
+      "sb-request-id": "019f2b02-5cd7-7e24-a7e3-ffd108583c1c",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=FRZrKo.fYtAGLxR82sRiPLvy2r8PFpyEwMIfxMLkPJs-1783133002.9633818-1.0.1.1-oBv0uDShl5r.sgmorHi76I9o0.gk1yafaKqTusvI_BoWQRjwwZgCqngN6YWtxLKYg5tlvJMdW_p.TW1gT7z3_YwR3oq5S5MwQjRDLarRyaSSkNvxSgrQ8W3rna.aZFl.; HttpOnly; SameSite=None; Secure; Path=/; Domain=supabase.co; Expires=Sat, 04 Jul 2026 03:13:23 GMT",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "vary": "Accept-Encoding, Origin",
+      "x-deno-execution-id": "38c931e4-c176-4c21-8d64-fa6e15aff087",
+      "x-sb-edge-region": "eu-west-3",
+      "x-served-by": "supabase-edge-runtime"
+    }
+  }
+]

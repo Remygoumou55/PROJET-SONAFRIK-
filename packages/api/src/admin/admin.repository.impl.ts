@@ -248,4 +248,8 @@ export class AdminRepository {
   deleteBeat(beatId: string): Promise<void> {
     return this.beatstore.deleteBeat(beatId);
   }
+
+  createBeatPreviewSignedUrl(storagePath: string): Promise<string | null> {
+    return this.beatstore.createBeatPreviewSignedUrl(storagePath);
+  }
 }

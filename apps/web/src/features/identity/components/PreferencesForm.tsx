@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@sonafrik/ui";
 import {
   AUDIO_QUALITY_OPTIONS,
@@ -19,7 +18,6 @@ interface PreferencesFormProps {
 }
 
 export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
-  const router = useRouter();
   const identity = useIdentityService();
   const [state, setState] = useState(preferences);
   const [loading, setLoading] = useState(false);
@@ -53,7 +51,6 @@ export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
       });
       setMessage("Préférences enregistrées.");
       publishIdentityLdseEvent(IDENTITY_LDSE_EVENTS.preferencesUpdated, userId);
-      router.refresh();
     } catch {
       setMessage("Erreur lors de l'enregistrement.");
     } finally {

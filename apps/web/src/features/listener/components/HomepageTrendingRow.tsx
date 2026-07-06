@@ -6,6 +6,7 @@ import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
 import { CoverImage } from "@/components/CoverImage";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 function toTrackWithMeta(t: TrendingTrack): TrackWithMeta {
   return {
@@ -106,7 +107,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
               {isActive && (
                 <div
                   className="absolute inset-0 flex items-center justify-center"
-                  style={{ background: "rgba(0,0,0,0.45)" }}
+                  style={{ background: OVERLAY.noir45 }}
                 >
                   {isPlaying ? (
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--color-vert-energie)">
@@ -122,7 +123,7 @@ export function HomepageTrendingSection({ tracks }: Props) {
               )}
               <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"
-                style={{ background: "rgba(0,0,0,0.6)" }}
+                style={{ background: OVERLAY.noir60 }}
               >
                 <svg width={10} height={12} viewBox="0 0 10 12" fill="var(--color-vert-energie)">
                   <path d="M0 0L10 6L0 12V0Z" />

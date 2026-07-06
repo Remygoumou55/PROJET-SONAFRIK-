@@ -3,6 +3,7 @@ import type { LiveControlSnapshot } from "@sonafrik/api/admin";
 import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
 import { isTopupEnabled } from "@/features/wallet/lib/paymentsEnabled";
+import { LIVE_CONTROL_STYLES } from "@/lib/design/overlayTokens";
 
 interface ChainStep {
   step: string;
@@ -87,11 +88,7 @@ export function LiveControlDashboard({ data }: Props) {
       {!paymentsEnabled && (
         <p
           className="rounded-xl px-4 py-3 text-sm"
-          style={{
-            backgroundColor: "rgba(255,194,14,0.08)",
-            border: "1px solid rgba(255,194,14,0.25)",
-            color: "var(--color-or-solaire)",
-          }}
+          style={LIVE_CONTROL_STYLES.warnBanner}
         >
           Paiements désactivés : définir <code>NEXT_PUBLIC_PAYMENTS_ENABLED=true</code> dans{" "}
           <code>apps/web/.env.local</code> puis relancer <code>pnpm dev</code>.
@@ -100,10 +97,7 @@ export function LiveControlDashboard({ data }: Props) {
 
       <div
         className="rounded-2xl p-5 text-center"
-        style={{
-          backgroundColor: allGreen ? "rgba(0,210,106,0.1)" : "rgba(255,77,79,0.08)",
-          border: `1px solid ${allGreen ? "rgba(0,210,106,0.3)" : "rgba(255,77,79,0.25)"}`,
-        }}
+        style={allGreen ? LIVE_CONTROL_STYLES.okShell : LIVE_CONTROL_STYLES.errShell}
       >
         <p className="text-4xl">{allGreen ? "✅" : "⏳"}</p>
         <p className="mt-2 text-xl font-bold" style={{ color: "var(--color-texte-principal)" }}>
@@ -199,10 +193,7 @@ export function LiveControlDashboard({ data }: Props) {
 
       <section
         className="rounded-2xl p-5 space-y-3"
-        style={{
-          backgroundColor: "rgba(255,194,14,0.06)",
-          border: "1px solid rgba(255,194,14,0.2)",
-        }}
+        style={LIVE_CONTROL_STYLES.warnSection}
       >
         <h2 className="text-base font-semibold" style={{ color: "var(--color-or-solaire)" }}>
           Guide étape par étape
@@ -243,7 +234,7 @@ export function LiveControlDashboard({ data }: Props) {
             <span
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
               style={{
-                backgroundColor: "rgba(255,194,14,0.2)",
+                backgroundColor: LIVE_CONTROL_STYLES.warnPill.backgroundColor,
                 color: "var(--color-or-solaire)",
               }}
             >

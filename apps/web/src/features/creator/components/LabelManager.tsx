@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { Label } from "@sonafrik/types";
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 interface EditState {
   name: string;
@@ -138,7 +138,7 @@ function LabelCard({
                   variant="outline"
                   disabled={busy}
                   onClick={() => setConfirmDelete(true)}
-                  style={{ color: "var(--color-erreur)", borderColor: "rgba(255,68,68,0.2)" }}
+                  style={{ color: "var(--color-erreur)", borderColor: OVERLAY.erreur25 }}
                 >
                   Supprimer
                 </Button>
@@ -152,7 +152,6 @@ function LabelCard({
 }
 
 export function LabelManager({ labels: initial }: { labels: Label[] }) {
-  const router = useRouter();
   const creatorService = useCreatorService();
   const [labels, setLabels] = useState(initial);
   const [name, setName] = useState("");
@@ -169,7 +168,6 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
       setLabels((current) => [label, ...current]);
       setName("");
       setDescription("");
-      router.refresh();
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : "Impossible de créer le label.");
     } finally {
@@ -183,13 +181,11 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
       description: newDescription || null,
     });
     setLabels((current) => current.map((l) => (l.id === id ? updated : l)));
-    router.refresh();
   }
 
   async function handleDelete(id: string) {
     await creatorService.deleteLabel(id);
     setLabels((current) => current.filter((l) => l.id !== id));
-    router.refresh();
   }
 
   return (

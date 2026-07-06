@@ -51,7 +51,6 @@ function CreatorHeaderUtilitiesView({
     setOpen(false);
     await auth.signOut();
     router.push("/auth/connexion");
-    router.refresh();
   }
 
   return (

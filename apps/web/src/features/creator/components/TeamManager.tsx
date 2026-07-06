@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge, Button, Card, CardContent, Input } from "@sonafrik/ui";
 import type { CreatorTeamMember } from "@sonafrik/types";
@@ -9,7 +8,6 @@ import { isValidGuineanPhone, GUINEAN_PHONE_ERROR } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
 
 export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
-  const router = useRouter();
   const creatorService = useCreatorService();
   const [team, setTeam] = useState(initial);
   const [phone, setPhone] = useState("+224");
@@ -31,7 +29,6 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
       const member = await creatorService.inviteTeamMember({ memberPhone: phone, role });
       setTeam((current) => [...current, member]);
       setPhone("+224");
-      router.refresh();
     } catch {
       setError("Membre introuvable. Le numéro doit être un compte SONAFRIK existant.");
     } finally {
@@ -44,7 +41,6 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
     try {
       await creatorService.removeTeamMember(memberId);
       setTeam((current) => current.filter((m) => m.member_id !== memberId));
-      router.refresh();
     } finally {
       setLoading(false);
     }

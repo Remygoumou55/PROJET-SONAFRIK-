@@ -1,7 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createListenerService } from "@sonafrik/api/listener";
+import { SRTSP_DOMAIN_EVENTS } from "@sonafrik/realtime/events";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export interface ReactionCount {
@@ -10,6 +10,12 @@ export interface ReactionCount {
 }
 
 const REACTION_EMOJIS = ["❤️", "🔥", "😢", "🕺", "😮"] as const;
+const POLL_MS = 30_000;
+
+const LIVE_EVENTS = [
+  SRTSP_DOMAIN_EVENTS.TRACK_REACTION_UPDATED,
+  SRTSP_DOMAIN_EVENTS.LISTENER_LIVE_UPDATED,
+] as const;
 
 function emptyReactions(): ReactionCount[] {
   return REACTION_EMOJIS.map((emoji) => ({ emoji, count: 0 }));
@@ -26,82 +32,71 @@ export function useTrackReactions(trackId: string | null) {
   const [reactions, setReactions] = useState<ReactionCount[]>(emptyReactions);
   const [liveListeners, setLiveListeners] = useState(0);
 
+  const listener = useMemo(() => createListenerService(getSupabaseBrowserClient()), []);
+
+  const loadInitialReactions = useCallback(async () => {
+    if (!trackId) return;
+    try {
+      const rows = await listener.getTrackReactionCounts(trackId);
+      setReactions(rows.length ? mergeReactionRows(rows) : emptyReactions());
+    } catch {
+      setReactions(emptyReactions());
+    }
+  }, [listener, trackId]);
+
+  const loadLiveListeners = useCallback(async () => {
+    if (!trackId) return;
+    try {
+      const count = await listener.getLiveListenerCount(trackId);
+      setLiveListeners(count);
+    } catch {
+      setLiveListeners(0);
+    }
+  }, [listener, trackId]);
+
+  const refreshAll = useCallback(() => {
+    void loadInitialReactions();
+    void loadLiveListeners();
+  }, [loadInitialReactions, loadLiveListeners]);
+
   useEffect(() => {
     if (!trackId) {
       setReactions(emptyReactions());
       setLiveListeners(0);
       return;
     }
+    refreshAll();
+    const id = window.setInterval(refreshAll, POLL_MS);
+    return () => window.clearInterval(id);
+  }, [trackId, refreshAll]);
 
-    const supabase = getSupabaseBrowserClient();
-    const listener = createListenerService(supabase);
+  useEventSubscription(
+    [...LIVE_EVENTS],
+    (event) => {
+      const payloadTrackId = event.payload?.trackId;
+      if (typeof payloadTrackId !== "string" || payloadTrackId !== trackId) return;
 
-    const loadInitialReactions = async () => {
-      try {
-        const rows = await listener.getTrackReactionCounts(trackId);
-        setReactions(rows.length ? mergeReactionRows(rows) : emptyReactions());
-      } catch {
-        setReactions(emptyReactions());
+      if (event.name === SRTSP_DOMAIN_EVENTS.TRACK_REACTION_UPDATED) {
+        const emoji = event.payload?.emoji;
+        const count = event.payload?.count;
+        if (typeof emoji !== "string") {
+          void loadInitialReactions();
+          return;
+        }
+        setReactions((prev) =>
+          prev.map((reaction) =>
+            reaction.emoji === emoji
+              ? { ...reaction, count: typeof count === "number" ? count : reaction.count }
+              : reaction,
+          ),
+        );
+        return;
       }
-    };
 
-    const loadLiveListeners = async () => {
-      try {
-        const count = await listener.getLiveListenerCount(trackId);
-        setLiveListeners(count);
-      } catch {
-        setLiveListeners(0);
-      }
-    };
-
-    void loadInitialReactions();
-    void loadLiveListeners();
-
-    const reactionsChannel = supabase
-      .channel(`reactions:${trackId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "track_reaction_counts",
-          filter: `track_id=eq.${trackId}`,
-        },
-        (payload) => {
-          const row = payload.new as { emoji?: string; count?: number } | null;
-          if (!row?.emoji) return;
-          setReactions((prev) =>
-            prev.map((reaction) =>
-              reaction.emoji === row.emoji
-                ? { ...reaction, count: row.count ?? reaction.count }
-                : reaction,
-            ),
-          );
-        },
-      )
-      .subscribe();
-
-    const sessionsChannel = supabase
-      .channel(`live-listeners:${trackId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "stream_sessions",
-          filter: `track_id=eq.${trackId}`,
-        },
-        () => {
-          void loadLiveListeners();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(reactionsChannel);
-      void supabase.removeChannel(sessionsChannel);
-    };
-  }, [trackId]);
+      void loadLiveListeners();
+    },
+    Boolean(trackId),
+  );
 
   return { reactions, liveListeners };
 }

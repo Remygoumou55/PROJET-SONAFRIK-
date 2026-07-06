@@ -70,17 +70,23 @@ export default async function CreatorAnalyticsPage() {
 
   const data: CreatorAnalyticsData = {
     streamStats:
-      streamStats.status === "fulfilled" ? streamStats.value : EMPTY_STREAM_STATS,
+      streamStats.status === "fulfilled"
+        ? { ...EMPTY_STREAM_STATS, ...streamStats.value }
+        : EMPTY_STREAM_STATS,
     timeline: timeline.status === "fulfilled" ? timeline.value : [],
     topTracks: topTracks.status === "fulfilled" ? topTracks.value : [],
     topAlbums: topAlbums.status === "fulfilled" ? topAlbums.value : [],
     audienceStats:
-      audienceStats.status === "fulfilled" ? audienceStats.value : EMPTY_AUDIENCE,
+      audienceStats.status === "fulfilled"
+        ? { ...EMPTY_AUDIENCE, ...audienceStats.value }
+        : EMPTY_AUDIENCE,
     revenueStats:
-      revenueStats.status === "fulfilled" ? revenueStats.value : EMPTY_REVENUE,
+      revenueStats.status === "fulfilled"
+        ? { ...EMPTY_REVENUE, ...revenueStats.value }
+        : EMPTY_REVENUE,
     royaltyHistory:
       royaltyHistory.status === "fulfilled" ? royaltyHistory.value : [],
   };
 
-  return <CreatorAnalyticsDashboard data={data} />;
+  return <CreatorAnalyticsDashboard data={data} creatorId={creatorId} />;
 }

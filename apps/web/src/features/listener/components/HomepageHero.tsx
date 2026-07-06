@@ -1,5 +1,3 @@
-"use client";
-
 import { ListenHeroGreeting } from "./ListenHeroGreeting";
 
 interface HomepageHeroProps {

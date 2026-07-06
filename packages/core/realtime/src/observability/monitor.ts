@@ -51,6 +51,11 @@ export class SrtspMonitor {
     return Math.round(sum / this.latencySamples.length);
   }
 
+  getMaxLatency(): number {
+    if (this.latencySamples.length === 0) return 0;
+    return Math.max(...this.latencySamples.map((s) => s.ms));
+  }
+
   snapshot(
     partial: Omit<SrtspMonitorSnapshot, "latency" | "errors" | "subscriptions"> & {
       transport: SrtspMonitorSnapshot["transport"];
@@ -66,6 +71,7 @@ export class SrtspMonitor {
       latency: {
         lastPropagationMs: this.lastPropagationMs,
         avgPropagationMs: this.getAvgLatency(),
+        maxPropagationMs: this.getMaxLatency(),
         samples: this.latencySamples.length,
       },
       errors: { count: this.errors, lastMessage: this.lastError, journalSize: journal.count },

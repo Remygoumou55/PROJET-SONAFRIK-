@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useState } from "react";
 import type { AdminBeatStoreDashboard, AdminBeatStoreRow } from "@sonafrik/api/admin";
 import { formatGnf } from "@sonafrik/shared";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { AdminTable, type AdminTableColumn } from "./AdminTable";
 import { AdminConfirmModal } from "./AdminConfirmModal";
 import {
   adminApproveBeatAction,
+  adminBeatPreviewUrlAction,
   adminDeleteBeatAction,
   adminRejectBeatAction,
 } from "../actions/admin-sprint5.actions";
@@ -22,38 +22,50 @@ type ActionTarget = {
 
 async function resolvePreviewUrl(path: string | null): Promise<string | null> {
   if (!path) return null;
-  const supabase = getSupabaseBrowserClient();
-  const { data } = await supabase.storage.from("catalog-audio").createSignedUrl(path, 300);
-  return data?.signedUrl ?? null;
+  const result = await adminBeatPreviewUrlAction({ storagePath: path });
+  if (result.error) return null;
+  return result.signedUrl ?? null;
 }
 
 export function AdminBeatStoreClient({
-  beats,
+  beats: initialBeats,
   total,
   currentFilter,
   counts,
   totalRevenue,
 }: AdminBeatStoreDashboard) {
+  const [beats, setBeats] = useState(initialBeats);
   const [selected, setSelected] = useState<ActionTarget | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
   const { error, isPending, run } = useAdminActionRunner();
+
+  const removeBeat = useCallback((beatId: string) => {
+    setBeats((prev) => prev.filter((beat) => beat.id !== beatId));
+  }, []);
 
   const executeAction = async () => {
     if (!selected) return;
+    const beatId = selected.id;
     if (selected.action === "approve") {
-      await run(() => adminApproveBeatAction({ beatId: selected.id }));
+      await run(() => adminApproveBeatAction({ beatId: selected.id }), {
+        ldseEvent: { type: ADMIN_LDSE_EVENTS.catalogUpdated, payload: { beatId } },
+        onSuccess: () => removeBeat(beatId),
+      });
     } else if (selected.action === "reject") {
-      await run(() => adminRejectBeatAction({ beatId: selected.id, reason: rejectReason }));
+      await run(() => adminRejectBeatAction({ beatId: selected.id, reason: rejectReason }), {
+        ldseEvent: { type: ADMIN_LDSE_EVENTS.catalogUpdated, payload: { beatId } },
+        onSuccess: () => removeBeat(beatId),
+      });
     } else {
-      await run(() => adminDeleteBeatAction({ beatId: selected.id }));
+      await run(() => adminDeleteBeatAction({ beatId: selected.id }), {
+        ldseEvent: { type: ADMIN_LDSE_EVENTS.catalogUpdated, payload: { beatId } },
+        onSuccess: () => removeBeat(beatId),
+      });
     }
     setSelected(null);
     setRejectReason("");
-    startTransition(() => router.refresh());
   };
 
   const togglePreview = useCallback(

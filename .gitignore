@@ -34,6 +34,8 @@ supabase/.temp
 # Testing / Storybook build output
 storybook-static/
 .storybook-static/
+test-results/
+playwright-report/
 
 
 # Mobile

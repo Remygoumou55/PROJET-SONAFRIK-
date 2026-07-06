@@ -17,7 +17,6 @@ export function BecomeArtistButton() {
     try {
       await identity.becomeArtist();
       router.push("/creator/identity");
-      router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("déjà artiste")) {

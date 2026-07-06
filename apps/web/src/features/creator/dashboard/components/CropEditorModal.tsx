@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 // ─── Public API (unchanged — no regression on callers) ────────────────────────
 
@@ -52,7 +53,7 @@ async function getCroppedBlob(src: string, px: Area): Promise<Blob> {
       canvas.height = h;
       const ctx = canvas.getContext("2d");
       if (!ctx) { reject(new Error("canvas_ctx_failed")); return; }
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = "rgb(13, 13, 13)";
       ctx.fillRect(0, 0, w, h);
       ctx.drawImage(
         img,
@@ -282,7 +283,7 @@ export function CropEditorModal({
                   },
                   cropAreaStyle: {
                     border: "2px solid var(--color-vert-energie)",
-                    boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.72)",
+                    boxShadow: `0 0 0 9999px ${OVERLAY.scrimCrop}`,
                   },
                 }}
               />

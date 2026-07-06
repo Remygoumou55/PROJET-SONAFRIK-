@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { memo } from "react";
 import { IDENTITY_NAV_ENTRIES, isIdentityNavActive } from "../lib/identityNavConfig";

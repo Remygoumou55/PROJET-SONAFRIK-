@@ -28,7 +28,8 @@ function StatCard({
 }
 
 export function StreamStatsGrid({ stats }: { stats: CreatorStreamStats }) {
-  const fmt = (n: number) => n.toLocaleString("fr-FR");
+  const fmt = (n: number | null | undefined) =>
+    (Number.isFinite(Number(n)) ? Number(n) : 0).toLocaleString("fr-FR");
 
   return (
     <div className="space-y-4">

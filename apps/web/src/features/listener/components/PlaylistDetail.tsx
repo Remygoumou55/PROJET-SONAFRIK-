@@ -6,6 +6,7 @@ import type { Playlist, TrackWithMeta } from "@sonafrik/types";
 import { useStreamingService } from "../hooks/useStreaming";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatTime } from "@/lib/formatters";
+import { LISTENER_ACTIVE_ROW_STYLE, LISTENER_INACTIVE_ROW_STYLE } from "@/lib/design/overlayTokens";
 import { CoverImage } from "@/components/CoverImage";
 import { PlaylistPrivacyToggle } from "@/components/playlist/PlaylistPrivacyToggle";
 import { PlaylistVisibilityBadge } from "@/components/playlist/PlaylistVisibilityBadge";
@@ -28,10 +29,7 @@ const TrackRow = memo(function TrackRow({
   return (
     <div
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl group"
-      style={{
-        backgroundColor: isActive ? "rgba(0,210,106,0.07)" : "transparent",
-        border: `1px solid ${isActive ? "rgba(0,210,106,0.2)" : "transparent"}`,
-      }}
+      style={isActive ? LISTENER_ACTIVE_ROW_STYLE : LISTENER_INACTIVE_ROW_STYLE}
     >
       <button onClick={() => onPlay(track)} className="w-8 text-center flex-shrink-0">
         {isActive ? (

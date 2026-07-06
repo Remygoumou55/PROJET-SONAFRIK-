@@ -2,11 +2,14 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const E2E_EMAIL = process.env.PLAYWRIGHT_TEST_EMAIL ?? "s13b-playwright-listener@sonafrik.test";
-const E2E_PASSWORD = process.env.PLAYWRIGHT_TEST_PASSWORD ?? "S13BCert2026!";
+const LISTENER_EMAIL = process.env.PLAYWRIGHT_TEST_EMAIL ?? "s13b-playwright-listener@sonafrik.test";
+const LISTENER_PASSWORD = process.env.PLAYWRIGHT_TEST_PASSWORD ?? "S13BCert2026!";
+const CREATOR_EMAIL =
+  process.env.PLAYWRIGHT_CREATOR_EMAIL ?? "s12b-artist-1-1782222972289@sonafrik.test";
+const CREATOR_PASSWORD = process.env.PLAYWRIGHT_CREATOR_PASSWORD ?? "Sprint12BTest2026!";
 
 /** Connexion E2E — cookies SSR réels (dev local uniquement, jamais Vercel). */
-export async function POST() {
+export async function POST(request: Request) {
   if (process.env.NODE_ENV !== "development" || process.env.VERCEL === "1") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
@@ -16,6 +19,10 @@ export async function POST() {
   if (!url || !anonKey) {
     return NextResponse.json({ error: "config" }, { status: 500 });
   }
+
+  const role = new URL(request.url).searchParams.get("role");
+  const email = role === "creator" ? CREATOR_EMAIL : LISTENER_EMAIL;
+  const password = role === "creator" ? CREATOR_PASSWORD : LISTENER_PASSWORD;
 
   const cookieStore = await cookies();
   const supabase = createServerClient(url, anonKey, {
@@ -31,14 +38,11 @@ export async function POST() {
     },
   });
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: E2E_EMAIL,
-    password: E2E_PASSWORD,
-  });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, role: role === "creator" ? "creator" : "listener" });
 }

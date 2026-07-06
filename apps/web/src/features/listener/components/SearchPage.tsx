@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import type { SearchType } from "@sonafrik/types";
 import { useSearch } from "../hooks/useSearch";
+import { useSearchSrtspInvalidation } from "../hooks/useSearchSrtspInvalidation";
+import { GENRE_CHIP_COLORS } from "@/lib/design/overlayTokens";
 
 const SearchResults = dynamic(
   () => import("./SearchResults").then((m) => ({ default: m.SearchResults })),
@@ -44,6 +46,10 @@ export function SearchPage({ initialGenre, initialQuery, beatStoreEnabled = fals
   const [activeGenre, setActiveGenre] = useState<string | undefined>(initialGenre);
   const [activeTab, setActiveTab] = useState<SearchType>("all");
   const { results, isSearching, error, search, clearSearch } = useSearch(beatStoreEnabled);
+
+  useSearchSrtspInvalidation(query, activeTab, beatStoreEnabled, () => {
+    if (query.trim().length >= 2) search(query, activeTab);
+  });
 
   useEffect(() => {
     if (seed.trim().length >= 2) {
@@ -99,7 +105,7 @@ export function SearchPage({ initialGenre, initialQuery, beatStoreEnabled = fals
         <div className="flex items-center gap-2 mb-4">
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-            style={{ background: "rgba(0,210,106,0.08)", color: "var(--color-vert-energie)", border: "1px solid rgba(0,210,106,0.19)" }}
+            style={{ background: GENRE_CHIP_COLORS[0].bg, color: GENRE_CHIP_COLORS[0].text, border: `1px solid ${GENRE_CHIP_COLORS[0].border}` }}
           >
             <svg width={10} height={10} viewBox="0 0 24 24" fill="var(--color-vert-energie)">
               <path d="M9 18V5l12-2v13" />

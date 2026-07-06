@@ -4,6 +4,7 @@ import { memo, useCallback, useState } from "react";
 import type { TrackWithMeta } from "@sonafrik/types";
 import { usePlayer } from "../hooks/usePlayer";
 import { CoverImage } from "@/components/CoverImage";
+import { LISTENER_ACTIVE_ROW_STYLE, LISTENER_INACTIVE_ROW_STYLE } from "@/lib/design/overlayTokens";
 import { formatTime } from "@/lib/formatters";
 import { AddToPlaylistButton } from "./AddToPlaylistButton";
 
@@ -23,10 +24,7 @@ const TrackRow = memo(function TrackRow({
   return (
     <div
       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
-      style={{
-        backgroundColor: isActive ? "rgba(0,210,106,0.07)" : "transparent",
-        border: `1px solid ${isActive ? "rgba(0,210,106,0.2)" : "transparent"}`,
-      }}
+      style={isActive ? LISTENER_ACTIVE_ROW_STYLE : LISTENER_INACTIVE_ROW_STYLE}
     >
       {/* Zone cliquable = lecture */}
       <button

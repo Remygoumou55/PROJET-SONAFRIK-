@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { AdminAccountStatus, AdminUserListItem, AdminUsersFilter } from "@sonafrik/types";
 import {
   adminDeleteUserAction,
   adminSuspendUserAction,
   adminWarnUserAction,
 } from "@/features/admin/actions/admin-moderation.actions";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useAdminUsersSrtspLive } from "../hooks/useAdminUsersSrtspLive";
 import { AdminTable } from "./AdminTable";
 import { AdminStatusBadge } from "./AdminStatusBadge";
 import { AdminSearchBar } from "./AdminSearchBar";
@@ -59,8 +61,17 @@ export function AdminUsersClient({
   const [selectedUser, setSelectedUser] = useState<SelectedUser | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
+
+  const live = useAdminUsersSrtspLive({
+    initialData: { users, total, page, limit },
+    filter: currentFilter,
+    query: currentQuery,
+    page,
+  });
+  const liveUsers = live.data?.users ?? users;
+  const liveTotal = live.data?.total ?? total;
+  const livePage = live.data?.page ?? page;
+  const liveLimit = live.data?.limit ?? limit;
 
   const handleAction = (userId: string, userName: string, action: ActionType) => {
     setActionError(null);
@@ -89,7 +100,7 @@ export function AdminUsersClient({
     }
 
     setSelectedUser(null);
-    startTransition(() => router.refresh());
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.userUpdated, { userId: selectedUser.id });
   };
 
   const columns = [
@@ -193,13 +204,13 @@ export function AdminUsersClient({
   ];
 
   const filters: { key: AdminUsersFilter; label: string }[] = [
-    { key: "all", label: `Tous (${total.toLocaleString("fr-FR")})` },
+    { key: "all", label: `Tous (${liveTotal.toLocaleString("fr-FR")})` },
     { key: "premium", label: "Premium" },
     { key: "suspended", label: "Suspendus" },
     { key: "new", label: "Nouveaux (7j)" },
   ];
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(liveTotal / liveLimit);
   const filterKey = currentFilter ?? "all";
   const confirmFirstName = (selectedUser?.name ?? "CONFIRMER").split(" ")[0]?.toUpperCase() ?? "CONFIRMER";
 
@@ -233,7 +244,7 @@ export function AdminUsersClient({
 
       <AdminTable
         columns={columns}
-        data={users}
+        data={liveUsers}
         keyField="id"
         emptyMessage="Aucun utilisateur trouvé pour ces critères."
         expandedRowKey={expandedUser}
@@ -283,20 +294,20 @@ export function AdminUsersClient({
 
       {totalPages > 1 ? (
         <div className="admin-pagination">
-          {page > 1 ? (
+          {livePage > 1 ? (
             <a
-              href={buildPageHref(page - 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
+              href={buildPageHref(livePage - 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
               className="admin-btn admin-btn-ghost admin-btn-sm"
             >
               ← Précédent
             </a>
           ) : null}
           <span className="admin-pagination-info">
-            Page {page} / {totalPages} — {total.toLocaleString("fr-FR")} résultats
+            Page {livePage} / {totalPages} — {liveTotal.toLocaleString("fr-FR")} résultats
           </span>
-          {page < totalPages ? (
+          {livePage < totalPages ? (
             <a
-              href={buildPageHref(page + 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
+              href={buildPageHref(livePage + 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
               className="admin-btn admin-btn-ghost admin-btn-sm"
             >
               Suivant →

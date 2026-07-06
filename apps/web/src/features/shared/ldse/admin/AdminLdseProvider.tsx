@@ -4,10 +4,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { getAdminHubInvalidateEvents, shouldRefreshAdminSnapshot } from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 import type { AdminLiveSnapshot, AdminNavBadges, AdminFraudMetrics, AdminModerationMetrics, AdminUserMetrics } from "@sonafrik/api/admin";
 import {
   fetchAdminLiveSnapshot,
@@ -138,7 +141,22 @@ export function AdminLdseProvider({ initialSnapshot, children }: Props) {
     void refreshSnapshot();
   });
 
+  const adminInvalidateEvents = useMemo(() => getAdminHubInvalidateEvents(), []);
+  useEventSubscription(
+    adminInvalidateEvents,
+    (event) => {
+      if (!shouldRefreshAdminSnapshot(event)) return;
+      void refreshSnapshot();
+    },
+    true,
+  );
+
   useLdseBackgroundRefresh(refreshSnapshot);
+
+  useEffect(() => {
+    if (initialSnapshot.fetchedAt) return;
+    void refreshSnapshot();
+  }, [initialSnapshot.fetchedAt, refreshSnapshot]);
 
   const value = useMemo<AdminLdseContextValue>(
     () => ({

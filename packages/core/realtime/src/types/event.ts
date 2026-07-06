@@ -98,7 +98,7 @@ export interface SrtspMonitorSnapshot {
   deduplication: { tracked: number; dropped: number };
   offline: { buffered: number; flushed: number };
   transport: { kind: SrtspTransportKind; connected: boolean; state: SrtspConnectionState; reconnectAttempts: number };
-  latency: { lastPropagationMs: number; avgPropagationMs: number; samples: number };
+  latency: { lastPropagationMs: number; avgPropagationMs: number; maxPropagationMs: number; samples: number };
   subscriptions: { active: number };
   errors: { count: number; lastMessage?: string; journalSize: number };
 }
@@ -129,7 +129,7 @@ export interface SrtspTransportStats {
 
 export interface SrtspJournalEntry {
   at: number;
-  level: "error" | "warn";
+  level: "error" | "warn" | "info";
   code: string;
   message: string;
   context?: Record<string, unknown>;

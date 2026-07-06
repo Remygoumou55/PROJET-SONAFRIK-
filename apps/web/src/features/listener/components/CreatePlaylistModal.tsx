@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { PlaylistPrivacyToggle } from "@/components/playlist/PlaylistPrivacyToggle";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 interface Props {
   isOpen: boolean;
@@ -77,7 +78,7 @@ export function CreatePlaylistModal({ isOpen, onClose, onCreate }: Props) {
     /* Overlay */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+      style={{ backgroundColor: OVERLAY.noir70 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       {/* Panneau */}

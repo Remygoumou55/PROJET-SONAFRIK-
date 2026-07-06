@@ -135,6 +135,7 @@ export type Database = {
       albums: {
         Row: {
           cover_path: string | null
+          cover_status: string
           created_at: string
           created_by: string | null
           creator_id: string
@@ -157,6 +158,7 @@ export type Database = {
         }
         Insert: {
           cover_path?: string | null
+          cover_status?: string
           created_at?: string
           created_by?: string | null
           creator_id: string
@@ -179,6 +181,7 @@ export type Database = {
         }
         Update: {
           cover_path?: string | null
+          cover_status?: string
           created_at?: string
           created_by?: string | null
           creator_id?: string

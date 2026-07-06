@@ -1,19 +1,47 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { CreatorDashboardData } from "@sonafrik/types";
-import { HeroCard } from "../dashboard/components/HeroCard";
 import { GlanceKpiGrid } from "../dashboard/components/enterprise/GlanceKpiGrid";
-import { WelcomeModal } from "../dashboard/components/WelcomeModal";
+import { useCreatorDashboardSrtspLive } from "../dashboard/hooks/useCreatorDashboardSrtspLive";
 import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalogueCard";
 import { DashboardCareerProgressCard } from "../dashboard/components/DashboardCareerProgressCard";
-import { DashboardCoachCard } from "../dashboard/components/DashboardCoachCard";
 import { DashboardPremiumCard } from "../dashboard/components/DashboardPremiumCard";
 import { isValidContentName } from "@/lib/content-filter";
+
+const HeroCard = dynamic(
+  () => import("../dashboard/components/HeroCard").then((m) => ({ default: m.HeroCard })),
+  {
+    loading: () => (
+      <div className="ahero animate-pulse" aria-busy="true" aria-label="Chargement vitrine">
+        <div className="ahero__cover-default" style={{ minHeight: "20rem" }} />
+      </div>
+    ),
+  },
+);
+
+const WelcomeModal = dynamic(
+  () => import("../dashboard/components/WelcomeModal").then((m) => ({ default: m.WelcomeModal })),
+  { ssr: false },
+);
+
+const DashboardCoachCard = dynamic(
+  () =>
+    import("../dashboard/components/DashboardCoachCard").then((m) => ({
+      default: m.DashboardCoachCard,
+    })),
+  {
+    loading: () => (
+      <div className="dash-coach animate-pulse rounded-2xl bg-card" style={{ minHeight: "12rem" }} aria-hidden="true" />
+    ),
+  },
+);
 
 interface Props {
   data: CreatorDashboardData;
   careerOsEnabled?: boolean;
+  greeting: string;
 }
 
 function fmtGnf(n: number): string {
@@ -41,9 +69,19 @@ function WalletCard({ balanceGnf }: { balanceGnf: number }) {
   );
 }
 
-export function CreatorDashboardView({ data, careerOsEnabled = false }: Props) {
-  const { context, hero, revenueStats, topTrack, catalogCounts, activities, assistantTips, careerOs, profileCreatedAt } = data;
-  const creatorId = context.creator.id;
+export function CreatorDashboardView({ data: initialData, careerOsEnabled = false, greeting }: Props) {
+  const creatorId = initialData.context.creator.id;
+  const userId = initialData.context.creator.owner_id;
+
+  const { data: liveData } = useCreatorDashboardSrtspLive({
+    creatorId,
+    userId,
+    initialData,
+  });
+
+  const data = liveData ?? initialData;
+  const { context, hero, revenueStats, topTrack, catalogCounts, activities, assistantTips, careerOs, profileCreatedAt } =
+    data;
 
   const validTopTrack = topTrack && isValidContentName(topTrack.title) ? topTrack : null;
 
@@ -59,6 +97,7 @@ export function CreatorDashboardView({ data, careerOsEnabled = false }: Props) {
         artistProfile={context.artistProfile}
         creator={context.creator}
         profileCreatedAt={profileCreatedAt}
+        greeting={greeting}
         stats={{
           streams: data.streamStats.total_streams,
           validStreams: data.streamStats.valid_streams,

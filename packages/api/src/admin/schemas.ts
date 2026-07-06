@@ -67,3 +67,7 @@ export const adminRejectBeatSchema = z.object({
   beatId: z.string().uuid(),
   reason: z.string().min(3).max(500),
 });
+
+export const adminBeatPreviewPathSchema = z.object({
+  storagePath: z.string().min(1).max(500),
+});

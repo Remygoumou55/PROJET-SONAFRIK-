@@ -23,8 +23,13 @@ export function DevAuthBootstrap() {
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        if (session?.access_token) return;
-        await fetch("/api/e2e/session", { method: "POST" });
+        if (session?.access_token) {
+          const { data: isArtist } = await supabase.rpc("is_artist_account", {
+            p_user_id: session.user.id,
+          });
+          if (isArtist) return;
+        }
+        await fetch("/api/e2e/session?role=creator", { method: "POST" });
       } catch {
         // silencieux — l'utilisateur pourra se connecter manuellement
       }

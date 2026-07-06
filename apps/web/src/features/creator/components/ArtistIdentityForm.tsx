@@ -1,27 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@sonafrik/ui";
 import type { ArtistProfile } from "@sonafrik/types";
 import { GENRE_OPTIONS } from "@sonafrik/types";
 import { FIELD_LIMITS } from "@sonafrik/shared";
 import { useCreatorService } from "../hooks/useCreator";
+import { useArtistProfileSrtspLive } from "../identity/hooks/useArtistProfileSrtspLive";
 
 export function ArtistIdentityForm({
-  profile,
+  profile: initialProfile,
+  creatorId,
+  userId,
 }: {
   profile: ArtistProfile;
+  creatorId: string;
+  userId?: string;
 }) {
-  const router = useRouter();
   const creatorService = useCreatorService();
+  const { data: liveProfile, refresh } = useArtistProfileSrtspLive({
+    creatorId,
+    userId,
+    initialData: initialProfile,
+  });
+
+  const profile = liveProfile ?? initialProfile;
   const [stageName, setStageName] = useState(profile.stage_name);
   const [bio, setBio] = useState(profile.bio ?? "");
   const [genres, setGenres] = useState<string[]>(profile.genres);
   const [isPublic, setIsPublic] = useState(profile.is_public);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    setStageName(profile.stage_name);
+    setBio(profile.bio ?? "");
+    setGenres(profile.genres);
+    setIsPublic(profile.is_public);
+  }, [profile]);
 
   function toggleGenre(genre: string) {
     setGenres((current) =>
@@ -41,7 +58,7 @@ export function ArtistIdentityForm({
         isPublic,
       });
       setMessage("Identité artiste enregistrée.");
-      router.refresh();
+      refresh();
     } catch {
       setMessage("Erreur lors de l'enregistrement.");
     } finally {

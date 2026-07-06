@@ -11,6 +11,31 @@
 
 ---
 
+## 2026-07-06 — Vague D CERTIFIÉE (Typage + design tokens)
+
+### Mission
+Certification Vague D audit 360° — 3 cycles : tokens overlay SSOT, migration rgba features → `overlayTokens`, re-audit 3 passes.
+
+### Livraisons clés
+- `apps/web/src/lib/design/overlayTokens.ts` — module design partagé (OVERLAY, status, homepage, beats)
+- `globals.css` — tokens `@theme` étendus (overlays, chips, shadows, day-accent)
+- **0 `rgba()`** dans `features/**/*.tsx` (baseline 146)
+- `scripts/probe-vague-d-cleanup.ts` — seuil cycle 3 ≤60
+
+### Validation
+- `probe:vague-d-cleanup` **13/13** (×3 passes)
+- `probe:vague-d` **23/23** · `probe:vague-d-stabilisation` **23/23**
+- `probe:hex-colors` **4/4** · `probe:certification` **134/134**
+- `typecheck` · `lint` · `build` ✅
+
+### Dette reportée Vague H
+- rgba en CSS domaine (`admin.css`, `listen-home/*.css`) — découpage CSS, pas bloquant MVP
+
+### Doc
+- `docs/vagues/VAGUE-D-CERTIFICATION.md` — ✅ CERTIFIÉE
+
+---
+
 ## 2026-07-05 — SRTSP v1.1 ENTERPRISE CERTIFICATION + FREEZE
 
 ### Mission

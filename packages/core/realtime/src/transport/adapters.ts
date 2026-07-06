@@ -53,18 +53,22 @@ export function createPollingTransport(options?: {
   };
 }
 
-/** Stub Supabase — brancher côté app Phase 2. */
-export function createSupabaseTransportStub(): SrtspTransportAdapter {
-  return {
-    kind: "supabase",
-    connect() {},
-    disconnect() {},
-    isConnected: () => false,
-    onMessage: () => () => {},
-  };
-}
+export {
+  createSupabaseTransport,
+  createSupabaseTransportStub,
+} from "./supabase-transport";
+export { DEFAULT_SRTSP_SUPABASE_SUBSCRIPTIONS } from "./supabase-config";
+export { normalizeSupabaseInbound, toTransportInboundMessage } from "./inbound-normalizer";
+export type {
+  SupabasePostgresChangePayload,
+  SupabasePostgresSubscription,
+  SupabaseRealtimeChannelLike,
+  SupabaseRealtimeClientLike,
+  SrtspTransportInboundMessage,
+  SupabaseTransportOptions,
+} from "./supabase-types";
 
-/** Stub WebSocket — préparé, testable, non connecté MVP. */
+/** Stub WebSocket — préparé Phase 3. */
 export function createWebSocketTransportStub(): SrtspTransportAdapter {
   return {
     kind: "websocket",
@@ -75,7 +79,7 @@ export function createWebSocketTransportStub(): SrtspTransportAdapter {
   };
 }
 
-/** Stub SSE — préparé, testable, non connecté MVP. */
+/** Stub SSE — préparé Phase 3. */
 export function createSseTransportStub(): SrtspTransportAdapter {
   return {
     kind: "sse",

@@ -6,3 +6,10 @@ export {
   useCountUpMotion,
   useAnimatedNumberMotion,
 } from "./use-motion-duration";
+export {
+  prefetchRoute,
+  prefetchRoutes,
+  useSmartPrefetch,
+  resetPrefetchCacheForTests,
+} from "./smart-prefetch";
+export type { PrefetchRoutesOptions, UseSmartPrefetchOptions } from "./smart-prefetch";

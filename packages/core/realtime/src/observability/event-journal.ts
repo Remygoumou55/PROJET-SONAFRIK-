@@ -19,6 +19,10 @@ export class EventJournal {
     this.log("warn", code, message, context);
   }
 
+  info(code: string, message: string, context?: Record<string, unknown>): void {
+    this.log("info", code, message, context);
+  }
+
   getRecent(limit = 20): SrtspJournalEntry[] {
     return this.entries.slice(-limit);
   }

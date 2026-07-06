@@ -1,6 +1,6 @@
 {
   "name": "@sonafrik/realtime",
-  "version": "1.1.0",
+  "version": "3.9.0",
   "private": true,
   "description": "SONAFRIK Real-Time Synchronization Program (SRTSP) — Event Bus & Sync Engine",
   "main": "./dist/index.js",
@@ -25,6 +25,10 @@
     "./events": {
       "types": "./dist/registry/domain-events.d.ts",
       "default": "./dist/registry/domain-events.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "default": "./dist/adapters/index.js"
     }
   },
   "scripts": {
@@ -37,9 +41,13 @@
     "zod": "^3.25.36"
   },
   "peerDependencies": {
+    "@supabase/supabase-js": "^2.49.0",
     "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
+    "@supabase/supabase-js": {
+      "optional": true
+    },
     "react": {
       "optional": true
     }

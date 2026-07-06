@@ -1,5 +1,3 @@
-"use client";
-
 import { memo } from "react";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { buildGlanceKpis } from "@sonafrik/api/creator/presentation";

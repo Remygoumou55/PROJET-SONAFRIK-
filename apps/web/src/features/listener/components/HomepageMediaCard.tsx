@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 
 function MusicNoteIcon({ size = 18, color }: { size?: number; color: string }) {
   return (
@@ -50,7 +51,7 @@ export function MediaCard({ title, subtitle, gradient, href = "/search", badge }
         </div>
         <div
           className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.5)" }}
+          style={{ background: OVERLAY.noir50 }}
         >
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center"

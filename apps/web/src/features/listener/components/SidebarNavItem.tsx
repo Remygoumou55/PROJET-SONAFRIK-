@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { memo } from "react";
 import { usePerformanceFlags } from "@/lib/performance/performance-context";
+import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
 
 export const LISTENER_NAV_ITEMS = [
   { href: "/listen", label: "Accueil", icon: "home" as const },
@@ -79,6 +80,7 @@ export const SidebarNavItem = memo(function SidebarNavItem({
   isActive,
 }: SidebarNavItemProps) {
   const { routePrefetchEnabled } = usePerformanceFlags();
+  const { prefetchOnHover } = useSmartPrefetch([href], { enabled: routePrefetchEnabled, idle: false });
 
   return (
     <Link
@@ -86,6 +88,8 @@ export const SidebarNavItem = memo(function SidebarNavItem({
       prefetch={routePrefetchEnabled}
       className={`ls-nav-item${isActive ? " ls-nav-item--active" : ""}`}
       aria-current={isActive ? "page" : undefined}
+      onMouseEnter={() => prefetchOnHover(href)}
+      onFocus={() => prefetchOnHover(href)}
     >
       <span className="ls-nav-icon">
         <NavIcon icon={icon} />

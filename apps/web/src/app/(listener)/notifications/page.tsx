@@ -1,7 +1,7 @@
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
-import { NotificationsList } from "@/features/shared/notifications/components/NotificationsList";
+import { NotificationsLiveList } from "@/features/shared/notifications/components/NotificationsLiveList";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Notifications — SONAFRIK" };
@@ -20,10 +20,7 @@ export default async function NotificationsPage() {
       <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--color-texte-principal)" }}>
         Notifications
       </h1>
-      <NotificationsList
-        initialNotifications={notifications}
-        userId={context.profile.id}
-      />
+      <NotificationsLiveList initialNotifications={notifications} userId={context.profile.id} />
     </div>
   );
 }

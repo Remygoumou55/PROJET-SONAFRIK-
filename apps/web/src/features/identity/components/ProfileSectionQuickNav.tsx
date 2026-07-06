@@ -1,5 +1,3 @@
-"use client";
-
 const PROFILE_SECTIONS = [
   { id: "profile-musical-identity", label: "Identité" },
   { id: "profile-musical-dna", label: "ADN" },

@@ -118,12 +118,15 @@ function staticChecks() {
 
   const settingsNotif = read("apps/web/src/app/(identity)/settings/notifications/page.tsx");
   const streamNotif = read("apps/web/src/app/(listener)/notifications/page.tsx");
+  const unifiedNotifications =
+    (settingsNotif.includes("NotificationsLiveList") || settingsNotif.includes("NotificationsList")) &&
+    (streamNotif.includes("NotificationsLiveList") || streamNotif.includes("NotificationsList")) &&
+    settingsNotif.includes("createNotificationsService") &&
+    streamNotif.includes("createNotificationsService");
   log(
     "C8 notifications unifiées",
-    settingsNotif.includes("NotificationsList") &&
-      streamNotif.includes("NotificationsList") &&
-      settingsNotif.includes("createNotificationsService"),
-    "settings + /notifications",
+    unifiedNotifications,
+    "settings + /notifications (NotificationsLiveList + service)",
   );
 
   const bell = read("apps/web/src/features/shared/notifications/components/NotificationBell.tsx");

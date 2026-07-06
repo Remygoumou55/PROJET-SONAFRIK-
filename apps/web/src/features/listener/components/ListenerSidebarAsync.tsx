@@ -1,5 +1,3 @@
-"use client";
-
 import { Suspense, use } from "react";
 import type { ListenerSidebarData } from "@sonafrik/types";
 import { useListenSidebarLdse } from "@/features/shared/ldse/listener/useListenSidebarLdse";

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 import { useInView } from "@/hooks/useInView";
-import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 import type { LandingPublicStats } from "@/lib/landing/constants";
 
 const POLL_MS = 30_000;
@@ -59,12 +58,6 @@ export function LiveStats() {
     const id = setInterval(() => void load(), POLL_MS);
     return () => clearInterval(id);
   }, [load]);
-
-  useRealtimeChannel(
-    "landing-live-streams",
-    [{ event: "*", table: "stream_sessions", onEvent: () => void load() }],
-    stats !== null,
-  );
 
   const shellClass =
     "mb-12 border-y border-vert-energie/15 bg-vert-energie/5 px-4 py-4 min-h-[72px]";

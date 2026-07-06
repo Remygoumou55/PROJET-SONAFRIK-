@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { AdminLiveSnapshot } from "@sonafrik/api/admin";
+import type { AdminNavFeatureFlags } from "../lib/admin-nav";
 import { AdminLdseProvider } from "@/features/shared/ldse/admin/AdminLdseProvider";
 import { AdminHeader, type AdminHeaderUser } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
@@ -11,6 +12,7 @@ interface Props {
   liveSnapshot: AdminLiveSnapshot;
   adminUser: AdminHeaderUser;
   disableLiveRealtime?: boolean;
+  navFeatureFlags?: AdminNavFeatureFlags;
 }
 
 export function AdminLayoutClient({
@@ -18,6 +20,7 @@ export function AdminLayoutClient({
   liveSnapshot,
   adminUser,
   disableLiveRealtime = false,
+  navFeatureFlags,
 }: Props) {
   const [navOpen, setNavOpen] = useState(false);
 
@@ -50,7 +53,7 @@ export function AdminLayoutClient({
             onClick={closeNav}
             tabIndex={navOpen ? 0 : -1}
           />
-          <AdminSidebar onNavigate={closeNav} />
+          <AdminSidebar onNavigate={closeNav} featureFlags={navFeatureFlags} />
           <div className="admin-main">
             <AdminHeader
               user={adminUser}

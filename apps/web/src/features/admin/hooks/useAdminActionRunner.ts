@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { ADMIN_ACTION_FALLBACK_ERROR } from "../lib/adminActionShared";
+import { useCallback, useState } from "react";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
 import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { ADMIN_ACTION_FALLBACK_ERROR } from "../lib/adminActionShared";
 
 type ActionFn<T extends Record<string, unknown> = Record<string, unknown>> = () => Promise<
   { error?: string } & T
 >;
 
 interface RunOptions<T> {
+  /** Opt-in snapshot invalidate (défaut : false — préférer ldseEvent). */
   refresh?: boolean;
   onSuccess?: (result: { error?: string } & T) => void;
   /** Publie un événement LDSE après succès (sync sidebar / dashboard sans F5). */
@@ -25,8 +26,7 @@ interface RunOptions<T> {
  */
 export function useAdminActionRunner() {
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
   const run = useCallback(
     async <T extends Record<string, unknown> = Record<string, unknown>>(
@@ -34,6 +34,7 @@ export function useAdminActionRunner() {
       options?: RunOptions<T>,
     ): Promise<({ error?: string } & T) | null> => {
       setError(null);
+      setIsPending(true);
       try {
         const result = await fn();
         if (result.error) {
@@ -43,9 +44,8 @@ export function useAdminActionRunner() {
         options?.onSuccess?.(result);
         if (options?.ldseEvent) {
           publishAdminLdseEvent(options.ldseEvent.type, options.ldseEvent.payload);
-        }
-        if (options?.refresh !== false) {
-          startTransition(() => router.refresh());
+        } else if (options?.refresh === true) {
+          publishAdminLdseEvent(ADMIN_LDSE_EVENTS.snapshotInvalidate);
         }
         return result;
       } catch (err) {
@@ -55,9 +55,11 @@ export function useAdminActionRunner() {
             : ADMIN_ACTION_FALLBACK_ERROR;
         setError(message);
         return null;
+      } finally {
+        setIsPending(false);
       }
     },
-    [router],
+    [],
   );
 
   const clearError = useCallback(() => setError(null), []);

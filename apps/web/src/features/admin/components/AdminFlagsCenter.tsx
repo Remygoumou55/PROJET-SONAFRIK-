@@ -1,5 +1,7 @@
 "use client";
 
+import { OVERLAY } from "@/lib/design/overlayTokens";
+
 import { useState, useTransition } from "react";
 import type { FeatureFlag } from "@sonafrik/types";
 import { toggleFeatureFlagAction } from "../actions/admin.actions";
@@ -46,7 +48,7 @@ export function AdminFlagsCenter({ flags: initial }: Props) {
       {error ? (
         <div
           className="mb-4 rounded-lg px-4 py-3 text-sm"
-          style={{ backgroundColor: "rgba(255,68,68,0.09)", color: "var(--color-erreur)", border: "1px solid rgba(255,68,68,0.2)" }}
+          style={{ backgroundColor: OVERLAY.erreur09, color: "var(--color-erreur)", border: `1px solid ${OVERLAY.erreur25}` }}
         >
           {error}
         </div>
@@ -93,9 +95,9 @@ export function AdminFlagsCenter({ flags: initial }: Props) {
               onClick={() => toggle(flag.name, flag.enabled)}
               className="w-full rounded py-1.5 text-xs font-medium transition-colors"
               style={{
-                backgroundColor: flag.enabled ? "rgba(255,68,68,0.09)" : "rgba(0,210,106,0.04)",
+                backgroundColor: flag.enabled ? OVERLAY.erreur09 : OVERLAY.vert04,
                 color: flag.enabled ? "var(--color-erreur)" : "var(--color-vert-energie)",
-                border: `1px solid ${flag.enabled ? "rgba(255,68,68,0.2)" : "rgba(0,210,106,0.15)"}`,
+                border: `1px solid ${flag.enabled ? OVERLAY.erreur25 : OVERLAY.vertBorder}`,
                 cursor: isPending ? "not-allowed" : "pointer",
               }}
             >

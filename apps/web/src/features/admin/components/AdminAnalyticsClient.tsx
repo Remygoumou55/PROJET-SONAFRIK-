@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AdminAnalyticsDashboard } from "@sonafrik/api/admin";
+import { getAdminHubInvalidateEvents, shouldRefreshAdminAnalytics } from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 import { isValidContentName } from "@/lib/content-filter";
-import { useRealtimeChannel } from "@/hooks/useRealtimeChannel";
 import { fetchAdminAnalyticsDashboard } from "@/features/admin/lib/adminLdseClient";
 import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
 import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
@@ -87,12 +88,14 @@ export function AdminAnalyticsClient({ initialData, initialUpdatedAt }: AdminAna
     }, DEBOUNCE_MS);
   }, [applyDashboard]);
 
-  useRealtimeChannel(
-    "admin-analytics-live",
-    [
-      { event: "INSERT", table: "stream_sessions", onEvent: refreshFromServer },
-      { event: "UPDATE", table: "stream_sessions", onEvent: refreshFromServer },
-    ],
+  const invalidateEvents = useMemo(() => getAdminHubInvalidateEvents(), []);
+
+  useEventSubscription(
+    invalidateEvents,
+    (event) => {
+      if (!shouldRefreshAdminAnalytics(event)) return;
+      refreshFromServer();
+    },
     true,
   );
 

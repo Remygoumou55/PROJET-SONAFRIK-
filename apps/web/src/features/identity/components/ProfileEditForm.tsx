@@ -43,7 +43,6 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
       });
       setSuccess(true);
       publishIdentityLdseEvent(IDENTITY_LDSE_EVENTS.profileUpdated, profile.id);
-      router.refresh();
     } catch {
       setError("Impossible d'enregistrer le profil. Vérifiez les champs.");
     } finally {
@@ -61,7 +60,9 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
           <AvatarUpload
             displayName={fullName || profile.phone || "Utilisateur"}
             initialUrl={avatarUrl}
-            onUploaded={() => router.refresh()}
+            onUploaded={() =>
+              publishIdentityLdseEvent(IDENTITY_LDSE_EVENTS.profileUpdated, profile.id)
+            }
           />
         </CardContent>
       </Card>

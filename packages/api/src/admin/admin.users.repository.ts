@@ -168,6 +168,25 @@ export class AdminUsersRepository {
     });
     if (error) throw error;
   }
+
+  async resolveProfileDisplayLabels(profileIds: string[]): Promise<Record<string, string>> {
+    if (profileIds.length === 0) return {};
+    const { data, error } = await this.client
+      .from("profiles")
+      .select("id, full_name, email")
+      .in("id", profileIds);
+    if (error) throw error;
+
+    const labels: Record<string, string> = {};
+    for (const row of data ?? []) {
+      const name =
+        (row.full_name as string | null)?.trim() ||
+        (row.email as string | null)?.split("@")[0] ||
+        "Administrateur";
+      labels[row.id as string] = name;
+    }
+    return labels;
+  }
 }
 
 export class AdminArtistsRepository {

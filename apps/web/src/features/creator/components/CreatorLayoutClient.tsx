@@ -7,6 +7,28 @@ import { CreatorMobileNav } from "./CreatorMobileNav";
 import { CreatorHeaderUtilities } from "../dashboard/components/enterprise/CreatorHeaderUtilities";
 import type { CreatorNavEntry } from "../lib/creatorNavConfig";
 
+function resolveCreatorPageTitle(pathname: string): string {
+  if (pathname === "/creator/catalog/tracks") return "Mes publications";
+  if (pathname.startsWith("/creator/catalog/tracks/new")) return "Publier";
+  if (/^\/creator\/catalog\/tracks\/[^/]+\/edit/.test(pathname)) return "Modifier la publication";
+  if (pathname.startsWith("/creator/catalog/releases")) return "Albums et morceaux";
+  if (pathname.startsWith("/creator/catalog")) return "Mon catalogue";
+  if (pathname.startsWith("/creator/analytics")) return "Statistiques";
+  if (pathname.startsWith("/creator/identity")) return "Mon profil";
+  if (pathname === "/creator") return "Vue d'ensemble";
+  return "Espace Artiste";
+}
+
+function resolveCreatorPageSubtitle(pathname: string): string | null {
+  if (pathname === "/creator/catalog/tracks") {
+    return "Gérez vos publications, suivez leur validation et leur diffusion.";
+  }
+  if (pathname.startsWith("/creator/catalog/tracks/new")) {
+    return "Partagez votre musique avec le monde entier 🚀";
+  }
+  return null;
+}
+
 export function CreatorLayoutClient({
   navEntries,
   pendingVerifications: _pendingVerifications,
@@ -29,47 +51,36 @@ export function CreatorLayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const pageTitle = resolveCreatorPageTitle(pathname);
+  const pageSubtitle = resolveCreatorPageSubtitle(pathname);
 
   return (
     <div className="min-h-dvh bg-noir-profond creator-workspace">
-      <header className="creator-header border-b border-bordure">
-        <div className="creator-header__inner">
-          <div className="creator-header__row">
-            <div className="creator-header__copy">
-              <h1 className="creator-page-title">
-                {pathname.startsWith("/creator/catalog/tracks")
-                  ? "Publier"
-                  : pathname.startsWith("/creator/catalog/releases")
-                    ? "Albums et morceaux"
-                    : pathname.startsWith("/creator/catalog")
-                      ? "Mon catalogue"
-                      : pathname.startsWith("/creator/analytics")
-                        ? "Statistiques"
-                        : pathname.startsWith("/creator/identity")
-                          ? "Mon profil"
-                          : pathname === "/creator"
-                            ? "Vue d'ensemble"
-                            : "Espace Artiste"}
-              </h1>
-              {pathname.startsWith("/creator/catalog/tracks") && (
-                <p className="creator-page-sub">
-                  Partagez votre musique avec le monde entier 🚀
-                </p>
-              )}
+      <CreatorSidebar navEntries={navEntries} />
+
+      <div className="creator-workspace__body">
+        <header className="creator-header border-b border-bordure">
+          <div className="creator-header__inner">
+            <div className="creator-header__row">
+              <div className="creator-header__copy">
+                <h1 className="creator-page-title">{pageTitle}</h1>
+                {pageSubtitle ? (
+                  <p className="creator-page-sub">{pageSubtitle}</p>
+                ) : null}
+              </div>
+              <CreatorHeaderUtilities
+                userId={userId}
+                initialUnreadCount={initialUnreadCount}
+              />
             </div>
-            <CreatorHeaderUtilities
-              userId={userId}
-              initialUnreadCount={initialUnreadCount}
-            />
           </div>
+        </header>
+
+        <CreatorMobileNav activePath={pathname} navEntries={navEntries} />
+
+        <div className="creator-workspace__main">
+          <div className="creator-workspace__frame">{children}</div>
         </div>
-      </header>
-
-      <CreatorMobileNav activePath={pathname} navEntries={navEntries} />
-
-      <div className="creator-workspace__frame">
-        <CreatorSidebar navEntries={navEntries} />
-        <div className="min-w-0 flex-1 creator-workspace__main">{children}</div>
       </div>
     </div>
   );

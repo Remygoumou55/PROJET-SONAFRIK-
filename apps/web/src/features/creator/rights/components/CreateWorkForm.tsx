@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GENRE_OPTIONS } from "@sonafrik/types";
 import { useRightsService } from "../hooks/useRightsService";
+import { ERROR_BANNER_STYLE } from "@/lib/design/overlayTokens";
 
 interface Props {
   creatorId: string;
@@ -36,7 +37,6 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
         description: description.trim() || undefined,
       });
       router.push(`/creator/rights/${work.id}`);
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de créer l'œuvre.");
     } finally {
@@ -147,7 +147,7 @@ export function CreateWorkForm({ creatorId, onCancel }: Props) {
         {error && (
           <p
             className="text-xs px-3 py-2 rounded-lg"
-            style={{ backgroundColor: "rgba(255,68,68,0.09)", color: "var(--color-erreur)" }}
+            style={ERROR_BANNER_STYLE}
           >
             {error}
           </p>

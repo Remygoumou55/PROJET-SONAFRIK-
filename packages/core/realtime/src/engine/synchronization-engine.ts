@@ -11,6 +11,7 @@ import { getEventRegistry } from "../registry/event-registry";
 import { EventGuard } from "../security/event-guard";
 import { SubscriptionManager } from "../subscription/subscription-manager";
 import { createNoopTransport } from "../transport/adapters";
+import { normalizeSupabaseInbound } from "../transport/inbound-normalizer";
 import { TransportManager } from "../transport/transport-manager";
 import type {
   SrtspConnectionState,
@@ -29,6 +30,8 @@ export interface SynchronizationEngineOptions {
   dedupeTtlMs?: number;
   transport?: SrtspTransportAdapter;
   connectTransportOnInit?: boolean;
+  /** Journalise chaque étape du pipeline (diagnostic E2E — désactivé par défaut). */
+  enablePipelineTrace?: boolean;
 }
 
 /** Moteur central SRTSP Enterprise v1.1. */
@@ -47,8 +50,11 @@ export class SynchronizationEngine {
   readonly metrics: SrtspMetricsApi;
 
   private destinationHandlers = new Map<string, Set<SrtspEventListener>>();
+  private transportInboundBound = false;
+  private readonly pipelineTraceEnabled: boolean;
 
   constructor(options: SynchronizationEngineOptions = {}) {
+    this.pipelineTraceEnabled = options.enablePipelineTrace === true;
     this.guard = new EventGuard(options.requireActor);
     this.deduplication = new DeduplicationStore(options.dedupeTtlMs);
     this.queue = new EventQueue({
@@ -63,6 +69,7 @@ export class SynchronizationEngine {
     });
     this.transport = new TransportManager(options.transport ?? createNoopTransport(), {}, this.journal);
     this.metrics = createMetricsApi(this);
+    this.bindTransportInbound();
 
     if (options.connectTransportOnInit) {
       void this.transport.connect().catch(() => {
@@ -83,24 +90,64 @@ export class SynchronizationEngine {
     return this.transport.getState();
   }
 
+  /** Ingestion transport → bus (sans contourner EventGuard / Registry). */
+  ingestFromTransport(input: SrtspPublishInput): SrtspEvent | null {
+    try {
+      return this.publish(input);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.journal.warn("TRANSPORT_INGEST_SKIP", message, { name: input.name });
+      return null;
+    }
+  }
+
+  private bindTransportInbound(): void {
+    if (this.transportInboundBound) return;
+    this.transportInboundBound = true;
+    this.transport.onInbound((raw) => {
+      this.tracePipeline("transport.inbound", { kind: this.transport.adapter.kind });
+      const input = normalizeSupabaseInbound(raw);
+      if (!input) {
+        this.journal.warn("TRANSPORT_INBOUND_IGNORED", "Message inbound non mappable", {
+          transport: this.transport.adapter.kind,
+        });
+        this.tracePipeline("normalizer.skipped");
+        return;
+      }
+      this.tracePipeline("normalizer.mapped", { name: input.name });
+      this.ingestFromTransport(input);
+    });
+  }
+
+  private tracePipeline(stage: string, context?: Record<string, unknown>): void {
+    if (!this.pipelineTraceEnabled) return;
+    this.journal.info("PIPELINE_TRACE", stage, context);
+  }
+
   publish<TPayload extends Record<string, unknown>>(input: SrtspPublishInput<TPayload>): SrtspEvent<TPayload> {
     try {
       this.guard.assertCanPublish(input);
+      this.tracePipeline("guard.validated", { name: input.name });
       const validated = this.registry.validatePayload(input.name, input.payload);
+      this.tracePipeline("registry.validated", { name: input.name });
       const payload = this.guard.sanitizePayload(validated) as TPayload;
       const event = buildSrtspEventContract(this.registry, input, payload);
+      this.tracePipeline("registry.contract", { eventId: event.id, name: event.name });
 
       const dedupeKey = event.dedupeKey ?? event.id;
       if (this.deduplication.isDuplicate(dedupeKey, event.timestamp)) {
         this.bus.markDropped();
         this.monitor.trackSent();
+        this.tracePipeline("dedupe.dropped", { dedupeKey });
         return event;
       }
+      this.tracePipeline("dedupe.accepted", { dedupeKey });
 
       this.monitor.trackSent();
 
       if (!this.offline.isOnline()) {
         this.offline.bufferEvent(event as SrtspEvent);
+        this.tracePipeline("offline.buffered", { eventId: event.id });
         return event;
       }
 
@@ -118,13 +165,16 @@ export class SynchronizationEngine {
 
   private deliver(event: SrtspEvent): void {
     const start = Date.now();
-    this.bus.deliver(event);
+    this.tracePipeline("bus.deliver.start", { name: event.name, eventId: event.id });
+    const listenerCount = this.bus.deliver(event);
+    this.tracePipeline("bus.delivered", { name: event.name, listenerCount });
     const notified = this.dispatcher.dispatch(event, (dest, ev) => {
       const handlers = this.destinationHandlers.get(dest);
       if (handlers) {
         for (const h of handlers) h(ev);
       }
     });
+    this.tracePipeline("dispatcher.notified", { destinations: notified });
     this.monitor.trackPropagation(start, notified);
     this.monitor.trackReceived();
   }
@@ -147,6 +197,7 @@ export class SynchronizationEngine {
 
   async connectTransport(): Promise<void> {
     await this.transport.connect();
+    this.bindTransportInbound();
   }
 
   async disconnectTransport(): Promise<void> {
@@ -213,13 +264,19 @@ export class SynchronizationEngine {
     this.journal.resetForTests();
     this.transport.resetForTests();
     this.destinationHandlers.clear();
+    this.transportInboundBound = false;
+    this.bindTransportInbound();
   }
 }
 
 let defaultEngine: SynchronizationEngine | null = null;
 
-export function getSynchronizationEngine(): SynchronizationEngine {
-  if (!defaultEngine) defaultEngine = new SynchronizationEngine();
+export function getSynchronizationEngine(
+  options?: SynchronizationEngineOptions,
+): SynchronizationEngine {
+  if (!defaultEngine) {
+    defaultEngine = new SynchronizationEngine(options);
+  }
   return defaultEngine;
 }
 

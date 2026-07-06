@@ -1,5 +1,6 @@
 "use client";
 
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { usePlayer } from "../hooks/usePlayer";
 
 function ShuffleIcon({ active }: { active: boolean }) {
@@ -72,7 +73,7 @@ export function PlayerControls() {
         <button
           onClick={toggleShuffle}
           className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
-          style={{ backgroundColor: shuffle ? "rgba(0,210,106,0.09)" : "transparent" }}
+          style={{ backgroundColor: shuffle ? OVERLAY.vertNav : "transparent" }}
           aria-label={shuffle ? "Désactiver le mode aléatoire" : "Mode aléatoire"}
           title={shuffle ? "Aléatoire activé" : "Aléatoire"}
         >
@@ -145,7 +146,7 @@ export function PlayerControls() {
       <button
         onClick={cycleRepeat}
         className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
-        style={{ backgroundColor: repeatMode !== "off" ? "rgba(0,210,106,0.09)" : "transparent" }}
+        style={{ backgroundColor: repeatMode !== "off" ? OVERLAY.vertNav : "transparent" }}
         aria-label={
           repeatMode === "off" ? "Activer la répétition" :
           repeatMode === "all" ? "Répéter un morceau" :

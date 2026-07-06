@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { LibraryLdseProvider } from "@/features/listener/lib/libraryLdseContext";
 import { LibraryPage } from "@/features/listener/components/LibraryPage";
+import LibraryLoading from "./loading";
 
 export const metadata: Metadata = {
   title: "Bibliothèque — SONAFRIK",
@@ -14,7 +15,7 @@ export default async function Library() {
 
   return (
     <LibraryLdseProvider userId={profile.id}>
-      <Suspense fallback={null}>
+      <Suspense fallback={<LibraryLoading />}>
         <LibraryPage />
       </Suspense>
     </LibraryLdseProvider>

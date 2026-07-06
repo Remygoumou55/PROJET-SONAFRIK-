@@ -1,5 +1,3 @@
-"use client";
-
 import {
   generateDefaultArtwork,
   type CatalogService,

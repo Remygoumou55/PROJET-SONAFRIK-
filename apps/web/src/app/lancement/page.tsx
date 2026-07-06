@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLaunchProgress } from "@/lib/landing/getLaunchProgress";
-import { getLandingArtistsSection } from "@/lib/landing/getLandingArtistsSection";
-import { getAvatarPalette } from "@/lib/landing/artistDisplay";
+import { Suspense } from "react";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
-import { LancementHeroStats } from "@/components/lancement/LancementHeroStats";
-import { LancementProgressBar } from "@/components/lancement/LancementProgressBar";
+import { LancementHeroStatsSection } from "@/components/lancement/LancementHeroStatsSection";
+import { LancementProgressBarSection } from "@/components/lancement/LancementProgressBarSection";
+import { LancementProgressFallback } from "@/components/lancement/LancementProgressFallback";
+import { LancementArtistsSection } from "@/components/lancement/LancementArtistsSection";
 import { LancementHelpSection } from "@/components/lancement/LancementHelpSection";
 import { LancementBuildSection } from "@/components/lancement/LancementBuildSection";
+import { LancementArtistsFallback } from "@/components/lancement/LancementArtistsFallback";
+import { LancementHeroStatsFallback } from "@/components/lancement/LancementHeroStatsFallback";
 
 export const revalidate = 60;
 
@@ -22,12 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function LancementPage() {
-  const [progress, artistsSection] = await Promise.all([
-    getLaunchProgress(),
-    getLandingArtistsSection(),
-  ]);
-
+export default function LancementPage() {
   return (
     <div className="lancement-page">
       <header className="flex items-center justify-between px-6 py-5">
@@ -51,26 +48,14 @@ export default async function LancementPage() {
             SONAFRIK rémunère directement les artistes. Chaque écoute compte. Ensemble, nous
             débloquons le lancement.
           </p>
-          {progress ? (
-            <LancementHeroStats
-              artistCount={progress.artistCount}
-              trackCount={progress.trackCount}
-            />
-          ) : null}
+          <Suspense fallback={<LancementHeroStatsFallback />}>
+            <LancementHeroStatsSection />
+          </Suspense>
         </section>
 
-        {progress ? (
-          <LancementProgressBar
-            current={progress.current}
-            target={progress.target}
-            percentage={progress.percent}
-            launched={progress.launched}
-          />
-        ) : (
-          <p className="lancement-progress-message mb-8">
-            Lancement en cours de préparation
-          </p>
-        )}
+        <Suspense fallback={<LancementProgressFallback />}>
+          <LancementProgressBarSection />
+        </Suspense>
 
         <div className="lancement-cta-row">
           <Link href="/auth/connexion" className="lancement-cta-primary">
@@ -84,41 +69,9 @@ export default async function LancementPage() {
         <LancementHelpSection />
         <LancementBuildSection />
 
-        {artistsSection.artists.length > 0 ? (
-          <div className="lancement-artists text-center">
-            <p className="mb-1 text-base font-bold text-texte-principal">
-              Les artistes fondateurs
-            </p>
-            <p className="mb-6 text-sm text-texte-secondaire">
-              Les premiers artistes qui font confiance à la plateforme
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4">
-              {artistsSection.artists.map((artist) => {
-                const palette = getAvatarPalette(artist.paletteIndex);
-                return (
-                  <Link
-                    key={artist.creatorId}
-                    href={`/listen/artist/${artist.creatorId}`}
-                    className="flex w-[72px] flex-col items-center no-underline"
-                  >
-                    <div
-                      className={`mb-2 flex size-[52px] items-center justify-center rounded-full border-2 text-base font-semibold ${palette.bg} ${palette.text} ${palette.border}`}
-                    >
-                      {artist.initials}
-                    </div>
-                    <p className="text-xs font-medium leading-snug text-texte-principal">
-                      {artist.stageName}
-                    </p>
-                    <p className="text-[11px] leading-snug text-texte-secondaire">
-                      {artist.genre}
-                    </p>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
+        <Suspense fallback={<LancementArtistsFallback />}>
+          <LancementArtistsSection />
+        </Suspense>
       </main>
 
       <footer className="px-6 py-6 text-center">

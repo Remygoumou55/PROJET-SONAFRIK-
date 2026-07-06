@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   adminAwardEditionActionSchema,
   adminBeatActionSchema,
+  adminBeatPreviewPathSchema,
   adminRejectBeatSchema,
 } from "@sonafrik/api/admin";
 import {
@@ -100,5 +101,23 @@ export async function adminDeleteBeatAction(input: { beatId: string }): Promise<
     return {};
   } catch (err) {
     return { error: formatAdminActionError(err, "Impossible de supprimer ce beat.") };
+  }
+}
+
+export async function adminBeatPreviewUrlAction(input: {
+  storagePath: string;
+}): Promise<AdminActionResult & { signedUrl?: string }> {
+  const parsed = adminBeatPreviewPathSchema.safeParse(input);
+  if (!parsed.success) return { error: "Chemin audio invalide." };
+
+  const ctx = await getAdminServiceForAction();
+  if (!ctx.ok) return { error: ctx.error };
+
+  try {
+    const signedUrl = await ctx.service.createBeatPreviewSignedUrl(parsed.data.storagePath);
+    if (!signedUrl) return { error: "Aperçu audio indisponible." };
+    return { signedUrl };
+  } catch (err) {
+    return { error: formatAdminActionError(err, "Impossible de lire l'aperçu audio.") };
   }
 }

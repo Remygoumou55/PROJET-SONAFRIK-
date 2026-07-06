@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge, Button, Card, CardContent } from "@sonafrik/ui";
 import type { Creator, CreatorVerification } from "@sonafrik/types";
 import { VERIFICATION_STATUS_LABELS, VERIFICATION_TYPE_LABELS } from "@sonafrik/types";
 import { VERIFICATION_ACCEPT, resolveVerificationDocMime } from "@sonafrik/shared";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { useCreatorService } from "../hooks/useCreator";
+import { useArtistVerificationsSrtspLive } from "../identity/hooks/useArtistVerificationsSrtspLive";
 
 export function VerificationPanel({
   creator,
@@ -15,8 +16,12 @@ export function VerificationPanel({
   creator: Creator;
   verifications: CreatorVerification[];
 }) {
-  const router = useRouter();
   const creatorService = useCreatorService();
+  const { data: liveVerifications, refresh } = useArtistVerificationsSrtspLive({
+    creatorId: creator.id,
+    userId: creator.owner_id,
+    initialData: initial,
+  });
   const fileRef = useRef<HTMLInputElement>(null);
   const [verifications, setVerifications] = useState(initial);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -24,6 +29,10 @@ export function VerificationPanel({
   const [error, setError] = useState<string | null>(null);
   // Track which verifications had a successful doc upload in this session
   const [uploadedIds, setUploadedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (liveVerifications) setVerifications(liveVerifications);
+  }, [liveVerifications]);
 
   async function create(type: "identity" | "artist" | "label") {
     setLoading(true);
@@ -77,7 +86,7 @@ export function VerificationPanel({
       );
       // Clear upload success indicator once submitted
       setUploadedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
-      router.refresh();
+      refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de soumettre. Réessayez.");
     } finally {
@@ -90,7 +99,7 @@ export function VerificationPanel({
       {error && (
         <p
           className="rounded-lg px-4 py-3 text-sm"
-          style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-danger)" }}
+          style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-danger)" }}
           role="alert"
         >
           {error}
@@ -122,7 +131,7 @@ export function VerificationPanel({
           try {
             await uploadDoc(targetId, file);
             setUploadedIds((prev) => new Set(prev).add(targetId));
-            router.refresh();
+            refresh();
           } catch (err) {
             setError(err instanceof Error ? err.message : "Échec de l'envoi du document.");
           } finally {

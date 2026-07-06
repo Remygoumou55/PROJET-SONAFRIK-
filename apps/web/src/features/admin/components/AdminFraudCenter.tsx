@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getAdminHubInvalidateEvents, shouldRefreshAdminFraud } from "@sonafrik/realtime/adapters";
+import { useEventSubscription } from "@sonafrik/realtime/react";
 import type {
   AdminFraudIncident,
   AdminFraudIncidentsPage,
@@ -83,6 +85,16 @@ export function AdminFraudCenter({ initialPage, stats, initialFilters }: Props) 
 
   useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, refreshLiveData);
   useLdseEvent(ADMIN_LDSE_EVENTS.fraudUpdated, refreshLiveData);
+
+  const fraudInvalidateEvents = useMemo(() => getAdminHubInvalidateEvents(), []);
+  useEventSubscription(
+    fraudInvalidateEvents,
+    (event) => {
+      if (!shouldRefreshAdminFraud(event)) return;
+      refreshLiveData();
+    },
+    true,
+  );
 
   const mergedStats = useMemo(
     () => ({

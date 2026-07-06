@@ -3,6 +3,13 @@ import type { Json } from "@sonafrik/database/types";
 import type { Album, Genre, Track, TrackAppearance, TrackCredit, TrackCreditRole, TrackFile } from "@sonafrik/types";
 import { enrichTrackCreditsWithCreatorIds } from "../common/profile-creator.helpers";
 import type { TrackCreditItem } from "./schemas";
+import { COVER_SOURCE_METADATA_KEY, type CoverSource, type CoverStatus } from "./artwork";
+import {
+  applyPublicationSearchFilter,
+  type PublicationLibrarySort,
+  type PublicationSearchField,
+  publicationSortToOrder,
+} from "./publication-library";
 
 function slugify(value: string): string {
   return value
@@ -20,6 +27,18 @@ export class CatalogRepository {
     const { data, error } = await this.client.rpc("ensure_creator_for_current_user");
     if (error) throw error;
     return data as string;
+  }
+
+  async getArtistStageName(creatorId: string): Promise<string> {
+    const { data, error } = await this.client
+      .from("artist_profiles")
+      .select("stage_name")
+      .eq("creator_id", creatorId)
+      .maybeSingle();
+
+    if (error) throw error;
+    const name = (data as { stage_name?: string | null } | null)?.stage_name?.trim();
+    return name && name.length > 0 ? name : "Artiste";
   }
 
   async getGenres(): Promise<Genre[]> {
@@ -42,6 +61,21 @@ export class CatalogRepository {
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return (data ?? []).map((row) => ({
+      ...(row as Album),
+      metadata: (row.metadata as Record<string, unknown>) ?? {},
+    }));
+  }
+
+  async listAlbumsByIds(albumIds: string[]): Promise<Album[]> {
+    if (albumIds.length === 0) return [];
+    const { data, error } = await this.client
+      .from("albums")
+      .select("*")
+      .in("id", albumIds)
+      .is("deleted_at", null);
 
     if (error) throw error;
     return (data ?? []).map((row) => ({
@@ -130,7 +164,11 @@ export class CatalogRepository {
 
   async countCreatorTracks(
     creatorId: string,
-    options?: { search?: string; status?: string },
+    options?: {
+      search?: string;
+      status?: string;
+      searchFields?: PublicationSearchField[];
+    },
   ): Promise<number> {
     let query = this.client
       .from("tracks")
@@ -138,9 +176,11 @@ export class CatalogRepository {
       .eq("creator_id", creatorId)
       .is("deleted_at", null);
 
-    if (options?.search?.trim()) {
-      query = query.ilike("title", `%${options.search.trim()}%`);
-    }
+    query = applyPublicationSearchFilter(
+      query,
+      options?.search,
+      options?.searchFields ?? ["title"],
+    );
     if (options?.status && options.status !== "all") {
       query = query.eq("publication_status", options.status);
     }
@@ -154,22 +194,31 @@ export class CatalogRepository {
     creatorId: string,
     limit: number,
     offset: number,
-    options?: { search?: string; status?: string },
+    options?: {
+      search?: string;
+      status?: string;
+      sort?: PublicationLibrarySort;
+      searchFields?: PublicationSearchField[];
+    },
   ): Promise<Track[]> {
+    const { column, ascending } = publicationSortToOrder(options?.sort ?? "updated_desc");
+
     let query = this.client
       .from("tracks")
       .select("*")
       .eq("creator_id", creatorId)
-      .is("deleted_at", null)
-      .order("updated_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .is("deleted_at", null);
 
-    if (options?.search?.trim()) {
-      query = query.ilike("title", `%${options.search.trim()}%`);
-    }
+    query = applyPublicationSearchFilter(
+      query,
+      options?.search,
+      options?.searchFields ?? ["title"],
+    );
     if (options?.status && options.status !== "all") {
       query = query.eq("publication_status", options.status);
     }
+
+    query = query.order(column, { ascending }).range(offset, offset + limit - 1);
 
     const { data, error } = await query;
     if (error) throw error;
@@ -306,6 +355,166 @@ export class CatalogRepository {
 
   async submitTrack(trackId: string): Promise<void> {
     const { error } = await this.client.rpc("submit_track_for_review", { p_track_id: trackId });
+    if (error) throw error;
+  }
+
+  async patchAlbumCoverArtworkState(
+    albumId: string,
+    userId: string,
+    input: { source: CoverSource; status: CoverStatus },
+  ): Promise<Album> {
+    const existing = await this.getAlbum(albumId);
+    if (!existing) throw new Error("Album introuvable.");
+
+    const metadata = {
+      ...(existing.metadata ?? {}),
+      [COVER_SOURCE_METADATA_KEY]: input.source,
+    };
+
+    const { data, error } = await this.client
+      .from("albums")
+      .update({
+        metadata: metadata as Json,
+        cover_status: input.status,
+        updated_by: userId,
+      })
+      .eq("id", albumId)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return {
+      ...(data as Album),
+      metadata: (data.metadata as Record<string, unknown>) ?? {},
+    };
+  }
+
+  async patchAlbumMetadata(
+    albumId: string,
+    userId: string,
+    patch: Record<string, unknown>,
+  ): Promise<Album> {
+    const existing = await this.getAlbum(albumId);
+    if (!existing) throw new Error("Album introuvable.");
+
+    const metadata = {
+      ...(existing.metadata ?? {}),
+      ...patch,
+    };
+
+    const { data, error } = await this.client
+      .from("albums")
+      .update({ metadata: metadata as Json, updated_by: userId })
+      .eq("id", albumId)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return {
+      ...(data as Album),
+      metadata: (data.metadata as Record<string, unknown>) ?? {},
+    };
+  }
+
+  async patchTrackMetadata(
+    trackId: string,
+    userId: string,
+    patch: Record<string, unknown>,
+  ): Promise<Track> {
+    const existing = await this.getTrack(trackId);
+    if (!existing) throw new Error("Morceau introuvable.");
+
+    const metadata = {
+      ...(existing.metadata ?? {}),
+      ...patch,
+    };
+
+    const { data, error } = await this.client
+      .from("tracks")
+      .update({ metadata: metadata as Json, updated_by: userId })
+      .eq("id", trackId)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return {
+      ...(data as Track),
+      metadata: (data.metadata as Record<string, unknown>) ?? {},
+    };
+  }
+
+  async upsertTrackLyricsPending(input: {
+    trackId: string;
+    userId: string;
+    language: string;
+    lines: import("@sonafrik/types").LyricLine[];
+  }): Promise<void> {
+    const payload = {
+      lines: input.lines as unknown as Json,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data: existing, error: readError } = await this.client
+      .from("track_lyrics")
+      .select("id")
+      .eq("track_id", input.trackId)
+      .eq("language", input.language)
+      .maybeSingle();
+
+    if (readError) throw readError;
+
+    if (existing?.id) {
+      const { error } = await this.client
+        .from("track_lyrics")
+        .update(payload)
+        .eq("id", existing.id);
+      if (error) throw error;
+      return;
+    }
+
+    const { error } = await this.client.from("track_lyrics").insert({
+      track_id: input.trackId,
+      language: input.language,
+      lines: input.lines as unknown as Json,
+      submitted_by: input.userId,
+      status: "pending",
+    });
+    if (error) throw error;
+  }
+
+  async getTrackLyricsPending(
+    trackId: string,
+    language: string,
+  ): Promise<import("@sonafrik/types").LyricLine[]> {
+    const { data, error } = await this.client
+      .from("track_lyrics")
+      .select("lines")
+      .eq("track_id", trackId)
+      .eq("language", language)
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data?.lines || !Array.isArray(data.lines)) return [];
+
+    return (data.lines as unknown[]).filter(
+      (line): line is import("@sonafrik/types").LyricLine =>
+        typeof line === "object" &&
+        line !== null &&
+        "time" in line &&
+        "text" in line &&
+        typeof (line as import("@sonafrik/types").LyricLine).time === "number" &&
+        typeof (line as import("@sonafrik/types").LyricLine).text === "string",
+    );
+  }
+
+  async deleteTrackLyricsPending(trackId: string, language: string): Promise<void> {
+    const { error } = await this.client
+      .from("track_lyrics")
+      .delete()
+      .eq("track_id", trackId)
+      .eq("language", language)
+      .eq("status", "pending");
     if (error) throw error;
   }
 

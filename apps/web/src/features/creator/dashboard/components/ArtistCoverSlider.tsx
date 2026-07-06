@@ -7,13 +7,13 @@ import type { CropResult } from "./CropEditorModal";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 import { useCreatorService } from "../../hooks/useCreator";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
+import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
 import {
   compressImageFile,
   IMAGE_UPLOAD,
   isAllowedImageMime,
 } from "@/lib/image/compress-image";
-import { useRouter } from "next/navigation";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 
 type AllowedImageMime = ImageMime;
@@ -44,7 +44,6 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
   cropZoom,
 }: ArtistCoverSliderProps) {
   const creatorService = useCreatorService();
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localCoverPath, setLocalCoverPath] = useState(primaryCoverPath);
@@ -171,14 +170,14 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       setPendingOriginalFile(null);
       if (cropSrc?.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
       setCropSrc(null);
-      router.refresh();
+      publishArtistProfileUpdate(creatorId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Échec de l'enregistrement.");
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService, router]);
+  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService]);
 
   return (
     <>

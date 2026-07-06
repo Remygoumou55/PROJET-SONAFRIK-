@@ -6,6 +6,7 @@ import { Badge, Button, Card, CardContent, Modal } from "@sonafrik/ui";
 import type { UserSession } from "@sonafrik/types";
 import { useIdentityService } from "../hooks/useIdentity";
 import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { formatDateWithTime } from "@/lib/formatters";
 
 interface SessionListProps {
@@ -33,7 +34,6 @@ export function SessionList({ sessions: initial }: SessionListProps) {
     try {
       await identity.revokeSession(sessionId);
       setSessions((current) => current.filter((session) => session.id !== sessionId));
-      router.refresh();
     } finally {
       setLoadingId(null);
     }
@@ -104,7 +104,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
             className="hover:bg-rouge-alerte/5 w-full rounded-xl px-[18px] py-3 text-sm font-medium transition-colors"
             style={{
               background: "transparent",
-              border: "1px solid rgba(255, 77, 79, 0.3)",
+              border: `1px solid ${OVERLAY.erreur25}`,
               color: "var(--color-danger)",
             }}
           >

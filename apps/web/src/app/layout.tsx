@@ -1,12 +1,13 @@
 ﻿import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
+import { connection } from "next/server";
 import { Montserrat } from "next/font/google";
 import { SONAFRIK_BRAND } from "@sonafrik/types";
-import { RootLdseShell } from "@/features/shared/ldse/RootLdseShell";
 import "./globals.css";
 
+/** Variable font — un seul fichier réseau au lieu de 4 poids statiques (LCP texte). */
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
   variable: "--font-montserrat",
   display: "swap",
   preload: true,
@@ -50,11 +51,15 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Requis pour CSP nonce en prod — sans cela les scripts Next.js sont bloqués (écran noir).
+  await connection();
+  void (await headers()).get("x-nonce");
+
   return (
     <html lang="fr" className="dark">
       <head>
@@ -63,11 +68,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <link rel="preconnect" href="https://accounts.google.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
-        <link rel="prefetch" href="/listen" as="document" />
-        <link rel="prefetch" href="/auth/connexion" as="document" />
       </head>
       <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-noir-profond text-texte-principal`}>
-        <RootLdseShell>{children}</RootLdseShell>
+        {children}
       </body>
     </html>
   );

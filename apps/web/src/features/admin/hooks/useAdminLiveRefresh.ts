@@ -1,29 +1,10 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient, isLocalAuditMode } from "@/lib/supabase/client";
+import { getAdminHubInvalidateEvents, shouldRefreshAdminHub } from "@sonafrik/realtime/adapters";
+import { useEventSubscription, useSrtspOptional } from "@sonafrik/realtime/react";
+import { isLocalAuditMode } from "@/lib/supabase/client";
 import { ldseEventBus } from "@/features/shared/ldse/event-bus";
-import {
-  ADMIN_LDSE_EVENTS,
-  mapAdminRealtimeTableToEvents,
-} from "@/features/shared/ldse/admin/admin-ldse-config";
-import { ldseObservability } from "@/features/shared/ldse/observability";
-
-/** Tables qui impactent KPIs, badges sidebar ou activité admin. */
-export const ADMIN_REALTIME_TABLES = [
-  "profiles",
-  "artist_profiles",
-  "creators",
-  "stream_sessions",
-  "wallet_ledger",
-  "albums",
-  "tracks",
-  "withdrawals",
-  "rights_claims",
-  "creator_verifications",
-  "audit_logs",
-] as const;
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { useLdseEvent } from "@/features/shared/ldse/LdseProvider";
 
 const DEBOUNCE_MS = 300;
 const FALLBACK_POLL_MS = 60_000;
@@ -44,41 +25,40 @@ interface Options {
 }
 
 /**
- * Rafraîchit les RSC admin à chaque changement DB (< 1 s via Supabase Realtime).
- * Repli polling 60 s si Realtime indisponible (audit local, erreur channel).
+ * Pont SRTSP hub → LDSE snapshot (sans channel Supabase direct).
  */
 export function useAdminLiveRefresh(options?: Options) {
-  const router = useRouter();
   const [liveTime, setLiveTime] = useState<string | null>(null);
   const [mode, setMode] = useState<AdminLiveMode>("connecting");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const disableRealtime = options?.disableRealtime === true || isLocalAuditMode();
+  const srtsp = useSrtspOptional();
+  const invalidateEvents = getAdminHubInvalidateEvents();
 
-  const refresh = useCallback(() => {
-    try {
-      router.refresh();
-      setLiveTime(formatLiveTime(new Date()));
-    } catch {
-      setMode("polling");
-    }
-  }, [router]);
+  const publishSnapshotInvalidate = useCallback(() => {
+    ldseEventBus.publish(ADMIN_LDSE_EVENTS.snapshotInvalidate);
+    setLiveTime(formatLiveTime(new Date()));
+  }, []);
 
   const scheduleRefresh = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       debounceRef.current = null;
-      ldseEventBus.publish(ADMIN_LDSE_EVENTS.snapshotInvalidate);
+      publishSnapshotInvalidate();
     }, DEBOUNCE_MS);
-  }, []);
+  }, [publishSnapshotInvalidate]);
 
-  const onRealtimeChange = useCallback(
-    (table: (typeof ADMIN_REALTIME_TABLES)[number]) => {
-      for (const eventType of mapAdminRealtimeTableToEvents(table)) {
-        ldseEventBus.publish(eventType, { table });
-      }
+  useLdseEvent(ADMIN_LDSE_EVENTS.snapshotRefreshed, () => {
+    setLiveTime(formatLiveTime(new Date()));
+  });
+
+  useEventSubscription(
+    invalidateEvents,
+    (event) => {
+      if (!shouldRefreshAdminHub(event)) return;
       scheduleRefresh();
     },
-    [scheduleRefresh],
+    !disableRealtime,
   );
 
   useEffect(() => {
@@ -86,56 +66,34 @@ export function useAdminLiveRefresh(options?: Options) {
       setMode("polling");
       return;
     }
-
-    let cancelled = false;
-
-    try {
-      const supabase = getSupabaseBrowserClient();
-      const channelName = `admin_live_${Date.now()}`;
-
-      let channel = supabase.channel(channelName);
-      for (const table of ADMIN_REALTIME_TABLES) {
-        channel = channel.on(
-          "postgres_changes",
-          { event: "*", schema: "public", table },
-          () => onRealtimeChange(table),
-        );
-      }
-
-      channel.subscribe((status) => {
-        if (cancelled) return;
-        if (status === "SUBSCRIBED") {
-          setMode("realtime");
-          ldseObservability.setActiveRealtimeChannels(1);
-          refresh();
-        } else if (
-          status === "CHANNEL_ERROR" ||
-          status === "TIMED_OUT" ||
-          status === "CLOSED"
-        ) {
-          setMode("polling");
-          ldseObservability.setActiveRealtimeChannels(0);
-        }
-      });
-
-      return () => {
-        cancelled = true;
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        ldseObservability.setActiveRealtimeChannels(0);
-        void supabase.removeChannel(channel);
-      };
-    } catch {
-      setMode("polling");
-      return undefined;
+    if (srtsp?.connectionState === "online") {
+      setMode("realtime");
+      publishSnapshotInvalidate();
+      return;
     }
-  }, [disableRealtime, refresh, onRealtimeChange]);
+    setMode("connecting");
+    const id = window.setInterval(() => {
+      if (srtsp?.connectionState === "online") {
+        setMode("realtime");
+        publishSnapshotInvalidate();
+        window.clearInterval(id);
+      }
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [disableRealtime, publishSnapshotInvalidate, srtsp]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (mode !== "polling") return;
-    refresh();
-    const id = window.setInterval(refresh, FALLBACK_POLL_MS);
+    publishSnapshotInvalidate();
+    const id = window.setInterval(publishSnapshotInvalidate, FALLBACK_POLL_MS);
     return () => window.clearInterval(id);
-  }, [mode, refresh]);
+  }, [mode, publishSnapshotInvalidate]);
 
   return { liveTime, mode };
 }

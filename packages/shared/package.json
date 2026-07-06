@@ -32,6 +32,14 @@
     "./streaming": {
       "types": "./dist/streaming/buildStreamCompletePayload.d.ts",
       "default": "./dist/streaming/buildStreamCompletePayload.js"
+    },
+    "./cover": {
+      "types": "./dist/cover/index.d.ts",
+      "default": "./dist/cover/index.js"
+    },
+    "./publication-wizard": {
+      "types": "./dist/publication-wizard/index.d.ts",
+      "default": "./dist/publication-wizard/index.js"
     }
   },
   "scripts": {

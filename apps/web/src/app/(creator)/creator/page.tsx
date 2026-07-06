@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { CreatorDashboard } from "@/features/creator/components/CreatorDashboard";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
+import { formatCreatorGreeting } from "@/features/creator/lib/greeting";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createCreatorService } from "@sonafrik/api/creator";
 import { createListenerService } from "@sonafrik/api/listener";
@@ -10,13 +11,20 @@ import CreatorPageLoading from "./loading";
 async function CreatorDashboardContent() {
   const context = await requireCreatorContext();
   const supabase = await getSupabaseServerClient();
+  const stageName = context.artistProfile.stage_name || "Artiste";
 
   const [data, careerOsEnabled] = await Promise.all([
     createCreatorService(supabase).getDashboardDataForContext(context),
     createListenerService(supabase).isFeatureEnabled("career_os").catch(() => false),
   ]);
 
-  return <CreatorDashboard data={data} careerOsEnabled={careerOsEnabled} />;
+  return (
+    <CreatorDashboard
+      data={data}
+      careerOsEnabled={careerOsEnabled}
+      greeting={formatCreatorGreeting(stageName)}
+    />
+  );
 }
 
 function CreatorDashboardError() {

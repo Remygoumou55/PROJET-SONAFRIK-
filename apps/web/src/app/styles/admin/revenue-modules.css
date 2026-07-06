@@ -1,0 +1,232 @@
+/* ===== Module Revenus / Retraits ===== */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--color-admin-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-tab:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-texte-principal);
+  font-weight: 600;
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
+.admin-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-texte-principal);
+  margin: 0 0 20px;
+}
+
+.admin-card-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-card-header-row .admin-card-title {
+  margin-bottom: 0;
+}
+
+.admin-kpis-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.admin-kpi-card--warning {
+  border-color: rgba(255, 140, 0, 0.3);
+}
+
+.admin-kpi-value--warning {
+  color: var(--color-avertissement);
+}
+
+.admin-alerts-bar--warning {
+  border-color: rgba(255, 140, 0, 0.3);
+  background: rgba(255, 140, 0, 0.06);
+}
+
+.admin-alerts-bar--danger {
+  border-color: rgba(255, 68, 68, 0.3);
+  background: rgba(255, 68, 68, 0.06);
+}
+
+.admin-alerts-action {
+  margin-left: auto;
+}
+
+.admin-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-td-strong {
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.admin-td-success {
+  color: var(--color-vert-energie);
+  font-weight: 600;
+}
+
+.admin-td-warning {
+  color: var(--color-avertissement);
+}
+
+.admin-td-warning-sm {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: var(--color-avertissement);
+}
+
+.admin-td-muted {
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-td-muted-sm {
+  font-size: 11px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-mono {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--color-texte-secondaire);
+}
+
+.admin-rank-medal {
+  font-weight: 700;
+}
+
+.admin-rank-num {
+  font-weight: 700;
+  color: var(--color-texte-desactive);
+}
+
+.revenue-types-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.revenue-type-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.revenue-type-info {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.revenue-type-label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--color-texte-secondaire);
+}
+
+.revenue-type-amount {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-vert-energie);
+}
+
+.revenue-type-amount--commission {
+  color: var(--color-or-solaire);
+}
+
+.revenue-type-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.revenue-type-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.revenue-type-fill {
+  height: 100%;
+  background: var(--color-vert-energie);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.revenue-type-pct {
+  width: 40px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--color-texte-desactive);
+}
+
+.admin-revenue-table-wrap {
+  margin-top: 20px;
+}
+
+@media print {
+  .admin-sidebar,
+  .admin-topbar,
+  .admin-tabs,
+  .admin-btn,
+  .admin-moderation-actions,
+  .admin-filters,
+  .admin-pagination {
+    display: none !important;
+  }
+
+  .admin-main {
+    margin: 0;
+  }
+
+  .admin-card {
+    break-inside: avoid;
+  }
+}

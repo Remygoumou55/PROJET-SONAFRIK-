@@ -1,28 +1,27 @@
-# SRTSP v1.1 — FREEZE DÉFINITIF
+# SRTSP v3.9 — FREEZE (Phase 3.9 Workspace Super Admin Hub)
 
-**Package :** `@sonafrik/realtime` v1.1.0  
-**Date freeze :** 2026-07-05  
-**Statut :** 🧊 CERTIFICATION ENTERPRISE
+**Package :** `@sonafrik/realtime` v3.9.0  
+**Date freeze :** 2026-07-05
 
-## Périmètre gelé
+| Version | Note |
+|---|---|
+| v3.7.0 | Artist Profile Hub consumer |
+| v3.8.0 | Workspace Auditeur Hub consumer |
+| v3.9.0 | Workspace Super Admin Hub consumer |
 
-```
-packages/core/realtime/**
-docs/realtime/**
-```
+## Intégration app
 
-## Modification autorisée uniquement si
+- `useAdminSrtspLiveQuery.ts` → SSOT Super Admin
+- `useAdminUsersSrtspLive.ts` → `/admin/users`
+- `useAdminArtistsSrtspLive.ts` → `/admin/artists`
+- `useAdminCatalogSrtspLive.ts` → modération catalogue
+- `useAdminWithdrawalsSrtspLive.ts` → `/admin/withdrawals`
+- `useAdminRevenueSrtspLive.ts` → `/admin/finance`
+- `useAdminAwardsSrtspLive.ts` → `/admin/awards`
+- `AdminLdseProvider.tsx` → snapshot SRTSP + LDSE bridge
+- `useAdminLiveRefresh.ts` → pont DB Realtime → LDSE (0 F5)
 
-- Bug critique prouvé avec reproduction
-- Faille de sécurité documentée
+## Gelé — ne pas modifier
 
-## Interdit sans ADR
-
-- Modifier les contrats d'événements (`SRTSP_DOMAIN_EVENTS`) sans migration version
-- Brancher transport sans passer par `TransportManager`
-- Contourner `EventGuard` ou RLS
-
-## Intégration app (hors freeze package)
-
-- `apps/web/src/features/shared/srtsp/` — bridge LDSE (v1.0)
-- Modules certifiés : **NE PAS MODIFIER**
+- Phases 3.1 → 3.8 consumers
+- Workspace Super Admin Hub (v3.9.0)

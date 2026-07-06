@@ -9,9 +9,13 @@ import type { AdminRightsClaim } from "@sonafrik/api/admin";
 import {
   RIGHTS_CLAIM_TYPE_LABELS,
   RIGHTS_CLAIM_STATUS_LABELS,
-  type RightsClaimType,
   type RightsClaimStatus,
 } from "@sonafrik/types";
+import {
+  OVERLAY,
+  RIGHTS_CLAIM_STATUS_STYLES,
+  RIGHTS_CLAIM_TYPE_STYLES,
+} from "@/lib/design/overlayTokens";
 
 export type ClaimWithContext = AdminRightsClaim;
 
@@ -29,18 +33,8 @@ const STATUS_FILTERS: { label: string; value: StatusFilter }[] = [
   { label: "Tout",         value: "all" },
 ];
 
-const STATUS_COLORS: Record<RightsClaimStatus, { bg: string; text: string }> = {
-  pending:   { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
-  accepted:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
-  rejected:  { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
-  escalated: { bg: "rgba(168,85,247,0.13)",  text: "var(--color-accent-violet-clair)" },
-};
-
-const TYPE_COLORS: Record<RightsClaimType, { color: string; bg: string }> = {
-  ownership:     { color: "var(--color-info)",       bg: "rgba(59, 130, 246, 0.13)" },
-  infringement:  { color: "var(--color-erreur)",     bg: "rgba(255, 68, 68, 0.13)" },
-  takedown:      { color: "var(--color-or-solaire)", bg: "rgba(255, 194, 14, 0.13)" },
-};
+const STATUS_COLORS = RIGHTS_CLAIM_STATUS_STYLES;
+const TYPE_COLORS = RIGHTS_CLAIM_TYPE_STYLES;
 
 export function AdminRightsCenter({ initialClaims }: Props) {
   const { error, isPending, run } = useAdminActionRunner();
@@ -119,7 +113,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       </div>
 
       {error && (
-        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
+        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
@@ -202,7 +196,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         disabled={busy || isPending}
                         onClick={() => handleAccept(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                        style={{ backgroundColor: "rgba(0,210,106,0.13)", color: "var(--color-vert-energie)" }}
+                        style={{ backgroundColor: OVERLAY.vertSoft, color: "var(--color-vert-energie)" }}
                       >
                         {busy ? "…" : "Accepter"}
                       </button>
@@ -211,7 +205,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                           disabled={busy || isPending}
                           onClick={() => handleEscalate(claim.id)}
                           className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                          style={{ backgroundColor: "rgba(168,85,247,0.13)", color: "var(--color-accent-violet-clair)" }}
+                          style={{ backgroundColor: OVERLAY.violetSoft, color: "var(--color-accent-violet-clair)" }}
                         >
                           Escalader
                         </button>
@@ -220,7 +214,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
                         disabled={busy || isPending}
                         onClick={() => handleReject(claim.id)}
                         className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-40 transition-opacity"
-                        style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
+                        style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}
                       >
                         Rejeter
                       </button>
@@ -237,7 +231,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
       {modal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
+          style={{ backgroundColor: OVERLAY.noir75 }}
         >
           <div
             className="w-full max-w-md space-y-4 rounded-2xl p-6"
@@ -259,7 +253,7 @@ export function AdminRightsCenter({ initialClaims }: Props) {
               <button
                 onClick={confirmReject}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
-                style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}
+                style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}
               >
                 Confirmer le rejet
               </button>

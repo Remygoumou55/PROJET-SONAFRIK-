@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { AdminArtistListItem, AdminArtistsFilter, AdminCreatorTier } from "@sonafrik/types";
 import {
   adminChangeArtistTierAction,
@@ -10,6 +9,9 @@ import {
   adminVerifyArtistAction,
   adminWarnCreatorAction,
 } from "@/features/admin/actions/admin-moderation.actions";
+import { ADMIN_LDSE_EVENTS } from "@/features/shared/ldse/admin/admin-ldse-config";
+import { publishAdminLdseEvent } from "@/features/shared/ldse/admin/AdminLdseProvider";
+import { useAdminArtistsSrtspLive } from "../hooks/useAdminArtistsSrtspLive";
 import { AdminTable } from "./AdminTable";
 import { AdminStatusBadge } from "./AdminStatusBadge";
 import { AdminSearchBar } from "./AdminSearchBar";
@@ -65,8 +67,17 @@ export function AdminArtistsClient({
   const [selectedArtist, setSelectedArtist] = useState<SelectedArtist | null>(null);
   const [expandedArtist, setExpandedArtist] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const router = useRouter();
+
+  const live = useAdminArtistsSrtspLive({
+    initialData: { artists, total, page, limit },
+    filter: currentFilter,
+    query: currentQuery,
+    page,
+  });
+  const liveArtists = live.data?.artists ?? artists;
+  const liveTotal = live.data?.total ?? total;
+  const livePage = live.data?.page ?? page;
+  const liveLimit = live.data?.limit ?? limit;
 
   const handleVerify = async (creatorId: string, approved: boolean) => {
     setActionError(null);
@@ -79,7 +90,7 @@ export function AdminArtistsClient({
       setActionError(result.error);
       return;
     }
-    startTransition(() => router.refresh());
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.userUpdated, { creatorId });
   };
 
   const handleChangeTier = async (creatorId: string, newTier: AdminCreatorTier) => {
@@ -89,7 +100,7 @@ export function AdminArtistsClient({
       setActionError(result.error);
       return;
     }
-    startTransition(() => router.refresh());
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.userUpdated, { creatorId, newTier });
   };
 
   const executeModeration = async () => {
@@ -110,7 +121,7 @@ export function AdminArtistsClient({
     }
 
     setSelectedArtist(null);
-    startTransition(() => router.refresh());
+    publishAdminLdseEvent(ADMIN_LDSE_EVENTS.userUpdated, { creatorId: selectedArtist.creatorId });
   };
 
   const columns = [
@@ -267,14 +278,14 @@ export function AdminArtistsClient({
   ];
 
   const filters: { key: AdminArtistsFilter; label: string }[] = [
-    { key: "all", label: `Tous (${total.toLocaleString("fr-FR")})` },
+    { key: "all", label: `Tous (${liveTotal.toLocaleString("fr-FR")})` },
     { key: "pending", label: "À vérifier" },
     { key: "verified", label: "Vérifiés" },
     { key: "tier_etabli", label: "Établis" },
     { key: "suspended", label: "Suspendus" },
   ];
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(liveTotal / liveLimit);
   const filterKey = currentFilter ?? "all";
   const confirmFirstName = (selectedArtist?.name ?? "CONFIRMER").split(" ")[0]?.toUpperCase() ?? "CONFIRMER";
 
@@ -308,7 +319,7 @@ export function AdminArtistsClient({
 
       <AdminTable
         columns={columns}
-        data={artists}
+        data={liveArtists}
         keyField="creator_id"
         emptyMessage="Aucun artiste trouvé."
         expandedRowKey={expandedArtist}
@@ -348,20 +359,20 @@ export function AdminArtistsClient({
 
       {totalPages > 1 ? (
         <div className="admin-pagination">
-          {page > 1 ? (
+          {livePage > 1 ? (
             <a
-              href={buildPageHref(page - 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
+              href={buildPageHref(livePage - 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
               className="admin-btn admin-btn-ghost admin-btn-sm"
             >
               ← Précédent
             </a>
           ) : null}
           <span className="admin-pagination-info">
-            Page {page} / {totalPages} — {total.toLocaleString("fr-FR")} résultats
+            Page {livePage} / {totalPages} — {liveTotal.toLocaleString("fr-FR")} résultats
           </span>
-          {page < totalPages ? (
+          {livePage < totalPages ? (
             <a
-              href={buildPageHref(page + 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
+              href={buildPageHref(livePage + 1, filterKey !== "all" ? filterKey : undefined, currentQuery)}
               className="admin-btn admin-btn-ghost admin-btn-sm"
             >
               Suivant →

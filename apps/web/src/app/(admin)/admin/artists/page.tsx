@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { AdminArtistsFilter } from "@sonafrik/types";
 import { AdminArtistsClient } from "@/features/admin/components/AdminArtistsClient";
 import { AdminPageFrame } from "@/features/admin/components/AdminPageFrame";
+import { AdminPageSkeleton } from "@/features/admin/components/AdminPageSkeleton";
 import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +46,7 @@ export default async function AdminArtistsPage({ searchParams }: AdminArtistsPag
       title="Artistes"
       subtitle={`${data.total.toLocaleString("fr-FR")} artiste${data.total > 1 ? "s" : ""} sur SONAFRIK`}
     >
-      <Suspense fallback={null}>
+      <Suspense fallback={<AdminPageSkeleton variant="list" rows={10} />}>
         <AdminArtistsClient
           artists={data.artists}
           total={data.total}

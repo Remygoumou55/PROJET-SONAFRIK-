@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 import { OnboardingStepPill } from "./OnboardingStepPill";

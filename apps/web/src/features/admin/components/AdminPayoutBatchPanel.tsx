@@ -8,6 +8,7 @@ import {
   adminCreatePayoutBatchAction,
   adminListPayoutBatchesAction,
 } from "../actions/admin-financial.actions";
+import { OVERLAY } from "@/lib/design/overlayTokens";
 import { useAdminActionRunner } from "../hooks/useAdminActionRunner";
 
 interface Props {
@@ -105,7 +106,7 @@ export function AdminPayoutBatchPanel({ initialBatches }: Props) {
       </div>
 
       {error && (
-        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
+        <p className="text-sm rounded-lg px-3 py-2" style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}

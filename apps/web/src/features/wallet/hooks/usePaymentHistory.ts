@@ -1,32 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import type { PaymentIntent } from "@sonafrik/types";
 import { PAYMENT_ERROR_MESSAGES } from "@sonafrik/types";
-import { PaymentError } from "@sonafrik/api/payments";
 import { usePaymentService } from "./usePaymentService";
+import { useWalletUserId } from "./useWalletUserId";
+import { useWalletSrtspLiveQuery } from "./useWalletSrtspLiveQuery";
 
 export function usePaymentHistory(limit = 10) {
   const service = usePaymentService();
-  const [intents, setIntents] = useState<PaymentIntent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const userId = useWalletUserId();
 
-  useEffect(() => {
-    setError(null);
-    service
-      .listUserIntents(limit)
-      .then(setIntents)
-      .catch((err: unknown) => {
-        setIntents([]);
-        if (err instanceof PaymentError) {
-          setError(err.message);
-        } else {
-          setError(PAYMENT_ERROR_MESSAGES.unknown ?? "Une erreur est survenue.");
-        }
-      })
-      .finally(() => setIsLoading(false));
+  const fetchHistory = useCallback(async (): Promise<PaymentIntent[]> => {
+    try {
+      return await service.listUserIntents(limit);
+    } catch (err: unknown) {
+      if (err instanceof Error) throw err;
+      throw new Error(PAYMENT_ERROR_MESSAGES.unknown ?? "Une erreur est survenue.");
+    }
   }, [service, limit]);
 
-  return { intents, isLoading, error };
+  const {
+    data: intents,
+    loading: isLoading,
+    error: liveError,
+  } = useWalletSrtspLiveQuery<PaymentIntent[]>({
+    userId,
+    queryKey: userId ? `wallet-payments:${userId}:${limit}` : "wallet-payments:pending",
+    fetcher: fetchHistory,
+    initialData: [],
+    enabled: Boolean(userId),
+  });
+
+  const error: string | null = liveError?.message ?? null;
+
+  return { intents: intents ?? [], isLoading: isLoading || !userId, error };
 }

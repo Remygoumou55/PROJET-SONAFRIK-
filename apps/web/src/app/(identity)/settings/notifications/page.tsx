@@ -1,7 +1,7 @@
 import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createNotificationsService } from "@sonafrik/api/notifications";
-import { NotificationsList } from "@/features/shared/notifications/components/NotificationsList";
+import { NotificationsLiveList } from "@/features/shared/notifications/components/NotificationsLiveList";
 
 export default async function SettingsNotificationsPage() {
   const context = await requireIdentityContext();
@@ -14,7 +14,7 @@ export default async function SettingsNotificationsPage() {
 
   return (
     <div className="space-y-4">
-      <NotificationsList initialNotifications={notifications} userId={context.profile.id} />
+      <NotificationsLiveList initialNotifications={notifications} userId={context.profile.id} />
     </div>
   );
 }

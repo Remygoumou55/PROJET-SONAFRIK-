@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { AdminPayoutEntry, WithdrawalStatus } from "@sonafrik/types";
+import type { AdminPayoutEntry } from "@sonafrik/types";
 import { PAYOUT_ACCOUNT_LABELS, WITHDRAWAL_STATUS_LABELS } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
 import { formatDateTime } from "@/lib/formatters";
@@ -19,18 +19,12 @@ import { AdminActionBtn } from "./AdminActionBtn";
 import { AdminPayoutModal } from "./AdminPayoutModal";
 import { AdminRoyaltyPanel } from "./AdminRoyaltyPanel";
 import { AdminPayoutBatchPanel } from "./AdminPayoutBatchPanel";
+import { OVERLAY, WITHDRAWAL_STATUS_STYLES } from "@/lib/design/overlayTokens";
 import type { RoyaltyCycle, PayoutBatch } from "@sonafrik/types";
 
 type StatusFilter = "pending" | "approved" | "processing" | "completed" | "cancelled" | "all";
 
-const STATUS_COLORS: Record<WithdrawalStatus, { bg: string; text: string }> = {
-  pending:    { bg: "rgba(255,194,14,0.13)",  text: "var(--color-or-solaire)" },
-  approved:   { bg: "rgba(59,130,246,0.13)",  text: "var(--color-accent-bleu-clair)" },
-  processing: { bg: "rgba(245,158,11,0.13)",  text: "var(--color-avertissement)" },
-  completed:  { bg: "rgba(0,210,106,0.13)",   text: "var(--color-vert-energie)" },
-  failed:     { bg: "rgba(255,68,68,0.13)",   text: "var(--color-erreur)" },
-  cancelled:  { bg: "rgba(85,85,85,0.13)",    text: "var(--color-texte-desactive)" },
-};
+const STATUS_COLORS = WITHDRAWAL_STATUS_STYLES;
 
 const FILTERS: { label: string; value: StatusFilter }[] = [
   { label: "En attente",  value: "pending" },
@@ -138,7 +132,7 @@ export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initial
       </div>
 
       {error && (
-        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: "rgba(255,68,68,0.13)", color: "var(--color-erreur)" }}>
+        <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: OVERLAY.erreurSoft, color: "var(--color-erreur)" }}>
           {error}
         </p>
       )}
@@ -189,19 +183,19 @@ export function AdminFinanceCenter({ initialQueue, initialRoyaltyCycles, initial
                     {entry.status === "pending" && (
                       <>
                         <AdminActionBtn label="Approuver" color="var(--color-vert-energie)" textColor="var(--color-noir-profond)" disabled={busy || isPending} onClick={() => handleApprove(entry.id)} />
-                        <AdminActionBtn label="Rejeter" color="rgba(255,68,68,0.13)" textColor="var(--color-erreur)" disabled={busy || isPending} onClick={() => handleReject(entry.id)} />
+                        <AdminActionBtn label="Rejeter" color={OVERLAY.erreurSoft} textColor="var(--color-erreur)" disabled={busy || isPending} onClick={() => handleReject(entry.id)} />
                       </>
                     )}
                     {entry.status === "approved" && (
                       <>
-                        <AdminActionBtn label="Traiter" color="rgba(59,130,246,0.13)" textColor="var(--color-accent-bleu-clair)" disabled={busy || isPending} onClick={() => handleProcess(entry.id)} />
-                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
+                        <AdminActionBtn label="Traiter" color={OVERLAY.bleuSoft} textColor="var(--color-accent-bleu-clair)" disabled={busy || isPending} onClick={() => handleProcess(entry.id)} />
+                        <AdminActionBtn label="Annuler" color={OVERLAY.neutreSoft} textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
                     {entry.status === "processing" && (
                       <>
-                        <AdminActionBtn label="Marquer payé" color="rgba(0,210,106,0.13)" textColor="var(--color-vert-energie)" disabled={busy || isPending} onClick={() => handleMarkPaid(entry.id)} />
-                        <AdminActionBtn label="Annuler" color="rgba(85,85,85,0.13)" textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
+                        <AdminActionBtn label="Marquer payé" color={OVERLAY.vertSoft} textColor="var(--color-vert-energie)" disabled={busy || isPending} onClick={() => handleMarkPaid(entry.id)} />
+                        <AdminActionBtn label="Annuler" color={OVERLAY.neutreSoft} textColor="var(--color-texte-desactive)" disabled={busy || isPending} onClick={() => handleCancel(entry.id)} />
                       </>
                     )}
                     {busy && <span className="text-xs" style={{ color: "var(--color-texte-secondaire)" }}>…</span>}

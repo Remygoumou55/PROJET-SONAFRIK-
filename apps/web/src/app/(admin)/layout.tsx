@@ -1,64 +1,38 @@
-import { Suspense } from "react";
-import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
 import { getAdminSessionContext } from "@/features/admin/lib/getAdminSessionContext";
+import { getAdminServiceForSession } from "@/features/admin/lib/getAdminService";
+import { EMPTY_ADMIN_LIVE_SNAPSHOT } from "@/features/admin/lib/admin-empty-snapshot";
 import { requireAdmin } from "@/features/admin/lib/requireAdmin";
 import { isDevBypassActive } from "@/lib/auth/guards";
 import { AdminLayoutShell } from "@/features/admin/components/AdminLayoutShell";
-import AdminLoading from "./loading";
+import { RealtimeShell } from "@/features/shared/rendering/RealtimeShell";
 
 export const dynamic = "force-dynamic";
 
-async function AdminGuard({ children }: { children: React.ReactNode }) {
+/**
+ * Layout admin allégé — snapshot live délégué au client (AdminLdseProvider + SRTSP).
+ * Réduit TTFB et évite un re-fetch snapshot à chaque navigation inter-pages.
+ */
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();
-  const admin = await getAdminServiceForSession();
-  const [liveSnapshot, adminUser] = await Promise.all([
-    admin.getAdminLiveSnapshot().catch(() => ({
-      navBadges: {
-        content: 0,
-        pendingRightsClaims: 0,
-        fraudSessions: 0,
-        withdrawals: 0,
-      },
-      fraudMetrics: {
-        totalFlagged: 0,
-        flaggedThisMonth: 0,
-        flaggedToday: 0,
-      },
-      moderationMetrics: {
-        pendingAlbums: 0,
-        pendingTracks: 0,
-        pendingCatalog: 0,
-        pendingWithdrawals: 0,
-        pendingRightsClaims: 0,
-        pendingArtistVerifications: 0,
-      },
-      userMetrics: {
-        totalUsers: 0,
-        premiumUsers: 0,
-        newUsersToday: 0,
-        activeArtists: 0,
-        newArtistsThisWeek: 0,
-      },
-      fetchedAt: new Date().toISOString(),
-    })),
+  const [adminUser, admin] = await Promise.all([
     getAdminSessionContext(),
+    getAdminServiceForSession(),
+  ]);
+  const [beatStoreAdmin, awardsAdmin] = await Promise.all([
+    admin.isFeatureEnabled("beat_store_admin"),
+    admin.isFeatureEnabled("awards_admin"),
   ]);
 
   return (
-    <AdminLayoutShell
-      liveSnapshot={liveSnapshot}
-      adminUser={adminUser}
-      disableLiveRealtime={isDevBypassActive()}
-    >
-      {children}
-    </AdminLayoutShell>
-  );
-}
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <Suspense fallback={<AdminLoading />}>
-      <AdminGuard>{children}</AdminGuard>
-    </Suspense>
+    <RealtimeShell>
+      <AdminLayoutShell
+        liveSnapshot={EMPTY_ADMIN_LIVE_SNAPSHOT}
+        adminUser={adminUser}
+        disableLiveRealtime={isDevBypassActive()}
+        navFeatureFlags={{ beatStoreAdmin, awardsAdmin }}
+      >
+        {children}
+      </AdminLayoutShell>
+    </RealtimeShell>
   );
 }
