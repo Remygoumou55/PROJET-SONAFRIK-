@@ -11,6 +11,44 @@
 
 ---
 
+## 2026-07-06 — Fix webpack TypeError "cannot read .call" — pattern `"use client"` factorisation
+
+### Cause racine identifiée
+- Commit `4b00d4c` (Cursor, "Reduce use client to 235") a supprimé `"use client"` de 26 fichiers
+- Suppression incorrecte sur des composants/hooks qui appellent des React hooks
+- **Impact direct :** `ListenerSidebarAsync.tsx` sans `"use client"` → webpack ne peut pas inclure le module factory dans le bundle client → `TypeError: Cannot read properties of undefined (reading 'call')` dans le navigateur
+
+### Fichiers corrigés (commit `0909c47`)
+- `apps/web/src/features/listener/components/ListenerSidebarAsync.tsx` ← **cause racine** — utilise `use()` + `useListenSidebarLdse`
+- `apps/web/src/features/listener/hooks/useStreamQuality.ts` — utilise `useNetworkAware`, `useQualityPreference`, `usePerformanceFlags`
+- `apps/web/src/features/listener/hooks/useTrackReactions.ts` — utilise `useState`, `useEffect`, `useMemo`, `useCallback`
+- `apps/web/src/features/listener/components/StartListeningBanner.tsx` — utilise `usePlayerContext`
+- `apps/web/src/features/admin/hooks/useAdminLiveRefresh.ts` — utilise `useState`, `useEffect`, `useCallback`, `useRef`
+- `apps/web/src/lib/performance/use-motion-duration.ts` — utilise `usePerformanceFlags`
+
+### Règle de prévention — Pattern webpack `"use client"` obligatoire
+
+```
+RÈGLE ABSOLUE : Tout fichier .ts/.tsx qui importe ou appelle un hook React DOIT avoir
+"use client" en ligne 1, même s'il est importé depuis un composant "use client".
+
+Pourquoi : Next.js/webpack peut optimiser le module comme "server-only" si la directive
+est absente. Au runtime navigateur, __webpack_modules__[moduleId] est undefined
+→ TypeError: Cannot read properties of undefined (reading 'call').
+
+Signal d'alarme : tout hook custom (useXxx), useState, useEffect, useCallback,
+useMemo, useRef, useContext, use() dans un .tsx/.ts sans "use client".
+
+Exception : fichiers qui n'ont aucun hook React (pure data, types, constantes,
+fonctions utilitaires sans hooks) — peuvent être RSC-compatibles sans la directive.
+```
+
+### Validation
+- `pnpm typecheck` : ✅ 17/17 sans erreur
+- Commit + push : ✅ `0909c47` → main
+
+---
+
 ## 2026-07-06 — Vague J (CSS SSOT) + Sprint 1 Streaming Engine Foundation Audit
 
 ### Fichiers touchés
