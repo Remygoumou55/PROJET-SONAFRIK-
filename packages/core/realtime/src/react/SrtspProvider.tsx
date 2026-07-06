@@ -8,17 +8,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  getSynchronizationEngine,
-  type SubscriptionFilter,
-  type SrtspEvent,
-  type SrtspEventListener,
-  type SrtspMetrics,
-  type SrtspMonitorSnapshot,
-  type SrtspPublishInput,
-  type SrtspTransportAdapter,
-  type SynchronizationEngine,
-} from "../index";
+import { getSynchronizationEngine, type SynchronizationEngine } from "../engine/synchronization-engine";
+import type { SubscriptionFilter } from "../subscription/subscription-manager";
+import type {
+  SrtspEvent,
+  SrtspEventListener,
+  SrtspMetrics,
+  SrtspMonitorSnapshot,
+  SrtspPublishInput,
+  SrtspTransportAdapter,
+} from "../types";
 
 export interface SrtspContextValue {
   engine: SynchronizationEngine;

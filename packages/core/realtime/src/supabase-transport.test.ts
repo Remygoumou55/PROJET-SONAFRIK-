@@ -102,9 +102,9 @@ describe("Supabase inbound normalizer", () => {
   it("ignore les tables non mappées", () => {
     const raw = toTransportInboundMessage({
       schema: "public",
-      table: "profiles",
+      table: "studios",
       eventType: "UPDATE",
-      new: { id: "p1" },
+      new: { id: "s1" },
       old: {},
     });
     expect(normalizeSupabaseInbound(raw)).toBeNull();

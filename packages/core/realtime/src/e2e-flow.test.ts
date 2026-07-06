@@ -187,16 +187,16 @@ describe("SRTSP Phase 2.2 — E2E Event Flow Certification", () => {
     const mock = createMockSupabaseHarness();
     const transport = createSupabaseTransport({
       client: mock.client,
-      subscriptions: [{ table: "profiles", events: ["UPDATE"] }],
+      subscriptions: [{ table: "studios", events: ["UPDATE"] }],
     });
     const engine = new SynchronizationEngine({ transport, enablePipelineTrace: true });
     await engine.connectTransport();
     mock.emitChange({
       schema: "public",
-      table: "profiles",
+      table: "studios",
       eventType: "UPDATE",
       commit_timestamp: "2026-07-05T10:00:13Z",
-      new: { id: "p1" },
+      new: { id: "s1" },
       old: {},
     });
     expect(
