@@ -1,10 +1,11 @@
-/** Couleurs officielles SONAFRIK — CDC V9.0 */
+/** Couleurs officielles SONAFRIK — Charte Graphique V5.0
+ * vertEnergie/orSolaire conservés (±3°), aucune régression visuelle */
 
 export const colors = {
   vertEnergie: "#00D26A",
-  vertProfond: "#009B3A",
+  vertProfond: "#0E5E3A",
   orSolaire: "#FFC20E",
-  orProfond: "#F4A300",
+  orProfond: "#DAAF37",
   noirProfond: "#0D0D0D",
   surface: "#1A1A1A",
   card: "#1F1F1F",
