@@ -11,6 +11,35 @@
 
 ---
 
+## 2026-07-06 — Vague H — Découpage CSS + Composants (H1 + H2 partiel)
+
+### Fichiers CSS (H1)
+- `admin-dashboard-human.css` (1015L) → supprimé, remplacé par :
+  - `admin/dashboard-hero-kpi.css` (247L) — Hero + Section headers + KPIs
+  - `admin/dashboard-grid-panels.css` (361L) — Grid + Coach + Health + Charts + Musical
+  - `admin/dashboard-modules-alerts.css` (407L) — Modules + Alertes + Launch
+- `identity.css` (809L → 399L) — core shell + mobile nav + creator sidebar + status badge
+- `identity-profile.css` (409L, CRÉÉ) — hero, passport, chips, completion, quicknav
+- `admin-bundle.css` mis à jour (3 nouveaux imports)
+- `(identity)/layout.tsx` importe `identity-profile.css`
+
+### Fichiers Composants (H2)
+- `AdminArtistsClient.tsx` (408L → 168L) — state + handlers + JSX
+- `adminArtistsColumns.tsx` (155L, CRÉÉ) — définition colonnes + helpers + types
+- `FullPlayerPanel.tsx` (393L → 215L) — main panel
+- `FullPlayerSubComponents.tsx` (140L, CRÉÉ) — TrackListenStats, FullPlayerProgress, QueueOverlay, LyricsOverlay
+
+### Validation
+- typecheck ✅ · lint ✅ · build prod ✅
+- Git push ✅ (56c8c7f)
+
+### Dette Vague H restante
+- AdminRevenueClient.tsx (388L) — extract charts → H2 suite
+- AdminWithdrawalsClient.tsx (370L) — extract batch panel → H2 suite
+- listener.repository.ts (648L) — split read/write → H3
+
+---
+
 ## 2026-07-06 — LDSE P0 fixes + Charte Graphique V5.0
 
 ### Fichiers touchés
