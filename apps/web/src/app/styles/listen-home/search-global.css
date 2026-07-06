@@ -296,13 +296,13 @@
 
 .gp-expand-hint {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--overlay-blanc-20);
   flex-shrink: 0;
   transition: color 0.15s;
 }
 
 .gp-track-clickable:hover .gp-expand-hint {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--overlay-blanc-50);
 }
 
 .gp-volume-icon-btn {
@@ -322,5 +322,5 @@
 }
 
 .gp-volume-icon-btn.muted {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
 }

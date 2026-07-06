@@ -32,7 +32,7 @@
 }
 
 .admin-tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--overlay-blanc-02);
 }
 
 .admin-tr:last-child {
@@ -41,19 +41,19 @@
 
 .admin-td {
   padding: 14px 16px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--overlay-blanc-75);
   vertical-align: middle;
 }
 
 .admin-td-empty {
   padding: 48px 16px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
 }
 
 .admin-skeleton {
   height: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   border-radius: 6px;
   animation: admin-skeleton-pulse 1.5s ease-in-out infinite;
 }
@@ -81,42 +81,42 @@
 .badge-active {
   background: var(--overlay-vert-soft);
   color: var(--color-vert-energie);
-  border: 1px solid rgba(0, 210, 106, 0.25);
+  border: 1px solid var(--overlay-vert-25);
 }
 
 .badge-premium {
-  background: rgba(255, 194, 14, 0.12);
+  background: var(--overlay-or-12);
   color: var(--color-or-solaire);
-  border: 1px solid rgba(255, 194, 14, 0.25);
+  border: 1px solid var(--overlay-or-25);
 }
 
 .badge-suspended {
-  background: rgba(255, 140, 0, 0.12);
+  background: var(--overlay-admin-warning-12);
   color: var(--color-admin-warning);
-  border: 1px solid rgba(255, 140, 0, 0.25);
+  border: 1px solid var(--overlay-admin-warning-25);
 }
 
 .badge-pending {
-  background: rgba(55, 138, 221, 0.12);
+  background: var(--overlay-admin-info-12);
   color: var(--color-feature-azure);
-  border: 1px solid rgba(55, 138, 221, 0.25);
+  border: 1px solid var(--overlay-admin-info-25);
 }
 
 .badge-verified {
   background: var(--overlay-vert-soft);
   color: var(--color-vert-energie);
-  border: 1px solid rgba(0, 210, 106, 0.25);
+  border: 1px solid var(--overlay-vert-25);
 }
 
 .badge-banned {
   background: var(--overlay-erreur-soft);
   color: var(--color-erreur);
-  border: 1px solid rgba(255, 68, 68, 0.25);
+  border: 1px solid var(--overlay-erreur-25);
 }
 
 .badge-default {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.5);
+  background: var(--overlay-blanc-06);
+  color: var(--overlay-blanc-50);
 }
 
 .admin-search-wrap {
@@ -125,7 +125,7 @@
   gap: 10px;
   padding: 0 14px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--overlay-blanc-04);
   border: 1px solid var(--color-admin-card-border);
   border-radius: 10px;
   min-width: 0;
@@ -140,13 +140,13 @@
 }
 
 .admin-search-wrap:focus-within {
-  border-color: rgba(0, 210, 106, 0.3);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--overlay-vert-30);
+  background: var(--overlay-blanc-06);
 }
 
 .admin-search-icon {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--overlay-blanc-30);
   flex-shrink: 0;
 }
 
@@ -160,7 +160,7 @@
 }
 
 .admin-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
 }
 
 .admin-btn {
@@ -197,13 +197,13 @@
 }
 
 .admin-btn-ghost {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--overlay-blanc-06);
+  color: var(--overlay-blanc-70);
+  border: 1px solid var(--overlay-blanc-10);
 }
 
 .admin-btn-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--overlay-blanc-10);
 }
 
 .admin-btn-warning {
@@ -223,8 +223,8 @@
 .admin-input {
   width: 100%;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--overlay-blanc-05);
+  border: 1px solid var(--overlay-blanc-10);
   border-radius: 8px;
   color: var(--color-texte-principal);
   font-size: 13px;
@@ -233,13 +233,13 @@
 }
 
 .admin-input:focus {
-  border-color: rgba(0, 210, 106, 0.4);
+  border-color: var(--overlay-vert-40);
 }
 
 .admin-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--overlay-noir-75);
   backdrop-filter: blur(8px);
   z-index: 500;
   display: flex;
@@ -314,7 +314,7 @@
   border-radius: 99px;
   font-size: 12px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--overlay-blanc-05);
   border: 1px solid var(--color-admin-card-border);
   color: var(--color-admin-text-muted);
   cursor: pointer;
@@ -323,13 +323,13 @@
 }
 
 .admin-filter-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-08);
   color: var(--color-texte-principal);
 }
 
 .admin-filter-btn.active {
-  background: rgba(0, 210, 106, 0.1);
-  border-color: rgba(0, 210, 106, 0.3);
+  background: var(--overlay-vert-10);
+  border-color: var(--overlay-vert-30);
   color: var(--color-vert-energie);
 }
 
@@ -356,8 +356,8 @@
 
 .admin-tier-select {
   padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--overlay-blanc-06);
+  border: 1px solid var(--overlay-blanc-10);
   border-radius: 6px;
   color: var(--color-texte-principal);
   font-size: 11px;
@@ -367,7 +367,7 @@
 }
 
 .admin-tier-select:focus {
-  border-color: rgba(0, 210, 106, 0.3);
+  border-color: var(--overlay-vert-30);
 }
 
 .admin-tier-select option {
@@ -375,7 +375,7 @@
 }
 
 .admin-tr-expanded {
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--overlay-blanc-01);
 }
 
 .admin-td-expanded {
@@ -447,7 +447,7 @@
   height: 36px;
   border-radius: 50%;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-08);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -474,12 +474,12 @@
 }
 
 .admin-tier-croissance {
-  background: rgba(55, 138, 221, 0.12);
+  background: var(--overlay-admin-info-12);
   color: var(--color-feature-azure);
 }
 
 .admin-tier-etabli {
-  background: rgba(255, 194, 14, 0.12);
+  background: var(--overlay-or-12);
   color: var(--color-or-solaire);
 }
 
@@ -589,12 +589,12 @@
 }
 
 .badge-gold {
-  background: rgba(255, 194, 14, 0.13);
+  background: var(--overlay-or-soft);
   color: var(--color-or-solaire);
 }
 
 .badge-info {
-  background: rgba(96, 165, 250, 0.13);
+  background: var(--overlay-bleu-clair-13);
   color: var(--color-accent-bleu-clair);
 }
 
@@ -624,7 +624,7 @@
 }
 
 .admin-inline-alert--error {
-  background: rgba(255, 68, 68, 0.13);
+  background: var(--overlay-erreur-soft);
   color: var(--color-rouge-alerte);
 }
 

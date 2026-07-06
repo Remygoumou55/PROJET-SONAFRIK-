@@ -283,7 +283,7 @@
 }
 
 .fs-vol-mute.muted {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
 }
 
 /* Queue */

@@ -25,16 +25,16 @@
   gap: 0.625rem;
   padding: 0.35rem 0.625rem 0.35rem 0.35rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--overlay-blanc-10);
+  background: var(--overlay-blanc-04);
   text-decoration: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .creator-header-utils__profile:hover,
 .creator-header-utils__profile:focus-visible {
-  border-color: rgba(0, 210, 106, 0.35);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--overlay-vert-35);
+  background: var(--overlay-blanc-06);
   outline: none;
 }
 

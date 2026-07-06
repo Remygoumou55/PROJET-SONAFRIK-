@@ -28,14 +28,14 @@
 .admin-human-governance__item {
   padding: 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--overlay-blanc-02);
   border: 1px solid var(--color-admin-border-subtle);
   text-decoration: none;
   color: inherit;
 }
 
 .admin-human-governance__item:hover {
-  border-color: rgba(0, 210, 106, 0.3);
+  border-color: var(--overlay-vert-30);
 }
 
 .admin-human-business__metric span,
@@ -87,7 +87,7 @@
 }
 
 .admin-human-module-card:hover {
-  border-color: rgba(255, 194, 14, 0.35);
+  border-color: var(--overlay-or-35);
 }
 
 .admin-human-module-card__head {
@@ -110,17 +110,17 @@
 }
 
 .admin-human-module-card__status--ok {
-  background: rgba(0, 210, 106, 0.15);
+  background: var(--overlay-vert-15);
   color: var(--color-vert-energie);
 }
 
 .admin-human-module-card__status--attention {
-  background: rgba(255, 140, 0, 0.15);
+  background: var(--overlay-admin-warning-15);
   color: var(--color-admin-warning);
 }
 
 .admin-human-module-card__status--live {
-  background: rgba(0, 210, 106, 0.2);
+  background: var(--overlay-vert-20);
   color: var(--color-vert-energie);
   animation: admin-badge-pulse 2s ease-in-out infinite;
 }
@@ -183,8 +183,8 @@
 
 /* --- KPI alert state --- */
 .admin-human-kpi-card--alert {
-  border-color: rgba(255, 140, 0, 0.3) !important;
-  background: rgba(255, 140, 0, 0.04) !important;
+  border-color: var(--overlay-admin-warning-30) !important;
+  background: var(--overlay-admin-warning-04) !important;
 }
 
 .admin-kpi-action-link {
@@ -259,7 +259,7 @@
 }
 
 .admin-alert-cat--danger {
-  background: rgba(255, 68, 68, 0.07);
+  background: var(--overlay-erreur-07);
 }
 
 .admin-alert-cat--danger .admin-alert-cat-count {
@@ -267,13 +267,13 @@
 }
 
 .admin-alert-cat--danger .admin-alert-cat-cta {
-  background: rgba(255, 68, 68, 0.15);
+  background: var(--overlay-erreur-15);
   color: var(--color-rouge-alerte);
-  border: 1px solid rgba(255, 68, 68, 0.25);
+  border: 1px solid var(--overlay-erreur-25);
 }
 
 .admin-alert-cat--warning {
-  background: rgba(255, 140, 0, 0.07);
+  background: var(--overlay-admin-warning-07);
 }
 
 .admin-alert-cat--warning .admin-alert-cat-count {
@@ -281,13 +281,13 @@
 }
 
 .admin-alert-cat--warning .admin-alert-cat-cta {
-  background: rgba(255, 140, 0, 0.15);
+  background: var(--overlay-admin-warning-15);
   color: var(--color-admin-warning);
-  border: 1px solid rgba(255, 140, 0, 0.25);
+  border: 1px solid var(--overlay-admin-warning-25);
 }
 
 .admin-alert-cat--info {
-  background: rgba(255, 194, 14, 0.06);
+  background: var(--overlay-or-06);
 }
 
 .admin-alert-cat--info .admin-alert-cat-count {
@@ -295,13 +295,13 @@
 }
 
 .admin-alert-cat--info .admin-alert-cat-cta {
-  background: rgba(255, 194, 14, 0.15);
+  background: var(--overlay-or-15);
   color: var(--color-or-solaire);
-  border: 1px solid rgba(255, 194, 14, 0.25);
+  border: 1px solid var(--overlay-or-25);
 }
 
 .admin-alert-cat--neutral {
-  background: rgba(55, 138, 221, 0.07);
+  background: var(--overlay-admin-info-07);
 }
 
 .admin-alert-cat--neutral .admin-alert-cat-count {
@@ -309,13 +309,13 @@
 }
 
 .admin-alert-cat--neutral .admin-alert-cat-cta {
-  background: rgba(55, 138, 221, 0.15);
+  background: var(--overlay-admin-info-15);
   color: var(--color-admin-info);
-  border: 1px solid rgba(55, 138, 221, 0.25);
+  border: 1px solid var(--overlay-admin-info-25);
 }
 
 .admin-alert-cat--success {
-  background: rgba(0, 210, 106, 0.06);
+  background: var(--overlay-vert-06);
 }
 
 .admin-alert-cat-success-text {
@@ -396,7 +396,7 @@
 
 .launch-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   border-radius: 99px;
   overflow: hidden;
 }

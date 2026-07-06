@@ -12,7 +12,7 @@
 /* ─── Wallet retirable label ─────────────────────────────────────────────────── */
 .co-wallet-retirable {
   font-size: 11px;
-  color: rgba(0, 210, 106, 0.7);
+  color: var(--overlay-vert-70);
   margin: -8px 0 10px;
 }
 
@@ -27,8 +27,8 @@
 .dash-catalogue-card {
   padding: 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--overlay-blanc-08);
+  background: var(--overlay-blanc-03);
 }
 
 .dash-catalogue-card__header {
@@ -106,8 +106,8 @@
   font-weight: 700;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(0, 210, 106, 0.1);
-  border: 1px solid rgba(0, 210, 106, 0.2);
+  background: var(--overlay-vert-10);
+  border: 1px solid var(--overlay-vert-20);
   color: var(--color-vert-energie);
   flex-shrink: 0;
 }
@@ -116,8 +116,8 @@
 .dash-career-progress {
   padding: 1.25rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--overlay-blanc-08);
+  background: var(--overlay-blanc-03);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -138,7 +138,7 @@
 }
 
 .dash-career-circle__svg { width: 72px; height: 72px; }
-.dash-career-circle__track { stroke: rgba(255, 255, 255, 0.08); }
+.dash-career-circle__track { stroke: var(--overlay-blanc-08); }
 
 .dash-career-circle__fill {
   stroke: var(--color-vert-energie);
@@ -191,8 +191,8 @@
 .dash-coach {
   padding: 1.25rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 194, 14, 0.12);
-  background: rgba(255, 194, 14, 0.04);
+  border: 1px solid var(--overlay-or-12);
+  background: var(--overlay-or-04);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -203,7 +203,7 @@
   gap: 0.625rem;
   padding-bottom: 0.875rem;
   margin-bottom: 0.875rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--overlay-blanc-06);
 }
 
 .dash-coach__tip-icon { font-size: 1.125rem; flex-shrink: 0; }
@@ -221,7 +221,7 @@
 .dash-coach__tip-text {
   margin: 0;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--overlay-blanc-75);
   line-height: 1.45;
 }
 
@@ -276,11 +276,11 @@
 /* ─── Premium footer card ─────────────────────────────────────────────────────── */
 .dash-premium {
   border-radius: 1rem;
-  border: 1px solid rgba(255, 194, 14, 0.25);
+  border: 1px solid var(--overlay-or-25);
   background: linear-gradient(
     135deg,
-    rgba(255, 194, 14, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 100%
+    var(--overlay-or-08) 0%,
+    var(--overlay-blanc-02) 100%
   );
 }
 
@@ -313,8 +313,8 @@
   flex-shrink: 0;
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 194, 14, 0.4);
-  background: rgba(255, 194, 14, 0.1);
+  border: 1px solid var(--overlay-or-40);
+  background: var(--overlay-or-10);
   color: var(--color-or-solaire);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -322,4 +322,4 @@
   transition: background 0.15s ease;
 }
 
-.dash-premium__cta:hover { background: rgba(255, 194, 14, 0.18); }
+.dash-premium__cta:hover { background: var(--overlay-or-18); }

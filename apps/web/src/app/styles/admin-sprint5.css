@@ -36,7 +36,7 @@
 }
 
 .admin-kpi-card--alert {
-  border-color: rgba(255, 77, 79, 0.3);
+  border-color: var(--overlay-admin-danger-30);
 }
 
 .admin-kpis-grid--3 {
@@ -59,7 +59,7 @@
   margin: 0 0 16px;
   padding: 10px 14px;
   border-radius: 8px;
-  background: rgba(255, 77, 79, 0.1);
+  background: var(--overlay-admin-danger-10);
   color: var(--color-erreur);
   font-size: 13px;
 }
@@ -88,9 +88,9 @@
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1px;
-  background: rgba(0, 210, 106, 0.15);
+  background: var(--overlay-vert-15);
   color: var(--color-vert-energie);
-  border: 1px solid rgba(0, 210, 106, 0.25);
+  border: 1px solid var(--overlay-vert-25);
   padding: 2px 8px;
   border-radius: 4px;
   animation: live-badge-pulse 2s ease-in-out infinite;
@@ -129,7 +129,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--overlay-blanc-04);
   transition: background 0.2s;
 }
 
@@ -139,7 +139,7 @@
 
 @keyframes stream-new {
   from {
-    background: rgba(0, 210, 106, 0.08);
+    background: var(--overlay-vert-08);
   }
   to {
     background: transparent;
@@ -151,7 +151,7 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--overlay-blanc-15);
 }
 
 .analytics-stream-dot--live {
@@ -181,7 +181,7 @@
 
 .analytics-stream-time {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -191,7 +191,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--overlay-blanc-04);
 }
 
 .analytics-health-label {
@@ -215,7 +215,7 @@
 .analytics-health-score {
   margin-top: 16px;
   padding: 12px;
-  background: rgba(0, 210, 106, 0.06);
+  background: var(--overlay-vert-06);
   border-radius: 10px;
 }
 
@@ -238,7 +238,7 @@
 
 .analytics-health-score-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -254,12 +254,12 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--overlay-blanc-04);
 }
 
 .analytics-top-rank {
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
   min-width: 24px;
 }
 
@@ -337,14 +337,14 @@
   gap: 12px;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--overlay-blanc-05);
   margin-bottom: 8px;
   transition: border-color 0.2s;
 }
 
 .awards-nominee-row--leading {
-  border-color: rgba(255, 194, 14, 0.2);
-  background: rgba(255, 194, 14, 0.04);
+  border-color: var(--overlay-or-medium);
+  background: var(--overlay-or-04);
 }
 
 .awards-rank {
@@ -360,7 +360,7 @@
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -394,7 +394,7 @@
 
 .awards-vote-bar {
   height: 5px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -423,7 +423,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--overlay-blanc-05);
 }
 
 .admin-field-config-label {
@@ -438,7 +438,7 @@
 
 .awards-history-row {
   padding: 14px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--overlay-blanc-05);
 }
 
 .awards-history-top {
@@ -465,7 +465,7 @@
   height: 40px;
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,8 +515,8 @@
   padding: 12px 16px;
   margin-bottom: 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-06);
   flex-wrap: wrap;
 }
 

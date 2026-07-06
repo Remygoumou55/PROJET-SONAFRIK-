@@ -5,7 +5,7 @@ html[data-perf-cdc="true"] .artist-hero__progress-fill--animated {
 
 html[data-perf-cdc="true"] .dash-quick-actions__card--pulse {
   animation: none;
-  box-shadow: 0 0 0 0 rgba(0, 210, 106, 0);
+  box-shadow: 0 0 0 0 var(--overlay-vert-00);
 }
 
 html[data-perf-cdc="true"] .artist-hero__cover-slide {

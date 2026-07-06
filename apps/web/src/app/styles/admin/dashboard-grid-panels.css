@@ -25,8 +25,8 @@
 .admin-human-priorities {
   padding: 20px;
   border-radius: 16px;
-  background: rgba(255, 140, 0, 0.06);
-  border: 1px solid rgba(255, 140, 0, 0.2);
+  background: var(--overlay-admin-warning-06);
+  border: 1px solid var(--overlay-admin-warning-20);
 }
 
 .admin-human-priorities__list {
@@ -45,16 +45,16 @@
   gap: 12px;
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--overlay-noir-25);
   border: 1px solid var(--color-admin-border-subtle);
 }
 
 .admin-human-priority--critical {
-  border-color: rgba(255, 68, 68, 0.35);
+  border-color: var(--overlay-erreur-35);
 }
 
 .admin-human-priority--warning {
-  border-color: rgba(255, 140, 0, 0.35);
+  border-color: var(--overlay-admin-warning-35);
 }
 
 .admin-human-priority__label {
@@ -125,7 +125,7 @@
 
 .admin-human-timeline__item--success .admin-human-timeline__dot {
   background: var(--color-vert-energie);
-  box-shadow: 0 0 8px rgba(0, 210, 106, 0.5);
+  box-shadow: 0 0 8px var(--overlay-vert-50);
 }
 
 .admin-human-timeline__label {
@@ -150,8 +150,8 @@
 .admin-human-coach {
   padding: 20px;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(255, 194, 14, 0.1), rgba(13, 13, 13, 0.8));
-  border: 1px solid rgba(255, 194, 14, 0.25);
+  background: linear-gradient(160deg, var(--overlay-or-10), var(--overlay-modal-backdrop));
+  border: 1px solid var(--overlay-or-25);
 }
 
 .admin-human-coach__badge {
@@ -180,7 +180,7 @@
   flex-wrap: wrap;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--overlay-noir-20);
   font-size: 13px;
   line-height: 1.5;
   color: var(--color-texte-secondaire);
@@ -228,12 +228,12 @@
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 99px;
-  background: rgba(255, 68, 68, 0.15);
+  background: var(--overlay-erreur-15);
   color: var(--color-erreur);
 }
 
 .admin-human-health__badge--ok {
-  background: rgba(0, 210, 106, 0.15);
+  background: var(--overlay-vert-15);
   color: var(--color-vert-energie);
 }
 
@@ -332,13 +332,13 @@
 .admin-human-musical__card {
   padding: 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--overlay-blanc-02);
   border: 1px solid var(--color-admin-border-subtle);
 }
 
 .admin-human-musical__card--gold {
-  border-color: rgba(255, 194, 14, 0.35);
-  background: rgba(255, 194, 14, 0.05);
+  border-color: var(--overlay-or-35);
+  background: var(--overlay-or-05);
 }
 
 .admin-human-musical__label {

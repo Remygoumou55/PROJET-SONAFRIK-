@@ -35,14 +35,14 @@
 }
 
 .landing-hero-brand__cta--ghost {
-  border: 1px solid rgba(255, 194, 14, 0.55);
-  background: rgba(13, 13, 13, 0.35);
+  border: 1px solid var(--overlay-or-55);
+  background: var(--overlay-noir-profond-35);
   color: var(--color-texte-principal);
 }
 
 .landing-hero-brand__cta--ghost:hover {
-  border-color: rgba(255, 194, 14, 0.85);
-  background: rgba(255, 194, 14, 0.08);
+  border-color: var(--overlay-or-85);
+  background: var(--overlay-or-08);
 }
 
 @media (max-width: 767px) {
@@ -127,15 +127,15 @@
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 0.5px solid var(--overlay-blanc-08);
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .landing-nav--scrolled {
-  background: rgba(13, 13, 13, 0.95);
+  background: var(--overlay-noir-profond-95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--overlay-blanc-06);
 }
 
 .landing-nav__inner {
@@ -185,8 +185,8 @@
 }
 
 .landing-nav__login {
-  border: 0.5px solid rgba(255, 255, 255, 0.18);
-  color: rgba(255, 255, 255, 0.65);
+  border: 0.5px solid var(--overlay-blanc-18);
+  color: var(--overlay-blanc-65);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;

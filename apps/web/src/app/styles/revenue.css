@@ -20,8 +20,8 @@
 .revenue-destination__select,
 .revenue-destination__input {
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--overlay-blanc-05);
+  border: 1px solid var(--overlay-blanc-10);
   border-radius: 0.625rem;
   padding: 0.75rem 0.875rem;
   font-size: 0.875rem;
@@ -33,8 +33,8 @@
 
 .revenue-destination__select:focus-visible,
 .revenue-destination__input:focus-visible {
-  border-color: rgba(0, 210, 106, 0.45);
-  outline: 2px solid rgba(0, 210, 106, 0.2);
+  border-color: var(--overlay-vert-45);
+  outline: 2px solid var(--overlay-vert-20);
   outline-offset: 0;
 }
 
@@ -51,8 +51,8 @@
   justify-content: center;
   min-width: 4.5rem;
   padding: 0 0.75rem;
-  background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--overlay-blanc-08);
+  border: 1px solid var(--overlay-blanc-10);
   border-right: none;
   border-radius: 0.625rem 0 0 0.625rem;
   font-size: 0.875rem;
@@ -86,8 +86,8 @@
   margin-top: 0.25rem;
   padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-08);
 }
 
 .revenue-destination__info-title {

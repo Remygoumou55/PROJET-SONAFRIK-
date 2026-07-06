@@ -2,7 +2,7 @@
 .fpp-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: var(--overlay-noir-65);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 150;
@@ -22,7 +22,7 @@
   width: min(480px, 100vw);
   max-height: calc(100vh - 120px);
   background: var(--color-surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--overlay-blanc-08);
   border-radius: 28px 28px 0 0;
   z-index: 160;
   display: flex;
@@ -45,7 +45,7 @@
   border-radius: inherit;
   background: radial-gradient(
     ellipse at 50% 0%,
-    rgba(0, 210, 106, 0.12) 0%,
+    var(--overlay-vert-12) 0%,
     transparent 65%
   );
 }
@@ -64,7 +64,7 @@
 .fpp-handle {
   width: 36px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--overlay-blanc-15);
   border-radius: 99px;
 }
 
@@ -73,9 +73,9 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--overlay-blanc-07);
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--overlay-blanc-50);
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -88,7 +88,7 @@
 }
 
 .fpp-close:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--overlay-blanc-14);
   color: var(--color-texte-principal);
 }
 
@@ -107,7 +107,7 @@
   height: min(280px, 75vw);
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px var(--overlay-noir-50);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -189,7 +189,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--overlay-blanc-35);
   font-variant-numeric: tabular-nums;
 }
 
@@ -230,7 +230,7 @@
 }
 
 .fpp-vol-mute.muted {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--overlay-blanc-20);
 }
 
 .fpp-vol-slider {
@@ -243,8 +243,8 @@
   display: flex;
   gap: 4px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-07);
   border-radius: 99px;
   padding: 4px;
   margin-bottom: 16px;
@@ -259,7 +259,7 @@
   border-radius: 99px;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--overlay-blanc-40);
   background: none;
   border: none;
   cursor: pointer;
@@ -268,17 +268,17 @@
 }
 
 .fpp-tab:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--overlay-blanc-70);
 }
 
 .fpp-tab.active {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--overlay-blanc-10);
   color: var(--color-texte-principal);
   font-weight: 600;
 }
 
 .fpp-tab--soutenir.active {
-  background: rgba(255, 194, 14, 0.15);
+  background: var(--overlay-or-15);
   color: var(--color-or-solaire);
 }
 
@@ -301,11 +301,11 @@
   align-items: center;
   gap: 6px;
   padding: 14px 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-07);
   border-radius: 14px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--overlay-blanc-60);
   font-size: 11px;
   width: 100%;
   min-height: 100%;
@@ -317,19 +317,19 @@
   align-items: center;
   gap: 6px;
   padding: 14px 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-07);
   border-radius: 14px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--overlay-blanc-60);
   font-size: 11px;
   transition: all 0.15s;
 }
 
 .fpp-action-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-08);
   color: var(--color-texte-principal);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--overlay-blanc-15);
 }
 
 .fpp-action-btn:disabled {
@@ -353,7 +353,7 @@
 
 .fpp-reactions-intro {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--overlay-blanc-40);
   text-align: center;
   margin-bottom: 14px;
 }
@@ -366,7 +366,7 @@
 
 .fpp-tip-note {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--overlay-blanc-25);
   text-align: center;
   line-height: 1.5;
   margin-top: 12px;
@@ -384,7 +384,7 @@
 .fpp-queue-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--overlay-noir-55);
   z-index: 170;
   display: flex;
   align-items: flex-end;
@@ -395,7 +395,7 @@
   width: min(480px, 100vw);
   max-height: 70vh;
   background: var(--color-surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--overlay-blanc-08);
   border-radius: 24px 24px 0 0;
   padding: 16px 20px 24px;
   overflow-y: auto;
@@ -405,7 +405,7 @@
   width: min(480px, 100vw);
   max-height: 75vh;
   background: var(--color-surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--overlay-blanc-08);
   border-radius: 24px 24px 0 0;
   padding: 16px 20px 24px;
   overflow-y: auto;
@@ -460,7 +460,7 @@
 
 .tip-subtitle {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--overlay-blanc-40);
   line-height: 1.4;
 }
 
@@ -477,8 +477,8 @@
   justify-content: center;
   gap: 2px;
   padding: 14px 8px;
-  background: rgba(255, 194, 14, 0.06);
-  border: 1px solid rgba(255, 194, 14, 0.2);
+  background: var(--overlay-or-06);
+  border: 1px solid var(--overlay-or-medium);
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.15s;
@@ -486,8 +486,8 @@
 }
 
 .tip-amount-btn:hover:not(:disabled) {
-  background: rgba(255, 194, 14, 0.12);
-  border-color: rgba(255, 194, 14, 0.4);
+  background: var(--overlay-or-12);
+  border-color: var(--overlay-or-40);
   transform: translateY(-2px);
 }
 
@@ -506,7 +506,7 @@
 .tip-amount-currency {
   font-size: 10px;
   font-weight: 500;
-  color: rgba(255, 194, 14, 0.6);
+  color: var(--overlay-or-60);
   text-transform: uppercase;
 }
 
@@ -562,7 +562,7 @@
 
 .tip-success-sub {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--overlay-blanc-50);
 }
 
 .tip-error {
@@ -570,16 +570,16 @@
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  background: rgba(255, 77, 79, 0.08);
-  border: 1px solid rgba(255, 77, 79, 0.2);
+  background: var(--overlay-admin-danger-08);
+  border: 1px solid var(--overlay-admin-danger-20);
   border-radius: 12px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--overlay-blanc-70);
 }
 
 .tip-error--wallet {
-  background: rgba(255, 194, 14, 0.06);
-  border-color: rgba(255, 194, 14, 0.2);
+  background: var(--overlay-or-06);
+  border-color: var(--overlay-or-medium);
   flex-direction: column;
 }
 

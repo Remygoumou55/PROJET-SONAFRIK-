@@ -8,13 +8,13 @@
   max-height: 88vh !important;
   overflow-y: auto !important;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: var(--overlay-blanc-10) transparent;
 }
 
 [role="dialog"]:has(.cs-studio)::-webkit-scrollbar { width: 4px; }
 [role="dialog"]:has(.cs-studio)::-webkit-scrollbar-track { background: transparent; }
 [role="dialog"]:has(.cs-studio)::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--overlay-blanc-12);
   border-radius: 2px;
 }
 
@@ -33,8 +33,8 @@
   gap: 0.25rem;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(206, 17, 38, 0.08);
-  border: 1px solid rgba(206, 17, 38, 0.25);
+  background: var(--color-erreur-banner);
+  border: 1px solid var(--overlay-rouge-25);
 }
 
 .cs-error {
@@ -46,24 +46,24 @@
 
 /* ─── Drop zone ──────────────────────────────────────────────────────────────── */
 .cs-dropzone {
-  border: 2px dashed rgba(0, 210, 106, 0.3);
+  border: 2px dashed var(--overlay-vert-30);
   border-radius: 1rem;
   padding: 2.25rem 1.5rem;
   text-align: center;
   transition: border-color 0.2s ease, background 0.2s ease;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--overlay-blanc-02);
   cursor: default;
   user-select: none;
 }
 
 .cs-dropzone--over {
   border-color: var(--color-vert-energie);
-  background: rgba(0, 210, 106, 0.07);
+  background: var(--overlay-vert-07);
 }
 
 .cs-dropzone--busy {
-  border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--overlay-blanc-15);
+  background: var(--overlay-blanc-03);
 }
 
 .cs-dropzone__inner {
@@ -113,8 +113,8 @@
   pointer-events: auto;
   padding: 0.5rem 1.375rem;
   border-radius: 999px;
-  background: rgba(0, 210, 106, 0.12);
-  border: 1px solid rgba(0, 210, 106, 0.4);
+  background: var(--overlay-vert-12);
+  border: 1px solid var(--overlay-vert-40);
   color: var(--color-vert-energie);
   font-size: 0.875rem;
   font-weight: 700;
@@ -124,7 +124,7 @@
 }
 
 .cs-dropzone__btn:hover {
-  background: rgba(0, 210, 106, 0.2);
+  background: var(--overlay-vert-20);
   border-color: var(--color-vert-energie);
 }
 
@@ -188,15 +188,15 @@
   border-radius: 0.75rem;
   overflow: hidden;
   aspect-ratio: 16 / 9;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-04);
+  border: 1.5px solid var(--overlay-blanc-08);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 /* Primary card */
 .cs-card--primary .cs-card__thumb {
   border-color: var(--color-vert-energie);
-  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2), 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 2px var(--overlay-vert-20), 0 4px 20px var(--overlay-noir-40);
 }
 
 /* Drag-over card */
@@ -219,9 +219,9 @@
   left: 0.4rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.65);
+  background: var(--overlay-noir-65);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(0, 210, 106, 0.6);
+  border: 1px solid var(--overlay-vert-60);
   color: var(--color-vert-energie);
   font-size: 0.5625rem;
   font-weight: 800;
@@ -238,7 +238,7 @@
   right: 0.4rem;
   padding: 0.2rem 0.45rem;
   border-radius: 999px;
-  background: rgba(255, 194, 14, 0.85);
+  background: var(--overlay-or-85);
   color: var(--color-noir-profond);
   font-size: 0.5625rem;
   font-weight: 800;
@@ -253,7 +253,7 @@
   position: absolute;
   inset: 0;
   border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--overlay-noir-55);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
@@ -276,8 +276,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--overlay-blanc-20);
+  background: var(--overlay-blanc-12);
   backdrop-filter: blur(4px);
   font-size: 0.875rem;
   cursor: pointer;
@@ -287,8 +287,8 @@
 }
 
 .cs-card__btn:hover {
-  background: rgba(255, 255, 255, 0.24);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: var(--overlay-blanc-24);
+  border-color: var(--overlay-blanc-45);
   transform: scale(1.08);
 }
 
@@ -298,8 +298,8 @@
 }
 
 .cs-card__btn--danger:hover {
-  background: rgba(206, 17, 38, 0.3);
-  border-color: rgba(206, 17, 38, 0.6);
+  background: var(--overlay-rouge-30);
+  border-color: var(--overlay-rouge-60);
 }
 
 /* Card label */
@@ -322,8 +322,8 @@
 .cs-tips {
   padding: 0.875rem 1rem;
   border-radius: 0.875rem;
-  border: 1px solid rgba(255, 194, 14, 0.15);
-  background: rgba(255, 194, 14, 0.04);
+  border: 1px solid var(--overlay-or-15);
+  background: var(--overlay-or-04);
 }
 
 .cs-tips__title {
@@ -377,12 +377,12 @@
 
 .cs-btn--cancel {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--overlay-blanc-15);
   color: var(--color-texte-secondaire);
 }
 
 .cs-btn--cancel:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--overlay-blanc-06);
   color: var(--color-texte-principal);
 }
 

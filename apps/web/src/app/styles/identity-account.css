@@ -188,7 +188,7 @@
 .identity-activity-item {
   border: 1px solid var(--color-bordure);
   border-radius: 0.875rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--overlay-blanc-02);
   padding: 1rem;
 }
 
@@ -216,9 +216,9 @@
 
 .identity-become-artist {
   overflow: hidden;
-  border: 1px solid rgba(255, 194, 14, 0.18);
+  border: 1px solid var(--overlay-or-18);
   border-radius: 1.25rem;
-  background: linear-gradient(135deg, rgba(255, 194, 14, 0.06), transparent 55%);
+  background: linear-gradient(135deg, var(--overlay-or-06), transparent 55%);
   padding: 1.5rem;
 }
 
@@ -281,7 +281,7 @@
 .identity-account-intro {
   border: 1px solid var(--color-bordure);
   border-radius: 1.25rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  background: linear-gradient(180deg, var(--overlay-blanc-03) 0%, var(--overlay-blanc-01) 100%);
   padding: 1.5rem;
 }
 
@@ -397,9 +397,9 @@
 }
 
 .identity-account-danger {
-  border: 1px solid rgba(255, 68, 68, 0.25);
+  border: 1px solid var(--overlay-erreur-25);
   border-radius: 1.25rem;
-  background: rgba(255, 68, 68, 0.04);
+  background: var(--overlay-erreur-04);
   padding: 1.5rem;
 }
 
@@ -432,7 +432,7 @@
 
 .onboarding-payment-step__continue {
   width: 100%;
-  background-color: rgba(0, 210, 106, 0.25);
+  background-color: var(--overlay-vert-25);
   color: var(--color-noir-profond);
   font-weight: 700;
   font-size: 0.9375rem;

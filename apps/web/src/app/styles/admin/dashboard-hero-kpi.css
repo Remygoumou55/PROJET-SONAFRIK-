@@ -15,11 +15,11 @@
   padding: 28px 32px;
   background: linear-gradient(
     135deg,
-    rgba(0, 210, 106, 0.08) 0%,
-    rgba(255, 194, 14, 0.06) 45%,
-    rgba(13, 13, 13, 0.95) 100%
+    var(--overlay-vert-08) 0%,
+    var(--overlay-or-06) 45%,
+    var(--overlay-noir-profond-95) 100%
   );
-  border: 1px solid rgba(255, 194, 14, 0.15);
+  border: 1px solid var(--overlay-or-15);
   overflow: hidden;
 }
 
@@ -29,7 +29,7 @@
   right: -10%;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(0, 210, 106, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--overlay-vert-12) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -80,7 +80,7 @@
 .admin-human-hero__stat {
   padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--overlay-blanc-03);
   border: 1px solid var(--color-admin-border-subtle);
 }
 
@@ -184,7 +184,7 @@
 }
 
 .admin-human-kpi-card:hover {
-  border-color: rgba(0, 210, 106, 0.35);
+  border-color: var(--overlay-vert-35);
   transform: translateY(-2px);
 }
 

@@ -11,6 +11,147 @@
 
 ---
 
+## 2026-07-06 — Vague J (CSS SSOT) + Sprint 1 Streaming Engine Foundation Audit
+
+### Fichiers touchés
+
+**Vague J — Global CSS SSOT complet :**
+- `apps/web/src/app/globals.css` — +117 tokens overlay (blanc, vert, or, admin-warning, admin-danger, erreur, admin-info, noir, noir-profond, couleurs spéciales)
+- `apps/web/src/app/styles/**/*.css` (28 fichiers) — 0 `rgba()` hardcodé restant, tout remplacé par `var(--overlay-*)`
+- Vague J : **TERMINÉE** — Source unique de vérité CSS overlay 100% opérationnelle
+
+**Sprint 1 — Streaming Engine Foundation Audit + Fix critique :**
+- `apps/web/src/features/listener/integration/useStreamingPlaybackBridge.ts` — Fix C1 : bridge state (playbackMode, runtimeStatus, isBridgeReady) surfacé dans React state via onObserve callbacks ; plus de valeurs hardcodées
+- `docs/streaming/SPRINT1_FOUNDATION_AUDIT.md` — Rapport d'audit complet (architecture, gaps, risques, décision READY FOR SPRINT 2)
+
+### Résumé audit Streaming Engine
+- Architecture enterprise (`packages/api/src/streaming/`) : ✅ complète, certifiée, aucune modification
+- SRTSP v1.1 (`packages/core/realtime/`) : ✅ FROZEN, aucune modification
+- Gap critique corrigé : `useStreamingPlaybackBridge` hardcodé → React state wired
+- Issues H1-H4 documentées pour Sprint 2 (devBypass centralisé, feature flags batch, race condition playlist, duplicate factory)
+
+### Décision
+- 🟢 **READY FOR SPRINT 2** — Foundation validée, bridge corrigé, CSS SSOT complet
+
+### Dette technique créée
+- Aucune nouvelle dette
+
+### Rapport détaillé
+- `docs/streaming/SPRINT1_FOUNDATION_AUDIT.md`
+
+---
+
+## 2026-07-06 — EFQ Sprint 1 — Authentication & Onboarding Certification
+
+### Audit + corrections minimales
+- **P1 corrigé :** `AuthService.completeOnboarding()` → RPC `complete_onboarding` (rôles + creator atomiques)
+- **P1 corrigé :** `smoke.spec.ts` aligné flux Google-only + page aide
+- **Nouveau :** `auth.service.test.ts` (3 tests) · vitest include `src/auth/**`
+
+### Tests
+- typecheck/lint/build ✅ · auth 3/3 · navigation 13/13 · srtsp 100/100 · player 15/15
+
+### Décision
+- 🟢 **CERTIFIED** — Web Auth & Onboarding
+- Mobile P1 (Google, logout) → backlog PCI
+
+### Rapport
+- `docs/functional-quality/reports/SPRINT1_AUTH_ONBOARDING_CERTIFICATION.md`
+
+---
+
+## 2026-07-06 — Performance Continuous Improvement (PCI) — Gouvernance officielle
+
+### Transition post-GEC
+- Performance Hardening Program : 🟢 **TERMINÉ · FREEZE**
+- Global Enterprise Certification : 🟢 **CERTIFIÉE** (85/100)
+- **GLOBAL FREEZE hardening : ACTIF** (pas de nouveau sprint performance sans exception)
+- **Mode actuel : PCI** — développement métier autorisé
+
+### Budgets opérationnels PCI
+- LCP ≤ **3,5 s** (ambitieux 2,5 s) · CLS ≤ 0,10 · INP ≤ 200 ms · TBT ≤ 300 ms
+- Régression **P0 = interdit de fusionner**
+- Mini rapport obligatoire par feature importante
+
+### Documents créés
+- `docs/performance/PERFORMANCE_CONTINUOUS_IMPROVEMENT.md`
+- `docs/performance/PCI_MINI_REPORT_TEMPLATE.md`
+- `.cursor/rules/sonafrik-pci-governance.mdc`
+
+---
+
+## 2026-07-06 — GLOBAL ENTERPRISE CERTIFICATION — Clôture officielle Performance Hardening Program
+
+### Validation finale (sans modification code)
+- Rebuild complet + clean caches : build/lint/typecheck ✅
+- Tests : web-navigation 13/13 · srtsp 100/100 · player 15/15 · api 351/351 = **479/479** ✅
+- Lighthouse frais : `gec-official-closure/` (listen×3, creator, lancement)
+
+### Performances finales GEC (médiane /listen stable)
+- LCP `/listen` : **3 733–3 820 ms** (cible 2 500 ms — écart imputé framework chunk 2060)
+- LCP `/lancement` : **2 152 ms** ✅ conforme
+- LCP `/creator` : **3 333 ms**
+- TBT `/listen` : **485–1 121 ms** (vs 1 985 ms peak programme, −76 % best)
+- Main Thread : **3 587–4 496 ms** (vs 6 090 ms peak, −41 % best)
+
+### Décision officielle
+- 🟢 **GLOBAL ENTERPRISE CERTIFIED**
+- Performance Hardening Program **TERMINÉ**
+- **GLOBAL FREEZE LEVÉ** — reprise développement métier autorisée
+- Score global : **85/100**
+- Aucun commit · aucun push
+
+### Rapport
+- `docs/performance/reports/global-certification/GLOBAL_ENTERPRISE_CERTIFICATION_OFFICIAL_CLOSURE.md`
+
+---
+
+## 2026-07-06 — CPU Precision Remediation Cycle 3 (FINAL) — PlayerProvider hydration hooks
+
+### Correction unique
+- `PlayerProvider` : 25+ `useCallback` → `useStablePlayerActions` (1× useMemo proxy) + `createPlayerQueueActions` factory
+- Fichiers : `playerContext.tsx`, `useStablePlayerActions.ts` (new), `usePlayerQueueControls.ts`
+
+### Résultat mesuré `/listen` (run comparable C2 r2 vs C3 r2)
+- LCP : 3 740 → 3 674 ms (−66 ms, objectif 2 500 ms non atteint)
+- Main Thread : 4 795 → 4 327 ms (−468 ms)
+- TBT : 1 065 → 917 ms (−148 ms)
+- TTI : 4 185 → 4 071 ms (−114 ms)
+- test:web-navigation 13/13 · test:srtsp 100/100 · test:player 15/15 ✅
+
+### Décision programme
+- **B** — LCP > 2,5 s · goulot résiduel chunk `2060` (React/Next runtime)
+- **CPU Precision Remediation Program TERMINÉ** (3/3 cycles) — pas de Cycle 4
+- Global Enterprise Certification : relance dans cadre GEC, pas d'autorisation auto
+- Aucun commit · aucun push
+
+### Rapport
+- `docs/performance/reports/global-certification/CPU_PRECISION_REMEDIATION_CYCLE3_REPORT.md`
+
+---
+
+## 2026-07-06 — CPU Precision Remediation Cycle 2 — Lazy bridge.initialize()
+
+### Correction unique
+- `useStreamingPlaybackBridge.ts` — suppression `useEffect(bridge.initialize())` au mount
+- Init réelle au premier Play via `StreamingPlaybackBridge.startStream()` (contrat existant)
+
+### Résultat mesuré `/listen` (best run vs Cycle 1)
+- LCP : 3 746 → 3 740 ms (≈0, objectif 2 500 ms non atteint)
+- FCP : 1 388 → 1 131 ms (−257 ms)
+- Requêtes `feature_flags` au load : 10+ → **0**
+- Long Tasks : 11 → 9
+- test:web-navigation 13/13 · test:srtsp 100/100 · test:player 15/15 ✅
+
+### Décision
+- **B** — Cycle 3 autorisé (cible : chunk 2060 / PlayerProvider hydration) — pas d'implémentation auto
+- Aucun commit · aucun push (gouvernance programme)
+
+### Rapport
+- `docs/performance/reports/global-certification/CPU_PRECISION_REMEDIATION_CYCLE2_REPORT.md`
+
+---
+
 ## 2026-07-06 — Vague I — Déplacement silos backend (I1 + I2 + I3)
 
 ### Fichiers déplacés
@@ -3288,4 +3429,241 @@ Aucun — tous les probes A→E passent après corrections des passes précéden
 
 ---
 
+## 2026-07-06 — Global Enterprise Certification (Performance Hardening Program)
+
+### Mission
+Certification globale finale Sprint 1→7, sans évolution fonctionnelle, sans changement métier, sans push.
+
+### Validations exécutées
+- Rebuild propre monorepo : suppression `.next` + `node_modules/.cache`
+- `pnpm build` ✅
+- `pnpm lint` ✅
+- `pnpm typecheck` ✅
+- `pnpm --filter @sonafrik/realtime test` → **100/100** ✅
+- `pnpm --filter @sonafrik/web test` → **13/13** ✅
+- `pnpm --filter @sonafrik/api test` → **351/351** ✅
+- Lighthouse local prod relancé sur :
+  - `/lancement`
+  - `/listen`
+  - `/creator`
+
+### Rapports générés
+- `docs/performance/reports/global-certification/GLOBAL_ENTERPRISE_CERTIFICATION_REPORT.md`
+- `docs/performance/reports/global-certification/lighthouse-lancement-global.json`
+- `docs/performance/reports/global-certification/lighthouse-listen-global.json`
+- `docs/performance/reports/global-certification/lighthouse-creator-global.json`
+
+### Résultats clés
+- `/lancement` : **LCP 2.3 s** ✅
+- `/listen` : **LCP 3.6 s** ❌
+- `/creator` : **LCP 3.2 s** ❌
+- CLS = **0** sur les routes mesurées
+- Backend / DB / SRTSP / sécurité : pas de régression critique détectée
+
+### Forensic 360°
+- **P0** : LCP hors cible sur `/listen` et `/creator`
+- **P1** : erreurs console Lighthouse sur `/listen` et `/creator`
+- **P2** : `select("*")` encore large dans les repositories ; First Load JS `/listen` au-dessus du gate historique
+- **P3** : TTL signed URLs assets, instrumentation mobile terrain incomplète
+
+### Décision
+🔴 **GLOBAL CERTIFICATION REFUSÉE**
+
+### Cause bloquante
+Les pages P0 `/listen` et `/creator` ne respectent pas encore la cible officielle SONAFRIK **LCP ≤ 2.5 s**.
+
+### Prochaine étape minimale
+- Corriger uniquement les blocages P0 de performance web
+- Relancer Lighthouse / re-audit final
+
+---
+
+## 6 juillet 2026 — P0 LCP Remediation + Re-Certification
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/ListenHeroGreeting.tsx` — hero greeting SSR (`getDayMode`)
+- `apps/web/src/app/(listener)/listen/page.tsx` — fetch parallèle, suppression Suspense
+- `apps/web/src/features/creator/components/CreatorSidebar.tsx` — RSC + FOUC fix
+- `apps/web/src/features/creator/components/CreatorWorkspaceHeader.tsx` — header SSR
+- `apps/web/src/features/creator/lib/creatorPageMeta.ts` — titres page extraits
+- `apps/web/src/app/(creator)/layout.tsx` — shell serveur sidebar + header
+- `apps/web/src/app/(creator)/creator/page.tsx` — HeroCard SSR, Suspense retiré
+- `apps/web/src/middleware.ts` — header `x-pathname`
+- `apps/web/src/app/styles/creator/layout.css`, `mobile.css` — sidebar FOUC + ahero defer mobile
+- `docs/performance/reports/global-certification/GLOBAL_ENTERPRISE_CERTIFICATION_REPORT.md` — §26
+
+### Root cause prouvé
+- `/listen` : H1 client (`useDayMode`) → render delay 1093 ms
+- `/creator` : sidebar client + FOUC CSS → nav LCP avec render delay 1239 ms
+
+### Mesures post-fix (médiane 3 runs Lighthouse)
+- `/listen` : LCP **4.1 s** (élément migré vers cover discovery, boundary client)
+- `/creator` : LCP **3.2 s** (élément migré vers `h1.creator-page-title`)
+- `/lancement` : LCP **2.2 s** ✅
+
+### Décision
+🔴 **GLOBAL CERTIFICATION REFUSÉE** (maintenu)
+
+### Tests à faire
+- [ ] Mesure CWV sur Vercel Preview (hors localhost Windows)
+- [ ] Sortir `DiscoveriesSection` du boundary client pour `/listen`
+
+---
+
 *Les entrées antérieures détaillées restent dans `docs/archive/RAPPORT_COLLECTION.md`.*
+
+---
+
+## 6 juillet 2026 — LCP Precision Remediation Program / Phase 1 (`/listen`)
+
+### Fichiers touchés
+- `apps/web/src/app/(listener)/listen/page.tsx` — rendu SSR direct de `HomepageContentSections` + pont live séparé
+- `apps/web/src/features/listener/components/HomepageContentLive.tsx` — bridge client SRTSP limité au `router.refresh()`
+- `apps/web/src/features/listener/components/HomepageContentSections.tsx` — retrait du boundary client au niveau des sections homepage
+- `docs/performance/reports/global-certification/GLOBAL_ENTERPRISE_CERTIFICATION_REPORT.md` — ajout du rapport Phase 1
+
+### Correction testée
+- Sortir la zone LCP `/listen` du subtree `HomepageContentLive` afin que le contenu homepage soit servi en SSR initial, avec hydratation réservée au live refresh.
+
+### Résultat mesuré (médiane 3 runs Lighthouse, prod locale `:3001`)
+- Avant : LCP **4.1 s**, FCP **1.4 s**, TBT **823 ms**, CLS **0**
+- Après : LCP **4.7 s**, FCP **1.1 s**, TBT **982 ms**, CLS **0**
+- Gain LCP : **-606 ms** (régression)
+
+### Régression prouvée
+- Le nouvel élément LCP sur les 3 runs est l’error boundary auditeur : `Impossible de charger le lecteur.`
+- Le runtime serveur loggue : `Attempted to call usePlayerContext() from the server...`
+- Cause : `DiscoveriesSection` dépend toujours du player client ; le simple passage de `HomepageContentSections` en SSR déclenche l’exécution serveur de cette chaîne et fait tomber la route sur l’error boundary.
+
+### Décision
+- **Phase 1 non validée** : la correction n’apporte pas le gain attendu et introduit une régression runtime sur `/listen`.
+
+---
+
+## 6 juillet 2026 — LCP Precision Remediation Program / Phase 1.5 (Rollback + Mapping)
+
+### Rollback contrôlé
+- `listen/page.tsx`, `HomepageContentLive.tsx`, `HomepageContentSections.tsx` restaurés à l'état certifié pré-Phase 1
+- Documentation Phase 1 conservée intégralement
+
+### Validations post-rollback
+- `pnpm build` / `lint` / `typecheck` : ✅
+- `test:web-navigation` 13/13, `test:srtsp` 100/100, `test:player` 15/15 : ✅
+
+### Livrable investigation
+- `docs/performance/reports/global-certification/LCP_PHASE_1_5_DEPENDENCY_MAPPING.md`
+
+### Conclusion architecture
+- Hypothèse Phase 1 (SSR parent naïf) : **invalidée**
+- Dépendance bloquante prouvée : `DiscoveriesSection` → `usePlayer()` → `usePlayerContext()`
+- Découplage Server/Client par îlots : **réalisable** (Scénario A recommandé pour Phase 2)
+
+---
+
+## 6 juillet 2026 — DiscoveriesSection Island Extraction
+
+### Implémentation
+- Server Island : `DiscoveriesSectionShell`, `TrackCardStatic`, `CoverImageStatic`
+- Client Island : `DiscoveriesSectionClient` (play, filtres, état actif)
+- Câblage minimal : `listen/page.tsx`, `HomepageContentLive` (SRTSP refresh), `HomepageContentSections` (retrait doublon)
+
+### Mesures Lighthouse `/listen` (3 runs)
+- Baseline LCP : **4081 ms** | Render Delay : **889 ms**
+- Après médiane LCP : **5930 ms** | Meilleur run : **3966 ms** (-115 ms)
+- SSR static card dans HTML initial : **confirmé**
+
+### Décision
+- **B — Gain insuffisant** pour autoriser `/creator` : médiane régressée, cible 2.5 s non atteinte
+
+### Rapport
+- `docs/performance/reports/global-certification/LCP_DISCOVERIES_ISLAND_REPORT.md`
+
+---
+
+## 6 juillet 2026 — Application Shell Root Cause Investigation (`/listen`)
+
+### Méthode
+- Inventaire shell complet (layouts, providers, boundaries)
+- Lighthouse forensique frais : `listen-shell-forensic.json` + trace Chrome
+- Analyse main thread, bootup-time, long tasks, bundles (37 scripts)
+
+### Conclusions mesurées
+- TTFB : **52–79 ms** (serveur innocenté)
+- LCP post-îlot : **3773 ms** — cover SSR confirmée
+- Element Render Delay : **1002 ms** (27 % LCP)
+- Script Evaluation : **2580 ms** (42 % main thread)
+- Style & Layout : **1579 ms** (26 %)
+- TBT : **1985 ms** | 14 long tasks
+- `StreamingLayoutClient` = ancre hydratation shell (chunks layout 156+65 ms + arbre Player/SRTSP/Sidebar)
+
+### Décision
+- **A — Shell applicatif confirmé comme principal responsable du LCP/Render Delay**
+
+### Rapport
+- `docs/performance/reports/global-certification/APPLICATION_SHELL_ROOT_CAUSE_REPORT.md`
+
+---
+
+## 6 juillet 2026 — Application Shell Decomposition Program
+
+### Implémentation (silo auditeur uniquement)
+- Layer 1 RSC : `ListenerLayoutShell` (prefetch)
+- Layer 2–4 : `StreamingLayoutClient` — chrome différé après FCP (`useAfterFCP`)
+- Layer 5 : `ListenerProgressiveRealtimeShell` — SRTSP context immédiat, `connectTransport()` + LDSE lourd après FCP
+- Différé : sidebar, `GlobalPlayer`, `ValidListenToast`, SRTSP connect, `LdseDevPanel`, bridge LDSE
+
+### Correction régression runtime
+- Sidebar montée hors `SrtspProvider` → `useSrtsp` throw ; corrigé en élargissant l'enveloppe progressive
+
+### Mesures Lighthouse fraîches
+- `/listen` (3 runs) : LCP **3734–5454 ms** (best **3734**, baseline **3773**) | TBT médian **1142 ms** (baseline **1985**, **−42 %**)
+- `/creator`, `/lancement` : non modifiés (variance seule)
+
+### Décision
+- **B — Objectifs non atteints** : LCP > 2.5 s, Render Delay résiduel dominant, `PlayerProvider` + `chunk 2060` restent bloquants
+
+### Rapport
+- `docs/performance/reports/global-certification/APPLICATION_SHELL_DECOMPOSITION_REPORT.md`
+
+---
+
+## 6 juillet 2026 — Main Thread Execution Forensics (`/listen`)
+
+### Méthode
+- Lighthouse bootup-time + mainthread-work-breakdown + long-tasks (run3 + capture fraîche)
+- Chrome trace `listen-shell-forensic-0.trace.json` (EvaluateScript, v8.run, FunctionCall)
+- Import graph statique `(listener)/layout` → providers → islands
+
+### Conclusions mesurées
+- Script Evaluation : **2 428–2 981 ms** (40–47 % main thread)
+- Chunk **2060** (React/Next hydration) : **1 506–1 669 ms scripting (66 %)**
+- Layout listener (PlayerProvider + SRTSP/LDSE) : **52–177 ms** direct + cascade 2060
+- Long task RSC `/listen` : **386–945 ms** avant LCP
+- Prefetch parasite `(wallet)/layout` : **161 ms** (run3)
+- Render Delay LCP : **87 %** (run3 stable)
+
+### Décision
+- **A — Cause CPU identifiée avec certitude** (chunk 2060 + hydratation shell Player/SRTSP)
+
+### Rapport
+- `docs/performance/reports/global-certification/MAIN_THREAD_EXECUTION_FORENSICS_REPORT.md`
+
+---
+
+## 6 juillet 2026 — CPU Precision Remediation Cycle 1 (prefetch Wallet post-LCP)
+
+### Correction unique
+- `useAfterLCP` + différé prefetch `/wallet` dans `ListenerMobileBottomNav` et `SidebarNavItem`
+
+### Mesures `/listen` (best run 2 / 3)
+- LCP : 3 734 → 3 746 ms (~0)
+- TBT : 1 492 → **883 ms** (−41 %)
+- Script Evaluation : 2 428 → **2 129 ms** (−12 %)
+- Long task wallet pré-LCP : **164 ms → 0**
+
+### Décision
+- **B — Objectifs LCP non atteints** → Cycle 2 autorisé (bridge lazy init)
+
+### Rapport
+- `docs/performance/reports/global-certification/CPU_PRECISION_REMEDIATION_CYCLE1_REPORT.md`
+

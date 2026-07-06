@@ -4,7 +4,7 @@
   width: 100%;
   max-width: 100%;
   overflow-x: clip;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--overlay-blanc-08);
   background: var(--color-noir-profond);
 }
 
@@ -31,8 +31,8 @@
   min-width: 0;
   padding: 0.45rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--overlay-blanc-10);
+  background: var(--overlay-blanc-03);
   color: var(--color-texte-secondaire);
   font-size: 0.75rem;
   font-weight: 600;
@@ -42,8 +42,8 @@
 }
 
 .creator-mobile-nav__pill--active {
-  border-color: rgba(0, 210, 106, 0.45);
-  background: rgba(0, 210, 106, 0.1);
+  border-color: var(--overlay-vert-45);
+  background: var(--overlay-vert-10);
   color: var(--color-texte-principal);
 }
 
@@ -167,6 +167,11 @@
   .creator-page-sub {
     font-size: 0.75rem;
     line-height: 1.45;
+  }
+
+  .creator-dashboard > .ahero {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 20rem;
   }
 
   .creator-breadcrumb {

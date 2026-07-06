@@ -34,7 +34,7 @@
 }
 .ap-banner--img { background: var(--color-card); }
 .ap-banner--gradient {
-  background: linear-gradient(135deg, rgba(0, 210, 106, 0.13) 0%, rgba(255, 194, 14, 0.07) 100%);
+  background: linear-gradient(135deg, var(--overlay-vert-soft) 0%, var(--overlay-or-07) 100%);
 }
 
 /* Body */
@@ -97,7 +97,7 @@
   border-radius: 999px;
   font-size: 0.6875rem;
   font-weight: 700;
-  background: rgba(255, 194, 14, 0.13);
+  background: var(--overlay-or-soft);
   color: var(--color-or-solaire);
 }
 
@@ -135,7 +135,7 @@
 .ap-stat-sep {
   width: 1px;
   height: 2rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-08);
   flex-shrink: 0;
   margin-right: 1rem;
 }
@@ -227,7 +227,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--overlay-blanc-04);
   border-radius: 999px;
   padding: 0.2rem;
 }
@@ -243,7 +243,7 @@
 }
 .ap-sort-tab:hover { color: var(--color-texte-principal); }
 .ap-sort-tab--active {
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--overlay-blanc-09);
   color: var(--color-texte-principal);
   font-weight: 600;
 }
@@ -289,10 +289,10 @@
   border: 1px solid transparent;
   transition: background 0.12s ease, border-color 0.12s ease;
 }
-.ap-track-row:hover { background: rgba(255, 255, 255, 0.03); }
+.ap-track-row:hover { background: var(--overlay-blanc-03); }
 .ap-track-row--active {
-  background: rgba(0, 210, 106, 0.07);
-  border-color: rgba(0, 210, 106, 0.18);
+  background: var(--overlay-vert-07);
+  border-color: var(--overlay-vert-18);
 }
 .ap-track-play-area {
   display: flex;

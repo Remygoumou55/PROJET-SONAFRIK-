@@ -58,12 +58,12 @@
   --color-admin-sidebar: #0a0a0a;
   --color-admin-warning: #ff8c00;
   --color-admin-info: #378add;
-  --color-admin-card-bg: rgba(255, 255, 255, 0.03);
-  --color-admin-card-border: rgba(255, 255, 255, 0.08);
-  --color-admin-border-subtle: rgba(255, 255, 255, 0.06);
-  --color-admin-text-muted: rgba(255, 255, 255, 0.45);
-  --color-admin-text-soft: rgba(255, 255, 255, 0.4);
-  --color-admin-section-gold: rgba(255, 194, 14, 0.55);
+  --color-admin-card-bg: var(--overlay-blanc-03);
+  --color-admin-card-border: var(--overlay-blanc-08);
+  --color-admin-border-subtle: var(--overlay-blanc-06);
+  --color-admin-text-muted: var(--overlay-blanc-45);
+  --color-admin-text-soft: var(--overlay-blanc-40);
+  --color-admin-section-gold: var(--overlay-or-55);
 
   /* Google Sign-In brand (guidelines officielles — usage SVG auth uniquement) */
   --color-google-blue: #4285f4;
@@ -150,6 +150,136 @@
   --overlay-blanc-30: rgb(255 255 255 / 0.3);
   --overlay-texte-soft: rgb(160 160 160 / 0.13);
   --overlay-vert-10: rgb(0 210 106 / 0.10);
+  /* ── Overlay tokens Vague J — SSOT complet (2026-07-06) ── */
+  /* Blanc (255 255 255) — série complète */
+  --overlay-blanc-01: rgb(255 255 255 / 0.01);
+  --overlay-blanc-02: rgb(255 255 255 / 0.02);
+  --overlay-blanc-03: rgb(255 255 255 / 0.03);
+  --overlay-blanc-04: rgb(255 255 255 / 0.04);
+  --overlay-blanc-05: rgb(255 255 255 / 0.05);
+  --overlay-blanc-06: rgb(255 255 255 / 0.06);
+  --overlay-blanc-07: rgb(255 255 255 / 0.07);
+  --overlay-blanc-08: rgb(255 255 255 / 0.08);
+  --overlay-blanc-09: rgb(255 255 255 / 0.09);
+  --overlay-blanc-10: rgb(255 255 255 / 0.10);
+  --overlay-blanc-12: rgb(255 255 255 / 0.12);
+  --overlay-blanc-14: rgb(255 255 255 / 0.14);
+  --overlay-blanc-15: rgb(255 255 255 / 0.15);
+  --overlay-blanc-18: rgb(255 255 255 / 0.18);
+  --overlay-blanc-20: rgb(255 255 255 / 0.20);
+  --overlay-blanc-22: rgb(255 255 255 / 0.22);
+  --overlay-blanc-24: rgb(255 255 255 / 0.24);
+  --overlay-blanc-25: rgb(255 255 255 / 0.25);
+  --overlay-blanc-35: rgb(255 255 255 / 0.35);
+  --overlay-blanc-40: rgb(255 255 255 / 0.40);
+  --overlay-blanc-45: rgb(255 255 255 / 0.45);
+  --overlay-blanc-50: rgb(255 255 255 / 0.50);
+  --overlay-blanc-65: rgb(255 255 255 / 0.65);
+  --overlay-blanc-70: rgb(255 255 255 / 0.70);
+  --overlay-blanc-75: rgb(255 255 255 / 0.75);
+  --overlay-blanc-78: rgb(255 255 255 / 0.78);
+  --overlay-blanc-80: rgb(255 255 255 / 0.80);
+  /* Vert energie (0 210 106) — série complète */
+  --overlay-vert-00: rgb(0 210 106 / 0.00);
+  --overlay-vert-08: rgb(0 210 106 / 0.08);
+  --overlay-vert-12: rgb(0 210 106 / 0.12);
+  --overlay-vert-14: rgb(0 210 106 / 0.14);
+  --overlay-vert-15: rgb(0 210 106 / 0.15);
+  --overlay-vert-18: rgb(0 210 106 / 0.18);
+  --overlay-vert-20: rgb(0 210 106 / 0.20);
+  --overlay-vert-25: rgb(0 210 106 / 0.25);
+  --overlay-vert-30: rgb(0 210 106 / 0.30);
+  --overlay-vert-40: rgb(0 210 106 / 0.40);
+  --overlay-vert-45: rgb(0 210 106 / 0.45);
+  --overlay-vert-50: rgb(0 210 106 / 0.50);
+  --overlay-vert-75: rgb(0 210 106 / 0.75);
+  /* Or solaire (255 194 14) — série complète */
+  --overlay-or-04: rgb(255 194 14 / 0.04);
+  --overlay-or-05: rgb(255 194 14 / 0.05);
+  --overlay-or-06: rgb(255 194 14 / 0.06);
+  --overlay-or-07: rgb(255 194 14 / 0.07);
+  --overlay-or-08: rgb(255 194 14 / 0.08);
+  --overlay-or-10: rgb(255 194 14 / 0.10);
+  --overlay-or-12: rgb(255 194 14 / 0.12);
+  --overlay-or-15: rgb(255 194 14 / 0.15);
+  --overlay-or-25: rgb(255 194 14 / 0.25);
+  --overlay-or-40: rgb(255 194 14 / 0.40);
+  --overlay-or-50: rgb(255 194 14 / 0.50);
+  --overlay-or-55: rgb(255 194 14 / 0.55);
+  /* Admin warning (255 140 0) */
+  --overlay-admin-warning-04: rgb(255 140 0 / 0.04);
+  --overlay-admin-warning-07: rgb(255 140 0 / 0.07);
+  --overlay-admin-warning-15: rgb(255 140 0 / 0.15);
+  --overlay-admin-warning-30: rgb(255 140 0 / 0.30);
+  --overlay-admin-warning-35: rgb(255 140 0 / 0.35);
+  /* Alt warning (255 166 0) */
+  --overlay-alt-warning-12: rgb(255 166 0 / 0.12);
+  --overlay-alt-warning-55: rgb(255 166 0 / 0.55);
+  --overlay-alt-warning-90: rgb(255 166 0 / 0.90);
+  /* Admin danger (255 77 79) */
+  --color-admin-danger: #ff4d4f;
+  --overlay-admin-danger-08: rgb(255 77 79 / 0.08);
+  --overlay-admin-danger-10: rgb(255 77 79 / 0.10);
+  --overlay-admin-danger-15: rgb(255 77 79 / 0.15);
+  --overlay-admin-danger-20: rgb(255 77 79 / 0.20);
+  --overlay-admin-danger-30: rgb(255 77 79 / 0.30);
+  /* Erreur (255 68 68) — compléments */
+  --overlay-erreur-04: rgb(255 68 68 / 0.04);
+  --overlay-erreur-07: rgb(255 68 68 / 0.07);
+  --overlay-erreur-10: rgb(255 68 68 / 0.10);
+  --overlay-erreur-12: rgb(255 68 68 / 0.12);
+  --overlay-erreur-15: rgb(255 68 68 / 0.15);
+  --overlay-erreur-20: rgb(255 68 68 / 0.20);
+  --overlay-erreur-30: rgb(255 68 68 / 0.30);
+  --overlay-erreur-35: rgb(255 68 68 / 0.35);
+  --overlay-erreur-65: rgb(255 68 68 / 0.65);
+  /* Admin info (55 138 221) */
+  --overlay-admin-info-12: rgb(55 138 221 / 0.12);
+  --overlay-admin-info-15: rgb(55 138 221 / 0.15);
+  --overlay-admin-info-25: rgb(55 138 221 / 0.25);
+  /* Noir pur (0 0 0) — compléments */
+  --overlay-noir-20: rgb(0 0 0 / 0.20);
+  --overlay-noir-25: rgb(0 0 0 / 0.25);
+  --overlay-noir-80: rgb(0 0 0 / 0.80);
+  --overlay-noir-85: rgb(0 0 0 / 0.85);
+  /* Noir profond (13 13 13) — série complète */
+  --overlay-noir-profond-15: rgb(13 13 13 / 0.15);
+  --overlay-noir-profond-55: rgb(13 13 13 / 0.55);
+  --overlay-noir-profond-65: rgb(13 13 13 / 0.65);
+  --overlay-noir-profond-82: rgb(13 13 13 / 0.82);
+  --overlay-noir-profond-85: rgb(13 13 13 / 0.85);
+  --overlay-noir-profond-95: rgb(13 13 13 / 0.95);
+  --overlay-noir-profond-97: rgb(13 13 13 / 0.97);
+  /* Couleurs spéciales — usage ponctuel */
+  --overlay-violet-20: rgb(120 80 255 / 0.20);
+  --overlay-rouge-30: rgb(206 17 38 / 0.30);
+  --overlay-rouge-60: rgb(206 17 38 / 0.60);
+  --overlay-vert-fonce-85: rgb(26 74 42 / 0.85);
+  --overlay-teal-95: rgb(15 110 86 / 0.95);
+  --overlay-vert-fonce-90: rgb(0 120 64 / 0.90);
+  /* Compléments Vague J — round 2 */
+  --overlay-vert-06: rgb(0 210 106 / 0.06);
+  --overlay-vert-07: rgb(0 210 106 / 0.07);
+  --overlay-vert-35: rgb(0 210 106 / 0.35);
+  --overlay-vert-60: rgb(0 210 106 / 0.60);
+  --overlay-vert-65: rgb(0 210 106 / 0.65);
+  --overlay-vert-70: rgb(0 210 106 / 0.70);
+  --overlay-or-18: rgb(255 194 14 / 0.18);
+  --overlay-or-35: rgb(255 194 14 / 0.35);
+  --overlay-or-60: rgb(255 194 14 / 0.60);
+  --overlay-or-85: rgb(255 194 14 / 0.85);
+  --overlay-admin-warning-06: rgb(255 140 0 / 0.06);
+  --overlay-admin-warning-12: rgb(255 140 0 / 0.12);
+  --overlay-admin-warning-20: rgb(255 140 0 / 0.20);
+  --overlay-admin-warning-25: rgb(255 140 0 / 0.25);
+  --overlay-admin-info-07: rgb(55 138 221 / 0.07);
+  --overlay-admin-info-30: rgb(55 138 221 / 0.30);
+  --overlay-erreur-06: rgb(255 68 68 / 0.06);
+  --overlay-noir-65: rgb(0 0 0 / 0.65);
+  --overlay-noir-profond-35: rgb(13 13 13 / 0.35);
+  --overlay-rouge-25: rgb(206 17 38 / 0.25);
+  --overlay-indigo-20: rgb(30 0 80 / 0.20);
+  --overlay-bleu-clair-13: rgb(96 165 250 / 0.13);
   --live-warn-bg: rgb(255 194 14 / 0.08);
   --live-warn-border: rgb(255 194 14 / 0.25);
   --live-warn-section-bg: rgb(255 194 14 / 0.06);
@@ -296,7 +426,7 @@ body {
   display: inline-block;
   width: 1.25rem;
   height: 1px;
-  background: rgba(255, 194, 14, 0.55);
+  background: var(--overlay-or-55);
   vertical-align: middle;
   margin: 0 0.5rem;
 }

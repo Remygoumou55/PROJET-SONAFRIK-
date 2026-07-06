@@ -120,7 +120,7 @@
   background: color-mix(in srgb, var(--color-noir-profond) 96%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--overlay-blanc-08);
 }
 
 html[data-player-active="true"] .has-global-player main {
@@ -156,8 +156,8 @@ html[data-player-active="true"] .has-global-player main {
   border-radius: 8px;
   font-size: 12px;
   color: var(--color-erreur);
-  background: rgba(255, 68, 68, 0.09);
-  border: 1px solid rgba(255, 68, 68, 0.2);
+  background: var(--overlay-erreur-09);
+  border: 1px solid var(--overlay-erreur-20);
 }
 
 .gp-body {
@@ -171,7 +171,7 @@ html[data-player-active="true"] .has-global-player main {
 }
 
 .gp-body:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--overlay-blanc-03);
 }
 
 .gp-track-info {
@@ -239,8 +239,8 @@ html[data-player-active="true"] .has-global-player main {
   padding: 2px 8px;
   border-radius: 99px;
   color: var(--color-or-solaire);
-  background: rgba(255, 194, 14, 0.1);
-  border: 1px solid rgba(255, 194, 14, 0.2);
+  background: var(--overlay-or-10);
+  border: 1px solid var(--overlay-or-medium);
 }
 
 .gp-volume {
@@ -297,8 +297,8 @@ html[data-player-active="true"] .has-global-player main {
   align-items: flex-start;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-left: 2px solid rgba(255, 194, 14, 0.4);
+  background: var(--overlay-blanc-02);
+  border-left: 2px solid var(--overlay-or-40);
   border-radius: 0 8px 8px 0;
   margin: 12px 0 0;
   max-width: 600px;
@@ -312,7 +312,7 @@ html[data-player-active="true"] .has-global-player main {
 
 .proverbe-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--overlay-blanc-65);
   font-style: italic;
   line-height: 1.6;
   margin-bottom: 4px;
@@ -320,7 +320,7 @@ html[data-player-active="true"] .has-global-player main {
 
 .proverbe-source {
   font-size: 11px;
-  color: rgba(255, 194, 14, 0.6);
+  color: var(--overlay-or-60);
   font-weight: 500;
 }
 
@@ -355,17 +355,17 @@ html[data-player-active="true"] .has-global-player main {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(0, 210, 106, 0);
+    box-shadow: 0 0 0 0 var(--overlay-vert-00);
   }
   50% {
     opacity: 0.8;
-    box-shadow: 0 0 0 5px rgba(0, 210, 106, 0.15);
+    box-shadow: 0 0 0 5px var(--overlay-vert-15);
   }
 }
 
 .live-text {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--overlay-blanc-45);
 }
 
 .reactions-row {
@@ -379,8 +379,8 @@ html[data-player-active="true"] .has-global-player main {
   align-items: center;
   gap: 5px;
   padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--overlay-blanc-04);
+  border: 1px solid var(--overlay-blanc-08);
   border-radius: 99px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -388,14 +388,14 @@ html[data-player-active="true"] .has-global-player main {
 }
 
 .reaction-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--overlay-blanc-08);
+  border-color: var(--overlay-blanc-15);
   transform: scale(1.05);
 }
 
 .reaction-btn.reacted {
-  background: rgba(0, 210, 106, 0.1);
-  border-color: rgba(0, 210, 106, 0.3);
+  background: var(--overlay-vert-10);
+  border-color: var(--overlay-vert-30);
   transform: scale(1.08);
 }
 
@@ -406,7 +406,7 @@ html[data-player-active="true"] .has-global-player main {
 .reaction-count {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--overlay-blanc-60);
 }
 
 .reaction-btn.reacted .reaction-emoji {
