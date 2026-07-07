@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="80" viewBox="0 0 28 80" fill="none">
+  <defs>
+    <pattern id="sonafrik-strip" width="28" height="80" patternUnits="userSpaceOnUse">
+      <path d="M14 4 L24 14 L14 24 L4 14 Z" stroke="#f6c009" stroke-width="0.65" stroke-opacity="0.28" fill="none"/>
+      <path d="M14 12 L20 18 L14 24 L8 18 Z" stroke="#f6c009" stroke-width="0.45" stroke-opacity="0.18" fill="none"/>
+      <circle cx="14" cy="14" r="1.2" fill="#f6c009" fill-opacity="0.22"/>
+      <path d="M6 30 h16 M6 34 h12 M8 38 h10" stroke="#f6c009" stroke-width="0.5" stroke-opacity="0.2" stroke-linecap="round"/>
+      <path d="M14 44 L22 52 L14 60 L6 52 Z" stroke="#f6c009" stroke-width="0.65" stroke-opacity="0.26" fill="none"/>
+      <path d="M10 48 L14 44 L18 48 L14 52 Z" stroke="#f6c009" stroke-width="0.4" stroke-opacity="0.16" fill="none"/>
+      <path d="M5 66 L14 58 L23 66 L14 74 Z" stroke="#f6c009" stroke-width="0.55" stroke-opacity="0.24" fill="none"/>
+      <circle cx="14" cy="66" r="0.9" fill="#f6c009" fill-opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="28" height="80" fill="url(#sonafrik-strip)"/>
+</svg>

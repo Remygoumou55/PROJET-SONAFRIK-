@@ -1,74 +1,39 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useCallback, useRef, useState } from "react";
-import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
-import {
-  compressImageFile,
-  IMAGE_UPLOAD,
-  isAllowedImageMime,
-} from "@/lib/image/compress-image";
+import { useCallback, useState } from "react";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
-import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
+import {
+  resolveCreatorIdForUpload,
+  resolveCreatorUploadError,
+  useEffectiveCreatorId,
+} from "../../hooks/useEffectiveCreatorId";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { CreatorAssetImage } from "./CreatorAssetImage";
-import type { CropResult } from "./CropEditorModal";
-
-const CropEditorModal = dynamic(
-  () => import("./CropEditorModal").then((m) => ({ default: m.CropEditorModal })),
-  { ssr: false },
-);
-
-type AllowedImageMime = ImageMime;
-
-// ─── Props ────────────────────────────────────────────────────────────────────
+import {
+  AUTO_IMAGE_VARIANTS,
+  type AutoImagePrepared,
+} from "@/features/shared/media/autoImagePipeline";
+import { useAutoImageUpload } from "@/features/shared/media/useAutoImageUpload";
 
 interface ArtistProfilePhotoProps {
   creatorId: string;
   stageName: string;
   photoPath: string | null;
-  // Crop persistence fields from artistProfile
-  originalPath: string | null;
-  cropX: number;
-  cropY: number;
-  cropZoom: number;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function ArtistProfilePhoto({
-  creatorId,
+  creatorId: creatorIdProp,
   stageName,
   photoPath,
-  originalPath,
-  cropX,
-  cropY,
-  cropZoom,
 }: ArtistProfilePhotoProps) {
+  const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localPhotoPath, setLocalPhotoPath] = useState(photoPath);
-  const [localOriginalPath, setLocalOriginalPath] = useState(originalPath);
-  const [localCropX, setLocalCropX] = useState(cropX);
-  const [localCropY, setLocalCropY] = useState(cropY);
-  const [localCropZoom, setLocalCropZoom] = useState(cropZoom);
-
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const [pendingOriginalFile, setPendingOriginalFile] = useState<File | null>(null);
-  const [cropOpen, setCropOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch signed URL for the stored original (for re-crop without re-upload)
-  const { url: originalSignedUrl } = useCreatorAssetUrl(
-    creatorId,
-    localOriginalPath,
-    "gallery",
-  );
+  const [removeError, setRemoveError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const initials = stageName
     .split(/\s+/)
@@ -76,150 +41,83 @@ export function ArtistProfilePhoto({
     .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
 
-  // ── Open crop editor ──────────────────────────────────────────────────────
-
-  const openCropEditor = useCallback(async () => {
-    setError(null);
-
-    // Re-crop saved original: no file picker needed
-    if (localOriginalPath && originalSignedUrl) {
-      setCropSrc(originalSignedUrl);
-      setCropOpen(true);
-      return;
-    }
-
-    // No original saved: trigger file picker
-    fileInputRef.current?.click();
-  }, [localOriginalPath, originalSignedUrl]);
-
-  // ── Handle new file selection ─────────────────────────────────────────────
-
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-
-    setError(null);
-
-    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!isAllowedImageMime(file.type) && !extOk) {
-      setError("Format non autorisé. Utilisez JPG, PNG ou WebP.");
-      return;
-    }
-    if (file.size > IMAGE_POLICY.maxBytes) {
-      setError(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
-      return;
-    }
-
-    setIsProcessing(true);
+  const uploadAvatar = useCallback(async (prepared: AutoImagePrepared) => {
     try {
-      // Compress without crop — preserve original proportions for the crop editor
-      const compressed = await compressImageFile(file, {
-        maxWidth: IMAGE_UPLOAD.PROFILE_MAX_PX * 2,
-        maxHeight: IMAGE_UPLOAD.PROFILE_MAX_PX * 2,
-      });
-      setPendingOriginalFile(compressed);
-      const objectUrl = URL.createObjectURL(compressed);
-      setCropSrc(objectUrl);
-      setCropOpen(true);
-    } catch {
-      setError("Impossible de traiter cette image.");
-    } finally {
-      setIsProcessing(false);
-    }
-  }, []);
-
-  // ── Save crop result ──────────────────────────────────────────────────────
-
-  const handleCropSave = useCallback(async (result: CropResult) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const croppedFile = new File([result.croppedBlob], "avatar.jpg", { type: "image/jpeg" });
-
-      let finalOriginalPath = localOriginalPath;
-
-      // Upload original (only when a new file was selected)
-      if (pendingOriginalFile) {
-        const origContentType: AllowedImageMime =
-          resolveImageUploadMime(pendingOriginalFile) ?? "image/jpeg";
-        const { signedUrl: origSignedUrl, token: origToken, path: origPath } =
-          await creatorService.requestAssetUploadUrl({
-            creatorId,
-            assetKind: "gallery",
-            contentType: origContentType,
-          });
-        await uploadAssetToSignedUrl(origSignedUrl, pendingOriginalFile, {
-          contentType: origContentType,
-          token: origToken,
-        });
-        finalOriginalPath = origPath;
-      }
-
-      // Upload cropped avatar (gallery = pas de pollution cover_path via edge fn)
-      const { signedUrl: cropSignedUrl, token: cropToken, path: croppedPath } =
+      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
+      const { signedUrl, token, path } =
         await creatorService.requestAssetUploadUrl({
           creatorId,
           assetKind: "gallery",
-          contentType: "image/jpeg",
+          contentType: prepared.contentType,
         });
-      await uploadAssetToSignedUrl(cropSignedUrl, croppedFile, {
-        contentType: "image/jpeg",
-        token: cropToken,
+      await uploadAssetToSignedUrl(signedUrl, prepared.file, {
+        contentType: prepared.contentType,
+        token,
       });
 
-      // Save to DB
       await creatorService.saveAvatarCrop({
         creatorId,
-        croppedPath,
-        originalPath: finalOriginalPath ?? croppedPath,
-        cropX: result.cropX,
-        cropY: result.cropY,
-        cropZoom: result.cropZoom,
+        croppedPath: path,
+        originalPath: path,
+        cropX: 0,
+        cropY: 0,
+        cropZoom: 1,
       });
 
       invalidateCreatorAssetUrl(creatorId);
-      setLocalPhotoPath(croppedPath);
-      setLocalOriginalPath(finalOriginalPath ?? croppedPath);
-      setLocalCropX(result.cropX);
-      setLocalCropY(result.cropY);
-      setLocalCropZoom(result.cropZoom);
-      setPendingOriginalFile(null);
-      if (cropSrc && cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
-      setCropSrc(null);
+      setLocalPhotoPath(path);
       publishArtistProfileUpdate(creatorId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Échec de l'enregistrement. Réessayez.");
-      throw err; // let CropEditorModal keep showing error
-    } finally {
-      setLoading(false);
+      throw new Error(resolveCreatorUploadError(err, "Échec de l'enregistrement de l'avatar."));
     }
-  }, [creatorId, localOriginalPath, pendingOriginalFile, cropSrc, creatorService]);
+  }, [creatorIdProp, creatorService]);
+
+  const {
+    inputRef,
+    uploading,
+    error: uploadError,
+    success,
+    accept,
+    openFilePicker,
+    handleInputChange,
+  } = useAutoImageUpload({
+    variant: AUTO_IMAGE_VARIANTS.avatar,
+    onUpload: uploadAvatar,
+    successMessage: "Avatar mis à jour.",
+  });
 
   const handleRemove = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setRemoving(true);
+    setRemoveError(null);
     try {
+      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
       await creatorService.removeProfilePhoto(creatorId);
       invalidateCreatorAssetUrl(creatorId);
       setLocalPhotoPath(null);
-      setLocalOriginalPath(null);
       publishArtistProfileUpdate(creatorId);
-    } catch {
-      setError("Impossible de supprimer la photo.");
+    } catch (err) {
+      setRemoveError(resolveCreatorUploadError(err, "Impossible de supprimer la photo."));
     } finally {
-      setLoading(false);
+      setRemoving(false);
     }
-  }, [creatorId, creatorService]);
+  }, [creatorIdProp, creatorService]);
+
+  const error = removeError ?? uploadError;
+  const busy = uploading || removing;
 
   return (
     <>
-      {/* Avatar display */}
       <div className="ahero__avatar-wrap">
-        <div className="ahero__avatar">
+        <button
+          type="button"
+          className="ahero__avatar ahero__avatar-button"
+          onClick={openFilePicker}
+          disabled={busy || resolving}
+          aria-label="Changer l'avatar"
+        >
           {localPhotoPath ? (
             <CreatorAssetImage
-              creatorId={creatorId}
+              creatorId={displayCreatorId}
               path={localPhotoPath}
               assetKind="gallery"
               alt={stageName}
@@ -236,29 +134,21 @@ export function ArtistProfilePhoto({
               {initials || "🎤"}
             </span>
           )}
-          {(loading || isProcessing) && (
+          {busy && (
             <div className="ahero__avatar-loading" aria-live="polite">
               <span>◌</span>
             </div>
           )}
-        </div>
+          <span className="ahero__avatar-edit" aria-hidden="true">Modifier</span>
+        </button>
       </div>
 
-      {/* Action buttons */}
       <div className="ahero__avatar-actions">
-        <button
-          className="ahero__btn"
-          onClick={() => void openCropEditor()}
-          disabled={loading || isProcessing}
-          aria-label="Gérer la photo de profil"
-        >
-          📷 Gérer l&apos;avatar
-        </button>
         {localPhotoPath && (
           <button
             className="ahero__btn ahero__btn--danger"
             onClick={() => void handleRemove()}
-            disabled={loading}
+            disabled={busy}
             aria-label="Supprimer la photo de profil"
           >
             🗑
@@ -269,40 +159,19 @@ export function ArtistProfilePhoto({
       {error && (
         <p className="ahero__photo-error" role="alert">{error}</p>
       )}
+      {success && !error && (
+        <p className="ahero__photo-success" role="status">{success}</p>
+      )}
 
-      {/* Hidden file input */}
       <input
-        ref={fileInputRef}
+        ref={inputRef}
         type="file"
-        accept={IMAGE_ACCEPT}
+        accept={accept}
         className="sr-only"
         aria-hidden="true"
         tabIndex={-1}
-        onChange={(e) => void handleFileSelect(e)}
+        onChange={(e) => void handleInputChange(e)}
       />
-
-      {/* Crop editor modal */}
-      {cropSrc && (
-        <CropEditorModal
-          key={cropSrc}
-          open={cropOpen}
-          onClose={() => {
-            if (cropSrc.startsWith("blob:")) URL.revokeObjectURL(cropSrc);
-            setCropSrc(null);
-            setPendingOriginalFile(null);
-            setCropOpen(false);
-          }}
-          imageSrc={cropSrc}
-          aspect={1}
-          // New image: pass undefined → auto-fit + "new image" messaging
-          // Re-crop: restore saved position/zoom
-          initialCrop={pendingOriginalFile ? undefined : { x: localCropX, y: localCropY }}
-          initialZoom={pendingOriginalFile ? undefined : localCropZoom}
-          title="Recadrer l'avatar"
-          onSave={handleCropSave}
-          onChangePhoto={() => fileInputRef.current?.click()}
-        />
-      )}
     </>
   );
 }

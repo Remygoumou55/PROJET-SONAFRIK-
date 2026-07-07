@@ -1,86 +1,50 @@
 "use client";
 
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import { useCreatorService } from "../../hooks/useCreator";
+import {
+  resolveCreatorIdForUpload,
+  resolveCreatorUploadError,
+  useEffectiveCreatorId,
+} from "../../hooks/useEffectiveCreatorId";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
-import { IMAGE_ACCEPT, IMAGE_POLICY, resolveImageUploadMime, type ImageMime } from "@sonafrik/shared";
-import {
-  compressImageFile,
-  IMAGE_UPLOAD,
-  isAllowedImageMime,
-} from "@/lib/image/compress-image";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
-
-type AllowedImageMime = ImageMime;
-
-// ─── Props ────────────────────────────────────────────────────────────────────
+import {
+  AUTO_IMAGE_VARIANTS,
+  type AutoImagePrepared,
+} from "@/features/shared/media/autoImagePipeline";
+import { useAutoImageUpload } from "@/features/shared/media/useAutoImageUpload";
 
 interface ArtistCoverSliderProps {
   creatorId: string;
   stageName: string;
   primaryCoverPath: string | null;
-  // kept in signature for API compat — unused (no re-crop flow)
-  originalPath: string | null;
-  cropX: number;
-  cropY: number;
-  cropZoom: number;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export const ArtistCoverSlider = memo(function ArtistCoverSlider({
-  creatorId,
+  creatorId: creatorIdProp,
   stageName,
   primaryCoverPath,
 }: ArtistCoverSliderProps) {
+  const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [localCoverPath, setLocalCoverPath] = useState(primaryCoverPath);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // ── Upload direct — pas de popup de recadrage ───────────────────────────
-
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-
-    setError(null);
-
-    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!isAllowedImageMime(file.type) && !extOk) {
-      setError("Format non supporté. Utilisez JPG, PNG ou WebP.");
-      return;
-    }
-    if (file.size > IMAGE_POLICY.maxBytes) {
-      setError(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
-      return;
-    }
-
-    setUploading(true);
+  const uploadCover = useCallback(async (prepared: AutoImagePrepared) => {
     try {
-      // Compression pour bannière
-      const compressed = await compressImageFile(file, {
-        maxWidth: IMAGE_UPLOAD.COVER_MAX_PX,
-        maxHeight: IMAGE_UPLOAD.COVER_MAX_PX,
-      });
-      const contentType: AllowedImageMime =
-        resolveImageUploadMime(compressed) ?? "image/jpeg";
-
-      // Upload unique — la même image sert de cover et d'original
+      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
       const { signedUrl, token, path } =
         await creatorService.requestAssetUploadUrl({
           creatorId,
           assetKind: "gallery",
-          contentType,
+          contentType: prepared.contentType,
         });
-      await uploadAssetToSignedUrl(signedUrl, compressed, { contentType, token });
+      await uploadAssetToSignedUrl(signedUrl, prepared.file, {
+        contentType: prepared.contentType,
+        token,
+      });
 
-      // Sauvegarde en DB (pas de crop → valeurs neutres centrées)
       await creatorService.saveCoverPrimaryCrop({
         creatorId,
         croppedPath: path,
@@ -94,19 +58,32 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       setLocalCoverPath(path);
       publishArtistProfileUpdate(creatorId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Échec de l'enregistrement.");
-    } finally {
-      setUploading(false);
+      throw new Error(
+        resolveCreatorUploadError(err, "Échec de l'enregistrement de la couverture."),
+      );
     }
-  }, [creatorId, creatorService]);
+  }, [creatorIdProp, creatorService]);
+
+  const {
+    inputRef,
+    uploading,
+    error,
+    success,
+    accept,
+    openFilePicker,
+    handleInputChange,
+  } = useAutoImageUpload({
+    variant: AUTO_IMAGE_VARIANTS.hero,
+    onUpload: uploadCover,
+    successMessage: "Couverture mise à jour.",
+  });
 
   return (
     <>
-      {/* Cover — remplit 100 % du hero */}
       <div className="ahero__cover">
         {localCoverPath ? (
           <CreatorAssetImage
-            creatorId={creatorId}
+            creatorId={displayCreatorId}
             path={localCoverPath}
             assetKind="gallery"
             alt={`Couverture ${stageName}`}
@@ -120,7 +97,6 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
           <div className="ahero__cover-default" aria-hidden="true" />
         )}
 
-        {/* Gradient overlay pour la lisibilité du texte */}
         <div className="ahero__overlay" aria-hidden="true" />
 
         {uploading && (
@@ -131,11 +107,10 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
         )}
       </div>
 
-      {/* Bouton couverture — coin supérieur droit */}
       <button
         className="ahero__btn ahero__btn--cover"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
+        onClick={openFilePicker}
+        disabled={uploading || resolving}
         aria-label="Changer la photo de couverture"
       >
         <span aria-hidden="true">🖼</span>
@@ -145,15 +120,18 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       {error && (
         <p className="ahero__cover-error" role="alert">{error}</p>
       )}
+      {success && !error && (
+        <p className="ahero__cover-success" role="status">{success}</p>
+      )}
 
       <input
-        ref={fileInputRef}
+        ref={inputRef}
         type="file"
-        accept={IMAGE_ACCEPT}
+        accept={accept}
         className="sr-only"
         aria-hidden="true"
         tabIndex={-1}
-        onChange={(e) => void handleFileSelect(e)}
+        onChange={(e) => void handleInputChange(e)}
       />
     </>
   );

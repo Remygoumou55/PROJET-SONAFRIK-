@@ -8,6 +8,7 @@ import type {
   CreatorVerification,
   Label,
 } from "@sonafrik/types";
+import { CREATOR_ERROR_MESSAGES } from "@sonafrik/types";
 import { CreatorError } from "./errors";
 import { CreatorRepository } from "./creator.repository";
 import {
@@ -28,6 +29,11 @@ import {
 } from "./schemas";
 import { resolveCreatorAssetUploadError } from "../shared/uploadSchemaErrors";
 import { extractFunctionInvokeMessageAsync } from "../shared/invoke-errors";
+import {
+  DEV_MOCK_CREATOR_ID,
+  DEV_MOCK_USER_ID,
+  isDevBypassActive,
+} from "@sonafrik/shared/auth";
 
 export class CreatorService {
   private readonly repository: CreatorRepository;
@@ -37,18 +43,49 @@ export class CreatorService {
   }
 
   private async requireUserId(): Promise<string> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return "dev-mock-id";
     const {
       data: { user },
     } = await this.client.auth.getUser();
-    if (!user) throw new CreatorError("unauthorized");
-    return user.id;
+    if (user) return user.id;
+
+    if (isDevBypassActive()) return DEV_MOCK_USER_ID;
+    throw new CreatorError("unauthorized");
   }
 
   private async requireArtistAccount(userId: string): Promise<void> {
-    if ((process.env.BYPASS_AUTH === "true" && process.env.VERCEL !== "1") || process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true") return;
+    if (isDevBypassActive()) return;
     const { data, error } = await this.client.rpc("is_artist_account", { p_user_id: userId });
     if (error || !data) throw new CreatorError("not_artist_account");
+  }
+
+  /** Résout le creatorId réel de la session — ignore le mock SSR en local control. */
+  private async resolveSelfCreatorId(requestedId: string): Promise<string> {
+    const {
+      data: { user },
+    } = await this.client.auth.getUser();
+
+    if (user) {
+      await this.requireArtistAccount(user.id);
+      try {
+        return await this.repository.ensureCreator();
+      } catch (err) {
+        this.throwRepositoryError(err, "creator_not_found");
+      }
+    }
+
+    if (requestedId !== DEV_MOCK_CREATOR_ID) return requestedId;
+    throw new CreatorError("unauthorized", "Connectez-vous pour enregistrer une image.");
+  }
+
+  private throwRepositoryError(
+    err: unknown,
+    code: keyof typeof CREATOR_ERROR_MESSAGES = "invalid_artist_profile",
+  ): never {
+    const detail =
+      err && typeof err === "object" && "message" in err
+        ? String((err as { message: unknown }).message)
+        : undefined;
+    throw new CreatorError(code, detail);
   }
 
   async becomeArtist(): Promise<void> {
@@ -244,11 +281,12 @@ export class CreatorService {
     }
 
     await this.requireUserId();
+    const creatorId = await this.resolveSelfCreatorId(parsed.data.creatorId);
 
     const { data, error } = await this.client.functions.invoke("creator-asset-signed-url", {
       body: {
         action: "upload",
-        creatorId: parsed.data.creatorId,
+        creatorId,
         assetKind: parsed.data.assetKind,
         contentType: parsed.data.contentType,
         verificationId: parsed.data.verificationId,
@@ -283,8 +321,9 @@ export class CreatorService {
 
   async removeProfilePhoto(creatorId: string): Promise<ArtistProfile> {
     const userId = await this.requireUserId();
+    const resolvedCreatorId = await this.resolveSelfCreatorId(creatorId);
     await this.repository.ensureCreator();
-    return this.repository.updateCropData(creatorId, userId, {
+    return this.repository.updateCropData(resolvedCreatorId, userId, {
       profile_photo: null,
       avatar_original_path: null,
     });
@@ -314,23 +353,33 @@ export class CreatorService {
     cropZoom: number;
   }): Promise<ArtistProfile> {
     const userId = await this.requireUserId();
+    const creatorId = await this.resolveSelfCreatorId(input.creatorId);
     await this.repository.ensureCreator();
-    const updated = await this.repository.updateCropData(input.creatorId, userId, {
-      profile_photo: input.croppedPath,
-      avatar_original_path: input.originalPath,
-      avatar_crop_x: input.cropX,
-      avatar_crop_y: input.cropY,
-      avatar_crop_zoom: input.cropZoom,
-    });
+    let updated: ArtistProfile;
+    try {
+      updated = await this.repository.updateCropData(creatorId, userId, {
+        profile_photo: input.croppedPath,
+        avatar_original_path: input.originalPath,
+        avatar_crop_x: input.cropX,
+        avatar_crop_y: input.cropY,
+        avatar_crop_zoom: input.cropZoom,
+      });
+    } catch (err) {
+      this.throwRepositoryError(err);
+    }
 
     // A1: edge fn assetKind:"gallery" adds both paths to cover_images[] — remove them
     const avatarPaths = new Set([input.originalPath, input.croppedPath]);
     const cleanImages = updated.cover_images.filter(p => !avatarPaths.has(p));
     if (cleanImages.length !== updated.cover_images.length) {
-      return this.repository.updateCropData(input.creatorId, userId, {
-        cover_images: cleanImages,
-        banner_path: cleanImages[0] ?? null,
-      });
+      try {
+        return await this.repository.updateCropData(creatorId, userId, {
+          cover_images: cleanImages,
+          banner_path: cleanImages[0] ?? null,
+        });
+      } catch (err) {
+        this.throwRepositoryError(err);
+      }
     }
     return updated;
   }
@@ -344,22 +393,27 @@ export class CreatorService {
     cropZoom: number;
   }): Promise<ArtistProfile> {
     const userId = await this.requireUserId();
+    const creatorId = await this.resolveSelfCreatorId(input.creatorId);
     await this.repository.ensureCreator();
-    const profile = await this.repository.getArtistProfile(input.creatorId);
+    const profile = await this.repository.getArtistProfile(creatorId);
     const coverImages = profile?.cover_images ?? [];
     // A3: filter duplicates (cropped + original both added by edge fn assetKind:"gallery")
     const filtered = coverImages.filter(
       p => p !== input.croppedPath && p !== input.originalPath,
     );
     const updatedImages = [input.croppedPath, ...filtered.slice(0, 9)];
-    return this.repository.updateCropData(input.creatorId, userId, {
-      cover_images: updatedImages,
-      banner_path: input.croppedPath,
-      cover_primary_original: input.originalPath,
-      cover_primary_crop_x: input.cropX,
-      cover_primary_crop_y: input.cropY,
-      cover_primary_crop_zoom: input.cropZoom,
-    });
+    try {
+      return await this.repository.updateCropData(creatorId, userId, {
+        cover_images: updatedImages,
+        banner_path: input.croppedPath,
+        cover_primary_original: input.originalPath,
+        cover_primary_crop_x: input.cropX,
+        cover_primary_crop_y: input.cropY,
+        cover_primary_crop_zoom: input.cropZoom,
+      });
+    } catch (err) {
+      this.throwRepositoryError(err);
+    }
   }
 
   async getDashboardData(): Promise<CreatorDashboardData> {

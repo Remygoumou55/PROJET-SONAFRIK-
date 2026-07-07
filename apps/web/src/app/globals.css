@@ -11,20 +11,27 @@
  * @see apps/web/src/app/(listener|creator|admin|wallet|identity)/layout.tsx */
 @import "./styles/performance.css";
 @import "./styles/responsive-system.css";
+@import "./styles/enterprise-shell.css";
+@import "./styles/music-navigation.css";
+@import "./styles/enterprise-design-system.css";
 
 @theme {
-  --color-vert-energie: #00d26a;
-  --color-vert-profond: #0e5e3a;
-  --color-or-solaire: #ffc20e;
-  --color-or-profond: #daaf37;
-  --color-noir-profond: #0d0d0d;
-  --color-surface: #1a1a1a;
-  --color-card: #1f1f1f;
-  --color-elevated: #2a2a2a;
-  --color-bordure: #333333;
-  --color-texte-principal: #ffffff;
-  --color-texte-secondaire: #a0a0a0;
-  --color-texte-desactive: #555555;
+  /* ── SONAFRIK Brand 2026 — palette jungle sombre ── */
+  /* Fond #010a06 · Sidebar #000805 · Marque #012413 · Or #f6c009 · Lueur #008830 */
+  --color-vert-casque: #008830;
+  --color-vert-energie: #f6c009;
+  --color-vert-profond: #012413;
+  --color-cta-principal: #008830;
+  --color-or-solaire: #f6c009;
+  --color-or-profond: #c99a07;
+  --color-noir-profond: #010a06;
+  --color-surface: #01120c;
+  --color-card: #011a10;
+  --color-elevated: #012218;
+  --color-bordure: #023524;
+  --color-texte-principal: #eef5f0;
+  --color-texte-secondaire: #94b0a0;
+  --color-texte-desactive: #5a7568;
   --color-erreur: #ff4444;
   --color-danger: #ff4444;
   --color-info: #3b82f6;
@@ -34,8 +41,8 @@
   --color-accent-rose: #ec4899;
   --color-accent-bleu-clair: #60a5fa;
 
-  --color-texte-subtil: #666666;
-  --color-skeleton: #141414;
+  --color-texte-subtil: #456055;
+  --color-skeleton: #010d08;
 
   --color-avertissement: #f59e0b;
   --color-accent-violet-clair: #c084fc;
@@ -54,8 +61,152 @@
 
   --color-pending: #f5a623;
 
+  /* ── Enterprise Shell — layout global SONAFRIK ── */
+  --shell-bg: var(--color-noir-profond);
+  --shell-sidebar: var(--color-admin-sidebar);
+  --shell-header: #010d08;
+  --shell-content: #010f0a;
+  --shell-card: var(--color-card);
+  --shell-card-hover: #011f14;
+  --shell-card-active: var(--color-elevated);
+  --shell-border: var(--color-bordure);
+  --shell-border-hover: #033d2a;
+  --shell-gap-outer: 0.625rem;
+  --shell-gap-inner: 0.625rem;
+  --shell-padding-content: 1.25rem;
+  --shell-max-width: 80rem;
+  --shell-sidebar-width: 15.5rem;
+  --shell-header-min-height: 3.75rem;
+  --shell-spacing-xs: 0.375rem;
+  --shell-spacing-s: 0.625rem;
+  --shell-spacing-m: 1rem;
+  --shell-spacing-l: 1.5rem;
+  --shell-spacing-xl: 2rem;
+  --shell-radius-xs: 0.5rem;
+  --shell-radius-s: 0.75rem;
+  --shell-radius-m: 1rem;
+  --shell-radius-l: 1.25rem;
+  --shell-radius-xl: 1.5rem;
+  --shell-shadow-light: 0 1px 0 rgb(255 255 255 / 0.035), 0 4px 18px rgb(0 0 0 / 0.3);
+  --shell-shadow-medium: 0 1px 0 rgb(255 255 255 / 0.045), 0 8px 28px rgb(0 0 0 / 0.36);
+  --shell-shadow-strong: 0 2px 0 rgb(255 255 255 / 0.05), 0 14px 42px rgb(0 0 0 / 0.44);
+
+  /* ── Music Navigation Experience — langage officiel Music OS ── */
+  --nav-icon-size: 1.25rem;
+  --nav-item-height: 2.5rem;
+  --nav-item-radius: var(--shell-radius-s);
+  --nav-item-padding-x: 0.75rem;
+  --nav-section-gap: 0.25rem;
+  --nav-spacing-xs: var(--shell-spacing-xs);
+  --nav-spacing-s: var(--shell-spacing-s);
+  --nav-spacing-m: var(--shell-spacing-m);
+  --nav-spacing-l: var(--shell-spacing-l);
+  --nav-sidebar-pattern-width: 1.75rem;
+  --nav-sidebar-body-width: 13.125rem;
+  --nav-sidebar-brand-padding: 1.25rem 1rem 0.875rem;
+  --nav-story-padding: 0.625rem 1rem 0.875rem;
+  --nav-link-active-bg: var(--overlay-vert-nav);
+  --nav-link-hover-bg: rgb(255 255 255 / 0.04);
+  --nav-bottom-height: 3.75rem;
+
+  /* ── Enterprise Design System — tokens officiels (--ds-*) ── */
+  /* Couleurs sémantiques */
+  --ds-color-bg: var(--color-noir-profond);
+  --ds-color-sidebar: var(--color-admin-sidebar);
+  --ds-color-header: var(--shell-header);
+  --ds-color-content: var(--shell-content);
+  --ds-color-card: var(--shell-card);
+  --ds-color-card-hover: var(--shell-card-hover);
+  --ds-color-card-active: var(--shell-card-active);
+  --ds-color-border: var(--shell-border);
+  --ds-color-border-hover: var(--shell-border-hover);
+  --ds-color-primary: var(--color-vert-casque);
+  --ds-color-secondary: var(--color-or-solaire);
+  --ds-color-success: var(--color-vert-casque);
+  --ds-color-warning: var(--color-avertissement);
+  --ds-color-danger: var(--color-erreur);
+  --ds-color-info: var(--color-info);
+  --ds-color-neutral: var(--color-texte-secondaire);
+
+  /* Marque — logo sidebar */
+  --ds-brand-logo-width-sidebar: 8.75rem;
+  --ds-brand-logo-height: 1.4rem;
+  --ds-brand-context-color: #ffffff;
+  --ds-brand-context-size: 0.5625rem;
+  --ds-brand-context-weight: 600;
+  --ds-brand-context-tracking: 0.07em;
+  --ds-brand-context-line-height: 1.25;
+  --ds-brand-context-gap: 0.5rem;
+
+  /* Typographie */
+  --ds-text-h1-size: 1.75rem;
+  --ds-text-h1-weight: 700;
+  --ds-text-h1-line-height: 1.25;
+  --ds-text-h1-tracking: -0.02em;
+  --ds-text-h1-color: var(--color-texte-principal);
+  --ds-text-h2-size: 1.125rem;
+  --ds-text-h2-weight: 700;
+  --ds-text-h2-line-height: 1.3;
+  --ds-text-h2-color: var(--color-texte-principal);
+  --ds-text-h3-size: 1rem;
+  --ds-text-h3-weight: 600;
+  --ds-text-h3-line-height: 1.35;
+  --ds-text-h3-color: var(--color-texte-principal);
+  --ds-text-section-size: 0.5625rem;
+  --ds-text-section-weight: 700;
+  --ds-text-section-tracking: 0.14em;
+  --ds-text-section-line-height: 1.3;
+  --ds-text-section-color: var(--color-texte-desactive);
+  --ds-text-card-title-size: 0.9375rem;
+  --ds-text-card-title-weight: 600;
+  --ds-text-card-title-line-height: 1.35;
+  --ds-text-card-title-color: var(--color-texte-principal);
+  --ds-text-kpi-size: 1.5rem;
+  --ds-text-kpi-weight: 700;
+  --ds-text-kpi-line-height: 1.2;
+  --ds-text-kpi-color: var(--color-texte-principal);
+  --ds-text-body-size: 0.875rem;
+  --ds-text-body-weight: 400;
+  --ds-text-body-line-height: 1.5;
+  --ds-text-body-color: var(--color-texte-principal);
+  --ds-text-secondary-size: 0.8125rem;
+  --ds-text-secondary-weight: 400;
+  --ds-text-secondary-line-height: 1.45;
+  --ds-text-secondary-color: var(--color-texte-secondaire);
+  --ds-text-muted-size: 0.75rem;
+  --ds-text-muted-weight: 400;
+  --ds-text-muted-line-height: 1.4;
+  --ds-text-muted-color: var(--color-texte-desactive);
+
+  /* Espacements — grille officielle */
+  --ds-space-xs: var(--shell-spacing-xs);
+  --ds-space-s: var(--shell-spacing-s);
+  --ds-space-m: var(--shell-spacing-m);
+  --ds-space-l: var(--shell-spacing-l);
+  --ds-space-xl: var(--shell-spacing-xl);
+  --ds-padding-card: var(--shell-spacing-m);
+  --ds-gap-xs: 0.25rem;
+  --ds-gap-s: var(--shell-spacing-xs);
+  --ds-gap-m: var(--shell-spacing-s);
+  --ds-gap-l: var(--shell-spacing-m);
+  --ds-gap-xl: var(--shell-spacing-l);
+
+  /* Rayons · ombres · motion */
+  --ds-radius-control: var(--shell-radius-s);
+  --ds-radius-card: var(--shell-radius-m);
+  --ds-radius-shell: var(--shell-radius-xl);
+  --ds-shadow-card: var(--shell-shadow-light);
+  --ds-shadow-card-hover: var(--shell-shadow-medium);
+  --ds-shadow-shell: var(--shell-shadow-medium);
+  --ds-transition-fast: 0.15s ease;
+  --ds-transition-base: 0.2s ease;
+  --ds-opacity-disabled: 0.45;
+  --ds-z-sidebar: 200;
+  --ds-z-header: 100;
+  --ds-z-overlay: 300;
+
   /* Admin back-office */
-  --color-admin-sidebar: #0a0a0a;
+  --color-admin-sidebar: #000805;
   --color-admin-warning: #ff8c00;
   --color-admin-info: #378add;
   --color-admin-card-bg: var(--overlay-blanc-03);
@@ -71,9 +222,14 @@
   --color-google-yellow: #fbbc05;
   --color-google-red: #ea4335;
 
-  --overlay-vert-soft: rgb(0 210 106 / 0.13);
+  --overlay-casque-04: rgb(0 136 48 / 0.04);
+  --overlay-casque-06: rgb(0 136 48 / 0.06);
+  --overlay-casque-08: rgb(0 136 48 / 0.08);
+  --overlay-casque-12: rgb(0 136 48 / 0.12);
+  --overlay-casque-18: rgb(0 136 48 / 0.18);
+  --overlay-vert-soft: rgb(246 192 9 / 0.13);
   --overlay-erreur-soft: rgb(255 68 68 / 0.13);
-  --overlay-vert-nav: rgb(0 210 106 / 0.09);
+  --overlay-vert-nav: rgb(246 192 9 / 0.09);
   --overlay-blanc-60: rgb(255 255 255 / 0.60);
   --overlay-blanc-55: rgb(255 255 255 / 0.55);
   --overlay-blanc-13: rgb(255 255 255 / 0.13);
@@ -82,19 +238,19 @@
   --overlay-erreur-25: rgb(255 68 68 / 0.25);
   --overlay-neutre-soft: rgb(85 85 85 / 0.13);
   --overlay-bleu-soft: rgb(59 130 246 / 0.13);
-  --overlay-modal-backdrop: rgb(13 13 13 / 0.80);
+  --overlay-modal-backdrop: rgb(1 10 6 / 0.88);
   --overlay-avertissement-soft: rgb(245 158 11 / 0.13);
   --overlay-violet-soft: rgb(168 85 247 / 0.13);
-  --overlay-vert-row: rgb(0 210 106 / 0.07);
+  --overlay-vert-row: rgb(246 192 9 / 0.07);
   --overlay-noir-50: rgb(0 0 0 / 0.5);
   --overlay-noir-70: rgb(0 0 0 / 0.7);
   --overlay-noir-75: rgb(0 0 0 / 0.75);
   --overlay-erreur-09: rgb(255 68 68 / 0.09);
-  --overlay-vert-04: rgb(0 210 106 / 0.04);
-  --chip-vert-bg: rgb(0 210 106 / 0.14);
-  --chip-vert-glow: rgb(0 210 106 / 0.06);
-  --chip-vert-ring: rgb(0 210 106 / 0.31);
-  --chip-vert-inner: rgb(0 210 106 / 0.20);
+  --overlay-vert-04: rgb(246 192 9 / 0.04);
+  --chip-vert-bg: rgb(246 192 9 / 0.14);
+  --chip-vert-glow: rgb(0 136 48 / 0.10);
+  --chip-vert-ring: rgb(246 192 9 / 0.31);
+  --chip-vert-inner: rgb(246 192 9 / 0.20);
   --chip-or-bg: rgb(255 194 14 / 0.14);
   --chip-or-glow: rgb(255 194 14 / 0.06);
   --chip-or-ring: rgb(255 194 14 / 0.31);
@@ -115,8 +271,8 @@
   --chip-rose-glow: rgb(236 72 153 / 0.06);
   --chip-rose-ring: rgb(236 72 153 / 0.31);
   --chip-rose-inner: rgb(236 72 153 / 0.20);
-  --badge-genre-vert-bg: rgb(0 210 106 / 0.08);
-  --badge-genre-vert-border: rgb(0 210 106 / 0.19);
+  --badge-genre-vert-bg: rgb(246 192 9 / 0.08);
+  --badge-genre-vert-border: rgb(246 192 9 / 0.19);
   --badge-genre-or-bg: rgb(255 194 14 / 0.08);
   --badge-genre-or-border: rgb(255 194 14 / 0.19);
   --badge-genre-violet-bg: rgb(168 85 247 / 0.08);
@@ -127,8 +283,8 @@
   --badge-genre-orange-border: rgb(249 115 22 / 0.19);
   --badge-genre-rose-bg: rgb(236 72 153 / 0.08);
   --badge-genre-rose-border: rgb(236 72 153 / 0.19);
-  --badge-pill-vert-bg: rgb(0 210 106 / 0.08);
-  --badge-pill-vert-border: rgb(0 210 106 / 0.13);
+  --badge-pill-vert-bg: rgb(246 192 9 / 0.08);
+  --badge-pill-vert-border: rgb(246 192 9 / 0.13);
   --section-icon-or-bg: rgb(255 194 14 / 0.10);
   --section-icon-or-border: rgb(255 194 14 / 0.20);
   --section-icon-violet-bg: rgb(168 85 247 / 0.10);
@@ -137,10 +293,11 @@
   --section-icon-info-border: rgb(59 130 246 / 0.20);
   --section-icon-rose-bg: rgb(236 72 153 / 0.10);
   --section-icon-rose-border: rgb(236 72 153 / 0.20);
-  --gradient-vert-section: linear-gradient(135deg, rgb(0 210 106 / 0.13), rgb(0 210 106 / 0.07));
-  --gradient-vert-empty: linear-gradient(135deg, rgb(0 210 106 / 0.10), rgb(0 210 106 / 0.04));
-  --shadow-vert-glow: 0 0 20px rgb(0 210 106 / 0.35);
-  --shadow-vert-glow-strong: 0 0 14px rgb(0 210 106 / 0.7);
+  --gradient-vert-section: linear-gradient(135deg, rgb(246 192 9 / 0.13), rgb(246 192 9 / 0.07));
+  --gradient-vert-empty: linear-gradient(135deg, rgb(246 192 9 / 0.10), rgb(246 192 9 / 0.04));
+  --shadow-vert-glow: 0 0 24px rgb(0 136 48 / 0.38);
+  --shadow-vert-glow-strong: 0 0 16px rgb(0 136 48 / 0.62);
+  --shadow-casque-glow: 0 0 32px rgb(0 136 48 / 0.28);
   --shadow-or-highlight: 0 0 16px rgb(255 194 14 / 0.25);
   --overlay-noir-40: rgb(0 0 0 / 0.4);
   --overlay-noir-45: rgb(0 0 0 / 0.45);
@@ -149,7 +306,7 @@
   --overlay-scrim-crop: rgb(0 0 0 / 0.72);
   --overlay-blanc-30: rgb(255 255 255 / 0.3);
   --overlay-texte-soft: rgb(160 160 160 / 0.13);
-  --overlay-vert-10: rgb(0 210 106 / 0.10);
+  --overlay-vert-10: rgb(246 192 9 / 0.10);
   /* ── Overlay tokens Vague J — SSOT complet (2026-07-06) ── */
   /* Blanc (255 255 255) — série complète */
   --overlay-blanc-01: rgb(255 255 255 / 0.01);
@@ -180,19 +337,19 @@
   --overlay-blanc-78: rgb(255 255 255 / 0.78);
   --overlay-blanc-80: rgb(255 255 255 / 0.80);
   /* Vert energie (0 210 106) — série complète */
-  --overlay-vert-00: rgb(0 210 106 / 0.00);
-  --overlay-vert-08: rgb(0 210 106 / 0.08);
-  --overlay-vert-12: rgb(0 210 106 / 0.12);
-  --overlay-vert-14: rgb(0 210 106 / 0.14);
-  --overlay-vert-15: rgb(0 210 106 / 0.15);
-  --overlay-vert-18: rgb(0 210 106 / 0.18);
-  --overlay-vert-20: rgb(0 210 106 / 0.20);
-  --overlay-vert-25: rgb(0 210 106 / 0.25);
-  --overlay-vert-30: rgb(0 210 106 / 0.30);
-  --overlay-vert-40: rgb(0 210 106 / 0.40);
-  --overlay-vert-45: rgb(0 210 106 / 0.45);
-  --overlay-vert-50: rgb(0 210 106 / 0.50);
-  --overlay-vert-75: rgb(0 210 106 / 0.75);
+  --overlay-vert-00: rgb(246 192 9 / 0.00);
+  --overlay-vert-08: rgb(246 192 9 / 0.08);
+  --overlay-vert-12: rgb(246 192 9 / 0.12);
+  --overlay-vert-14: rgb(246 192 9 / 0.14);
+  --overlay-vert-15: rgb(246 192 9 / 0.15);
+  --overlay-vert-18: rgb(246 192 9 / 0.18);
+  --overlay-vert-20: rgb(246 192 9 / 0.20);
+  --overlay-vert-25: rgb(246 192 9 / 0.25);
+  --overlay-vert-30: rgb(246 192 9 / 0.30);
+  --overlay-vert-40: rgb(246 192 9 / 0.40);
+  --overlay-vert-45: rgb(246 192 9 / 0.45);
+  --overlay-vert-50: rgb(246 192 9 / 0.50);
+  --overlay-vert-75: rgb(246 192 9 / 0.75);
   /* Or solaire (255 194 14) — série complète */
   --overlay-or-04: rgb(255 194 14 / 0.04);
   --overlay-or-05: rgb(255 194 14 / 0.05);
@@ -258,12 +415,12 @@
   --overlay-teal-95: rgb(15 110 86 / 0.95);
   --overlay-vert-fonce-90: rgb(0 120 64 / 0.90);
   /* Compléments Vague J — round 2 */
-  --overlay-vert-06: rgb(0 210 106 / 0.06);
-  --overlay-vert-07: rgb(0 210 106 / 0.07);
-  --overlay-vert-35: rgb(0 210 106 / 0.35);
-  --overlay-vert-60: rgb(0 210 106 / 0.60);
-  --overlay-vert-65: rgb(0 210 106 / 0.65);
-  --overlay-vert-70: rgb(0 210 106 / 0.70);
+  --overlay-vert-06: rgb(246 192 9 / 0.06);
+  --overlay-vert-07: rgb(246 192 9 / 0.07);
+  --overlay-vert-35: rgb(246 192 9 / 0.35);
+  --overlay-vert-60: rgb(246 192 9 / 0.60);
+  --overlay-vert-65: rgb(246 192 9 / 0.65);
+  --overlay-vert-70: rgb(246 192 9 / 0.70);
   --overlay-or-18: rgb(255 194 14 / 0.18);
   --overlay-or-35: rgb(255 194 14 / 0.35);
   --overlay-or-60: rgb(255 194 14 / 0.60);
@@ -285,17 +442,17 @@
   --live-warn-section-bg: rgb(255 194 14 / 0.06);
   --live-warn-section-border: rgb(255 194 14 / 0.2);
   --live-warn-pill: rgb(255 194 14 / 0.2);
-  --live-ok-bg: rgb(0 210 106 / 0.1);
-  --live-ok-border: rgb(0 210 106 / 0.3);
+  --live-ok-bg: rgb(0 136 48 / 0.12);
+  --live-ok-border: rgb(0 136 48 / 0.32);
   --live-err-bg: rgb(255 77 79 / 0.08);
   --live-err-border: rgb(255 77 79 / 0.25);
   --day-accent-morning: rgb(255 194 14 / 0.15);
-  --day-accent-day: rgb(0 210 106 / 0.1);
+  --day-accent-day: rgb(0 136 48 / 0.12);
   --day-accent-evening: rgb(120 60 0 / 0.15);
   --day-accent-night: rgb(30 0 80 / 0.2);
-  --color-vert-energie-bg: rgb(0 210 106 / 0.15);
-  --color-vert-energie-ring: rgb(0 210 106 / 0.2);
-  --color-vert-energie-border: rgb(0 210 106 / 0.25);
+  --color-vert-energie-bg: rgb(246 192 9 / 0.15);
+  --color-vert-energie-ring: rgb(246 192 9 / 0.2);
+  --color-vert-energie-border: rgb(246 192 9 / 0.25);
   --color-erreur-banner: rgb(206 17 38 / 0.08);
   --color-accent-violet-bg: rgb(168 85 247 / 0.12);
   --color-info-bg: rgb(59 130 246 / 0.12);
@@ -326,6 +483,8 @@
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   min-height: 100vh;
   background-color: var(--color-noir-profond);
@@ -333,9 +492,24 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Lueur casque #008830 — ~60 % plus discrète */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 45% 38% at 0% 0%, rgb(0 136 48 / 0.07) 0%, transparent 72%),
+    radial-gradient(ellipse 45% 38% at 100% 0%, rgb(0 136 48 / 0.05) 0%, transparent 72%),
+    radial-gradient(ellipse 42% 36% at 100% 100%, rgb(0 136 48 / 0.06) 0%, transparent 74%),
+    radial-gradient(ellipse 42% 36% at 0% 100%, rgb(0 136 48 / 0.05) 0%, transparent 74%);
+}
+
 /* Shells pleine page — CSS pur (fallback si utilitaires Tailwind absents en dev/mobile). */
 .app-page-shell {
   position: relative;
+  z-index: 1;
   min-height: 100dvh;
   min-height: 100vh;
   background-color: var(--color-noir-profond);
@@ -462,6 +636,28 @@ body {
 
 .brand-lockup--full {
   display: block;
+}
+
+.brand-mark {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 0.35rem;
+}
+
+.brand-logo-full {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.brand-logo-full--nav {
+  max-height: 1.35rem;
+  width: auto;
+}
+
+.brand-wordmark--image {
+  line-height: 0;
 }
 
 .brand-lockup__nav-text {

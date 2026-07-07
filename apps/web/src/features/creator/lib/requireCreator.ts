@@ -93,8 +93,27 @@ const fetchCreatorContext = cache(async () => {
 
 export async function requireCreatorContext(): Promise<CreatorContext> {
   assertBypassForbiddenOnVercel();
-  // Mode local control : mock SSR sans redirect — indépendant de la session cookies.
-  // Les uploads catalog résolvent le vrai creatorId côté client (PublicationWizard / getCatalogContext).
-  if (isDevBypassActive()) return DEV_MOCK_CREATOR;
+  // Mode local control : mock SSR seulement sans session réelle.
+  // Si l'utilisateur est connecté, charger le vrai contexte (uploads, profil, IDs).
+  if (isDevBypassActive()) {
+    try {
+      const supabase = await getSupabaseServerClient();
+      const auth = createAuthService(supabase);
+      const profile = await Promise.race([
+        auth.getCurrentProfile(),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+      ]);
+      if (profile) {
+        const creator = createCreatorService(supabase);
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 12000),
+        );
+        return await Promise.race([creator.getCreatorContext(), timeout]);
+      }
+    } catch {
+      // Pas de session — fallback mock pour contrôle visuel
+    }
+    return DEV_MOCK_CREATOR;
+  }
   return fetchCreatorContext();
 }

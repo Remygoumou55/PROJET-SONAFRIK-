@@ -1,8 +1,11 @@
+"use client";
+
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { SONAFRIK_BRAND } from "@sonafrik/types";
 
-/** wordmark = texte seul · nav = texte compact · full = texte + tagline · hero = texte XL + tagline */
+/** wordmark = texte seul · nav = marque + texte · full = logo complet · hero = logo XL */
 export type SonafrikLogoVariant = "wordmark" | "nav" | "full" | "hero";
 
 export type SonafrikLogoSize = "sm" | "md" | "lg";
@@ -19,10 +22,12 @@ interface SonafrikLogoProps {
   className?: string;
 }
 
-const WORDMARK_SIZE: Record<SonafrikLogoSize, string> = {
-  sm: "brand-wordmark brand-wordmark--sm",
-  md: "brand-wordmark brand-wordmark--md",
-  lg: "brand-wordmark brand-wordmark--lg",
+const BRAND_FULL = "/brand/sonafrik-logo-full.png";
+
+const FULL_WIDTH: Record<SonafrikLogoSize, number> = {
+  sm: 140,
+  md: 180,
+  lg: 240,
 };
 
 function resolveLogoProps(props: SonafrikLogoProps): {
@@ -30,9 +35,10 @@ function resolveLogoProps(props: SonafrikLogoProps): {
   size: SonafrikLogoSize;
   showTagline: boolean;
   href?: string;
+  priority: boolean;
   className: string;
 } {
-  const { size = "md", showTagline = false, href, className = "" } = props;
+  const { size = "md", showTagline = false, href, priority = false, className = "" } = props;
   let variant = props.variant ?? "wordmark";
   let resolvedSize: SonafrikLogoSize = "md";
 
@@ -46,15 +52,20 @@ function resolveLogoProps(props: SonafrikLogoProps): {
     resolvedSize = size;
   }
 
-  return { variant, size: resolvedSize, showTagline, href, className };
+  return { variant, size: resolvedSize, showTagline, href, priority, className };
 }
 
 function SonafrikWordmark({ size = "md" }: { size?: SonafrikLogoSize }) {
   return (
-    <span className={WORDMARK_SIZE[size]} aria-label={SONAFRIK_BRAND.name}>
-      <span className="text-vert-energie">SON</span>
-      <span className="text-or-solaire">A</span>
-      <span className="text-texte-principal">FRIK</span>
+    <span className="brand-wordmark brand-wordmark--image" aria-label={SONAFRIK_BRAND.name}>
+      <Image
+        src={BRAND_FULL}
+        alt={SONAFRIK_BRAND.name}
+        width={FULL_WIDTH[size]}
+        height={Math.round(FULL_WIDTH[size] * 0.22)}
+        className="brand-logo-full"
+        priority
+      />
     </span>
   );
 }
@@ -68,7 +79,7 @@ function SonafrikTagline({ compact = false }: { compact?: boolean }) {
 }
 
 export function SonafrikLogo(props: SonafrikLogoProps) {
-  const { variant, size, showTagline, href, className } = resolveLogoProps(props);
+  const { variant, size, showTagline, href, priority, className } = resolveLogoProps(props);
 
   const rootClass = ["brand-lockup", `brand-lockup--${variant}`, className]
     .filter(Boolean)
@@ -78,18 +89,36 @@ export function SonafrikLogo(props: SonafrikLogoProps) {
 
   switch (variant) {
     case "full":
-    case "hero":
+    case "hero": {
+      const imgWidth = variant === "hero" ? FULL_WIDTH.lg : FULL_WIDTH[size];
       content = (
         <>
-          <SonafrikWordmark size={variant === "hero" ? "lg" : "md"} />
-          <SonafrikTagline />
+          <Image
+            src={BRAND_FULL}
+            alt={SONAFRIK_BRAND.name}
+            width={imgWidth}
+            height={Math.round(imgWidth * 0.22)}
+            className="brand-logo-full"
+            priority={priority}
+          />
+          {showTagline !== false && (showTagline || variant === "full" || variant === "hero") ? (
+            <SonafrikTagline />
+          ) : null}
         </>
       );
       break;
+    }
     case "nav":
       content = (
         <span className="brand-lockup__nav-text">
-          <SonafrikWordmark size={size === "lg" ? "md" : "sm"} />
+          <Image
+            src={BRAND_FULL}
+            alt={SONAFRIK_BRAND.name}
+            width={FULL_WIDTH.sm}
+            height={Math.round(FULL_WIDTH.sm * 0.22)}
+            className="brand-logo-full brand-logo-full--nav"
+            priority={priority}
+          />
           {showTagline ? <SonafrikTagline compact /> : null}
         </span>
       );

@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
+import { isClientLocalControlMode } from "@sonafrik/shared/auth";
 
 const SKIP_BOOTSTRAP =
   process.env.NODE_ENV !== "development" ||
   process.env.NEXT_PUBLIC_LOCAL_AUDIT_MODE === "true" ||
-  process.env.NEXT_PUBLIC_BYPASS_AUTH !== "true";
+  !isClientLocalControlMode();
 
 /**
- * En dev avec BYPASS_AUTH : provisionne une vraie session Supabase (cookies SSR)
- * pour que stream-start et les edge functions reçoivent un JWT valide.
- * Désactivé en mode Live Control (LOCAL_AUDIT) — import Supabase différé.
+ * En dev local control : provisionne une vraie session Supabase (cookies SSR)
+ * pour que les edge functions (upload assets, stream-start) reçoivent un JWT valide.
  */
 export function DevAuthBootstrap() {
   useEffect(() => {

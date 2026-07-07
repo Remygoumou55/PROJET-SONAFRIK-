@@ -102,6 +102,7 @@ export function CoverImage({
           alt={alt}
           fill
           className="object-cover"
+          unoptimized
           onError={() => setError(true)}
           sizes={resolvedSizes}
           priority={priority}

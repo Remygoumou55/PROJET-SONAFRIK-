@@ -120,6 +120,72 @@ const { handleInputChange } = useAutoImageUpload({
 - [ ] Vérifier manuellement le remplacement de pochette dans `creator/catalog/releases` et `creator/catalog/tracks/[trackId]/edit`
 - [ ] Vérifier responsive desktop / tablette / mobile sur le hero compact
 
+---
+
+## 2026-07-07 — Audit lot `/creator` + stabilisation runtime image distante
+
+### Fichiers touchés
+- `apps/web/src/features/shared/media/autoImagePipeline.ts` — pipeline partagé d’optimisation et auto-crop côté front
+- `apps/web/src/features/shared/media/useAutoImageUpload.ts` — hook réutilisable d’upload image automatique
+- `apps/web/src/features/creator/hooks/useEffectiveCreatorId.ts` — résolution du creator réel en contexte dev/local control
+- `apps/web/src/features/creator/dashboard/components/ArtistCoverSlider.tsx` — couverture hero sans popup, upload auto
+- `apps/web/src/features/creator/dashboard/components/ArtistProfilePhoto.tsx` — avatar cliquable, suppression du bouton “Gérer l’avatar”
+- `apps/web/src/features/creator/dashboard/components/ArtistHero.tsx` — hero conservé avec stats + nouveau flux avatar/couverture
+- `apps/web/src/app/styles/creator/hero.css` — hero compact et affordances d’édition
+- `apps/web/src/features/identity/components/AvatarUpload.tsx` — upload avatar aligné sur la primitive partagée
+- `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` — suppression du flux modal de crop
+- `apps/web/src/features/creator/catalog/components/CatalogCropModal.tsx` — supprimé
+- `apps/web/src/features/creator/dashboard/components/CropEditorModal.tsx` — supprimé
+- `apps/web/src/features/creator/components/ArtistIdentityForm.tsx` — copy UX mise à jour
+- `apps/web/src/features/listener/components/HomepageHero.tsx` — import direct pour compatibilité build Next
+- `apps/web/src/features/creator/lib/requireCreator.ts` — meilleure résolution du contexte créateur en dev
+- `apps/web/src/features/identity/auth/components/DevAuthBootstrap.tsx` — bootstrap dev aligné sur local control
+- `packages/api/src/creator/creator.service.ts` — usage du creatorId réel pour les opérations asset
+- `apps/web/src/components/CoverImage.tsx` — bypass de l’optimizer Next pour les covers Supabase distantes
+- `apps/web/src/features/listener/components/discoveries/CoverImageStatic.tsx` — même stabilisation remote image
+- `apps/web/src/features/creator/dashboard/components/CreatorAssetImage.tsx` — fallback layout conservé + `unoptimized` sur le chemin `next/image`
+- `docs/performance/reports/pci/2026-07-07-remote-image-resilience.md` — mini rapport PCI
+
+### Code avant (extrait clé)
+```before
+<button className="ahero__btn">
+  📷 Gérer l'avatar
+</button>
+
+<Image
+  src={buildSrc(coverPath)}
+  alt={alt}
+  fill
+/>
+```
+
+### Code après (extrait clé)
+```after
+<button
+  type="button"
+  className="ahero__avatar ahero__avatar-button"
+  onClick={openFilePicker}
+>
+  <span className="ahero__avatar-edit">Modifier</span>
+</button>
+
+<Image
+  src={buildSrc(coverPath)}
+  alt={alt}
+  fill
+  unoptimized
+/>
+```
+
+### Dette technique créée
+- L’optimisation image livrée privilégie la résilience runtime sur les assets distants Supabase ; une passe Lighthouse complète reste à faire pour mesurer formellement l’impact CWV avant/après
+- Le repo contient toujours de nombreux changements UI hors du lot `/creator` audité ; ils ne doivent pas être inclus automatiquement dans un commit sans revue explicite
+
+### Tests à faire
+- [ ] Vérifier manuellement `/creator` après refresh complet navigateur
+- [ ] Vérifier que les covers listener/catalogue se chargent sans timeout visible
+- [ ] Produire une mesure Lighthouse avant/après si la passe PCI doit être clôturée formellement
+
 ## 2026-07-06 — Fix webpack TypeError "cannot read .call" — pattern `"use client"` factorisation
 
 ### Cause racine identifiée

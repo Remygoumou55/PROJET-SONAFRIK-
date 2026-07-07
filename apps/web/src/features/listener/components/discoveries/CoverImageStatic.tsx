@@ -66,6 +66,7 @@ export function CoverImageStatic({
           alt={alt}
           fill
           className="object-cover"
+          unoptimized
           sizes={imgSizes}
           priority={priority}
           fetchPriority={priority ? "high" : "auto"}

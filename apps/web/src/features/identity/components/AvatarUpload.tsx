@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { Avatar, Button } from "@sonafrik/ui";
-import { IMAGE_ACCEPT, IMAGE_POLICY, isImage, type ImageMime } from "@sonafrik/shared";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useIdentityService } from "../hooks/useIdentity";
-
-type AvatarMime = ImageMime;
+import {
+  AUTO_IMAGE_VARIANTS,
+  type AutoImagePrepared,
+} from "@/features/shared/media/autoImagePipeline";
+import { useAutoImageUpload } from "@/features/shared/media/useAutoImageUpload";
 
 interface AvatarUploadProps {
   displayName: string;
@@ -16,38 +18,15 @@ interface AvatarUploadProps {
 
 export function AvatarUpload({ displayName, initialUrl, onUploaded }: AvatarUploadProps) {
   const identity = useIdentityService();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialUrl ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Client-side validation before any network call
-    const extOk = /\.(jpe?g|png|webp)$/i.test(file.name);
-    if (!isImage(file.type) && !extOk) {
-      setError("Format non autorisé. Utilisez JPEG, PNG ou WebP.");
-      if (inputRef.current) inputRef.current.value = "";
-      return;
-    }
-    if (file.size > IMAGE_POLICY.maxBytes) {
-      setError(`Image trop lourde. Maximum ${IMAGE_POLICY.maxLabel}.`);
-      if (inputRef.current) inputRef.current.value = "";
-      return;
-    }
-
-    // Normalize MIME — if browser returns "" (drag-drop edge case) default to jpeg
-    const contentType: AvatarMime = isImage(file.type) ? (file.type as AvatarMime) : "image/jpeg";
-
-    setError(null);
-    setLoading(true);
-
+  const handleUpload = useCallback(async (prepared: AutoImagePrepared) => {
     try {
-      const { signedUrl, token } = await identity.requestAvatarUploadUrl(contentType);
-
-      await uploadAssetToSignedUrl(signedUrl, file, { contentType, token });
+      const { signedUrl, token } = await identity.requestAvatarUploadUrl(prepared.contentType);
+      await uploadAssetToSignedUrl(signedUrl, prepared.file, {
+        contentType: prepared.contentType,
+        token,
+      });
 
       const readUrl = await identity.getAvatarSignedUrl();
       if (readUrl) {
@@ -55,12 +34,25 @@ export function AvatarUpload({ displayName, initialUrl, onUploaded }: AvatarUplo
         onUploaded?.(readUrl);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : `Impossible d'enregistrer votre photo. Réessayez.`);
-    } finally {
-      setLoading(false);
-      if (inputRef.current) inputRef.current.value = "";
+      throw new Error(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'enregistrer votre photo. Réessayez.",
+      );
     }
-  }
+  }, [identity, onUploaded]);
+
+  const {
+    inputRef,
+    uploading,
+    error,
+    accept,
+    openFilePicker,
+    handleInputChange,
+  } = useAutoImageUpload({
+    variant: AUTO_IMAGE_VARIANTS.avatar,
+    onUpload: handleUpload,
+  });
 
   return (
     <div className="flex flex-col items-center gap-4 sm:flex-row">
@@ -69,20 +61,20 @@ export function AvatarUpload({ displayName, initialUrl, onUploaded }: AvatarUplo
         <input
           ref={inputRef}
           type="file"
-          accept={IMAGE_ACCEPT}
+          accept={accept}
           className="hidden"
-          onChange={handleFileChange}
+          onChange={(event) => void handleInputChange(event)}
         />
         <Button
           type="button"
           variant="outline"
           size="sm"
-          disabled={loading}
-          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          onClick={openFilePicker}
         >
-          {loading ? "Téléversement…" : "Changer la photo"}
+          {uploading ? "Téléversement…" : "Changer la photo"}
         </Button>
-        <p className="text-texte-desactive text-xs">JPEG, PNG ou WebP · {IMAGE_POLICY.maxLabel} max · URL signée</p>
+        <p className="text-texte-desactive text-xs">JPEG, PNG ou WebP · optimisation automatique · URL signée</p>
         {error ? <p className="text-rouge-alerte text-xs">{error}</p> : null}
       </div>
     </div>

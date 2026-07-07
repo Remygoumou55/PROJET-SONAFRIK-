@@ -74,7 +74,7 @@ export function ArtistIdentityForm({
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-texte-secondaire text-sm">
-            Modifiez votre avatar et votre bannière depuis la vue d&apos;ensemble — recadrage et aperçu en direct.
+            Modifiez votre avatar et votre couverture depuis la vue d&apos;ensemble. Choisissez une image, SONAFRIK optimise et enregistre automatiquement.
           </p>
           <Button type="button" variant="outline" size="sm" asChild>
             <Link href="/creator">Gérer photo et couverture</Link>

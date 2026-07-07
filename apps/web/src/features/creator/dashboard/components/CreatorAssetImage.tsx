@@ -66,6 +66,7 @@ export const CreatorAssetImage = memo(function CreatorAssetImage({
       src={url!}
       alt={alt}
       fill
+      unoptimized
       className={`${objectClass} ${className}`.trim()}
       sizes={sizes}
       priority={priority}

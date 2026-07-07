@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   manifest: "/manifest.webmanifest",
   icons: [
-    { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
-    { rel: "apple-touch-icon", url: "/favicon.svg" },
-    { rel: "shortcut icon", url: "/favicon.svg" },
+    { rel: "icon", type: "image/png", url: "/favicon.png" },
+    { rel: "apple-touch-icon", url: "/apple-icon.png" },
+    { rel: "shortcut icon", url: "/favicon.png" },
   ],
 };
 

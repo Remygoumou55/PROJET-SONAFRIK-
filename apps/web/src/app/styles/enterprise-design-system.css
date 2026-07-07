@@ -1,0 +1,238 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SONAFRIK Enterprise Design System — typographie · marque · cartes
+   Tokens : globals.css @theme (--ds-*)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Brand lockup officiel (logo + contexte) ─────────────────────────────── */
+
+.ds-brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ds-brand-context-gap);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.ds-brand-lockup__logo.brand-lockup,
+.ds-brand-lockup .brand-lockup {
+  display: block;
+  width: fit-content;
+  max-width: var(--ds-brand-logo-width-sidebar);
+}
+
+.ds-brand-lockup__logo.brand-lockup--full {
+  display: block;
+}
+
+.ds-brand-lockup__logo .brand-logo-full,
+.ds-brand-lockup .brand-logo-full {
+  display: block;
+  width: auto;
+  height: var(--ds-brand-logo-height);
+  max-width: var(--ds-brand-logo-width-sidebar);
+}
+
+.ds-brand-lockup__context {
+  display: block;
+  width: 100%;
+  max-width: var(--ds-brand-logo-width-sidebar);
+  margin: 0;
+  font-family: var(--font-montserrat, Montserrat, system-ui, sans-serif);
+  font-size: var(--ds-brand-context-size);
+  font-weight: var(--ds-brand-context-weight);
+  letter-spacing: var(--ds-brand-context-tracking);
+  line-height: var(--ds-brand-context-line-height);
+  text-transform: uppercase;
+  color: var(--ds-brand-context-color);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Pas de tirets décoratifs — slogan sur une seule ligne */
+.ds-brand-lockup__context::before,
+.ds-brand-lockup__context::after {
+  display: none;
+  content: none;
+}
+
+.ds-brand-lockup .brand-tagline {
+  display: none;
+}
+
+/* ── Typographie officielle ──────────────────────────────────────────────── */
+
+.ds-h1 {
+  margin: 0;
+  font-size: var(--ds-text-h1-size);
+  font-weight: var(--ds-text-h1-weight);
+  line-height: var(--ds-text-h1-line-height);
+  letter-spacing: var(--ds-text-h1-tracking);
+  color: var(--ds-text-h1-color);
+}
+
+.ds-h2 {
+  margin: 0;
+  font-size: var(--ds-text-h2-size);
+  font-weight: var(--ds-text-h2-weight);
+  line-height: var(--ds-text-h2-line-height);
+  color: var(--ds-text-h2-color);
+}
+
+.ds-h3 {
+  margin: 0;
+  font-size: var(--ds-text-h3-size);
+  font-weight: var(--ds-text-h3-weight);
+  line-height: var(--ds-text-h3-line-height);
+  color: var(--ds-text-h3-color);
+}
+
+.ds-section-title {
+  margin: 0;
+  font-size: var(--ds-text-section-size);
+  font-weight: var(--ds-text-section-weight);
+  letter-spacing: var(--ds-text-section-tracking);
+  line-height: var(--ds-text-section-line-height);
+  text-transform: uppercase;
+  color: var(--ds-text-section-color);
+}
+
+.ds-card-title {
+  margin: 0;
+  font-size: var(--ds-text-card-title-size);
+  font-weight: var(--ds-text-card-title-weight);
+  line-height: var(--ds-text-card-title-line-height);
+  color: var(--ds-text-card-title-color);
+}
+
+.ds-kpi-value {
+  margin: 0;
+  font-size: var(--ds-text-kpi-size);
+  font-weight: var(--ds-text-kpi-weight);
+  line-height: var(--ds-text-kpi-line-height);
+  color: var(--ds-text-kpi-color);
+}
+
+.ds-body {
+  margin: 0;
+  font-size: var(--ds-text-body-size);
+  font-weight: var(--ds-text-body-weight);
+  line-height: var(--ds-text-body-line-height);
+  color: var(--ds-text-body-color);
+}
+
+.ds-body-secondary {
+  margin: 0;
+  font-size: var(--ds-text-secondary-size);
+  font-weight: var(--ds-text-secondary-weight);
+  line-height: var(--ds-text-secondary-line-height);
+  color: var(--ds-text-secondary-color);
+}
+
+.ds-body-muted {
+  margin: 0;
+  font-size: var(--ds-text-muted-size);
+  font-weight: var(--ds-text-muted-weight);
+  line-height: var(--ds-text-muted-line-height);
+  color: var(--ds-text-muted-color);
+}
+
+/* ── Header Music OS → tokens DS ─────────────────────────────────────────── */
+
+.music-header__title {
+  font-size: var(--ds-text-h2-size);
+  font-weight: var(--ds-text-h2-weight);
+  line-height: var(--ds-text-h2-line-height);
+  color: var(--ds-text-h2-color);
+}
+
+.music-header__subtitle {
+  font-size: var(--ds-text-secondary-size);
+  color: var(--ds-text-secondary-color);
+}
+
+.music-header__eyebrow {
+  font-size: var(--ds-text-section-size);
+  font-weight: var(--ds-text-section-weight);
+  letter-spacing: var(--ds-text-section-tracking);
+  color: var(--ds-color-primary);
+}
+
+/* ── Carte Enterprise — tokens DS ──────────────────────────────────────── */
+
+.enterprise-card {
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-card);
+  border: 1px solid var(--ds-color-border);
+  box-shadow: var(--ds-shadow-card);
+  padding: var(--ds-padding-card);
+  transition:
+    border-color var(--ds-transition-base),
+    background var(--ds-transition-base),
+    box-shadow var(--ds-transition-base),
+    transform var(--ds-transition-fast);
+}
+
+.enterprise-card:hover {
+  background: var(--ds-color-card-hover);
+  border-color: var(--ds-color-border-hover);
+  box-shadow: var(--ds-shadow-card-hover);
+}
+
+.enterprise-card--active {
+  background: var(--ds-color-card-active);
+  border-color: color-mix(in srgb, var(--ds-color-primary) 28%, var(--ds-color-border-hover));
+  box-shadow: var(--ds-shadow-card-hover);
+}
+
+.enterprise-card--interactive:hover {
+  transform: translateY(-1px);
+}
+
+/* ── Wallet nav tabs → DS ────────────────────────────────────────────────── */
+
+.wallet-nav__link--active {
+  color: var(--ds-color-primary);
+  background: var(--nav-link-active-bg);
+}
+
+/* ── Sidebar pleine hauteur ──────────────────────────────────────────────── */
+
+.enterprise-shell {
+  align-items: stretch;
+}
+
+.enterprise-sidebar-card {
+  align-self: stretch;
+  min-height: calc(100dvh - 2 * var(--shell-gap-outer));
+}
+
+.music-sidebar {
+  min-height: 100%;
+}
+
+.music-sidebar__body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Subtitle nav → DS blanc officiel ───────────────────────────────────── */
+
+.music-sidebar__subtitle {
+  font-family: var(--font-montserrat, Montserrat, system-ui, sans-serif);
+  font-size: var(--ds-brand-context-size);
+  font-weight: var(--ds-brand-context-weight);
+  letter-spacing: var(--ds-brand-context-tracking);
+  line-height: var(--ds-brand-context-line-height);
+  text-transform: uppercase;
+  color: var(--ds-brand-context-color);
+}
+
+.music-sidebar--admin .music-sidebar__subtitle {
+  display: block;
+  padding: 0;
+  margin-top: 0;
+  border: none;
+  background: transparent;
+  color: var(--ds-brand-context-color);
+}
