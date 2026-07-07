@@ -5,7 +5,8 @@ interface EnterpriseCardProps {
   className?: string;
   active?: boolean;
   interactive?: boolean;
-  as?: "div" | "article" | "section";
+  as?: "div" | "article" | "section" | "aside";
+  "aria-label"?: string;
 }
 
 /**
@@ -17,10 +18,12 @@ export function EnterpriseCard({
   active = false,
   interactive = false,
   as: Tag = "div",
+  "aria-label": ariaLabel,
 }: EnterpriseCardProps) {
   return (
     <Tag
       className={`enterprise-card${active ? " enterprise-card--active" : ""}${interactive ? " enterprise-card--interactive" : ""}${className ? ` ${className}` : ""}`}
+      aria-label={ariaLabel}
     >
       {children}
     </Tag>
