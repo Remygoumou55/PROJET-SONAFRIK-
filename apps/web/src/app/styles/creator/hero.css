@@ -100,7 +100,8 @@
   overflow: hidden;
   border: 1px solid var(--overlay-blanc-08);
   background: var(--color-noir-profond);
-  min-height: 20rem;
+  /* Hauteur bannière style Boomplay */
+  min-height: 26rem;
   display: flex;
   flex-direction: column;
 }
@@ -135,7 +136,8 @@
   );
 }
 
-/* Intelligent gradient: dark at bottom (text legibility), lighter at top */
+/* Gradient renforcé : quasi-transparent en haut, quasi-opaque en bas
+   Garantit la lisibilité du nom/stats quelle que soit la photo */
 .ahero__overlay {
   position: absolute;
   inset: 0;
@@ -143,9 +145,10 @@
   background: linear-gradient(
     to bottom,
     var(--overlay-noir-profond-15) 0%,
-    var(--overlay-noir-profond-35) 40%,
-    var(--overlay-noir-profond-82) 75%,
-    var(--overlay-noir-profond-97) 100%
+    transparent 25%,
+    var(--overlay-noir-profond-55) 55%,
+    var(--overlay-noir-profond-90) 78%,
+    var(--overlay-noir-profond-98) 100%
   );
   pointer-events: none;
 }
@@ -195,8 +198,8 @@
   flex-direction: column;
   justify-content: space-between;
   flex: 1;
-  padding: 1rem 1.25rem 1.25rem;
-  min-height: 20rem;
+  padding: 1rem 1.25rem 1.5rem;
+  min-height: 26rem;
 }
 
 /* Top row: greeting */
@@ -318,12 +321,37 @@
   background: var(--overlay-erreur-10);
 }
 
-/* Cover button — positioned top-right */
+/* Bouton couverture — coin supérieur droit, style pill avec icône */
 .ahero__btn--cover {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0.875rem;
+  right: 0.875rem;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.4rem 0.875rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--overlay-blanc-30);
+  background: var(--overlay-noir-profond-70);
+  color: var(--color-texte-principal);
+  backdrop-filter: blur(8px);
+  letter-spacing: 0.01em;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.ahero__btn--cover:hover:not(:disabled) {
+  background: var(--overlay-noir-profond-90);
+  border-color: var(--overlay-vert-45);
+  transform: translateY(-1px);
+}
+
+.ahero__btn--cover:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Error messages */
@@ -434,8 +462,8 @@
   align-items: center;
   gap: 0.15rem;
   padding: 0.4rem 0.6rem;
-  background: var(--overlay-noir-40);
-  border: 1px solid var(--overlay-blanc-10);
+  background: var(--overlay-casque-04);
+  border: 1px solid var(--color-bordure);
   border-radius: 0.625rem;
   min-width: 4rem;
   backdrop-filter: blur(8px);
@@ -456,7 +484,7 @@
 
 .ahero__stat-label {
   font-size: 0.5625rem;
-  color: var(--overlay-blanc-45);
+  color: var(--color-texte-desactive);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -467,13 +495,13 @@
 
 @media (max-width: 600px) {
   .ahero {
-    min-height: 16rem;
+    min-height: 20rem;
     border-radius: 0.875rem;
   }
 
   .ahero__content {
-    min-height: 16rem;
-    padding: 0.875rem 1rem 1rem;
+    min-height: 20rem;
+    padding: 0.875rem 1rem 1.25rem;
   }
 
   .ahero__name {
