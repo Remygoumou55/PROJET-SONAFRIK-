@@ -122,6 +122,45 @@ const { handleInputChange } = useAutoImageUpload({
 
 ---
 
+## 2026-07-07 — Artist Overview Refinement Program
+
+### Fichiers touchés
+- `apps/web/src/features/shared/dashboard/*` — `DashboardSection`, `DashboardPanel`, `DashboardProgressBar`
+- `apps/web/src/features/shared/feedback/useSuccessToast.ts` — toast succès partagé
+- `apps/web/src/features/creator/components/CreatorLayoutClient.tsx` — `ToastProvider`
+- `apps/web/src/features/creator/dashboard/components/ArtistHero.tsx` — hero épuré, KPIs retirés, chips + barre profil
+- `apps/web/src/features/creator/dashboard/components/ArtistCoverSlider.tsx` — toast, suppression message inline
+- `apps/web/src/features/creator/dashboard/components/ArtistProfilePhoto.tsx` — toast, suppression message inline
+- `apps/web/src/features/shared/media/autoImagePipeline.ts` — contain-fit hero (moins de zoom)
+- `apps/web/src/features/creator/dashboard/components/DashboardCoachCard.tsx` — coach visuel
+- `apps/web/src/features/creator/components/CreatorDashboardView.tsx` — grille premium unifiée
+- `apps/web/src/app/styles/creator/dashboard.css` — respiration + coach visuel
+- `apps/web/src/app/styles/creator/hero.css` — greeting renforcé
+- `docs/functional-quality/reports/ARTIST_OVERVIEW_REFINEMENT_CERTIFICATION.md`
+
+### Code avant (extrait clé)
+```before
+{success && <p className="ahero__photo-success">Avatar mis à jour.</p>}
+<div className="ahero__stats">…4 KPIs lifetime…</div>
+```
+
+### Code après (extrait clé)
+```after
+onSuccess: () => showSuccessToast("Avatar enregistré")
+<DashboardProgressBar value={hero.profilePercent} label="Profil artiste" />
+```
+
+### Dette technique créée
+- First Load `/creator` +~20 kB (Toast + primitives dashboard) — suivi PCI P2
+- Captures avant/après à produire manuellement
+
+### Tests à faire
+- [ ] Upload avatar + cover → vérifier toast (pas de texte dans hero)
+- [ ] Vérifier cover portrait moins zoomée
+- [ ] Responsive desktop / tablette / mobile
+
+---
+
 ## 2026-07-07 — Audit lot `/creator` + stabilisation runtime image distante
 
 ### Fichiers touchés
