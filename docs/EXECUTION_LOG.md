@@ -11,6 +11,48 @@
 
 ---
 
+## 2026-07-07 — Optimisation performance + audit complet
+
+### Fichiers touchés
+- `apps/web/src/components/CoverImage.tsx` — unoptimized→conditionnel (AVIF/WebP activé pour Supabase)
+- `apps/web/src/features/listener/components/discoveries/CoverImageStatic.tsx` — idem
+- `apps/web/src/features/creator/dashboard/components/CreatorAssetImage.tsx` — idem
+- `apps/web/src/features/admin/components/adminArtistsColumns.tsx` — idem
+- `apps/web/src/app/(listener)/listen/artist/[id]/page.tsx` — generateStaticParams + ISR 3600s
+- `apps/web/src/features/creator/analytics/components/CreatorAnalyticsDashboard.tsx` — AnalyticsDetailsPanel dynamique (ssr:false)
+- `packages/api/src/creator/creatorDashboard.kpiBand.presentation.ts` — fix audienceStats→followersKpi.numericValue
+- `apps/web/src/features/shared/dashboard/` — DashboardKpiBand, DashboardCoachWalletActivity, dashboardFormat
+- Commits: 33cdec0, bab9c37, 4613b2d, 01893f6, 5dfb6de, cddafb5
+
+### Code avant
+```before
+// CoverImage.tsx — toutes les images bypassed optimization
+<Image unoptimized ... />
+// Artist page — page dynamique, chaque visite = DB query
+export default async function ArtistPublicPage
+```
+
+### Code après
+```after
+// CoverImage.tsx — optimisation conditionnelle
+unoptimized={!isOptimizableUrl(buildSrc(coverPath))}
+// Artist page — top 24 artistes pre-rendus statiquement
+export const revalidate = 3600;
+export async function generateStaticParams() { ... }
+```
+
+### Impact performance
+- Images Supabase : AVIF/WebP + srcset activés → ~50% taille image
+- Top 24 artistes : rendu statique ISR → LCP drastiquement réduit
+- AnalyticsDetailsPanel : lazy (ssr:false) → moins JS chargé au premier rendu analytics
+
+### Tests à faire
+- [ ] Vérifier images servies en WebP/AVIF en prod
+- [ ] Vérifier que les pages artistes sont pré-rendues (○ dans le build output)
+- [ ] Tester /listen/artist/[id] sur mobile (header sticky, images optimisées)
+
+---
+
 ## 2026-07-07 — Fix /listen layout brisé — enterprise-shell mobile scroll model
 
 ### Fichiers touchés
