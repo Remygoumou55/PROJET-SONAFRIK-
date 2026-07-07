@@ -12,6 +12,11 @@ export {
 } from "./schemas";
 export { buildGlanceKpis, type GlanceKpiView, type GlanceKpiId } from "./creatorDashboard.glance.presentation";
 export {
+  buildDashboardKpiBand,
+  type DashboardKpiTileView,
+  type DashboardKpiId,
+} from "./creatorDashboard.kpiBand.presentation";
+export {
   buildStatCards,
   resolveNextCareerLevel,
   resolveCareerLevelNumber,
