@@ -164,11 +164,11 @@
 @keyframes lancement-progress-pulse {
   0%,
   100% {
-    box-shadow: 0 0 12px 4px rgb(0 210 106 / 0.5);
+    box-shadow: 0 0 12px 4px rgb(0 136 48 / 0.5);
   }
 
   50% {
-    box-shadow: 0 0 20px 8px rgb(0 210 106 / 0.3);
+    box-shadow: 0 0 20px 8px rgb(0 136 48 / 0.3);
   }
 }
 
@@ -320,7 +320,7 @@
 }
 
 .lancement-build-card:hover {
-  border-color: rgb(0 210 106 / 0.25);
+  border-color: rgb(0 136 48 / 0.25);
   transform: translateY(-4px);
 }
 

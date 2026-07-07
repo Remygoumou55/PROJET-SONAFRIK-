@@ -2,15 +2,29 @@
 
 .wallet-shell {
   min-height: 100dvh;
-  background-color: var(--color-noir-profond);
+  background-color: transparent;
+}
+
+.wallet-shell__header {
+  flex-wrap: wrap;
+  gap: var(--ds-gap-m);
+}
+
+.wallet-shell__header .wallet-nav {
+  margin-bottom: 0;
+  flex: 1 1 auto;
+  min-width: min(100%, 16rem);
+}
+
+.wallet-shell__content {
+  flex: 1;
 }
 
 .wallet-shell__inner {
   width: 100%;
   max-width: 42rem;
   margin-inline: auto;
-  padding: var(--page-pad-y) max(var(--page-pad-x), var(--safe-left)) var(--page-pad-y)
-    max(var(--page-pad-x), var(--safe-right));
+  padding: 0;
   box-sizing: border-box;
 }
 
