@@ -20,7 +20,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: min(480px, 100vw);
-  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 100px);
   background: var(--color-surface);
   border: 1px solid var(--overlay-blanc-08);
   border-radius: 28px 28px 0 0;
@@ -28,9 +28,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 24px 32px;
+  padding: 0 24px 20px;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: fpp-panel-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* scrollbar discret si débordement exceptionnel */
+  scrollbar-width: thin;
+  scrollbar-color: var(--overlay-blanc-12) transparent;
 }
 
 @keyframes fpp-panel-in {
@@ -96,18 +100,18 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 16px 0 20px;
+  padding: 10px 0 12px;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
 }
 
 .fpp-cover {
-  width: min(280px, 75vw);
-  height: min(280px, 75vw);
-  border-radius: 18px;
+  width: min(200px, 58vw);
+  height: min(200px, 58vw);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 60px var(--overlay-noir-50);
+  box-shadow: 0 16px 48px var(--overlay-noir-50);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -120,7 +124,7 @@
   align-items: center;
   width: 100%;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -132,13 +136,13 @@
 }
 
 .fpp-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--color-texte-principal);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .fpp-artist {
@@ -167,7 +171,7 @@
 
 .fpp-progress-section {
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -197,7 +201,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -208,7 +212,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -247,7 +251,7 @@
   border: 1px solid var(--overlay-blanc-07);
   border-radius: 99px;
   padding: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -598,20 +602,48 @@
 @media (max-width: 480px) {
   .fpp-panel {
     border-radius: 24px 24px 0 0;
-    padding: 0 16px 24px;
+    padding: 0 16px 16px;
     bottom: 72px;
   }
 
   .fpp-cover {
-    width: min(240px, 70vw);
-    height: min(240px, 70vw);
+    width: min(170px, 60vw);
+    height: min(170px, 60vw);
   }
 
   .fpp-title {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .fpp-actions-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Écrans très courts (ex: 667px type iPhone SE) */
+@media (max-height: 700px) {
+  .fpp-cover {
+    width: min(150px, 48vw);
+    height: min(150px, 48vw);
+  }
+
+  .fpp-cover-wrap {
+    padding: 6px 0 8px;
+  }
+
+  .fpp-track-info {
+    margin-bottom: 8px;
+  }
+
+  .fpp-progress-section {
+    margin-bottom: 8px;
+  }
+
+  .fpp-controls {
+    margin-bottom: 6px;
+  }
+
+  .fpp-volume-row {
+    margin-bottom: 8px;
   }
 }
