@@ -1,4 +1,5 @@
 /* listen-home — bundle modulaire (généré par scripts/split-listen-home-css.mjs) */
+@import "./listen-home/hero-carousel.css";
 @import "./listen-home/sections-sidebar.css";
 @import "./listen-home/player-core.css";
 @import "./listen-home/discover-top.css";
