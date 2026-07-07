@@ -1,0 +1,281 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SONAFRIK Enterprise Shell — layout global (Sidebar · Header · Content)
+   Tokens : globals.css @theme (--shell-*)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Shell racine ────────────────────────────────────────────────────────── */
+
+.enterprise-shell {
+  display: flex;
+  gap: var(--shell-gap-outer);
+  box-sizing: border-box;
+  min-height: 100dvh;
+  padding: var(--shell-gap-outer);
+  padding-left: max(var(--shell-gap-outer), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--shell-gap-outer), env(safe-area-inset-right, 0px));
+  padding-bottom: max(var(--shell-gap-outer), env(safe-area-inset-bottom, 0px));
+  background: var(--shell-bg);
+  color: var(--color-texte-principal);
+}
+
+.enterprise-shell--stacked {
+  flex-direction: column;
+}
+
+.enterprise-main-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--shell-gap-inner);
+  min-height: calc(100dvh - 2 * var(--shell-gap-outer));
+}
+
+/* ── Sidebar Card ──────────────────────────────────────────────────────────── */
+
+.enterprise-sidebar-card {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--shell-sidebar-width);
+  border-radius: var(--shell-radius-xl);
+  background: var(--shell-sidebar);
+  border: 1px solid var(--shell-border);
+  box-shadow: var(--shell-shadow-medium);
+  overflow: hidden;
+  position: sticky;
+  top: var(--shell-gap-outer);
+}
+
+.enterprise-sidebar-card > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.enterprise-sidebar-card .cs-sidebar,
+.enterprise-sidebar-card .listener-sidebar,
+.enterprise-sidebar-card .admin-sidebar,
+.enterprise-sidebar-card .music-sidebar {
+  height: 100%;
+  max-height: calc(100dvh - 2 * var(--shell-gap-outer));
+  position: static;
+  top: auto;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.enterprise-sidebar-card .cs-sidebar__body,
+.enterprise-sidebar-card .listener-sidebar__body,
+.enterprise-sidebar-card .music-sidebar__body {
+  border-right: none;
+}
+
+/* ── Header Card ─────────────────────────────────────────────────────────── */
+
+.enterprise-header-card {
+  flex-shrink: 0;
+  min-height: var(--shell-header-min-height);
+  border-radius: var(--shell-radius-l);
+  background: var(--shell-header);
+  border: 1px solid var(--shell-border);
+  box-shadow: var(--shell-shadow-light);
+  box-sizing: border-box;
+}
+
+.enterprise-header-card.creator-header,
+.enterprise-header-card.admin-header,
+.enterprise-header-card.identity-shell__header {
+  background: var(--shell-header);
+  border-bottom: none;
+  backdrop-filter: none;
+}
+
+/* ── Content Card ────────────────────────────────────────────────────────── */
+
+.enterprise-content-card {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--shell-radius-xl);
+  background: var(--shell-content);
+  border: 1px solid var(--shell-border);
+  box-shadow: var(--shell-shadow-light);
+  overflow-x: clip;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.enterprise-content-card__inner {
+  width: 100%;
+  max-width: var(--shell-max-width);
+  margin-inline: auto;
+  padding: var(--shell-padding-content);
+  padding-inline: max(var(--shell-padding-content), env(safe-area-inset-left, 0px))
+    max(var(--shell-padding-content), env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+}
+
+/* ── Cartes internes — tokens DS dans enterprise-design-system.css ───────── */
+
+.dash-glance__card,
+.co-card,
+.analytics-kpi,
+.dash-catalogue-card,
+.wallet-stat-card {
+  border-radius: var(--shell-radius-m);
+  border-color: var(--shell-border);
+  box-shadow: var(--shell-shadow-light);
+}
+
+.dash-glance__card:hover,
+.co-card:hover {
+  border-color: var(--shell-border-hover);
+  box-shadow: var(--shell-shadow-medium);
+}
+
+/* ── Identity / Wallet ─────────────────────────────────────────────────────── */
+
+.enterprise-shell--single {
+  flex-direction: column;
+  max-width: 48rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.enterprise-shell--identity .identity-shell__layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--shell-gap-inner);
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+}
+
+.enterprise-shell--identity .identity-shell__aside {
+  width: 100%;
+}
+
+.enterprise-shell--listener .enterprise-content-card {
+  padding-bottom: max(var(--listener-player-offset, 5.5rem), env(safe-area-inset-bottom, 0px));
+}
+
+/* Listener silo — inner wrapper sans padding (chaque section gère le sien) */
+.enterprise-shell--listener .enterprise-content-card__inner {
+  padding: 0;
+  max-width: none;
+}
+
+/* Listener mobile — scroll dans la carte (pas via le document body) */
+@media (max-width: 1023px) {
+  .enterprise-shell--listener {
+    height: 100dvh;
+    overflow: hidden;
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+
+  .enterprise-shell--listener .enterprise-main-column {
+    min-height: 0;
+  }
+
+  .enterprise-shell--listener .enterprise-content-card {
+    border-radius: 0;
+    min-height: 0;
+  }
+}
+
+.enterprise-sidebar-card--compact {
+  padding: var(--shell-spacing-m);
+  overflow-y: auto;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (min-width: 640px) {
+  :root {
+    --shell-gap-outer: 0.75rem;
+    --shell-gap-inner: 0.75rem;
+    --shell-padding-content: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --shell-gap-outer: 1rem;
+    --shell-gap-inner: 0.875rem;
+    --shell-sidebar-width: 16.25rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .enterprise-sidebar-card {
+    display: none !important;
+  }
+
+  .enterprise-shell {
+    flex-direction: column;
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
+
+  .enterprise-main-column {
+    min-height: auto;
+  }
+
+  .enterprise-content-card {
+    border-radius: var(--shell-radius-l);
+  }
+
+  .enterprise-header-card {
+    border-radius: var(--shell-radius-m);
+  }
+}
+
+@media (min-width: 1024px) {
+  .enterprise-shell--identity {
+    flex-direction: row;
+    align-items: flex-start;
+    max-width: 72rem;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  .enterprise-shell--identity .enterprise-sidebar-card--compact {
+    display: flex !important;
+    width: 15rem;
+    position: sticky;
+    top: var(--shell-gap-outer);
+    max-height: calc(100dvh - 2 * var(--shell-gap-outer));
+  }
+
+  .enterprise-shell--identity .identity-shell__layout {
+    flex-direction: row;
+    flex: 1;
+    align-items: flex-start;
+    gap: var(--shell-spacing-l);
+  }
+
+  .enterprise-shell--identity .identity-shell__aside {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .admin-layout.enterprise-shell .enterprise-sidebar-card {
+    display: flex !important;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 200;
+    width: min(18rem, 88vw);
+    max-height: 100dvh;
+    border-radius: 0 var(--shell-radius-xl) var(--shell-radius-xl) 0;
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+  }
+
+  .admin-layout--nav-open .enterprise-sidebar-card {
+    transform: translateX(0);
+  }
+}

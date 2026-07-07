@@ -11,6 +11,115 @@
 
 ---
 
+## 2026-07-07 — Fix /listen layout brisé — enterprise-shell mobile scroll model
+
+### Fichiers touchés
+- `apps/web/src/app/styles/enterprise-shell.css` — fix scroll model mobile + padding listener
+- `apps/web/src/app/styles/listen-home/discover-top.css` — CSS `.discoveries-interactive-shell`
+
+### Code avant (extrait clé)
+```before
+/* enterprise-shell.css — listener n'avait pas de règles mobile spécifiques */
+/* enterprise-content-card__inner avait padding: 1.25rem (double padding) */
+/* .discoveries-interactive-shell n'existait pas en CSS */
+```
+
+### Code après (extrait clé)
+```after
+/* Listener silo — inner wrapper sans padding (chaque section gère le sien) */
+.enterprise-shell--listener .enterprise-content-card__inner {
+  padding: 0;
+  max-width: none;
+}
+
+/* Listener mobile — scroll dans la carte (pas via le document body) */
+@media (max-width: 1023px) {
+  .enterprise-shell--listener {
+    height: 100dvh;
+    overflow: hidden;
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+  .enterprise-shell--listener .enterprise-content-card {
+    border-radius: 0;
+    min-height: 0;
+  }
+}
+
+/* discover-top.css */
+.discoveries-interactive-shell {
+  width: 100%;
+  overflow: visible;
+}
+```
+
+### Dette technique créée
+- `enterprise-shell.css` est un fichier non-commité (créé dans la session précédente). À inclure dans le prochain commit.
+
+### Tests à faire
+- [ ] Test mobile : /listen page se scroll correctement dans la carte
+- [ ] Test sticky : streaming-header reste visible en haut lors du scroll
+- [ ] Test horizontal : track cards en scroll horizontal (pas empilés)
+- [ ] Test desktop : layout desktop non affecté (sidebar visible, card scrollable)
+
+---
+
+## 2026-07-07 — Artist Profile Experience Program — Hero / Cover / Avatar simplification
+
+### Fichiers touchés
+- `apps/web/src/features/shared/media/autoImagePipeline.ts` — nouvelle primitive front-only de validation, auto-crop, compression et préparation d’upload
+- `apps/web/src/features/shared/media/useAutoImageUpload.ts` — hook réutilisable pour sélection fichier + upload automatique
+- `apps/web/src/features/creator/dashboard/components/ArtistCoverSlider.tsx` — couverture hero branchée sur la primitive partagée, sans popup
+- `apps/web/src/features/creator/dashboard/components/ArtistProfilePhoto.tsx` — avatar cliquable, upload auto, bouton texte supprimé
+- `apps/web/src/features/identity/components/AvatarUpload.tsx` — avatar identity aligné sur la nouvelle logique auto
+- `apps/web/src/features/creator/catalog/components/CoverUploader.tsx` — suppression du recadrage modal, upload cover auto
+- `apps/web/src/features/creator/dashboard/components/ArtistHero.tsx` — nettoyage des props de crop devenues inutiles
+- `apps/web/src/app/styles/creator/hero.css` — hero plus compact, affordance avatar cliquable, feedback succès
+- `apps/web/src/features/creator/components/ArtistIdentityForm.tsx` — copy alignée sur la nouvelle UX
+- `apps/web/src/features/listener/components/HomepageHero.tsx` — correction import direct de `HeroCarousel`
+- `apps/web/src/features/creator/catalog/components/CatalogCropModal.tsx` — supprimé
+- `apps/web/src/features/creator/dashboard/components/CropEditorModal.tsx` — supprimé
+
+### Code avant (extrait clé)
+```before
+<button className="ahero__btn">
+  📷 Gérer l'avatar
+</button>
+
+<CatalogCropModal
+  open={cropOpen}
+  imageSrc={cropSrc}
+  onSave={handleCropSave}
+/>
+```
+
+### Code après (extrait clé)
+```after
+<button
+  type="button"
+  className="ahero__avatar ahero__avatar-button"
+  onClick={openFilePicker}
+>
+  <span className="ahero__avatar-edit">Modifier</span>
+</button>
+
+const { handleInputChange } = useAutoImageUpload({
+  variant: AUTO_IMAGE_VARIANTS.hero,
+  onUpload: uploadCover,
+});
+```
+
+### Dette technique créée
+- Le recadrage “intelligent” reste front-only avec heuristique de cadrage/focalisation, sans détection visage serveur ni service média dédié
+- Le bloc CSS historique `.crop-modal` peut encore être retiré plus tard pour nettoyage complet, bien que les composants modaux aient été supprimés
+
+### Tests à faire
+- [ ] Vérifier manuellement le changement de couverture sur `/creator`
+- [ ] Vérifier manuellement le clic direct sur l’avatar sur `/creator`
+- [ ] Vérifier manuellement l’upload avatar sur `/profile/edit`
+- [ ] Vérifier manuellement le remplacement de pochette dans `creator/catalog/releases` et `creator/catalog/tracks/[trackId]/edit`
+- [ ] Vérifier responsive desktop / tablette / mobile sur le hero compact
+
 ## 2026-07-06 — Fix webpack TypeError "cannot read .call" — pattern `"use client"` factorisation
 
 ### Cause racine identifiée

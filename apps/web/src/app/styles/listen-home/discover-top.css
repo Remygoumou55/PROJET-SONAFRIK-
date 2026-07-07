@@ -117,8 +117,8 @@
 
 .sl-cta {
   padding: 8px 20px;
-  background: rgb(0 210 106 / 0.1);
-  border: 1px solid rgb(0 210 106 / 0.25);
+  background: rgb(0 136 48 / 0.1);
+  border: 1px solid rgb(0 136 48 / 0.25);
   border-radius: 99px;
   color: var(--color-vert-energie);
   font-size: 13px;
@@ -129,10 +129,17 @@
 }
 
 .sl-cta:hover {
-  background: rgb(0 210 106 / 0.2);
+  background: rgb(0 136 48 / 0.2);
 }
 
 /* ===== DÉCOUVERTES (fusion Nouveautés + Dernières sorties) ===== */
+
+/* Wrapper interactif (délégation click + ref DOM) — ne doit pas contraindre le layout */
+.discoveries-interactive-shell {
+  width: 100%;
+  overflow: visible;
+}
+
 .discoveries-section {
   margin-bottom: 36px;
 }
@@ -538,7 +545,7 @@
   background: linear-gradient(
     90deg,
     var(--color-vert-energie) 0%,
-    rgb(0 210 106 / 0.4) 100%
+    rgb(0 136 48 / 0.4) 100%
   );
   border-radius: 99px;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
