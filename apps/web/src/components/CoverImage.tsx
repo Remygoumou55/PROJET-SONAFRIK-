@@ -36,19 +36,45 @@ function GradientPlaceholder({
 
   return (
     <div
-      className="w-full h-full flex flex-col items-center justify-center gap-0.5"
+      className="w-full h-full relative overflow-hidden"
       style={{ background: getArtistGradientStyle(artistName, gradientSeed) }}
       aria-hidden="true"
     >
+      {/* Grand filigrane — initiales semi-transparentes, taille fixe clippée par le conteneur */}
       <span
-        className="font-extrabold leading-none"
         style={{
-          fontSize: "clamp(12px, 28%, 28px)",
-          color: "rgba(255,255,255,0.9)",
-          letterSpacing: "-0.5px",
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "4.5rem",
+          fontWeight: 900,
+          lineHeight: 1,
+          letterSpacing: "-0.03em",
+          color: "rgba(255,255,255,0.15)",
+          userSelect: "none",
+          pointerEvents: "none",
         }}
       >
         {initials}
+      </span>
+
+      {/* Badge note de musique — coin inférieur droit */}
+      <span
+        style={{
+          position: "absolute",
+          bottom: "0.3125rem",
+          right: "0.375rem",
+          fontSize: "0.8125rem",
+          lineHeight: 1,
+          color: "var(--color-or-profond)",
+          opacity: 0.85,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        ♪
       </span>
     </div>
   );
