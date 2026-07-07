@@ -6,7 +6,6 @@ import { usePlayer } from "../hooks/usePlayer";
 import { formatCount } from "@/lib/utils";
 import { CARD_GRADIENTS } from "@/lib/constants";
 import { CoverImage } from "@/components/CoverImage";
-import { HOMEPAGE_SECTION_STYLES, OVERLAY } from "@/lib/design/overlayTokens";
 
 function toTrackWithMeta(t: DiscoveryTrack): TrackWithMeta {
   return {
@@ -89,10 +88,7 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                   imgSizes="128px"
                 />
                 {isActive && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{ background: OVERLAY.noir40 }}
-                  >
+                  <div className="absolute inset-0 flex items-center justify-center homepage-discovery-active-overlay">
                     {isPlaying ? (
                       <svg width="18" height="18" viewBox="0 0 16 16" fill={gradient.from}>
                         <rect x="2" y="2" width="4" height="12" rx="1" />
@@ -107,10 +103,7 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                 )}
                 {/* Like count */}
                 {track.like_count > 0 && (
-                  <div
-                    className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full"
-                    style={{ background: OVERLAY.noir60, backdropFilter: "blur(4px)" }}
-                  >
+                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full homepage-discovery-like-badge">
                     <svg width={8} height={8} viewBox="0 0 24 24" fill="var(--color-vert-energie)">
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
@@ -118,12 +111,8 @@ export function HomepageDiscoverySection({ tracks }: Props) {
                   </div>
                 )}
                 {/* Play/pause hover overlay */}
-                <div
-                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 motion-reduce:transition-none flex items-center justify-center"
-                  style={{ background: OVERLAY.noir55 }}
-                >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: "var(--color-vert-energie)", ...HOMEPAGE_SECTION_STYLES.playCtaGlow }}>
+                <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 motion-reduce:transition-none flex items-center justify-center homepage-discovery-play-overlay">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center homepage-discovery-play-btn">
                     {isActive && isPlaying ? (
                       <svg width={12} height={12} viewBox="0 0 16 16" fill="black">
                         <rect x="2" y="1" width="4" height="14" rx="1" />

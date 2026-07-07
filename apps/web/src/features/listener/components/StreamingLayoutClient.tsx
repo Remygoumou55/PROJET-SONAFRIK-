@@ -51,26 +51,27 @@ export function StreamingLayoutClient({
           <PlayerMuteProvider>
             <ListenerProgressiveRealtimeShell runtimeReady={chromeReady}>
               <div
-                className="has-global-player md:flex md:h-screen md:overflow-hidden"
-                style={{ backgroundColor: "var(--color-noir-profond)", minHeight: "100dvh" }}
+                className="enterprise-shell enterprise-shell--listener has-global-player md:flex md:overflow-hidden"
+                style={{ minHeight: "100dvh" }}
               >
                 {chromeReady ? (
-                  <ListenerSidebarAsync
-                    userId={userId}
-                    initialUnreadCount={initialUnreadCount}
-                    sidebarDataPromise={sidebarDataPromise}
-                  />
+                  <div className="enterprise-sidebar-card">
+                    <ListenerSidebarAsync
+                      userId={userId}
+                      initialUnreadCount={initialUnreadCount}
+                      sidebarDataPromise={sidebarDataPromise}
+                    />
+                  </div>
                 ) : (
-                  <ListenerSidebarPlaceholder />
+                  <div className="enterprise-sidebar-card">
+                    <ListenerSidebarPlaceholder />
+                  </div>
                 )}
-                <main
-                  className="flex-1 overflow-y-auto md:pb-[88px] md:min-h-screen"
-                  style={{
-                    paddingBottom: "var(--listener-player-offset)",
-                  }}
-                >
-                  {children}
-                </main>
+                <div className="enterprise-main-column flex-1 min-h-0">
+                  <main className="enterprise-content-card flex-1 md:pb-[88px]">
+                    <div className="enterprise-content-card__inner">{children}</div>
+                  </main>
+                </div>
               </div>
               <MobileBottomNav />
               {chromeReady ? <GlobalPlayer /> : null}

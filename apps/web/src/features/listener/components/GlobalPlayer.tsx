@@ -12,19 +12,24 @@ import { PlayerProgressBar, formatTime } from "./PlayerProgressBar";
 import { CoverImage } from "@/components/CoverImage";
 import { LikeButton } from "@/features/shared/social/components/LikeButton";
 import { FavoriteButton } from "@/features/shared/social/components/FavoriteButton";
+import { dynamicImportWithRetry } from "@/lib/dynamicImportWithRetry";
 
 const ShareButton = dynamic(
-  () => import("./ShareButton").then((m) => ({ default: m.ShareButton })),
+  dynamicImportWithRetry(() => import("./ShareButton").then((m) => ({ default: m.ShareButton }))),
   { ssr: false },
 );
 
 const FullPlayerPanel = dynamic(
-  () => import("./FullPlayerPanel").then((m) => ({ default: m.FullPlayerPanel })),
+  dynamicImportWithRetry(() =>
+    import("./FullPlayerPanel").then((m) => ({ default: m.FullPlayerPanel })),
+  ),
   { ssr: false },
 );
 
 const FullScreenPlayer = dynamic(
-  () => import("./FullScreenPlayer").then((m) => ({ default: m.FullScreenPlayer })),
+  dynamicImportWithRetry(() =>
+    import("./FullScreenPlayer").then((m) => ({ default: m.FullScreenPlayer })),
+  ),
   { ssr: false, loading: () => <div className="fs-loading">Chargement...</div> },
 );
 

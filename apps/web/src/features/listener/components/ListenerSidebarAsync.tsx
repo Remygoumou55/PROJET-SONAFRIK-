@@ -7,15 +7,18 @@ import { ListenerDesktopSidebar } from "./ListenerDesktopSidebar";
 
 function SidebarSkeleton() {
   return (
-    <aside className="listener-sidebar hidden md:flex" aria-hidden="true">
-      <div className="ls-logo">
-        <div className="h-5 w-28 rounded animate-pulse ls-skeleton" />
-        <div className="h-2 w-24 rounded animate-pulse ls-skeleton mt-2" />
-      </div>
-      <div className="ls-nav">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-10 rounded-lg animate-pulse ls-skeleton" />
-        ))}
+    <aside className="music-sidebar music-sidebar--listener" aria-hidden="true">
+      <div className="music-sidebar__pattern" />
+      <div className="music-sidebar__body">
+        <div className="music-sidebar__brand">
+          <div className="h-5 w-28 rounded animate-pulse admin-skeleton-block" />
+          <div className="h-2 w-24 rounded animate-pulse admin-skeleton-block mt-2" />
+        </div>
+        <div className="music-nav__group" style={{ padding: "0.5rem" }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-10 rounded-lg animate-pulse admin-skeleton-block mb-1" />
+          ))}
+        </div>
       </div>
     </aside>
   );

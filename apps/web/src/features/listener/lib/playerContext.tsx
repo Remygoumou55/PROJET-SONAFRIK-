@@ -176,7 +176,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
               : errorType === "network"
                 ? "Erreur réseau — vérifiez votre connexion."
                 : "Lecture interrompue. Nouvelle tentative…";
-          if (process.env.NODE_ENV === "development") {
+          if (process.env.NODE_ENV === "development" && errorType === "codec") {
             console.error("[Player] Erreur audio", errorType, mediaErr?.code);
           }
           heartbeatCtl.clear();
