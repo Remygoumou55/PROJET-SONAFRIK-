@@ -6,11 +6,11 @@
   animation: creator-fade-in 0.2s ease-out;
 }
 
-/* ─── Creator workspace shell (aligné admin-layout — sidebar cliquable) ─── */
+/* ─── Creator workspace shell ─────────────────────────────────────────────── */
 .creator-workspace {
   display: flex;
   min-height: 100dvh;
-  background: var(--color-noir-profond);
+  background: transparent;
   max-width: 100%;
   overflow-x: clip;
 }
@@ -20,36 +20,24 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  min-height: 0;
 }
 
 .creator-workspace__main {
   flex: 1;
   min-width: 0;
-  background: var(--color-noir-profond);
+  background: transparent;
   overflow-x: clip;
+  display: flex;
+  flex-direction: column;
 }
 
 .creator-workspace__frame {
   width: 100%;
-  max-width: 80rem;
-  margin-inline: auto;
-  padding: 1.25rem 1rem 2.5rem;
-  padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px));
+  max-width: none;
+  margin-inline: 0;
+  padding: 0;
   box-sizing: border-box;
-}
-
-@media (min-width: 640px) {
-  .creator-workspace__frame {
-    padding-inline: max(1.5rem, env(safe-area-inset-left, 0px)) max(1.5rem, env(safe-area-inset-right, 0px));
-    padding-top: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .creator-workspace__frame {
-    padding: 2rem 1.5rem 3rem;
-  }
 }
 
 .creator-asset-image__bounded {
@@ -103,19 +91,13 @@
 
 /* ─── Creator layout header ─────────────────────────────────────────────── */
 .creator-header {
-  background: var(--color-noir-profond);
+  background: transparent;
 }
 
 .creator-header__inner {
-  max-width: 80rem;
-  margin-inline: auto;
-  padding: 1rem max(1rem, env(safe-area-inset-left, 0px)) 1rem max(1rem, env(safe-area-inset-right, 0px));
-}
-
-@media (min-width: 640px) {
-  .creator-header__inner {
-    padding: 1rem 1.5rem;
-  }
+  max-width: none;
+  margin-inline: 0;
+  padding: var(--shell-spacing-m) var(--shell-spacing-l);
 }
 
 .creator-breadcrumb {
@@ -148,27 +130,49 @@
 .creator-page-sub {
   margin: 0.25rem 0 0;
   font-size: 0.8125rem;
-  color: var(--overlay-blanc-50);
+  color: var(--color-texte-secondaire);
   line-height: 1.5;
 }
 
 /* ─── Nouvelle sidebar artiste épurée ─────────────────────────────────────── */
 .cs-sidebar {
-  width: 200px;
+  width: auto;
   flex-shrink: 0;
-  background: var(--color-admin-sidebar);
-  border-right: 1px solid var(--overlay-blanc-05);
-  flex-direction: column;
-  height: 100dvh;
-  position: sticky;
-  top: 0;
+  flex-direction: row;
+  align-items: stretch;
+  background: transparent;
+  height: 100%;
+  max-height: 100%;
+  position: static;
+  top: auto;
   z-index: 30;
   pointer-events: auto;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.cs-sidebar__pattern {
+  width: 28px;
+  flex-shrink: 0;
+  background-color: var(--color-noir-profond);
+  background-image: url("/brand/listen-pattern-strip.svg");
+  background-repeat: repeat-y;
+  background-size: 28px 80px;
+  border-right: 1px solid rgb(246 192 9 / 0.08);
+}
+
+.cs-sidebar__body {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   scrollbar-width: none;
   padding-bottom: 16px;
+  border-right: 1px solid var(--color-bordure);
 }
-.cs-sidebar::-webkit-scrollbar { display: none; }
+
+.cs-sidebar__body::-webkit-scrollbar { display: none; }
 
 @media (min-width: 1024px) {
   .cs-sidebar { display: flex !important; }
@@ -176,16 +180,20 @@
 
 .cs-logo {
   padding: 20px 16px 14px;
-  border-bottom: 1px solid var(--overlay-blanc-05);
+  border-bottom: 1px solid var(--color-bordure);
 }
 .cs-logo-brand {
-  display: block;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: var(--color-texte-principal);
+  display: none;
 }
-.cs-logo-accent { color: var(--color-vert-energie); }
+
+.cs-logo-image {
+  display: block;
+  width: auto;
+  height: 1.55rem;
+  max-width: 100%;
+}
+
+.cs-logo-accent { color: var(--color-or-solaire); }
 .cs-logo-sub {
   display: block;
   font-size: 9px;
@@ -201,7 +209,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--overlay-blanc-05);
+  border-bottom: 1px solid var(--color-bordure);
 }
 .cs-avatar {
   width: 34px;
@@ -257,7 +265,7 @@
   border-left: 3px solid transparent;
   font-size: 13px;
   font-weight: 500;
-  color: var(--overlay-blanc-45);
+  color: var(--color-texte-desactive);
   text-decoration: none;
   cursor: pointer;
   pointer-events: auto;
@@ -273,10 +281,10 @@
   border-left-color: var(--overlay-or-medium);
 }
 .cs-nav-item--active {
-  background: var(--overlay-vert-08);
-  color: var(--color-texte-principal);
+  background: rgb(246 192 9 / 0.09);
+  color: var(--color-or-solaire);
   font-weight: 600;
-  border-left-color: var(--color-vert-energie);
+  border-left-color: var(--color-or-solaire);
 }
 .cs-nav-icon {
   font-size: 16px;

@@ -66,7 +66,6 @@ function DashboardCareerProgressCardView({ careerOs }: Props) {
   return (
     <section className="dash-career-progress" aria-label="Progression carrière">
       <h2 className="dash-section-title">Progression carrière</h2>
-
       <div className="dash-career-progress__body">
         <div className="dash-career-circle">
           <CircularProgress percent={careerOs.overallProgressPercent} />

@@ -14,7 +14,6 @@ export function DashboardCoachCard({ tips, activities }: Props) {
   return (
     <section className="dash-coach" aria-label="Coach SONAFRIK">
       <h2 className="dash-section-title">Coach SONAFRIK</h2>
-
       {tip && (
         <div className="dash-coach__tip">
           <span className="dash-coach__tip-icon" aria-hidden="true">{tip.icon}</span>

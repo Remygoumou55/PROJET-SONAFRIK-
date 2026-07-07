@@ -4,7 +4,7 @@ export function resolveCreatorPageTitle(pathname: string): string {
   if (/^\/creator\/catalog\/tracks\/[^/]+\/edit/.test(pathname)) return "Modifier la publication";
   if (pathname.startsWith("/creator/catalog/releases")) return "Albums et morceaux";
   if (pathname.startsWith("/creator/catalog")) return "Mon catalogue";
-  if (pathname.startsWith("/creator/analytics")) return "Statistiques";
+  if (pathname.startsWith("/creator/analytics")) return "Tes stats";
   if (pathname.startsWith("/creator/identity")) return "Mon profil";
   if (pathname === "/creator") return "Vue d'ensemble";
   return "Espace Artiste";

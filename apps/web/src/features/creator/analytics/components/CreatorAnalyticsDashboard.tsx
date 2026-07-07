@@ -1,12 +1,26 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
 import { useCreatorAnalyticsSrtspLive } from "../hooks/useCreatorAnalyticsSrtspLive";
-import { StreamStatsGrid } from "./StreamStatsGrid";
-import { StreamTimeline } from "./StreamTimeline";
-import { TopTracksTable } from "./TopTracksTable";
-import { TopAlbumsTable } from "./TopAlbumsTable";
-import { AudienceCard } from "./AudienceCard";
-import { RevenueCard } from "./RevenueCard";
-import { RoyaltyHistoryCard } from "./RoyaltyHistoryCard";
+import { useAnalyticsTimelineForPeriod } from "../hooks/useAnalyticsTimelineForPeriod";
+import { AnalyticsPeriodPicker } from "./AnalyticsPeriodPicker";
+import { AnalyticsSummaryKpis } from "./AnalyticsSummaryKpis";
+import { AnalyticsStreamChart } from "./AnalyticsStreamChart";
+import { AnalyticsTopTracks } from "./AnalyticsTopTracks";
+import { AnalyticsTopAlbums } from "./AnalyticsTopAlbums";
+import { AnalyticsDetailsPanel } from "./AnalyticsDetailsPanel";
+import {
+  buildAnalyticsStory,
+  computePeriodTrend,
+  DEFAULT_ANALYTICS_PERIOD,
+  getPresetById,
+  resolvePeriodAudience,
+  resolvePeriodRevenue,
+  resolvePeriodStreams,
+  type AnalyticsCustomRange,
+  type AnalyticsPeriodId,
+} from "../lib/analyticsPeriod";
 
 interface Props {
   data: CreatorAnalyticsData;
@@ -14,38 +28,84 @@ interface Props {
 }
 
 export function CreatorAnalyticsDashboard({ data: initialData, creatorId }: Props) {
+  const [periodId, setPeriodId] = useState<AnalyticsPeriodId>(DEFAULT_ANALYTICS_PERIOD);
+  const [customRange, setCustomRange] = useState<AnalyticsCustomRange | null>(null);
+
   const { data: liveData } = useCreatorAnalyticsSrtspLive({
     creatorId,
     initialData,
   });
 
-  const data = liveData ?? initialData;
+  const baseData = liveData ?? initialData;
+
+  const { timeline, loading: timelineLoading } = useAnalyticsTimelineForPeriod({
+    creatorId,
+    periodId,
+    customRange,
+    initialTimeline: baseData.timeline,
+  });
+
+  const data = useMemo(
+    () => ({ ...baseData, timeline }),
+    [baseData, timeline],
+  );
+
+  const periodLabel = useMemo(() => {
+    if (periodId === "custom" && customRange) {
+      return `${customRange.start} → ${customRange.end}`;
+    }
+    return getPresetById(periodId).label;
+  }, [periodId, customRange]);
+
+  const streams = resolvePeriodStreams(data.streamStats, periodId, data.timeline, customRange);
+  const trend = computePeriodTrend(data.timeline, periodId, customRange);
+  const audience = resolvePeriodAudience(data.audienceStats, periodId);
+  const revenue = resolvePeriodRevenue(data.revenueStats, periodId, streams);
+  const story = buildAnalyticsStory(data, periodId, customRange);
+
+  function handlePeriodChange(next: AnalyticsPeriodId, range?: AnalyticsCustomRange | null) {
+    setPeriodId(next);
+    setCustomRange(range ?? null);
+  }
 
   return (
-    <div className="space-y-8">
-      <StreamStatsGrid stats={data.streamStats} />
+    <div className="analytics-page">
+      <header className="analytics-page__header">
+        <div>
+          <h1 className="analytics-page__title">Tes stats</h1>
+          <p className="analytics-page__story">{story}</p>
+        </div>
+        <AnalyticsPeriodPicker
+          value={periodId}
+          customRange={customRange}
+          onChange={handlePeriodChange}
+          loading={timelineLoading}
+        />
+      </header>
 
-      <StreamTimeline entries={data.timeline} />
+      <AnalyticsSummaryKpis
+        streams={streams}
+        trend={trend}
+        estimatedGnf={revenue.estimated}
+        walletBalance={revenue.balance}
+        newFollowers={audience.newFollowers}
+        totalFollowers={audience.totalFollowers}
+        audienceLabel={audience.label}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <TopTracksTable tracks={data.topTracks} />
-        <TopAlbumsTable albums={data.topAlbums} />
+      <AnalyticsStreamChart
+        entries={data.timeline}
+        periodId={periodId}
+        customRange={customRange}
+        periodLabel={periodLabel}
+      />
+
+      <div className="analytics-page__rankings">
+        <AnalyticsTopTracks tracks={data.topTracks} />
+        <AnalyticsTopAlbums albums={data.topAlbums} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <AudienceCard stats={data.audienceStats} />
-        <RevenueCard stats={data.revenueStats} />
-      </div>
-
-      <RoyaltyHistoryCard history={data.royaltyHistory} />
-
-      <div className="border-bordure rounded-lg border border-dashed p-4">
-        <p className="text-texte-desactive text-sm">
-          <span className="text-texte-secondaire font-medium">Géographie · </span>
-          Données non disponibles — nous ne collectons pas encore la localisation de vos
-          auditeurs (pays, ville, région). Cette fonctionnalité arrivera prochainement.
-        </p>
-      </div>
+      <AnalyticsDetailsPanel data={data} />
     </div>
   );
 }

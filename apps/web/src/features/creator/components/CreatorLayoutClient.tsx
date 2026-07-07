@@ -16,8 +16,8 @@ export function CreatorLayoutClient({
   return (
     <>
       <CreatorMobileNav activePath={pathname} navEntries={navEntries} />
-      <div className="creator-workspace__main">
-        <div className="creator-workspace__frame">{children}</div>
+      <div className="enterprise-content-card creator-workspace__main">
+        <div className="enterprise-content-card__inner creator-workspace__frame">{children}</div>
       </div>
     </>
   );

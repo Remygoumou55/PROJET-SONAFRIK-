@@ -1,3 +1,4 @@
+import { MusicHeader } from "@/features/shared/navigation";
 import {
   resolveCreatorPageSubtitle,
   resolveCreatorPageTitle,
@@ -19,16 +20,13 @@ export function CreatorWorkspaceHeader({
   const pageSubtitle = resolveCreatorPageSubtitle(pathname);
 
   return (
-    <header className="creator-header border-b border-bordure">
-      <div className="creator-header__inner">
-        <div className="creator-header__row">
-          <div className="creator-header__copy">
-            <h1 className="creator-page-title">{pageTitle}</h1>
-            {pageSubtitle ? <p className="creator-page-sub">{pageSubtitle}</p> : null}
-          </div>
-          <CreatorHeaderUtilities userId={userId} initialUnreadCount={initialUnreadCount} />
-        </div>
-      </div>
-    </header>
+    <MusicHeader
+      className="creator-header"
+      title={pageTitle}
+      subtitle={pageSubtitle ?? undefined}
+      right={
+        <CreatorHeaderUtilities userId={userId} initialUnreadCount={initialUnreadCount} />
+      }
+    />
   );
 }

@@ -10,7 +10,7 @@ import type { SrtspEvent } from "@sonafrik/realtime";
 import { useLiveQuery } from "@sonafrik/realtime/react";
 import { useAnalyticsServices } from "./useAnalytics";
 
-const TIMELINE_DAYS = 30;
+const TIMELINE_DAYS = 90;
 const TOP_LIMIT = 10;
 const ROYALTY_HISTORY_LIMIT = 12;
 

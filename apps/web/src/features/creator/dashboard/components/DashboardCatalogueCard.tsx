@@ -23,7 +23,6 @@ export function DashboardCatalogueCard({ topTrack, tracksPublished, creatorId }:
           Voir tout →
         </Link>
       </div>
-
       {tracksPublished === 0 || !topTrack ? (
         <div className="dash-catalogue-card__empty">
           <span className="dash-catalogue-card__empty-icon" aria-hidden="true">🎵</span>

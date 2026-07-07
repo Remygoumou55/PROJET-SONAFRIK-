@@ -2,7 +2,7 @@ import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createAnalyticsService } from "@sonafrik/api/analytics";
 import { createRoyaltyService } from "@sonafrik/api/royalties";
-import { CreatorAnalyticsDashboard } from "@/features/creator/analytics/components/CreatorAnalyticsDashboard";
+import { CreatorAnalyticsDashboardShell } from "@/features/creator/analytics/components/CreatorAnalyticsDashboardShell";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
 
 const EMPTY_STREAM_STATS = {
@@ -60,7 +60,7 @@ export default async function CreatorAnalyticsPage() {
     royaltyHistory,
   ] = await Promise.allSettled([
     analytics.getStreamStats({ creatorId }),
-    analytics.getStreamTimeline({ creatorId, days: 30 }),
+    analytics.getStreamTimeline({ creatorId, days: 90 }),
     analytics.getTopTracks({ creatorId, limit: 10 }),
     analytics.getTopAlbums({ creatorId, limit: 10 }),
     analytics.getAudienceStats({ creatorId }),
@@ -88,5 +88,5 @@ export default async function CreatorAnalyticsPage() {
       royaltyHistory.status === "fulfilled" ? royaltyHistory.value : [],
   };
 
-  return <CreatorAnalyticsDashboard data={data} creatorId={creatorId} />;
+  return <CreatorAnalyticsDashboardShell data={data} creatorId={creatorId} />;
 }

@@ -17,8 +17,8 @@
   padding: 1rem;
   min-height: 7.5rem;
   border-radius: 1rem;
-  border: 1px solid var(--overlay-blanc-08);
-  background: var(--overlay-blanc-03);
+  border: 1px solid var(--color-bordure);
+  background: var(--color-card);
 }
 
 .dash-glance__icon {
@@ -51,15 +51,15 @@
 }
 
 .co-card {
-  background: var(--overlay-blanc-03);
-  border: 1px solid var(--overlay-blanc-07);
+  background: var(--color-card);
+  border: 1px solid var(--color-bordure);
   border-radius: 14px;
   padding: 18px;
 }
 
 .co-card--wallet {
-  background: var(--overlay-vert-04);
-  border-color: var(--overlay-vert-14);
+  background: var(--color-card);
+  border-color: var(--color-bordure);
 }
 
 .co-card-label {
@@ -92,8 +92,7 @@
 
 .co-empty-hint {
   font-size: 12px;
-  color: var(--overlay-blanc-25);
+  color: var(--color-texte-desactive);
   line-height: 1.55;
   margin: 0 0 12px;
 }
-

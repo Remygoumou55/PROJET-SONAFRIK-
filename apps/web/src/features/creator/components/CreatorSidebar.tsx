@@ -1,74 +1,44 @@
-import Link from "next/link";
-import { headers } from "next/headers";
-import { getCreatorNavLinks, type CreatorNavEntry } from "../lib/creatorNavConfig";
+"use client";
 
-function isNavActive(href: string, exact: boolean | undefined, pathname: string): boolean {
+import {
+  MusicSidebar,
+  MusicNavFromSections,
+  groupCreatorNavEntries,
+  getCreatorNavLinks,
+  type CreatorNavEntry,
+} from "@/features/shared/navigation";
+import { useSmartPrefetch } from "@/lib/performance/smart-prefetch";
+import { useMemo } from "react";
+
+function isNavActive(href: string, pathname: string, exact?: boolean): boolean {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 interface CreatorSidebarProps {
   navEntries: CreatorNavEntry[];
+  pathname: string;
 }
 
-export async function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
-  const pathname = (await headers()).get("x-pathname") ?? "";
+export function CreatorSidebar({ navEntries, pathname }: CreatorSidebarProps) {
+  const sections = useMemo(() => groupCreatorNavEntries(navEntries), [navEntries]);
+  const navHrefs = useMemo(() => getCreatorNavLinks(navEntries).map((l) => l.href), [navEntries]);
+  const { prefetchOnHover } = useSmartPrefetch(navHrefs);
 
   return (
-    <aside
-      className="cs-sidebar"
-      style={{ display: "none" }}
-      role="navigation"
-      aria-label="Navigation artiste"
+    <MusicSidebar
+      role="artist"
+      ariaLabel="Navigation artiste"
+      className="music-sidebar--creator"
     >
-      <div className="cs-logo">
-        <span className="cs-logo-brand">
-          SON<span className="cs-logo-accent">A</span>FRIK
-        </span>
-        <span className="cs-logo-sub">Espace Artiste</span>
-      </div>
-
-      <nav className="cs-nav" aria-label="Menu artiste">
-        {navEntries.map((entry, i) => {
-          if ("type" in entry && entry.type === "section") {
-            return (
-              <div
-                key={`sep-${i}`}
-                className="cs-nav-sep"
-                role="separator"
-                aria-hidden="true"
-              />
-            );
-          }
-          if (!("href" in entry)) return null;
-
-          const active = isNavActive(entry.href, entry.exact, pathname);
-
-          return (
-            <Link
-              key={entry.href}
-              href={entry.href}
-              prefetch
-              scroll
-              className={`cs-nav-item${active ? " cs-nav-item--active" : ""}`}
-              aria-current={active ? "page" : undefined}
-            >
-              <span className="cs-nav-icon" aria-hidden="true">
-                {entry.icon}
-              </span>
-              <span>{entry.label}</span>
-              {entry.badge && entry.badge > 0 ? (
-                <span className="cs-nav-badge" aria-label={`${entry.badge} en attente`}>
-                  {entry.badge}
-                </span>
-              ) : null}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="cs-spacer" />
-    </aside>
+      <MusicNavFromSections
+        sections={sections}
+        pathname={pathname}
+        ariaLabel="Menu artiste"
+        isActive={isNavActive}
+        onPrefetch={prefetchOnHover}
+      />
+    </MusicSidebar>
   );
 }
 
