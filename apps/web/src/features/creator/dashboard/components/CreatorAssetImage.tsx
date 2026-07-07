@@ -5,6 +5,11 @@ import { memo, useEffect, useState } from "react";
 import type { CreatorAssetKind } from "@sonafrik/types";
 import { useCreatorAssetUrl } from "../hooks/useCreatorAssetUrl";
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+function isOptimizableUrl(src: string): boolean {
+  return SUPABASE_URL !== "" && src.startsWith(SUPABASE_URL);
+}
+
 interface CreatorAssetImageProps {
   creatorId: string;
   path: string | null | undefined;
@@ -66,7 +71,7 @@ export const CreatorAssetImage = memo(function CreatorAssetImage({
       src={url!}
       alt={alt}
       fill
-      unoptimized
+      unoptimized={!isOptimizableUrl(url!)}
       className={`${objectClass} ${className}`.trim()}
       sizes={sizes}
       priority={priority}

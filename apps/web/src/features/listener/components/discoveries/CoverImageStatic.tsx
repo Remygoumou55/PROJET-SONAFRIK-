@@ -3,6 +3,10 @@ import { getArtistGradientStyle, getCoverInitials } from "@/lib/cover-placeholde
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
+function isOptimizableUrl(src: string): boolean {
+  return SUPABASE_URL !== "" && src.startsWith(SUPABASE_URL);
+}
+
 interface CoverImageStaticProps {
   coverPath: string | null | undefined;
   alt: string;
@@ -66,7 +70,7 @@ export function CoverImageStatic({
           alt={alt}
           fill
           className="object-cover"
-          unoptimized
+          unoptimized={!isOptimizableUrl(buildSrc(coverPath))}
           sizes={imgSizes}
           priority={priority}
           fetchPriority={priority ? "high" : "auto"}

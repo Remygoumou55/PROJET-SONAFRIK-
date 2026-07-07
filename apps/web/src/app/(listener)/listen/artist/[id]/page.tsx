@@ -2,11 +2,28 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { createListenerService } from "@sonafrik/api/listener";
+import { createDiscoveryService } from "@sonafrik/api/discovery";
 import { ArtistPublicPageClient } from "@/features/listener/components/ArtistPublicPageClient";
 import {
   fetchArtistPublicPageData,
   type ArtistPublicSort,
 } from "@/features/listener/lib/fetchArtistPublicPageData";
+
+/** Revalidate statically-generated artist pages every hour. */
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+/** Pre-render the top 24 suggested artists at build time for fast initial load. */
+export async function generateStaticParams() {
+  try {
+    const supabase = getSupabasePublicClient();
+    const discovery = createDiscoveryService(supabase);
+    const artists = await discovery.getSuggestedArtists({ limit: 24 });
+    return artists.map((a) => ({ id: a.creator_id }));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,

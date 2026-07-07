@@ -1,5 +1,10 @@
 import Image from "next/image";
 import type { AdminArtistListItem, AdminCreatorTier } from "@sonafrik/types";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+function isOptimizable(src: string): boolean {
+  return SUPABASE_URL !== "" && src.startsWith(SUPABASE_URL);
+}
 import { AdminStatusBadge } from "./AdminStatusBadge";
 
 export type ArtistAction = "warn" | "suspend" | "view" | null;
@@ -48,7 +53,7 @@ export function buildAdminArtistsColumns({
           <div className="admin-artist-row">
             <div className="admin-artist-avatar">
               {avatar ? (
-                <Image src={avatar} alt={row.stage_name} width={36} height={36} unoptimized />
+                <Image src={avatar} alt={row.stage_name} width={36} height={36} unoptimized={!isOptimizable(avatar)} />
               ) : (
                 <span aria-hidden>🎤</span>
               )}
