@@ -2,8 +2,8 @@
 .ls-mini-player {
   margin: 0 10px 8px;
   padding: 12px;
-  background: rgb(0 210 106 / 0.06);
-  border: 1px solid rgb(0 210 106 / 0.14);
+  background: var(--color-card);
+  border: 1px solid var(--color-bordure);
   border-radius: 14px;
   flex-shrink: 0;
   min-width: 0;

@@ -98,7 +98,26 @@
   align-items: center;
   justify-content: center;
   color: var(--color-noir-profond);
-  box-shadow: 0 4px 20px rgb(0 210 106 / 0.4);
+  box-shadow: 0 4px 20px rgb(0 136 48 / 0.4);
+}
+
+/* Homepage discovery row — tokens en CSS (évite mismatch hydration inline var()) */
+.homepage-discovery-active-overlay {
+  background: var(--overlay-noir-40);
+}
+
+.homepage-discovery-like-badge {
+  background: var(--overlay-noir-60);
+  backdrop-filter: blur(4px);
+}
+
+.homepage-discovery-play-overlay {
+  background: var(--overlay-noir-55);
+}
+
+.homepage-discovery-play-btn {
+  background: var(--color-vert-energie);
+  box-shadow: var(--shadow-vert-glow-strong);
 }
 
 .listen-track-card-title {
@@ -479,7 +498,7 @@
   height: 200px;
   background: radial-gradient(
     ellipse at 100% 0%,
-    rgb(0 210 106 / 0.08) 0%,
+    rgb(0 136 48 / 0.08) 0%,
     transparent 70%
   );
   pointer-events: none;
@@ -494,7 +513,7 @@
 }
 
 .listen-hero-name {
-  color: var(--color-vert-energie);
+  color: var(--color-or-solaire);
 }
 
 .listen-hero-sub {
@@ -504,19 +523,43 @@
 }
 
 .listener-sidebar {
+  flex-shrink: 0;
+  flex-direction: row;
+  align-items: stretch;
+  background: transparent;
+  height: 100%;
+  max-height: 100%;
+  position: static;
+  top: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.listener-sidebar__pattern {
+  width: 28px;
+  flex-shrink: 0;
+  background-color: var(--color-noir-profond);
+  background-image: url("/brand/listen-pattern-strip.svg");
+  background-repeat: repeat-y;
+  background-size: 28px 80px;
+  border-right: 1px solid rgb(246 192 9 / 0.08);
+}
+
+.listener-sidebar__body {
   width: 210px;
   flex-shrink: 0;
+  display: flex;
   flex-direction: column;
-  background: var(--color-noir-profond);
-  border-right: 1px solid rgb(255 255 255 / 0.05);
-  padding: 0 0 16px;
-  height: 100vh;
-  position: sticky;
-  top: 0;
   min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
+  padding: 0 0 16px;
+  border-right: 1px solid rgb(255 255 255 / 0.05);
+}
+
+.listener-sidebar__body::-webkit-scrollbar {
+  display: none;
 }
 
 .listener-sidebar::-webkit-scrollbar {
@@ -534,16 +577,18 @@
 }
 
 .ls-logo-brand {
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: var(--color-texte-principal);
-  line-height: 1;
-  margin-bottom: 4px;
+  display: none;
+}
+
+.ls-logo-image {
+  display: block;
+  width: auto;
+  height: 1.75rem;
+  max-width: 100%;
 }
 
 .ls-logo-accent {
-  color: var(--color-vert-energie);
+  color: var(--color-or-solaire);
 }
 
 .ls-logo-slogan {
@@ -551,7 +596,8 @@
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgb(255 194 14 / 0.55);
+  color: rgb(246 192 9 / 0.55);
+  margin-top: 6px;
 }
 
 /* ===== NAVIGATION ===== */
@@ -581,16 +627,16 @@
 }
 
 .ls-nav-item:hover:not(.ls-nav-item--active) {
-  background: rgb(255 194 14 / 0.05);
-  color: rgb(255 255 255 / 0.78);
-  border-left-color: rgb(255 194 14 / 0.2);
+  background: rgb(246 192 9 / 0.05);
+  color: rgb(255 255 255 / 0.85);
+  border-left-color: rgb(246 192 9 / 0.22);
 }
 
 .ls-nav-item--active {
-  background: rgb(0 210 106 / 0.08);
-  color: var(--color-texte-principal);
+  background: rgb(246 192 9 / 0.09);
+  color: var(--color-or-solaire);
   font-weight: 600;
-  border-left-color: var(--color-vert-energie);
+  border-left-color: var(--color-or-solaire);
 }
 
 .ls-nav-icon {
@@ -599,16 +645,16 @@
   justify-content: center;
   width: 22px;
   flex-shrink: 0;
-  color: rgb(255 194 14 / 0.55);
+  color: rgb(246 192 9 / 0.5);
   transition: color 0.15s ease;
 }
 
 .ls-nav-item--active .ls-nav-icon {
-  color: var(--color-vert-energie);
+  color: var(--color-or-solaire);
 }
 
 .ls-nav-item:hover:not(.ls-nav-item--active) .ls-nav-icon {
-  color: rgb(255 194 14 / 0.85);
+  color: rgb(246 192 9 / 0.88);
 }
 
 .ls-nav-label {
@@ -643,7 +689,7 @@
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgb(255 194 14 / 0.65);
+  color: rgb(246 192 9 / 0.65);
   padding: 12px 20px 8px;
   display: block;
   flex-shrink: 0;

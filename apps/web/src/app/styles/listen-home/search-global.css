@@ -18,8 +18,8 @@
 
 .smart-search-input-wrap:focus-within {
   background: rgb(255 255 255 / 0.09);
-  border-color: rgb(0 210 106 / 0.3);
-  box-shadow: 0 0 0 3px rgb(0 210 106 / 0.06);
+  border-color: rgb(0 136 48 / 0.3);
+  box-shadow: 0 0 0 3px rgb(0 136 48 / 0.06);
 }
 
 .smart-search-icon {
@@ -164,7 +164,7 @@
 }
 
 .search-result-item.active {
-  background: rgb(0 210 106 / 0.07);
+  background: rgb(0 136 48 / 0.07);
 }
 
 .search-result-cover {
@@ -216,7 +216,7 @@
 }
 
 .search-highlight {
-  background: rgb(0 210 106 / 0.25);
+  background: rgb(0 136 48 / 0.25);
   color: var(--color-vert-energie);
   border-radius: 2px;
   padding: 0 1px;
@@ -264,7 +264,7 @@
 }
 
 .search-see-all:hover {
-  background: rgb(0 210 106 / 0.05);
+  background: rgb(0 136 48 / 0.05);
 }
 
 @media (max-width: 767px) {
