@@ -1,8 +1,5 @@
 /* ===== ADMIN LAYOUT SHELL ===== */
 .admin-layout {
-  display: flex;
-  min-height: 100dvh;
-  background: var(--color-noir-profond);
   color: var(--color-texte-principal);
 }
 
@@ -11,25 +8,29 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  min-height: 0;
 }
 
 .admin-content {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* ===== SIDEBAR ADMIN ===== */
 .admin-sidebar {
-  width: 220px;
+  width: 100%;
   flex-shrink: 0;
-  background: var(--color-admin-sidebar);
-  border-right: 1px solid var(--color-admin-border-subtle);
+  background: transparent;
+  border-right: none;
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  position: sticky;
-  top: 0;
+  height: 100%;
+  max-height: 100%;
+  position: static;
+  top: auto;
   overflow-y: auto;
   scrollbar-width: none;
   padding-bottom: 20px;
@@ -182,17 +183,18 @@
 
 /* ===== ADMIN HEADER ===== */
 .admin-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: static;
+  top: auto;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
-  height: 60px;
-  background: var(--overlay-noir-profond-95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-admin-border-subtle);
+  padding: 0 var(--shell-spacing-l);
+  min-height: var(--shell-header-min-height);
+  height: auto;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
 }
 
 .admin-header-left {

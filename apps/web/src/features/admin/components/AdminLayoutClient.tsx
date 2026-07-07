@@ -45,7 +45,7 @@ export function AdminLayoutClient({
 
   return (
     <AdminLdseProvider initialSnapshot={liveSnapshot}>
-      <div className={`admin-layout${navOpen ? " admin-layout--nav-open" : ""}`}>
+      <div className={`admin-layout enterprise-shell${navOpen ? " admin-layout--nav-open" : ""}`}>
           <button
             type="button"
             className="admin-sidebar-backdrop"
@@ -53,15 +53,19 @@ export function AdminLayoutClient({
             onClick={closeNav}
             tabIndex={navOpen ? 0 : -1}
           />
-          <AdminSidebar onNavigate={closeNav} featureFlags={navFeatureFlags} />
-          <div className="admin-main">
+          <div className="enterprise-sidebar-card">
+            <AdminSidebar onNavigate={closeNav} featureFlags={navFeatureFlags} />
+          </div>
+          <div className="enterprise-main-column admin-main">
             <AdminHeader
               user={adminUser}
               disableLiveRealtime={disableLiveRealtime}
               menuOpen={navOpen}
               onMenuToggle={toggleNav}
             />
-            <div className="admin-content">{children}</div>
+            <div className="enterprise-content-card admin-content">
+              <div className="enterprise-content-card__inner">{children}</div>
+            </div>
           </div>
         </div>
     </AdminLdseProvider>

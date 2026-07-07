@@ -1,8 +1,10 @@
+import type { MusicNavIconName } from "@/features/shared/navigation";
+
 export type AdminNavBadgeKind = "alert" | "pending" | "live";
 
 export interface AdminNavItem {
   href: string;
-  icon: string;
+  icon: MusicNavIconName;
   label: string;
   badge: AdminNavBadgeKind | null;
 }
@@ -40,49 +42,49 @@ export function buildAdminModuleCards(flags: AdminNavFeatureFlags = {}) {
 /** Navigation principale — 12 modules + section MVP existante (zéro régression). */
 export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
-    title: "VUE D'ENSEMBLE",
+    title: "Piloter",
     items: [
-      { href: "/admin", icon: "📊", label: "Dashboard", badge: null },
-      { href: "/admin/analytics", icon: "📈", label: "Analytiques", badge: "live" },
+      { href: "/admin", icon: "dashboard", label: "Dashboard", badge: null },
+      { href: "/admin/analytics", icon: "analytics", label: "Analytiques", badge: "live" },
     ],
   },
   {
-    title: "GESTION",
+    title: "Écosystème",
     items: [
-      { href: "/admin/users", icon: "👥", label: "Utilisateurs", badge: null },
-      { href: "/admin/artists", icon: "🎤", label: "Artistes", badge: null },
-      { href: "/admin/catalog", icon: "🎵", label: "Contenus", badge: "pending" },
-      { href: "/admin/rights", icon: "⚖️", label: "Modération", badge: "alert" },
+      { href: "/admin/users", icon: "users", label: "Utilisateurs", badge: null },
+      { href: "/admin/artists", icon: "artists", label: "Artistes", badge: null },
+      { href: "/admin/catalog", icon: "catalog", label: "Contenus", badge: "pending" },
+      { href: "/admin/rights", icon: "rights", label: "Modération", badge: "alert" },
     ],
   },
   {
-    title: "FINANCIER",
+    title: "Flux financiers",
     items: [
-      { href: "/admin/revenue", icon: "💰", label: "Revenus", badge: null },
-      { href: "/admin/withdrawals", icon: "💳", label: "Retraits", badge: "pending" },
-      { href: "/admin/beatstore", icon: "🎹", label: "Beat Store", badge: null },
+      { href: "/admin/revenue", icon: "revenue", label: "Revenus", badge: null },
+      { href: "/admin/withdrawals", icon: "withdrawals", label: "Retraits", badge: "pending" },
+      { href: "/admin/beatstore", icon: "beatstore", label: "Beat Store", badge: null },
     ],
   },
   {
-    title: "PROGRAMME",
+    title: "Programme",
     items: [
-      { href: "/admin/awards", icon: "🏆", label: "Awards", badge: null },
+      { href: "/admin/awards", icon: "awards", label: "Awards", badge: null },
     ],
   },
   {
-    title: "SYSTÈME",
+    title: "Gouvernance",
     items: [
-      { href: "/admin/settings", icon: "⚙️", label: "Config Règles", badge: null },
-      { href: "/admin/audit", icon: "📋", label: "Journal Audit", badge: null },
-      { href: "/admin/health", icon: "🩺", label: "Santé système", badge: null },
+      { href: "/admin/settings", icon: "settings", label: "Config Règles", badge: null },
+      { href: "/admin/audit", icon: "audit", label: "Journal Audit", badge: null },
+      { href: "/admin/health", icon: "health", label: "Santé système", badge: null },
     ],
   },
   {
-    title: "MVP EXISTANT",
+    title: "Temps réel",
     items: [
-      { href: "/admin/live-control", icon: "🎛️", label: "Live Control", badge: "live" },
-      { href: "/admin/fraud", icon: "🛡️", label: "Fraude", badge: "alert" },
-      { href: "/admin/flags", icon: "🚩", label: "Flags", badge: null },
+      { href: "/admin/live-control", icon: "live", label: "Live Control", badge: "live" },
+      { href: "/admin/fraud", icon: "fraud", label: "Fraude", badge: "alert" },
+      { href: "/admin/flags", icon: "flags", label: "Flags", badge: null },
     ],
   },
 ];
