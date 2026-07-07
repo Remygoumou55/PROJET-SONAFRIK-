@@ -6,7 +6,7 @@
   border-radius: 1.25rem;
   background:
     radial-gradient(ellipse 75% 55% at 100% 0%, rgb(255 193 7 / 0.04) 0%, transparent 55%),
-    radial-gradient(ellipse 65% 50% at 0% 100%, rgb(0 210 106 / 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 50% at 0% 100%, rgb(0 136 48 / 0.04) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
 }
@@ -76,14 +76,14 @@
 }
 
 .identity-story__mode-btn--primary {
-  background: rgb(0 210 106 / 0.12);
-  border-color: rgb(0 210 106 / 0.35);
+  background: rgb(0 136 48 / 0.12);
+  border-color: rgb(0 136 48 / 0.35);
   color: var(--color-vert-energie);
 }
 
 .identity-story__mode-btn--primary:hover {
-  background: rgb(0 210 106 / 0.18);
-  border-color: rgb(0 210 106 / 0.45);
+  background: rgb(0 136 48 / 0.18);
+  border-color: rgb(0 136 48 / 0.45);
 }
 
 .identity-story__mode-btn--ghost {
@@ -176,7 +176,7 @@
 }
 
 .identity-story-card--filled {
-  border-color: rgb(0 210 106 / 0.18);
+  border-color: rgb(0 136 48 / 0.18);
 }
 
 .identity-story-card--editing {
@@ -261,7 +261,7 @@
 
 .identity-story-card__textarea:focus {
   outline: none;
-  border-color: rgb(0 210 106 / 0.4);
+  border-color: rgb(0 136 48 / 0.4);
   background: rgb(255 255 255 / 0.05);
 }
 

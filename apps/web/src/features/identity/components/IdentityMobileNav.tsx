@@ -1,5 +1,7 @@
-import Link from "next/link";
+"use client";
+
 import { memo } from "react";
+import { MusicMobilePillNav, type MusicMobileNavItem } from "@/features/shared/navigation";
 import { IDENTITY_NAV_ENTRIES, isIdentityNavActive } from "../lib/identityNavConfig";
 
 interface IdentityMobileNavProps {
@@ -8,33 +10,24 @@ interface IdentityMobileNavProps {
 }
 
 function IdentityMobileNavView({ activePath, unreadNotifications = 0 }: IdentityMobileNavProps) {
+  const items: MusicMobileNavItem[] = IDENTITY_NAV_ENTRIES.map((item) => ({
+    href: item.href,
+    label: item.shortLabel,
+    icon: item.icon,
+    exact: item.exact,
+    badge:
+      item.href === "/settings/notifications" && unreadNotifications > 0
+        ? unreadNotifications
+        : undefined,
+  }));
+
   return (
-    <nav className="identity-mobile-nav" aria-label="Navigation profil et paramètres">
-      <div className="identity-mobile-nav__scroll">
-        {IDENTITY_NAV_ENTRIES.map((item) => {
-          const active = isIdentityNavActive(item.href, activePath, item.exact);
-          const badge =
-            item.href === "/settings/notifications" && unreadNotifications > 0
-              ? unreadNotifications
-              : undefined;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`identity-mobile-nav__pill${active ? " identity-mobile-nav__pill--active" : ""}`}
-              aria-current={active ? "page" : undefined}
-            >
-              <span className="identity-mobile-nav__label">{item.shortLabel}</span>
-              {badge ? (
-                <span className="identity-mobile-nav__badge" aria-label={`${badge} non lues`}>
-                  {badge > 99 ? "99+" : badge}
-                </span>
-              ) : null}
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+    <MusicMobilePillNav
+      items={items}
+      activePath={activePath}
+      ariaLabel="Navigation profil et paramètres"
+      isActive={isIdentityNavActive}
+    />
   );
 }
 

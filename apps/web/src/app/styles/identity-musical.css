@@ -5,7 +5,7 @@
   border: 1px solid var(--color-bordure);
   border-radius: 1.25rem;
   background:
-    radial-gradient(ellipse 70% 50% at 0% 0%, rgb(0 210 106 / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 0% 0%, rgb(0 136 48 / 0.05) 0%, transparent 55%),
     radial-gradient(ellipse 60% 45% at 100% 100%, rgb(255 193 7 / 0.04) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
@@ -176,12 +176,12 @@
 }
 
 .identity-musical-dimension--filled {
-  border-color: rgb(0 210 106 / 0.15);
+  border-color: rgb(0 136 48 / 0.15);
 }
 
 .identity-musical-dimension--filled:hover,
 .identity-musical-dimension--filled:focus-within {
-  border-color: rgb(0 210 106 / 0.28);
+  border-color: rgb(0 136 48 / 0.28);
 }
 
 .identity-musical-dimension__header {
@@ -237,8 +237,8 @@
 
 .identity-musical-pill--accent {
   color: var(--color-vert-energie);
-  border: 1px solid rgb(0 210 106 / 0.3);
-  background: rgb(0 210 106 / 0.1);
+  border: 1px solid rgb(0 136 48 / 0.3);
+  background: rgb(0 136 48 / 0.1);
 }
 
 .identity-musical-pill--guinea {

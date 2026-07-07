@@ -1,6 +1,12 @@
-import { SidebarNav } from "@/components/SidebarNav";
-import type { SidebarNavItem } from "@/components/SidebarNav";
-import { IDENTITY_NAV_ENTRIES } from "../lib/identityNavConfig";
+"use client";
+
+import {
+  MusicSidebar,
+  MusicNavBackLink,
+  MusicNavFromSections,
+  isListenerNavActive,
+} from "@/features/shared/navigation";
+import { IDENTITY_NAV_ENTRIES, isIdentityNavActive } from "../lib/identityNavConfig";
 
 interface IdentityNavProps {
   activePath: string;
@@ -8,20 +14,33 @@ interface IdentityNavProps {
 }
 
 export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNavProps) {
-  const items: SidebarNavItem[] = IDENTITY_NAV_ENTRIES.map((item) => ({
-    href: item.href,
-    label: item.label,
-    exact: item.exact,
-    badge: item.href === "/settings/notifications" ? unreadNotifications : undefined,
-  }));
+  const sections = [
+    {
+      title: "Profil & compte",
+      items: IDENTITY_NAV_ENTRIES.map((item) => ({
+        href: item.href,
+        label: item.label,
+        icon: item.icon,
+        exact: item.exact,
+        badge:
+          item.href === "/settings/notifications" && unreadNotifications > 0
+            ? unreadNotifications
+            : undefined,
+      })),
+    },
+  ];
 
   return (
-    <SidebarNav
-      title="Navigation"
-      items={items}
-      activePath={activePath}
-      backHref="/listen"
-      backLabel="Retour à l'écoute"
-    />
+    <MusicSidebar role="listener" ariaLabel="Navigation profil" className="music-sidebar--identity">
+      <MusicNavBackLink href="/listen" label="Retour à l'écoute" />
+      <MusicNavFromSections
+        sections={sections}
+        pathname={activePath}
+        ariaLabel="Menu profil et paramètres"
+        isActive={(href, path, exact) =>
+          href === "/listen" ? isListenerNavActive(href, path) : isIdentityNavActive(href, path, exact)
+        }
+      />
+    </MusicSidebar>
   );
 }

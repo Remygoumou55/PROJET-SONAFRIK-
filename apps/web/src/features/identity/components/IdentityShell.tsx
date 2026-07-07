@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { IdentityNav } from "./IdentityNav";
 import { IdentityMobileNav } from "./IdentityMobileNav";
+import { MusicHeader } from "@/features/shared/navigation";
 
 interface IdentityShellProps {
   activePath: string;
@@ -18,22 +19,29 @@ export function IdentityShell({
   children,
 }: IdentityShellProps) {
   return (
-    <div className="identity-shell">
-      <header className="identity-shell__header">
-        <p className="identity-shell__eyebrow">NOTRE BIEN COMMUN</p>
-        <h1 className="identity-shell__title">{title}</h1>
-        {description ? (
-          <p className="identity-shell__description">{description}</p>
-        ) : null}
-      </header>
+    <div className="enterprise-shell enterprise-shell--identity identity-shell">
+      <div className="enterprise-sidebar-card enterprise-sidebar-card--compact">
+        <IdentityNav activePath={activePath} unreadNotifications={unreadNotifications} />
+      </div>
 
-      <IdentityMobileNav activePath={activePath} unreadNotifications={unreadNotifications} />
+      <div className="enterprise-main-column flex-1 min-w-0">
+        <MusicHeader
+          className="identity-shell__header"
+          eyebrow="NOTRE BIEN COMMUN"
+          title={title}
+          subtitle={description}
+        />
 
-      <div className="identity-shell__layout">
-        <aside className="identity-shell__aside" aria-label="Navigation du profil">
-          <IdentityNav activePath={activePath} unreadNotifications={unreadNotifications} />
-        </aside>
-        <main className="identity-shell__main">{children}</main>
+        <IdentityMobileNav activePath={activePath} unreadNotifications={unreadNotifications} />
+
+        <div className="identity-shell__layout flex-1 min-h-0">
+          <aside className="identity-shell__aside" aria-label="Navigation du profil">
+            <IdentityNav activePath={activePath} unreadNotifications={unreadNotifications} />
+          </aside>
+          <main className="enterprise-content-card identity-shell__main">
+            <div className="enterprise-content-card__inner">{children}</div>
+          </main>
+        </div>
       </div>
     </div>
   );

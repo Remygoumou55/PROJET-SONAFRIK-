@@ -36,7 +36,7 @@
   border: 1px solid var(--color-bordure);
   border-radius: 1.25rem;
   background:
-    radial-gradient(ellipse 70% 50% at 100% 0%, rgb(0 210 106 / 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgb(0 136 48 / 0.04) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
 }
@@ -117,7 +117,7 @@
 
 .identity-activity-card:hover,
 .identity-activity-card:focus-within {
-  border-color: rgb(0 210 106 / 0.22);
+  border-color: rgb(0 136 48 / 0.22);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
 }

@@ -6,7 +6,7 @@
   border-radius: 1.25rem;
   background:
     radial-gradient(ellipse 75% 55% at 100% 0%, rgb(255 193 7 / 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 45% at 0% 100%, rgb(0 210 106 / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 45% at 0% 100%, rgb(0 136 48 / 0.05) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
 }
@@ -193,12 +193,12 @@
 }
 
 .identity-reward-card--unlocked {
-  border-color: rgb(0 210 106 / 0.22);
+  border-color: rgb(0 136 48 / 0.22);
 }
 
 .identity-reward-card--unlocked:hover,
 .identity-reward-card--unlocked:focus-within {
-  border-color: rgb(0 210 106 / 0.35);
+  border-color: rgb(0 136 48 / 0.35);
 }
 
 .identity-reward-card--in_progress {
@@ -227,15 +227,15 @@
   background: linear-gradient(
     155deg,
     rgb(255 193 7 / 0.12) 0%,
-    rgb(0 210 106 / 0.04) 100%
+    rgb(0 136 48 / 0.04) 100%
   );
 }
 
 .identity-reward-card--special.identity-reward-card--unlocked {
-  border-color: rgb(0 210 106 / 0.35);
+  border-color: rgb(0 136 48 / 0.35);
   background: linear-gradient(
     155deg,
-    rgb(0 210 106 / 0.1) 0%,
+    rgb(0 136 48 / 0.1) 0%,
     rgb(255 193 7 / 0.06) 100%
   );
 }
@@ -274,7 +274,7 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: radial-gradient(circle, rgb(0 210 106 / 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(0 136 48 / 0.2) 0%, transparent 70%);
   animation: identity-reward-shine 3s ease-in-out infinite;
 }
 

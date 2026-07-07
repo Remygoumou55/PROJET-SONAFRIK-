@@ -5,7 +5,7 @@
   border: 1px solid var(--color-bordure);
   border-radius: 1.25rem;
   background:
-    radial-gradient(ellipse 75% 55% at 100% 0%, rgb(0 210 106 / 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 75% 55% at 100% 0%, rgb(0 136 48 / 0.06) 0%, transparent 55%),
     radial-gradient(ellipse 65% 45% at 0% 100%, rgb(255 193 7 / 0.05) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
@@ -158,7 +158,7 @@
   border: 1px solid rgb(255 255 255 / 0.08);
   border-radius: 1rem;
   background:
-    linear-gradient(145deg, rgb(0 210 106 / 0.06) 0%, transparent 55%),
+    linear-gradient(145deg, rgb(0 136 48 / 0.06) 0%, transparent 55%),
     rgb(255 255 255 / 0.02);
   padding: 1.25rem;
   transition:
@@ -168,7 +168,7 @@
 
 .identity-goals-primary:hover,
 .identity-goals-primary:focus-within {
-  border-color: rgb(0 210 106 / 0.25);
+  border-color: rgb(0 136 48 / 0.25);
   transform: translateY(-1px);
 }
 
@@ -339,7 +339,7 @@
 }
 
 .identity-goals-secondary__card--in_progress {
-  border-color: rgb(0 210 106 / 0.2);
+  border-color: rgb(0 136 48 / 0.2);
 }
 
 .identity-goals-secondary__top {
