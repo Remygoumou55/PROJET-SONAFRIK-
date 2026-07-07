@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
 import { useCreatorAnalyticsSrtspLive } from "../hooks/useCreatorAnalyticsSrtspLive";
 import { useAnalyticsTimelineForPeriod } from "../hooks/useAnalyticsTimelineForPeriod";
@@ -9,7 +10,11 @@ import { AnalyticsSummaryKpis } from "./AnalyticsSummaryKpis";
 import { AnalyticsStreamChart } from "./AnalyticsStreamChart";
 import { AnalyticsTopTracks } from "./AnalyticsTopTracks";
 import { AnalyticsTopAlbums } from "./AnalyticsTopAlbums";
-import { AnalyticsDetailsPanel } from "./AnalyticsDetailsPanel";
+
+const AnalyticsDetailsPanel = dynamic(
+  () => import("./AnalyticsDetailsPanel").then((m) => m.AnalyticsDetailsPanel),
+  { ssr: false },
+);
 import {
   buildAnalyticsStory,
   computePeriodTrend,

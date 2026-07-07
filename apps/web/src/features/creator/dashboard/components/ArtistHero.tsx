@@ -6,7 +6,6 @@ import type {
   Creator,
   CreatorDashboardHero,
 } from "@sonafrik/types";
-import { DashboardProgressBar } from "@/features/shared/dashboard";
 import { ArtistCoverSlider } from "./ArtistCoverSlider";
 import { ArtistProfilePhoto } from "./ArtistProfilePhoto";
 import {
@@ -51,7 +50,6 @@ export const ArtistHero = memo(function ArtistHero({
   const visibleBadges = allBadges.filter((b) => b.id === "verified");
   const artistType = resolveArtistTypeLabel(creator);
   const memberSince = fmtMemberSince(profileCreatedAt);
-  const profileComplete = hero.profilePercent >= 100;
 
   return (
     <section className="ahero" aria-label="Vitrine artiste">
@@ -100,16 +98,6 @@ export const ArtistHero = memo(function ArtistHero({
                 </span>
               ) : null}
             </div>
-
-            {!profileComplete ? (
-              <div className="ahero__profile-progress">
-                <DashboardProgressBar
-                  value={hero.profilePercent}
-                  label="Profil artiste"
-                  tone="energy"
-                />
-              </div>
-            ) : null}
           </div>
         </div>
       </div>
