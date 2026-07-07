@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CreatorTopTrack } from "@sonafrik/types";
+import { DashboardPanel } from "@/features/shared/dashboard";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 
 interface Props {
@@ -16,7 +17,7 @@ function fmtNum(n: number): string {
 
 export function DashboardCatalogueCard({ topTrack, tracksPublished, creatorId }: Props) {
   return (
-    <section className="dash-catalogue-card" aria-label="Mon catalogue">
+    <DashboardPanel ariaLabel="Mon catalogue">
       <div className="dash-catalogue-card__header">
         <h2 className="dash-section-title" style={{ margin: 0 }}>Mon catalogue</h2>
         <Link href="/creator/catalog" className="dash-catalogue-card__link">
@@ -57,6 +58,6 @@ export function DashboardCatalogueCard({ topTrack, tracksPublished, creatorId }:
           </span>
         </div>
       )}
-    </section>
+    </DashboardPanel>
   );
 }

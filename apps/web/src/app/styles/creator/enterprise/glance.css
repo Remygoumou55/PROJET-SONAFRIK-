@@ -14,11 +14,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 1rem;
   min-height: 7.5rem;
-  border-radius: 1rem;
-  border: 1px solid var(--color-bordure);
-  background: var(--color-card);
 }
 
 .dash-glance__icon {
@@ -48,18 +44,6 @@
 
 .dash-glance__card--up .dash-glance__sub {
   color: var(--color-vert-energie);
-}
-
-.co-card {
-  background: var(--color-card);
-  border: 1px solid var(--color-bordure);
-  border-radius: 14px;
-  padding: 18px;
-}
-
-.co-card--wallet {
-  background: var(--color-card);
-  border-color: var(--color-bordure);
 }
 
 .co-card-label {

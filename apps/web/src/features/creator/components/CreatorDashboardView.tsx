@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import type { CreatorDashboardData } from "@sonafrik/types";
+import { DashboardPanel } from "@/features/shared/dashboard";
 import { GlanceKpiGrid } from "../dashboard/components/enterprise/GlanceKpiGrid";
 import { useCreatorDashboardSrtspLive } from "../dashboard/hooks/useCreatorDashboardSrtspLive";
 import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalogueCard";
@@ -22,7 +23,7 @@ const DashboardCoachCard = dynamic(
     })),
   {
     loading: () => (
-      <div className="dash-coach animate-pulse rounded-2xl bg-card" style={{ minHeight: "12rem" }} aria-hidden="true" />
+      <div className="dashboard-panel dashboard-panel--coach animate-pulse" style={{ minHeight: "12rem" }} aria-hidden="true" />
     ),
   },
 );
@@ -42,7 +43,7 @@ function fmtGnf(n: number): string {
 
 function WalletCard({ balanceGnf }: { balanceGnf: number }) {
   return (
-    <div className="co-card co-card--wallet">
+    <DashboardPanel className="dashboard-panel--wallet" ariaLabel="Solde disponible">
       <p className="co-card-label">💳 Solde disponible</p>
       <p className="co-wallet-value">{fmtGnf(balanceGnf)}</p>
       <p className="co-wallet-retirable">Retirable maintenant</p>
@@ -55,7 +56,7 @@ function WalletCard({ balanceGnf }: { balanceGnf: number }) {
           Tes gains apparaîtront ici après tes premières écoutes validées.
         </p>
       )}
-    </div>
+    </DashboardPanel>
   );
 }
 
@@ -80,29 +81,8 @@ export function CreatorDashboardView({
 
   const validTopTrack = topTrack && isValidContentName(topTrack.title) ? topTrack : null;
 
-  return (
-    <div className="creator-dashboard">
-      <WelcomeModal
-        stageName={context.artistProfile.stage_name}
-        profileCreatedAt={profileCreatedAt}
-      />
-
-      {hideHero ? null : (
-        <HeroCard
-          hero={hero}
-          artistProfile={context.artistProfile}
-          creator={context.creator}
-          profileCreatedAt={profileCreatedAt}
-          greeting={greeting}
-          stats={{
-            streams: data.streamStats.total_streams,
-            validStreams: data.streamStats.valid_streams,
-            tracksPublished: data.catalogCounts.tracksPublished,
-            estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
-          }}
-        />
-      )}
-
+  const stack = (
+    <div className="creator-dashboard__stack">
       <GlanceKpiGrid data={data} />
 
       <WalletCard balanceGnf={revenueStats.wallet_balance_gnf} />
@@ -115,10 +95,47 @@ export function CreatorDashboardView({
 
       <div className={careerOsEnabled ? "dash-bottom-2col" : ""}>
         {careerOsEnabled ? <DashboardCareerProgressCard careerOs={careerOs} /> : null}
-        <DashboardCoachCard tips={assistantTips} activities={activities} />
+        <DashboardCoachCard
+          tips={assistantTips}
+          activities={activities}
+          profilePercent={hero.profilePercent}
+          careerLevelLabel={careerOsEnabled ? careerOs.level.label : undefined}
+          careerLevelIcon={careerOsEnabled ? careerOs.level.icon : undefined}
+        />
       </div>
 
       <DashboardPremiumCard />
+    </div>
+  );
+
+  if (hideHero) {
+    return (
+      <>
+        <WelcomeModal
+          stageName={context.artistProfile.stage_name}
+          profileCreatedAt={profileCreatedAt}
+        />
+        {stack}
+      </>
+    );
+  }
+
+  return (
+    <div className="creator-dashboard">
+      <WelcomeModal
+        stageName={context.artistProfile.stage_name}
+        profileCreatedAt={profileCreatedAt}
+      />
+
+      <HeroCard
+        hero={hero}
+        artistProfile={context.artistProfile}
+        creator={context.creator}
+        profileCreatedAt={profileCreatedAt}
+        greeting={greeting}
+      />
+
+      {stack}
     </div>
   );
 }

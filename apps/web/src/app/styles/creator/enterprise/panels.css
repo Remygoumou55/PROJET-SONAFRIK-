@@ -24,13 +24,6 @@
 }
 
 /* ─── Catalogue card ─────────────────────────────────────────────────────────── */
-.dash-catalogue-card {
-  padding: 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--color-bordure);
-  background: var(--color-card);
-}
-
 .dash-catalogue-card__header {
   display: flex;
   align-items: center;
@@ -114,10 +107,6 @@
 
 /* ─── Career progress card ───────────────────────────────────────────────────── */
 .dash-career-progress {
-  padding: 1.25rem;
-  border-radius: 1rem;
-  border: 1px solid var(--color-bordure);
-  background: var(--color-card);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -189,13 +178,9 @@
 
 /* ─── Coach card ─────────────────────────────────────────────────────────────── */
 .dash-coach {
-  padding: 1.25rem;
-  border-radius: 1rem;
-  border: 1px solid var(--overlay-or-12);
-  background: var(--overlay-or-04);
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.875rem;
 }
 
 .dash-coach__tip {
@@ -274,21 +259,10 @@
 }
 
 /* ─── Premium footer card ─────────────────────────────────────────────────────── */
-.dash-premium {
-  border-radius: 1rem;
-  border: 1px solid var(--overlay-or-25);
-  background: linear-gradient(
-    135deg,
-    var(--overlay-or-08) 0%,
-    var(--overlay-blanc-02) 100%
-  );
-}
-
 .dash-premium__inner {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.125rem 1.25rem;
   flex-wrap: wrap;
 }
 

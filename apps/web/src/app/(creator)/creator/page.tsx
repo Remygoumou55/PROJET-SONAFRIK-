@@ -28,12 +28,6 @@ export default async function CreatorDashboardPage() {
           creator={data.context.creator}
           profileCreatedAt={data.profileCreatedAt}
           greeting={greeting}
-          stats={{
-            streams: data.streamStats.total_streams,
-            validStreams: data.streamStats.valid_streams,
-            tracksPublished: data.catalogCounts.tracksPublished,
-            estimatedMonthlyGnf: data.revenueStats.estimated_monthly_gnf ?? 0,
-          }}
         />
         <CreatorDashboard
           data={data}

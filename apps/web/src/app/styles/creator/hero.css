@@ -119,7 +119,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
   display: block;
 }
 
@@ -210,9 +210,11 @@
 
 .ahero__greeting {
   margin: 0;
-  font-size: 0.8125rem;
-  color: var(--overlay-blanc-75);
-  text-shadow: 0 1px 4px var(--overlay-noir-55);
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-texte-principal);
+  text-shadow: 0 2px 12px var(--overlay-noir-70);
 }
 
 /* Bottom: avatar + identity */

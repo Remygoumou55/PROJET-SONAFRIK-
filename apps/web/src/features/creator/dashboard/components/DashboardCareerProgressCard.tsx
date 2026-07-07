@@ -4,6 +4,7 @@ import {
   resolveCareerLevelNumber,
   resolveNextCareerLevel,
 } from "@sonafrik/api/creator/presentation";
+import { DashboardPanel } from "@/features/shared/dashboard";
 
 interface Props {
   careerOs: CreatorCareerOsState;
@@ -64,7 +65,7 @@ function DashboardCareerProgressCardView({ careerOs }: Props) {
       : null;
 
   return (
-    <section className="dash-career-progress" aria-label="Progression carrière">
+    <DashboardPanel ariaLabel="Progression carrière">
       <h2 className="dash-section-title">Progression carrière</h2>
       <div className="dash-career-progress__body">
         <div className="dash-career-circle">
@@ -100,7 +101,7 @@ function DashboardCareerProgressCardView({ careerOs }: Props) {
           </p>
         </div>
       </div>
-    </section>
+    </DashboardPanel>
   );
 }
 

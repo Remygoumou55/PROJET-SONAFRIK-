@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { DashboardPanel } from "@/features/shared/dashboard";
 
 export function DashboardPremiumCard() {
   return (
-    <aside className="dash-premium" aria-label="SONAFRIK Premium">
+    <DashboardPanel as="aside" className="dashboard-panel--premium" ariaLabel="SONAFRIK Premium">
       <div className="dash-premium__inner">
         <span className="dash-premium__icon" aria-hidden="true">👑</span>
         <div className="dash-premium__body">
@@ -15,6 +16,6 @@ export function DashboardPremiumCard() {
           Découvrir →
         </Link>
       </div>
-    </aside>
+    </DashboardPanel>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
+import { useSuccessToast } from "@/features/shared/feedback/useSuccessToast";
 import {
   AUTO_IMAGE_VARIANTS,
   type AutoImagePrepared,
@@ -30,7 +31,9 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
 }: ArtistCoverSliderProps) {
   const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
+  const showSuccessToast = useSuccessToast();
   const [localCoverPath, setLocalCoverPath] = useState(primaryCoverPath);
+
   const uploadCover = useCallback(async (prepared: AutoImagePrepared) => {
     try {
       const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
@@ -68,14 +71,14 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
     inputRef,
     uploading,
     error,
-    success,
     accept,
     openFilePicker,
     handleInputChange,
   } = useAutoImageUpload({
     variant: AUTO_IMAGE_VARIANTS.hero,
     onUpload: uploadCover,
-    successMessage: "Couverture mise à jour.",
+    onSuccess: () => showSuccessToast("Couverture enregistrée"),
+    successMessage: null,
   });
 
   return (
@@ -108,6 +111,7 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
       </div>
 
       <button
+        type="button"
         className="ahero__btn ahero__btn--cover"
         onClick={openFilePicker}
         disabled={uploading || resolving}
@@ -117,12 +121,9 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
         {localCoverPath ? "Changer la couverture" : "Ajouter une couverture"}
       </button>
 
-      {error && (
+      {error ? (
         <p className="ahero__cover-error" role="alert">{error}</p>
-      )}
-      {success && !error && (
-        <p className="ahero__cover-success" role="status">{success}</p>
-      )}
+      ) : null}
 
       <input
         ref={inputRef}

@@ -1,18 +1,18 @@
 import { memo } from "react";
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { buildGlanceKpis } from "@sonafrik/api/creator/presentation";
+import { DashboardSection } from "@/features/shared/dashboard";
 
 function GlanceKpiGridView({ data }: { data: CreatorDashboardData }) {
   const items = buildGlanceKpis(data);
 
   return (
-    <section className="dash-glance" aria-label="En un coup d'œil">
-      <h2 className="dash-section-title">En un coup d&apos;œil</h2>
+    <DashboardSection title="En un coup d'œil" ariaLabel="En un coup d'œil">
       <div className="dash-glance__grid">
         {items.map((item) => (
           <article
             key={item.id}
-            className={`dash-glance__card dash-glance__card--${item.trend}`}
+            className={`dash-glance__card dash-glance__card--${item.trend} enterprise-card`}
             aria-label={`${item.label} : ${item.value}`}
           >
             <span className="dash-glance__icon" aria-hidden="true">
@@ -24,7 +24,7 @@ function GlanceKpiGridView({ data }: { data: CreatorDashboardData }) {
           </article>
         ))}
       </div>
-    </section>
+    </DashboardSection>
   );
 }
 

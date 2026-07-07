@@ -1,52 +1,81 @@
 import Link from "next/link";
 import type { CreatorDashboardActivity, CreatorDashboardAssistantTip } from "@sonafrik/types";
-import { OVERLAY } from "@/lib/design/overlayTokens";
+import { DashboardPanel, DashboardProgressBar } from "@/features/shared/dashboard";
 
 interface Props {
   tips: CreatorDashboardAssistantTip[];
   activities: CreatorDashboardActivity[];
+  profilePercent: number;
+  careerLevelLabel?: string;
+  careerLevelIcon?: string;
 }
 
-export function DashboardCoachCard({ tips, activities }: Props) {
-  const tip = tips[0] ?? null;
+export function DashboardCoachCard({
+  tips,
+  activities,
+  profilePercent,
+  careerLevelLabel,
+  careerLevelIcon,
+}: Props) {
+  const mission = tips[0] ?? null;
   const visibleActivities = activities.slice(0, 3);
 
   return (
-    <section className="dash-coach" aria-label="Coach SONAFRIK">
-      <h2 className="dash-section-title">Coach SONAFRIK</h2>
-      {tip && (
-        <div className="dash-coach__tip">
-          <span className="dash-coach__tip-icon" aria-hidden="true">{tip.icon}</span>
-          <div className="dash-coach__tip-body">
-            <p className="dash-coach__tip-label">Aujourd&apos;hui</p>
-            <p className="dash-coach__tip-text">{tip.message}</p>
-          </div>
-        </div>
-      )}
+    <DashboardPanel className="dashboard-panel--coach" ariaLabel="Coach SONAFRIK">
+      <div className="dash-coach__head">
+        <h2 className="dash-section-title" style={{ margin: 0 }}>Coach SONAFRIK</h2>
+        {careerLevelLabel ? (
+          <span className="dash-coach__level-pill">
+            {careerLevelIcon ? <span aria-hidden="true">{careerLevelIcon}</span> : null}
+            {careerLevelLabel}
+          </span>
+        ) : null}
+      </div>
 
-      {visibleActivities.length > 0 && (
-        <ul className="dash-coach__activities" aria-label="Activité récente">
+      {profilePercent < 100 ? (
+        <DashboardProgressBar
+          value={profilePercent}
+          label="Profil artiste"
+          tone="gold"
+        />
+      ) : null}
+
+      {mission ? (
+        <div className="dash-coach__mission">
+          <div className="dash-coach__mission-head">
+            <p className="dash-coach__mission-title">
+              <span aria-hidden="true">{mission.icon} </span>
+              {mission.title}
+            </p>
+            <span className="dash-coach__mission-time">{mission.time}</span>
+          </div>
+          {mission.actionHref && mission.actionLabel ? (
+            <Link href={mission.actionHref} className="dash-coach__mission-cta">
+              {mission.actionLabel} →
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
+      {visibleActivities.length > 0 ? (
+        <ul className="dash-coach__steps" aria-label="Activité récente">
           {visibleActivities.map((item) => (
             <li
               key={item.id}
-              className={`dash-coach__activity${item.isFuture ? " dash-coach__activity--future" : ""}`}
+              className={`dash-coach__step${item.isFuture ? " dash-coach__step--future" : ""}`}
             >
-              <span
-                className="dash-coach__dot"
-                style={{ color: item.isFuture ? OVERLAY.blanc30 : item.color }}
-                aria-hidden="true"
-              >
+              <span className="dash-coach__step-dot" aria-hidden="true">
                 {item.isFuture ? "○" : "✔"}
               </span>
-              <p className="dash-coach__activity-title">{item.title}</p>
+              <p className="dash-coach__step-label">{item.title}</p>
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
 
-      <Link href="/creator/analytics" className="dash-coach__see-all">
+      <Link href="/creator/analytics" className="dash-coach__footer-link">
         Voir tout →
       </Link>
-    </section>
+    </DashboardPanel>
   );
 }

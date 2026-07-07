@@ -10,6 +10,7 @@ import {
 } from "../../hooks/useEffectiveCreatorId";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
+import { useSuccessToast } from "@/features/shared/feedback/useSuccessToast";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import {
   AUTO_IMAGE_VARIANTS,
@@ -30,6 +31,7 @@ export function ArtistProfilePhoto({
 }: ArtistProfilePhotoProps) {
   const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
+  const showSuccessToast = useSuccessToast();
 
   const [localPhotoPath, setLocalPhotoPath] = useState(photoPath);
   const [removeError, setRemoveError] = useState<string | null>(null);
@@ -76,14 +78,14 @@ export function ArtistProfilePhoto({
     inputRef,
     uploading,
     error: uploadError,
-    success,
     accept,
     openFilePicker,
     handleInputChange,
   } = useAutoImageUpload({
     variant: AUTO_IMAGE_VARIANTS.avatar,
     onUpload: uploadAvatar,
-    successMessage: "Avatar mis à jour.",
+    onSuccess: () => showSuccessToast("Avatar enregistré"),
+    successMessage: null,
   });
 
   const handleRemove = useCallback(async () => {
@@ -95,12 +97,13 @@ export function ArtistProfilePhoto({
       invalidateCreatorAssetUrl(creatorId);
       setLocalPhotoPath(null);
       publishArtistProfileUpdate(creatorId);
+      showSuccessToast("Avatar supprimé");
     } catch (err) {
       setRemoveError(resolveCreatorUploadError(err, "Impossible de supprimer la photo."));
     } finally {
       setRemoving(false);
     }
-  }, [creatorIdProp, creatorService]);
+  }, [creatorIdProp, creatorService, showSuccessToast]);
 
   const error = removeError ?? uploadError;
   const busy = uploading || removing;
@@ -146,6 +149,7 @@ export function ArtistProfilePhoto({
       <div className="ahero__avatar-actions">
         {localPhotoPath && (
           <button
+            type="button"
             className="ahero__btn ahero__btn--danger"
             onClick={() => void handleRemove()}
             disabled={busy}
@@ -156,12 +160,9 @@ export function ArtistProfilePhoto({
         )}
       </div>
 
-      {error && (
+      {error ? (
         <p className="ahero__photo-error" role="alert">{error}</p>
-      )}
-      {success && !error && (
-        <p className="ahero__photo-success" role="status">{success}</p>
-      )}
+      ) : null}
 
       <input
         ref={inputRef}
