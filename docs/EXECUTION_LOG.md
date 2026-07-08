@@ -11,6 +11,78 @@
 
 ---
 
+## 2026-07-08 — Hero Carousel artistes tendance (/listen homepage)
+
+### Fichiers touchés
+- `supabase/migrations/20260708100000_get_trending_artists_mixed.sql` — nouveau RPC SQL (T2)
+- `packages/types/src/streaming.ts` — type `TrendingArtist` ajouté (T3)
+- `packages/api/src/listener/listener.track.repository.ts` — `getTrendingArtistsMixed()` (T3)
+- `packages/api/src/listener/listener.repository.ts` — délégation (T3)
+- `packages/api/src/listener/listener.service.ts` — `getTrendingArtistsMixed()` (T3)
+- `apps/web/src/features/listener/components/HeroCarousel.tsx` — réécriture complète (T4)
+- `apps/web/src/app/styles/listen-home/hero-carousel.css` — CSS multi-slides + peek (T4)
+- `apps/web/src/features/listener/components/HomepageHero.tsx` — `next/dynamic` (T5)
+- `apps/web/src/features/shared/dashboard/DashboardCoachWalletActivity.tsx` — fix import inutilisé
+
+### Code avant
+```before
+HeroCarousel: table hero_slides (admin-curated), bouton close, sessionStorage
+HomepageHero: import statique HeroCarousel
+hero-carousel.css: .hcarousel__track { position: absolute; inset: 0 } — single slide
+```
+
+### Code après
+```after
+HeroCarousel: get_trending_artists_mixed() — artistes auto-calculés, no close, no sessionStorage
+HomepageHero: next/dynamic({ ssr: false }) — lazy load
+hero-carousel.css: flex track + .hcarousel__slide — multi-slides avec peek 40px
+```
+
+### SQL exécuté
+- `supabase db query --linked --file supabase/migrations/20260708100000_get_trending_artists_mixed.sql` ✅
+- Validé en DB: `get_trending_artists_mixed` (proargtypes: 23, prosecdef: true) ✅
+
+### Tests à faire
+- [ ] Page /listen : HeroCarousel affiche les artistes tendance
+- [ ] Peek : slide suivante visible à droite (~40px)
+- [ ] Auto-rotate : avance toutes les 6s sans interaction
+- [ ] Pause : hover/focus stoppe la rotation
+- [ ] Dots : clic sur dot va à la slide correspondante
+- [ ] Keyboard : flèches gauche/droite naviguent
+- [ ] Swipe : glisser sur mobile change la slide
+- [ ] Si 0 artiste tendance : carousel caché (return null)
+- [ ] prefers-reduced-motion : pas d'auto-rotation, pas de transition CSS
+
+## 2026-07-07 — Dashboard Design Language Program (Artiste)
+
+### Fichiers touchés
+- `packages/api/src/creator/creatorDashboard.kpiBand.presentation.ts` — `buildDashboardKpiBand` (4 KPI)
+- `apps/web/src/features/shared/dashboard/` — `DashboardKpiBand`, `DashboardCoachWalletActivity`, `dashboardFormat`
+- `apps/web/src/features/creator/components/CreatorDashboardView.tsx` — nouvelle hiérarchie sections
+- `apps/web/src/features/creator/dashboard/components/ArtistHero.tsx` — profil % retiré (dédup Coach)
+- `apps/web/src/app/styles/creator/dashboard.css` — bandeau KPI, wallet, activité, micro-interactions
+
+### Code avant
+```before
+GlanceKpiGrid → Wallet inline → Catalogue → Coach+Career → Premium
+Hero avec barre profil % + KPIs ailleurs
+```
+
+### Code après
+```after
+KpiBand → Coach → Wallet → Catalogue → Activité → Premium
+Hero = identité uniquement (chips + badges)
+```
+
+### Dette technique créée
+- `GlanceKpiGrid` conservé mais non utilisé sur `/creator` (réutilisable analytics)
+
+### Tests à faire
+- [ ] Test manuel responsive `/creator` avec session artiste
+- [ ] Vérifier wallet CTA selon solde et `paymentConfigured`
+
+---
+
 ## 2026-07-07 — Optimisation performance + audit complet
 
 ### Fichiers touchés
