@@ -8,6 +8,7 @@ import type {
   TrackCredit,
   TrackListenCounts,
   TrackWithMeta,
+  TrendingArtist,
   TrendingTrack,
 } from "@sonafrik/types";
 import type {
@@ -428,5 +429,24 @@ export class ListenerTrackRepository {
         typeof (line as LyricLine).text === "string",
     );
     return { lines };
+  }
+
+  async getTrendingArtistsMixed(limit = 20): Promise<TrendingArtist[]> {
+    const { data, error } = await this.client.rpc("get_trending_artists_mixed", {
+      p_limit: limit,
+    });
+    if (error) throw error;
+    const rows = (data as unknown[]) ?? [];
+    return rows.map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        creator_id: String(row.creator_id ?? ""),
+        stage_name: String(row.stage_name ?? ""),
+        slug: String(row.slug ?? ""),
+        cover_path: row.cover_path != null ? String(row.cover_path) : null,
+        verified: Boolean(row.verified ?? false),
+        listen_count: Number(row.listen_count ?? 0),
+      };
+    });
   }
 }

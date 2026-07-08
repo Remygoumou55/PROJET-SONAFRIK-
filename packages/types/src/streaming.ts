@@ -329,6 +329,16 @@ export interface TrendingTrack {
   trending_score: number;
 }
 
+/** Artiste tendance — RPC get_trending_artists_mixed (fusion today/7d/30d, déduplication). */
+export interface TrendingArtist {
+  creator_id: string;
+  stage_name: string;
+  slug: string;
+  cover_path: string | null;
+  verified: boolean;
+  listen_count: number;
+}
+
 /** Compteur d'écoutes valides (Real Listen) pour un morceau — RPC get_track_listen_counts. */
 export interface TrackListenCounts {
   track_id: string;

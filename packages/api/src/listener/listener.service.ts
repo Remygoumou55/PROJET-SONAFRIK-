@@ -143,6 +143,10 @@ export class ListenerService {
     return this.repository.getTrackLyrics(trackId, language);
   }
 
+  getTrendingArtistsMixed(limit?: number) {
+    return this.repository.getTrendingArtistsMixed(limit);
+  }
+
   isFeatureEnabled(name: string): Promise<boolean> {
     return this.featureFlags.isFeatureEnabled(name);
   }

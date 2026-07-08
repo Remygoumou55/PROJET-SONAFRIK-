@@ -96,4 +96,7 @@ export class ListenerRepository {
 
   filterTrendingByCategory = (...args: Parameters<ListenerArtistRepository["filterTrendingByCategory"]>) =>
     this.artist.filterTrendingByCategory(...args);
+
+  getTrendingArtistsMixed = (...args: Parameters<ListenerTrackRepository["getTrendingArtistsMixed"]>) =>
+    this.track.getTrendingArtistsMixed(...args);
 }

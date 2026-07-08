@@ -3,11 +3,10 @@ import type {
   CreatorDashboardActivity,
   CreatorDashboardAssistantTip,
   CreatorDashboardGoal,
-  CreatorRevenueStats,
 } from "@sonafrik/types";
 import { DashboardPanel } from "./DashboardPanel";
 import { DashboardProgressBar } from "./DashboardProgressBar";
-import { formatActivityDate, formatDashboardGnf } from "./dashboardFormat";
+import { formatActivityDate } from "./dashboardFormat";
 
 const TIP_GOAL_MAP: Record<string, CreatorDashboardGoal["id"]> = {
   profile: "complete_profile",
@@ -130,109 +129,6 @@ export function DashboardCoachCard({
           <span className="dash-coach__reward-badge">{state.reward}</span>
         </div>
       </div>
-    </DashboardPanel>
-  );
-}
-
-interface DashboardWalletCardProps {
-  revenueStats: CreatorRevenueStats;
-  paymentConfigured: boolean;
-  activities: CreatorDashboardActivity[];
-}
-
-function resolveLastTransaction(
-  activities: CreatorDashboardActivity[],
-): CreatorDashboardActivity | null {
-  const financial = activities.find(
-    (a) => a.id === "royalties" || a.icon === "💰" || a.title.toLowerCase().includes("revenu"),
-  );
-  if (financial && !financial.isFuture) return financial;
-  const past = activities.find((a) => !a.isFuture && a.id !== "account_created");
-  return past ?? null;
-}
-
-/** Carte portefeuille — solde, revenus, retrait et état paiement. */
-export function DashboardWalletCard({
-  revenueStats,
-  paymentConfigured,
-  activities,
-}: DashboardWalletCardProps) {
-  const lastTx = resolveLastTransaction(activities);
-  const retirable = revenueStats.wallet_balance_gnf;
-  const payoutPending = revenueStats.pending_royalties_gnf;
-
-  return (
-    <DashboardPanel className="dashboard-panel--wallet" ariaLabel="Portefeuille">
-      <div className="dash-wallet__head">
-        <h2 className="dash-section-title" style={{ margin: 0 }}>
-          Portefeuille
-        </h2>
-        <Link href="/wallet" className="dash-wallet__link">
-          Gérer →
-        </Link>
-      </div>
-
-      <div className="dash-wallet__balance-block">
-        <span className="dash-wallet__balance-icon" aria-hidden="true">
-          💰
-        </span>
-        <p className="dash-wallet__balance-label">Solde</p>
-        <p className="dash-wallet__balance-value">{formatDashboardGnf(revenueStats.wallet_balance_gnf)}</p>
-      </div>
-
-      <div className="dash-wallet__grid">
-        <div className="dash-wallet__cell">
-          <p className="dash-wallet__cell-label">Revenus du mois</p>
-          <p className="dash-wallet__cell-value">
-            {formatDashboardGnf(revenueStats.estimated_monthly_gnf)}
-          </p>
-        </div>
-        <div className="dash-wallet__cell">
-          <p className="dash-wallet__cell-label">Montant retirable</p>
-          <p className="dash-wallet__cell-value dash-wallet__cell-value--accent">
-            {formatDashboardGnf(retirable)}
-          </p>
-        </div>
-        <div className="dash-wallet__cell dash-wallet__cell--wide">
-          <p className="dash-wallet__cell-label">Dernière transaction</p>
-          {lastTx ? (
-            <p className="dash-wallet__cell-value dash-wallet__cell-value--sm">
-              <span aria-hidden="true">{lastTx.icon} </span>
-              {lastTx.subtitle || lastTx.title}
-              <span className="dash-wallet__cell-meta">
-                {" "}
-                · {formatActivityDate(lastTx.occurredAt)}
-              </span>
-            </p>
-          ) : (
-            <p className="dash-wallet__cell-muted">Aucune transaction pour le moment</p>
-          )}
-        </div>
-        <div className="dash-wallet__cell">
-          <p className="dash-wallet__cell-label">Prochain versement</p>
-          <p className="dash-wallet__cell-value dash-wallet__cell-value--sm">
-            {payoutPending > 0 ? formatDashboardGnf(payoutPending) : "Cycle mensuel"}
-          </p>
-        </div>
-        <div className="dash-wallet__cell">
-          <p className="dash-wallet__cell-label">État du paiement</p>
-          <span
-            className={`dash-wallet__status dash-wallet__status--${paymentConfigured ? "ok" : "pending"}`}
-          >
-            {paymentConfigured ? "✓ Configuré" : "À configurer"}
-          </span>
-        </div>
-      </div>
-
-      {retirable > 0 ? (
-        <Link href="/wallet/payout" className="dash-wallet__cta">
-          Retirer mes gains
-        </Link>
-      ) : !paymentConfigured ? (
-        <Link href="/wallet/payout" className="dash-wallet__cta dash-wallet__cta--outline">
-          Configurer mes paiements
-        </Link>
-      ) : null}
     </DashboardPanel>
   );
 }
