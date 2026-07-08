@@ -1,21 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { CoverImage } from "@/components/CoverImage";
+import { createListenerService } from "@sonafrik/api/listener";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { TrendingArtist } from "@sonafrik/types";
 
-interface HeroSlide {
-  id: string;
-  title: string;
-  subtitle: string | null;
-  cover_url: string | null;
-  track_id: string | null;
-  display_order: number;
-}
-
-const SESSION_KEY = "hero_carousel_closed";
 const ROTATION_MS = 6000;
+const PEEK_PX = 40;
+const GAP_PX = 10;
 
-function usePrefersReducedMotion() {
+function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -28,61 +24,68 @@ function usePrefersReducedMotion() {
 }
 
 export function HeroCarousel() {
-  const [slides, setSlides] = useState<HeroSlide[]>([]);
-  const [active, setActive] = useState(0);
-  const [closed, setClosed] = useState(false);
+  const [artists, setArtists] = useState<TrendingArtist[]>([]);
+  const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [containerPx, setContainerPx] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartX = useRef<number | null>(null);
   const reducedMotion = usePrefersReducedMotion();
 
+  // Fetch trending artists once on mount
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "1") {
-      setClosed(true);
-      return;
-    }
-
-    // hero_slides not yet in generated DB types — cast after migration
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = getSupabaseBrowserClient() as any;
-    void (db
-      .from("hero_slides")
-      .select("id,title,subtitle,cover_url,track_id,display_order")
-      .eq("is_active", true)
-      .or("starts_at.is.null,starts_at.lte." + new Date().toISOString())
-      .or("ends_at.is.null,ends_at.gte." + new Date().toISOString())
-      .order("display_order", { ascending: true })
-      .limit(10)
-      .then((res: { data: HeroSlide[] | null }) => {
-        if (res.data && res.data.length > 0) setSlides(res.data);
-        setLoading(false);
-      }) as Promise<void>);
+    const service = createListenerService(getSupabaseBrowserClient());
+    service.getTrendingArtistsMixed(15).then(setArtists).catch(() => {});
   }, []);
 
-  const goTo = useCallback(
-    (idx: number) => {
-      if (slides.length === 0) return;
-      setActive(((idx % slides.length) + slides.length) % slides.length);
-    },
-    [slides.length],
-  );
-
-  const next = useCallback(() => goTo(active + 1), [active, goTo]);
-  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
-
+  // Measure container width for pixel-accurate peek
   useEffect(() => {
-    if (slides.length <= 1 || paused || reducedMotion) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setContainerPx(el.clientWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const goTo = useCallback((i: number) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setIndex((prev) => {
+      const n = artists.length;
+      if (n === 0) return prev;
+      return ((i % n) + n) % n;
+    });
+  }, [artists.length]);
+
+  const next = useCallback(() => {
+    setIndex((prev) => {
+      const n = artists.length;
+      return n > 0 ? (prev + 1) % n : 0;
+    });
+  }, [artists.length]);
+
+  const prev = useCallback(() => {
+    setIndex((prev) => {
+      const n = artists.length;
+      return n > 0 ? (prev - 1 + n) % n : 0;
+    });
+  }, [artists.length]);
+
+  // Auto-rotate: restarts on index change so timer always starts fresh
+  useEffect(() => {
+    if (artists.length <= 1 || paused || reducedMotion) return;
     timerRef.current = setTimeout(next, ROTATION_MS);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [active, slides.length, paused, reducedMotion, next]);
+  }, [index, artists.length, paused, reducedMotion, next]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowLeft") prev();
     },
     [next, prev],
   );
@@ -101,21 +104,20 @@ export function HeroCarousel() {
     touchStartX.current = null;
   };
 
-  const handleClose = () => {
-    sessionStorage.setItem(SESSION_KEY, "1");
-    setClosed(true);
-  };
+  if (artists.length === 0) return null;
 
-  if (loading || closed || slides.length === 0) return null;
-
-  const slide = slides[active]!;
+  const current = artists[index]!;
+  // Slide width: container minus peek allowance
+  const slidePx = containerPx > 0 ? containerPx - PEEK_PX : 0;
+  const translatePx = slidePx > 0 ? index * (slidePx + GAP_PX) : 0;
 
   return (
     <div
+      ref={containerRef}
       className="hcarousel"
       role="region"
       aria-roledescription="carousel"
-      aria-label="Bannières SONAFRIK"
+      aria-label="Artistes tendance"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -125,57 +127,68 @@ export function HeroCarousel() {
       onTouchEnd={handleTouchEnd}
       tabIndex={0}
     >
-      <div
-        className="hcarousel__track"
-        aria-live="polite"
-        aria-atomic="true"
-        aria-label={`Diapositive ${active + 1} sur ${slides.length} : ${slide.title}`}
-      >
-        {slide.cover_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={slide.cover_url}
-            alt=""
-            className="hcarousel__bg"
-            aria-hidden="true"
-          />
-        ) : (
-          <div className="hcarousel__bg hcarousel__bg--gradient" aria-hidden="true" />
-        )}
-        <div className="hcarousel__overlay" aria-hidden="true" />
-
-        <div className="hcarousel__content">
-          <span className="hcarousel__badge" aria-hidden="true">SONAFRIK</span>
-          <h2 className="hcarousel__title">{slide.title}</h2>
-          {slide.subtitle && (
-            <p className="hcarousel__subtitle">{slide.subtitle}</p>
-          )}
-        </div>
+      {/* Live region announces slide changes to screen readers */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {`Artiste ${index + 1} sur ${artists.length} : ${current.stage_name}`}
       </div>
 
-      {slides.length > 1 && (
+      <div
+        className="hcarousel__track"
+        style={{ transform: translatePx > 0 ? `translateX(-${translatePx}px)` : undefined }}
+      >
+        {artists.map((artist, i) => (
+          <Link
+            key={artist.creator_id}
+            href={`/listen/artist/${artist.creator_id}`}
+            className="hcarousel__slide"
+            style={{ width: slidePx > 0 ? `${slidePx}px` : "100%" }}
+            aria-hidden={i !== index ? true : undefined}
+            tabIndex={i !== index ? -1 : 0}
+            aria-label={`Voir le profil de ${artist.stage_name}`}
+          >
+            <div className="hcarousel__bg" aria-hidden="true">
+              <CoverImage
+                coverPath={artist.cover_path}
+                alt=""
+                artistName={artist.stage_name}
+                gradientSeed={i}
+                imgSizes="(max-width: 768px) 95vw, 70vw"
+                priority={i === 0}
+              />
+            </div>
+
+            <div className="hcarousel__overlay" aria-hidden="true" />
+
+            <div className="hcarousel__content">
+              {artist.verified && (
+                <span className="hcarousel__badge">VÉRIFIÉ</span>
+              )}
+              <h2 className="hcarousel__title">{artist.stage_name}</h2>
+              {artist.listen_count > 0 && (
+                <p className="hcarousel__subtitle">
+                  {artist.listen_count.toLocaleString("fr-FR")} écoutes
+                </p>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {artists.length > 1 && (
         <div className="hcarousel__dots" role="tablist" aria-label="Diapositives">
-          {slides.map((s, i) => (
+          {artists.map((artist, i) => (
             <button
-              key={s.id}
+              key={artist.creator_id}
               role="tab"
-              aria-selected={i === active}
-              aria-label={`Diapositive ${i + 1}`}
-              className={`hcarousel__dot${i === active ? " hcarousel__dot--active" : ""}`}
+              aria-selected={i === index}
+              aria-label={artist.stage_name}
+              className={`hcarousel__dot${i === index ? " hcarousel__dot--active" : ""}`}
               onClick={() => goTo(i)}
+              type="button"
             />
           ))}
         </div>
       )}
-
-      <button
-        className="hcarousel__close"
-        onClick={handleClose}
-        aria-label="Fermer le carousel"
-        type="button"
-      >
-        ✕
-      </button>
     </div>
   );
 }
