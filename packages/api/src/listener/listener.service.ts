@@ -151,6 +151,11 @@ export class ListenerService {
     return this.repository.getHeroFeaturedAlbums(days, limit);
   }
 
+  /** Moteur de recommandations MVP — 4 signaux, remplaçable par IA sans toucher les composants UI. */
+  getRecommendedTracks(limit?: number) {
+    return this.repository.getRecommendedTracks(limit);
+  }
+
   /** Mélange artistes tendance + albums récents pour le Hero Discovery Engine. */
   async getHeroDiscoveryFeed(totalLimit = 20): Promise<HeroItem[]> {
     const artistLimit = Math.max(totalLimit - 4, 8);

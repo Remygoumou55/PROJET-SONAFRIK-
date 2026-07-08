@@ -7,6 +7,7 @@ import type {
   HeroItemArtist,
   LyricLine,
   RecentlyPlayedTrack,
+  RecommendedTrack,
   TrackCredit,
   TrackListenCounts,
   TrackWithMeta,
@@ -479,6 +480,31 @@ export class ListenerTrackRepository {
         genre_primary: row.genre_primary != null ? String(row.genre_primary) : null,
         verified: Boolean(row.verified ?? false),
         bio_short: row.bio_short != null ? String(row.bio_short) : null,
+      };
+    });
+  }
+
+  async getRecommendedTracks(limit = 20): Promise<RecommendedTrack[]> {
+    // get_recommended_tracks_mvp n'est pas encore dans les types générés Supabase
+    const { data, error } = await this.client.rpc("get_recommended_tracks_mvp" as never, {
+      p_limit: limit,
+    } as never);
+    if (error) throw error;
+    const rows = (data as unknown[]) ?? [];
+    return rows.map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        track_id: String(row.track_id ?? ""),
+        title: String(row.title ?? ""),
+        slug: String(row.slug ?? ""),
+        duration_seconds: row.duration_seconds != null ? Number(row.duration_seconds) : null,
+        artist_name: row.artist_name != null ? String(row.artist_name) : null,
+        creator_id: String(row.creator_id ?? ""),
+        album_id: row.album_id != null ? String(row.album_id) : null,
+        album_title: row.album_title != null ? String(row.album_title) : null,
+        cover_path: row.cover_path != null ? String(row.cover_path) : null,
+        recommendation_score: Number(row.recommendation_score ?? 0),
+        reason: (row.reason as RecommendedTrack["reason"]) ?? "trending",
       };
     });
   }

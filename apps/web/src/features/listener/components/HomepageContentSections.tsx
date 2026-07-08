@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import type { DiscoveryArtist, DiscoveryTrack, TrendingTrack } from "@sonafrik/types";
+import type { DiscoveryArtist, DiscoveryTrack, HeroItemAlbum, TrendingTrack } from "@sonafrik/types";
 import { CARD_GRADIENTS } from "@/lib/constants";
-import { getInitials } from "@/lib/utils";
-import { HomepageTrendingSection } from "./HomepageTrendingRow";
 import { MediaCard } from "./HomepageMediaCard";
 import { ListenDiscoverModeSlot } from "./ListenDiscoverModeSlot";
 
@@ -41,11 +39,8 @@ function SectionRowSkeleton() {
   );
 }
 
-function formatPlaylistTrackCount(count: number): string {
-  return count <= 1 ? `${count} titre` : `${count} titres`;
-}
-
-import { ARTIST_RING_COLORS, ERROR_BANNER_STYLE, GENRE_CHIP_COLORS, HOMEPAGE_SECTION_STYLES } from "@/lib/design/overlayTokens";
+import { ERROR_BANNER_STYLE, GENRE_CHIP_COLORS, HOMEPAGE_SECTION_STYLES } from "@/lib/design/overlayTokens";
+import { CoverImage } from "@/components/CoverImage";
 
 export interface HomepageData {
   playlists: Array<{ id: string; title: string; track_count: number }>;
@@ -57,6 +52,7 @@ export interface HomepageData {
   trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
   suggestedArtists: DiscoveryArtist[];
+  featuredAlbums: HeroItemAlbum[];
   hadError: boolean;
 }
 
@@ -100,43 +96,83 @@ function ContentSkeleton() {
 
 export { ContentSkeleton };
 
+function formatPlaylistTrackCount(count: number): string {
+  return count <= 1 ? `${count} titre` : `${count} titres`;
+}
+
+function FeaturedAlbumCard({ album, index }: { album: HeroItemAlbum; index: number }) {
+  const albumHref = `/listen/album/${album.album_id}`;
+  const releaseTypeLabel =
+    album.release_type === "ep" ? "EP" :
+    album.release_type === "single" ? "Single" :
+    "Album";
+
+  return (
+    <Link
+      href={albumHref}
+      className="album-card flex-shrink-0 flex flex-col gap-2 w-[7.5rem] group"
+      aria-label={`${album.album_title} par ${album.stage_name}`}
+    >
+      <div className="w-[7.5rem] h-[7.5rem] rounded-xl overflow-hidden relative">
+        <CoverImage
+          coverPath={album.cover_path}
+          alt=""
+          artistName={album.stage_name}
+          gradientSeed={index + 300}
+          imgSizes="120px"
+        />
+        <span className="absolute top-1.5 left-1.5 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+          style={{ background: "rgb(0 0 0 / 0.6)", color: "var(--color-vert-energie)", border: "1px solid rgb(246 192 9 / 0.3)" }}>
+          {releaseTypeLabel}
+        </span>
+      </div>
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <p className="text-[12px] font-bold leading-tight truncate" style={{ color: "var(--color-texte-principal)" }}>
+          {album.album_title}
+        </p>
+        <p className="text-[10px] leading-tight truncate" style={{ color: "var(--color-texte-subtil)" }}>
+          {album.stage_name}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 export function HomepageContentSections({ content }: { content: HomepageData }) {
   const {
     playlists,
     artists,
     genres,
-    discoveryTracks,
     topGuineaTracks,
     trending,
     discoveries,
     suggestedArtists,
+    featuredAlbums,
     hadError,
   } = content;
 
   const hasMusicContent =
-    discoveryTracks.length > 0 ||
     topGuineaTracks.length > 0 ||
     trending.length > 0 ||
     playlists.length > 0 ||
     artists.length > 0 ||
     discoveries.length > 0 ||
-    suggestedArtists.length > 0;
+    suggestedArtists.length > 0 ||
+    featuredAlbums.length > 0;
 
   const hasContent = hasMusicContent || genres.length > 0;
 
   const filledCount = [
-    discoveryTracks.length > 0,
     topGuineaTracks.length > 0,
     trending.length > 0,
     playlists.length > 0,
     artists.length > 0,
     discoveries.length > 0,
     suggestedArtists.length > 0,
+    featuredAlbums.length > 0,
     genres.length > 0,
   ].filter(Boolean).length;
   const showHints = filledCount < 2;
-
-  const GENRE_COLORS = GENRE_CHIP_COLORS;
 
   return (
     <div className="pb-8">
@@ -172,46 +208,79 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
 
       <ListenDiscoverModeSlot />
 
+      {/* 🔥 TOP GUINÉE */}
       {topGuineaTracks.length > 0 ? (
         <TopGuineaSection tracks={topGuineaTracks} periodLabel={content.topGuineaPeriodLabel} />
       ) : null}
 
+      {/* 🎤 ARTISTES À DÉCOUVRIR */}
       <ArtistsDiscoverSection suggestedArtists={suggestedArtists} curatedArtists={artists} />
 
-      {/* TENDANCES (legacy — affiché si différent du top Guinée) */}
-      {trending.length === 0 && hasContent && showHints && <SectionEmptyHint label="Tendances" />}
-      {trending.length > 0 && topGuineaTracks.length === 0 && (
-        <section className="mt-8 mb-2">
+      {/* 💿 NOUVEAUX ALBUMS */}
+      {featuredAlbums.length > 0 && (
+        <section className="mt-8" aria-label="Nouveaux albums">
           <div className="flex items-center justify-between px-6 mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={HOMEPAGE_SECTION_STYLES.trendingIcon}>
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="var(--color-vert-energie)">
-                  <path d="M22 7l-9 9-4-4-7 7" stroke="var(--color-vert-energie)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                  <path d="M16 7h6v6" stroke="var(--color-vert-energie)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: "rgb(139 92 246 / 0.15)", border: "1px solid rgb(139 92 246 / 0.2)" }}>
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-violet)" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🇬🇳 Tendances en Guinée</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>
+                💿 Nouveaux albums
+              </h2>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={HOMEPAGE_SECTION_STYLES.trendingPill}>
-              7 derniers jours
-            </span>
+            <Link
+              href="/search"
+              className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+              style={{ background: "var(--color-surface)", color: "var(--color-vert-energie)", border: "1px solid var(--color-elevated)" }}
+            >
+              Voir tout →
+            </Link>
           </div>
-          <HomepageTrendingSection tracks={trending} />
+          <div className="flex gap-4 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
+            {featuredAlbums.map((album, i) => (
+              <FeaturedAlbumCard key={album.album_id} album={album} index={i} />
+            ))}
+          </div>
         </section>
       )}
+      {featuredAlbums.length === 0 && hasContent && showHints && <SectionEmptyHint label="Nouveaux albums" />}
 
-      {/* POUR VOUS */}
-      {playlists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Pour vous" />}
+      {/* 🔍 À DÉCOUVRIR MAINTENANT */}
+      {discoveries.length > 0 && (
+        <section className="mt-8">
+          <div className="flex items-center justify-between px-6 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={HOMEPAGE_SECTION_STYLES.pourToiIcon}>
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-info)" strokeWidth="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              </div>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🔍 À découvrir</h2>
+            </div>
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={HOMEPAGE_SECTION_STYLES.pourToiPill}>Pour toi</span>
+          </div>
+          <HomepageDiscoverySection tracks={discoveries} />
+        </section>
+      )}
+      {discoveries.length === 0 && hasContent && showHints && <SectionEmptyHint label="Découvertes" />}
+
+      {/* 🎵 PLAYLISTS */}
       {playlists.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between px-6 mb-4">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={HOMEPAGE_SECTION_STYLES.forYouIcon}>
                 <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-or-solaire)" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
                 </svg>
               </div>
-              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎯 Recommandé pour vous</h2>
+              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎵 Playlists</h2>
             </div>
             <Link href="/library" className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--color-surface)", color: "var(--color-vert-energie)", border: "1px solid var(--color-elevated)" }}>
               Voir tout →
@@ -233,68 +302,9 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
           </div>
         </section>
       )}
+      {playlists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Playlists" />}
 
-      {/* TOP ARTISTES */}
-      {artists.length === 0 && hasContent && showHints && <SectionEmptyHint label="Top artistes" />}
-      {artists.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center justify-between px-6 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={HOMEPAGE_SECTION_STYLES.discoverIcon}>
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-violet)" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </div>
-              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>⭐ Artistes populaires</h2>
-            </div>
-            <Link href="/search" className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "var(--color-surface)", color: "var(--color-vert-energie)", border: "1px solid var(--color-elevated)" }}>
-              Voir tout →
-            </Link>
-          </div>
-          <div className="flex gap-5 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
-            {artists.map((artist, i) => {
-              const c = ARTIST_RING_COLORS[i % ARTIST_RING_COLORS.length]!;
-              const genre = (artist.genres as string[])[0] ?? "Artiste";
-              return (
-                <Link key={artist.creator_id} href={`/listen/artist/${artist.creator_id}`} className="flex-shrink-0 flex flex-col items-center gap-2 w-20 group">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center font-black text-base relative transition-transform group-hover:scale-105"
-                    style={{ background: `linear-gradient(135deg, ${c.bg}, ${c.glow})`, border: `2.5px solid ${c.ring}`, color: c.color }}>
-                    {getInitials(artist.stage_name)}
-                    <div className="absolute inset-0 rounded-full opacity-20" style={{ border: `1px solid ${c.inner}` }} />
-                  </div>
-                  <p className="text-[11px] text-center font-bold leading-tight" style={{ color: "var(--color-texte-principal)" }}>{artist.stage_name}</p>
-                  <p className="text-[9px] text-center" style={{ color: "var(--color-texte-desactive)" }}>{genre}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* DÉCOUVERTES */}
-      {discoveries.length === 0 && hasContent && showHints && <SectionEmptyHint label="Découvertes" />}
-      {discoveries.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center justify-between px-6 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={HOMEPAGE_SECTION_STYLES.pourToiIcon}>
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-info)" strokeWidth="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </div>
-              <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🔍 À découvrir maintenant</h2>
-            </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={HOMEPAGE_SECTION_STYLES.pourToiPill}>Pour toi</span>
-          </div>
-          <HomepageDiscoverySection tracks={discoveries} />
-        </section>
-      )}
-
-      {/* NOUVEAUTÉS — fusionnées dans Découvertes (DiscoveriesSection) */}
-
-      {/* GENRES */}
-      {genres.length === 0 && hasContent && showHints && <SectionEmptyHint label="Genres" />}
+      {/* 🎶 GENRES */}
       {genres.length > 0 && (
         <section className="mt-8 px-6">
           <div className="flex items-center gap-2 mb-4">
@@ -303,11 +313,11 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
                 <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
               </svg>
             </div>
-            <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>Genres</h2>
+            <h2 className="text-base font-extrabold" style={{ color: "var(--color-texte-principal)" }}>🎶 Genres</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             {genres.map((genre, i) => {
-              const c = GENRE_COLORS[i % GENRE_COLORS.length]!;
+              const c = GENRE_CHIP_COLORS[i % GENRE_CHIP_COLORS.length]!;
               return (
                 <Link key={genre.id} href={`/search?genre=${encodeURIComponent(genre.name)}`}
                   className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
@@ -319,6 +329,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
           </div>
         </section>
       )}
+      {genres.length === 0 && hasContent && showHints && <SectionEmptyHint label="Genres" />}
 
       <StartListeningBanner />
 

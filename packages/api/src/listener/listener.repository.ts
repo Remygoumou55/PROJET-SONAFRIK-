@@ -102,4 +102,7 @@ export class ListenerRepository {
 
   getHeroFeaturedAlbums = (...args: Parameters<ListenerTrackRepository["getHeroFeaturedAlbums"]>) =>
     this.track.getHeroFeaturedAlbums(...args);
+
+  getRecommendedTracks = (...args: Parameters<ListenerTrackRepository["getRecommendedTracks"]>) =>
+    this.track.getRecommendedTracks(...args);
 }

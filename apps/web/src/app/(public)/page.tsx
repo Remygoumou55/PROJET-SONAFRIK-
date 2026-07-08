@@ -1,5 +1,6 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import { createAuthService } from "@sonafrik/api/auth";
 import { isDevBypassActive } from "@/lib/auth/guards";
@@ -24,11 +25,11 @@ import {
 } from "@/components/landing";
 import { LiveStatsSkeleton } from "@/components/landing/LiveStatsSkeleton";
 
-const LandingNav = dynamic(
+const LandingNav = nextDynamic(
   () => import("@/components/landing/LandingNav").then((m) => m.LandingNav),
 );
 
-const LiveStats = dynamic(
+const LiveStats = nextDynamic(
   () => import("@/components/landing/LiveStats").then((m) => m.LiveStats),
   { loading: () => <LiveStatsSkeleton /> },
 );
@@ -53,6 +54,10 @@ export default async function LandingV5Page({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
+  // Page is auth-aware (checks session + redirects) — must not be statically pre-rendered.
+  // Calling cookies() here opts into dynamic rendering without altering the webpack module graph.
+  await cookies();
+
   const params = await searchParams;
 
   if (params.code) {

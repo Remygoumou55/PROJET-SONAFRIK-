@@ -7,6 +7,7 @@ import { getSupabasePublicClient } from "@/lib/supabase/public";
 import { HomepageHero } from "@/features/listener/components/HomepageHero";
 import { ListenStreamingHeader } from "@/features/listener/components/ListenStreamingHeader";
 import { DiscoveriesSection } from "@/features/listener/components/DiscoveriesSection";
+import { RecommendedSection } from "@/features/listener/components/RecommendedSection";
 import { HomepageContentLive } from "@/features/listener/components/HomepageContentLive";
 import { ListenTrackDeepLink } from "@/features/listener/components/ListenTrackDeepLink";
 import type { HomepageData } from "@/features/listener/components/HomepageContentSections";
@@ -49,6 +50,7 @@ export default async function ListenPage({
       {content.discoveryTracks.length > 0 ? (
         <DiscoveriesSection tracks={content.discoveryTracks} />
       ) : null}
+      <RecommendedSection />
       <HomepageContentLive category={category} initialData={content} />
     </div>
   );

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { DiscoveryArtist, DiscoveryTrack, ListenMusicCategory } from "@sonafrik/types";
+import type { DiscoveryArtist, DiscoveryTrack, HeroItemAlbum, ListenMusicCategory } from "@sonafrik/types";
 import { createDiscoveryService } from "@sonafrik/api/discovery";
 import {
   createListenerService,
@@ -35,7 +35,7 @@ export async function fetchHomepageData(
     const listener = createListenerService(supabase);
     const discovery = createDiscoveryService(supabase);
 
-    const [curated, topGuineaRaw, discoveriesRaw, newReleasesResult, suggestedArtistsRaw] =
+    const [curated, topGuineaRaw, discoveriesRaw, newReleasesResult, suggestedArtistsRaw, featuredAlbumsRaw] =
       await Promise.all([
         listener.getHomepageCurated(8).catch(() => ({ playlists: [], artists: [], genres: [] })),
         listener.getTopGuineaTracks(24).catch((): TopGuineaFeed => ({
@@ -48,6 +48,7 @@ export async function fetchHomepageData(
           .getNewReleases({ type: "track", days: 365, limit: 20 })
           .catch((): { tracks: DiscoveryTrack[] } => ({ tracks: [] })),
         discovery.getSuggestedArtists({ limit: 8 }).catch((): DiscoveryArtist[] => []),
+        listener.getHeroFeaturedAlbums(60, 8).catch((): HeroItemAlbum[] => []),
       ]);
 
     const discoveryPoolRaw = dedupeDiscoveryTracks(newReleasesResult.tracks ?? []);
@@ -106,6 +107,7 @@ export async function fetchHomepageData(
       trending: [],
       discoveries: filterValidTracks(discoveries).slice(0, 8),
       suggestedArtists: filterValidArtists(suggestedArtists).slice(0, 8),
+      featuredAlbums: featuredAlbumsRaw.slice(0, 8),
       hadError: false,
     };
   } catch {
@@ -118,6 +120,7 @@ export async function fetchHomepageData(
       trending: [],
       discoveries: [],
       suggestedArtists: [],
+      featuredAlbums: [],
       hadError: true,
     };
   }
