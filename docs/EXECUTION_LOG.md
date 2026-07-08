@@ -137,6 +137,59 @@ middleware: import Edge-safe depuis accountType.ts
 
 ---
 
+## 2026-07-08 — Hero Discovery Engine — Sprint 1 Couches 1+2
+
+### Objectif
+Transformer le Hero carousel en Discovery Engine éditorial : contexte éditorial (title+subtitle), badges contextuels (VÉRIFIÉ / EN TENDANCE / ARTISTE ÉMERGENT / À DÉCOUVRIR), CTAs (▶ Écouter + 👤 Voir l'artiste), support multi-type artiste+album.
+
+### Fichiers touchés
+- `supabase/migrations/20260708110000_hero_discovery_engine.sql` — SQL : `get_trending_artists_mixed` v2 enrichi (genres, bio, first_track) + `get_hero_featured_albums`
+- `packages/types/src/streaming.ts` — types `HeroItemArtist`, `HeroItemAlbum`, `HeroItem` (union discriminée)
+- `packages/api/src/listener/listener.track.repository.ts` — `getTrendingArtistsMixed → HeroItemArtist[]`, `getHeroFeaturedAlbums()`, cast RPC `as never`
+- `packages/api/src/listener/listener.repository.ts` — délégation `getHeroFeaturedAlbums`
+- `packages/api/src/listener/listener.service.ts` — `getHeroFeaturedAlbums`, `getHeroDiscoveryFeed(20)` (interleave 3:1)
+- `apps/web/src/features/listener/components/hero/heroEditorial.ts` — `getHeroTheme()` : 5 thèmes artiste + 3 thèmes album
+- `apps/web/src/features/listener/components/hero/HeroArtistCard.tsx` — carte artiste : bg+overlay+éditorial+info+2 CTAs
+- `apps/web/src/features/listener/components/hero/HeroAlbumCard.tsx` — carte album : bg+overlay+éditorial+info+date sortie+2 CTAs
+- `apps/web/src/features/listener/components/HeroCarousel.tsx` — réécriture dispatcher : `HeroItemCard → HeroArtistCard | HeroAlbumCard`
+- `apps/web/src/app/styles/listen-home/hero-carousel.css` — CSS complet `.hcard` (bg, overlay, body, editorial, badge, name, meta, bio, actions, CTAs, responsive)
+
+### Code avant
+```before
+HeroCarousel: affiche uniquement artistes (TrendingArtist), listen_count brut, pas de contexte
+hero-carousel.css: track flex basique, pas de classes .hcard
+```
+
+### Code après
+```after
+HeroCarousel: getHeroDiscoveryFeed(20) → artistes + albums interleaved 3:1
+HeroArtistCard + HeroAlbumCard: éditorial label+subtitle + badge contextuel + 2 CTAs
+hero-carousel.css: .hcard complet, overlay multi-couches, responsive 420/600/1100px
+```
+
+### SQL exécuté
+- `supabase db query --linked --file supabase/migrations/20260708110000_hero_discovery_engine.sql` ✅
+- `get_trending_artists_mixed` v2 validé en DB ✅
+- `get_hero_featured_albums` validé en DB ✅
+
+### Validation
+- `pnpm build` : ✅ EXIT:0
+- `pnpm lint` : ✅ EXIT:0
+- `pnpm typecheck` : ✅ EXIT:0
+- Commit : `55e7b65` — pushé sur main ✅
+
+### Tests à faire
+- [ ] Page /listen : HeroArtistCard affiche label éditorial + badge + 2 CTAs
+- [ ] Page /listen : HeroAlbumCard apparaît toutes les ~3 slides (interleave 3:1)
+- [ ] Badge VÉRIFIÉ sur artiste vérifié, EN TENDANCE si > 500 écoutes
+- [ ] CTA "▶ Écouter" → /listen/artist/{creator_id}
+- [ ] CTA "👤 Voir l'artiste" → /listen/artist/{creator_id}
+- [ ] Album CTA → /listen/album/{album_id}
+- [ ] Responsive : carousel hauteur 13rem → 14.5rem → 16rem → 18rem
+- [ ] prefers-reduced-motion : transition: none
+
+---
+
 ## 2026-07-08 — Hero Carousel artistes tendance (/listen homepage)
 
 ### Fichiers touchés
