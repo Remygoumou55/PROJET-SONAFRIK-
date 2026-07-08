@@ -99,4 +99,7 @@ export class ListenerRepository {
 
   getTrendingArtistsMixed = (...args: Parameters<ListenerTrackRepository["getTrendingArtistsMixed"]>) =>
     this.track.getTrendingArtistsMixed(...args);
+
+  getHeroFeaturedAlbums = (...args: Parameters<ListenerTrackRepository["getHeroFeaturedAlbums"]>) =>
+    this.track.getHeroFeaturedAlbums(...args);
 }

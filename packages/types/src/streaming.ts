@@ -337,7 +337,47 @@ export interface TrendingArtist {
   cover_path: string | null;
   verified: boolean;
   listen_count: number;
+  genre_primary: string | null;
+  bio_short: string | null;
+  first_track_id: string | null;
+  first_track_slug: string | null;
 }
+
+// ─── Hero Discovery Engine ─────────────────────────────────────────────────────
+
+/** Slide Hero de type artiste — source: get_trending_artists_mixed enrichi */
+export interface HeroItemArtist {
+  content_type: "artist";
+  creator_id: string;
+  stage_name: string;
+  slug: string;
+  cover_path: string | null;
+  verified: boolean;
+  listen_count: number;
+  genre_primary: string | null;
+  bio_short: string | null;
+  first_track_id: string | null;
+  first_track_slug: string | null;
+}
+
+/** Slide Hero de type album — source: get_hero_featured_albums */
+export interface HeroItemAlbum {
+  content_type: "album";
+  album_id: string;
+  album_title: string;
+  release_type: string;
+  release_date: string | null;
+  cover_path: string | null;
+  creator_id: string;
+  stage_name: string;
+  artist_slug: string;
+  genre_primary: string | null;
+  verified: boolean;
+  bio_short: string | null;
+}
+
+/** Union discriminée des types Hero — dispatcher selon content_type */
+export type HeroItem = HeroItemArtist | HeroItemAlbum;
 
 /** Compteur d'écoutes valides (Real Listen) pour un morceau — RPC get_track_listen_counts. */
 export interface TrackListenCounts {

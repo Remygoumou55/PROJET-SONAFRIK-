@@ -11,6 +11,132 @@
 
 ---
 
+## 2026-07-08 — Mes publications Phase 3.5 Enterprise Quality Gate
+
+### Objectif
+Gate enterprise complète (8 quality gates) avant FREEZE officiel — seuil 9,8/10.
+
+### Résultat
+**Score global : 8,86 / 10** — ⚠️ **NON CERTIFIÉ ENTERPRISE** — FREEZE refusé.
+
+### Livrables
+- `docs/functional-quality/reports/SONAFRIK_PUBLICATIONS_ENTERPRISE_QG_3.5.md` — rapport complet
+- `apps/web/tests/e2e/publications-long-session.spec.ts` — stress 30 cycles (QG4)
+- `apps/web/package.json` — `test:e2e:publications-stress`
+
+### Validation
+- lint + typecheck web ✅
+- Vitest publication-library 13/13 ✅
+- Vitest SRTSP consumer 6/6 ✅
+- Playwright rejeu : bloqué timeout Supabase (référence Phase 3 : 8/8 PASS)
+
+### Bloquants FREEZE (P1)
+- [ ] Pagination UI avec catalogue > PAGE_SIZE
+- [ ] Long session 30 min certifiée (stress spec livré, exécution pending)
+
+### Décision
+Module **prêt bêta** — pas de FREEZE enterprise au seuil 9,8.
+
+---
+
+## 2026-07-08 — Mes publications Phase 3 Certification Gate
+
+### Objectif
+Gate CI certifié : smoke multi-viewports + pagination URL-driven + historique navigateur, en complément de la suite library Phase 2.
+
+### Fichiers touchés
+- `apps/web/tests/e2e/publications-e2e-helpers.ts` — helpers auth/wait/shell partagés (anti false-empty sur « Chargement… »)
+- `apps/web/tests/e2e/publications-certification-gate.spec.ts` — gate Phase 3 (history, pagination, sort, tablet/mobile)
+- `apps/web/tests/e2e/publications-library.spec.ts` — refactor sur helpers partagés
+- `apps/web/tests/e2e/global-setup.ts` — goto retry 180s + warm `/creator/catalog/tracks`
+- `apps/web/package.json` — `test:e2e:publications` / `test:e2e:publications-cert`
+- `.github/workflows/ci.yml` — job `e2e-publications-cert` (secrets Supabase requis)
+
+### Couverture gate
+| Cas | Résultat |
+|---|---|
+| Desktop back/forward après filtres | ✅ compteurs stables |
+| Pagination UI **ou** contrat `?page=2` | ✅ (catalogue ≤50 → smoke URL) |
+| Tri `alpha` / `updated` via URL | ✅ |
+| Tablet iPad + Mobile iPhone 13 | ✅ shell + filtre Publiés |
+| Library Phase 2 (header, filtres, refresh) | ✅ |
+
+### Validation
+- `pnpm test:e2e:publications` (PLAYWRIGHT_SKIP_WEBSERVER=1) : **8/8 PASSED** (~12 min cold Windows)
+
+### Dette / notes
+- Pagination UI profonde nécessite catalogue > `PAGE_SIZE` (50) — fallback contrat URL documenté dans le test.
+- Cold compile Next après `dev:clean` peut dépasser 2 min : waits e2e calés à 180s + warm global-setup.
+
+### Tests à faire
+- [x] Multi-viewports smoke
+- [x] Historique navigateur
+- [x] Pagination / contrat URL
+- [ ] CI GitHub Actions job `e2e-publications-cert` sur main (secrets)
+
+---
+
+## 2026-07-08 — Mes publications Phase 2 Enterprise remediation
+
+### Fichiers touchés
+- `packages/core/realtime/src/react/SrtspProvider.tsx` — race safety `useLiveQuery` + sync `initialData` par query key + anti-overlap refresh
+- `apps/web/src/features/creator/publications/hooks/usePublicationsSrtspLive.ts` — skip refetch si SSR stable + cache albums/insights + insights ciblés
+- `apps/web/src/features/creator/publications/components/PublicationsLibrary.tsx` — URL = source de vérité + loading state + recovery auto + refresh borné
+- `apps/web/src/app/(creator)/creator/catalog/tracks/page.tsx` — remount par query + insights utiles uniquement
+- `apps/web/src/lib/auth/accountType.ts` — mapAccountType/RouteRole isolés (Edge-safe)
+- `apps/web/src/lib/auth/getSessionAndRole.ts` — réutilise accountType sans polluer le middleware
+- `apps/web/src/middleware.ts` — import Edge-safe (plus de chaînage vers `server.ts`)
+- `apps/web/src/lib/auth/redirectByRole.ts` — import `RouteRole` corrigé
+- `packages/api/src/creator/catalog/publication-library/actions.ts` — menu sans actions fantômes disabled
+- `packages/api/src/creator/catalog/publication-library/types.ts` — import inutilisé retiré
+- `packages/api/src/creator/catalog/publication-library/lifecycle.test.ts` — assertions menu alignées
+- `apps/web/tests/e2e/publications-library.spec.ts` — e2e durable filtres + refresh
+- `apps/web/tests/e2e/global-setup.ts` — `domcontentloaded` + timeout réaliste
+
+### Code avant (extrait clé)
+```before
+useLiveQuery: skipInitialFetch=false toujours, pas de race guard
+PublicationsLibrary: props initial* = source de vérité
+MENU_MATRIX: actions disabled fantômes (Retirer, Dupliquer…)
+middleware: import mapAccountType depuis getSessionAndRole → tire supabase/server dans Edge
+```
+
+### Code après (extrait clé)
+```after
+useLiveQuery: requestId + inFlight + resync initialData sur key change
+PublicationsLibrary: useSearchParams + remount page + recovery empty
+MENU_MATRIX: uniquement actions réellement câblées et disponibles
+middleware: import Edge-safe depuis accountType.ts
+```
+
+### Cause racine → solution
+| Anomalie | Cause racine | Solution |
+|---|---|---|
+| Empty state trompeur | live fetch agressif + props stale + insights massifs | skip SSR stable + recovery + insights ciblés |
+| Filtres incohérents clic vs URL | source de vérité non URL | `useSearchParams` + remount keyed |
+| Tempête réseau/refresh | race réponses + no cache + insights N×2 | requestId/inFlight + cache albums/insights |
+| Build `Cannot find module './xxxx.js'` | cache `.next` corrompu | purge `clean-next` + rebuild |
+| Edge warning supabase | import middleware → server.ts | découpage `accountType.ts` |
+| Menu ≠ panneau détail | actions fantômes disabled | matrice menu nettoyée |
+
+### Validation
+- `pnpm --filter @sonafrik/web build` ✅
+- `pnpm --filter @sonafrik/api|web|realtime lint/typecheck` ✅
+- Vitest `publication-library/lifecycle.test.ts` (relancé dans la boucle)
+- Playwright `publications-library.spec.ts` : 3/3 PASSED
+
+### Dette technique créée
+- Aucune dette bloquante. Cache albums/insights local au hook live = intentional MVP.
+
+### Tests à faire
+- [x] Chargement initial peuplé
+- [x] Filtres clic = URL directe
+- [x] Refresh borné
+- [ ] Pagination profonde (si catalogue > PAGE_SIZE)
+- [ ] Menu publié Actions Analytics/Revenus en manuel
+
+---
+
 ## 2026-07-08 — Hero Carousel artistes tendance (/listen homepage)
 
 ### Fichiers touchés

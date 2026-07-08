@@ -1,5 +1,5 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { ListenMusicCategory } from "@sonafrik/types";
+import type { HeroItem, ListenMusicCategory } from "@sonafrik/types";
 import { AdminConfigRepository } from "../admin/admin.config.repository";
 import { ListenerRepository } from "./listener.repository";
 import type {
@@ -145,6 +145,30 @@ export class ListenerService {
 
   getTrendingArtistsMixed(limit?: number) {
     return this.repository.getTrendingArtistsMixed(limit);
+  }
+
+  getHeroFeaturedAlbums(days?: number, limit?: number) {
+    return this.repository.getHeroFeaturedAlbums(days, limit);
+  }
+
+  /** Mélange artistes tendance + albums récents pour le Hero Discovery Engine. */
+  async getHeroDiscoveryFeed(totalLimit = 20): Promise<HeroItem[]> {
+    const artistLimit = Math.max(totalLimit - 4, 8);
+    const [artists, albums] = await Promise.all([
+      this.repository.getTrendingArtistsMixed(artistLimit),
+      this.repository.getHeroFeaturedAlbums(30, 4),
+    ]);
+    // Interleave: 1 album every ~3 artists for editorial variety
+    const result: HeroItem[] = [];
+    let ai = 0;
+    let bi = 0;
+    while (ai < artists.length || bi < albums.length) {
+      if (ai < artists.length) result.push(artists[ai++]!);
+      if (ai < artists.length) result.push(artists[ai++]!);
+      if (ai < artists.length) result.push(artists[ai++]!);
+      if (bi < albums.length)  result.push(albums[bi++]!);
+    }
+    return result.slice(0, totalLimit);
   }
 
   isFeatureEnabled(name: string): Promise<boolean> {

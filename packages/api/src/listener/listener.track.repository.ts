@@ -3,12 +3,13 @@ import { enrichTrackCreditsWithCreatorIds } from "../common/profile-creator.help
 import { fetchStageNamesByCreatorIds } from "../common/stage-name.helpers";
 import type {
   DiscoveryTrack,
+  HeroItemAlbum,
+  HeroItemArtist,
   LyricLine,
   RecentlyPlayedTrack,
   TrackCredit,
   TrackListenCounts,
   TrackWithMeta,
-  TrendingArtist,
   TrendingTrack,
 } from "@sonafrik/types";
 import type {
@@ -431,7 +432,7 @@ export class ListenerTrackRepository {
     return { lines };
   }
 
-  async getTrendingArtistsMixed(limit = 20): Promise<TrendingArtist[]> {
+  async getTrendingArtistsMixed(limit = 20): Promise<HeroItemArtist[]> {
     const { data, error } = await this.client.rpc("get_trending_artists_mixed", {
       p_limit: limit,
     });
@@ -440,12 +441,44 @@ export class ListenerTrackRepository {
     return rows.map((r) => {
       const row = r as Record<string, unknown>;
       return {
+        content_type: "artist" as const,
         creator_id: String(row.creator_id ?? ""),
         stage_name: String(row.stage_name ?? ""),
         slug: String(row.slug ?? ""),
         cover_path: row.cover_path != null ? String(row.cover_path) : null,
         verified: Boolean(row.verified ?? false),
         listen_count: Number(row.listen_count ?? 0),
+        genre_primary: row.genre_primary != null ? String(row.genre_primary) : null,
+        bio_short: row.bio_short != null ? String(row.bio_short) : null,
+        first_track_id: row.first_track_id != null ? String(row.first_track_id) : null,
+        first_track_slug: row.first_track_slug != null ? String(row.first_track_slug) : null,
+      };
+    });
+  }
+
+  async getHeroFeaturedAlbums(days = 30, limit = 6): Promise<HeroItemAlbum[]> {
+    // get_hero_featured_albums n'est pas encore dans les types générés Supabase
+    const { data, error } = await this.client.rpc("get_hero_featured_albums" as never, {
+      p_days: days,
+      p_limit: limit,
+    } as never);
+    if (error) throw error;
+    const rows = (data as unknown[]) ?? [];
+    return rows.map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        content_type: "album" as const,
+        album_id: String(row.album_id ?? ""),
+        album_title: String(row.album_title ?? ""),
+        release_type: String(row.release_type ?? "album"),
+        release_date: row.release_date != null ? String(row.release_date) : null,
+        cover_path: row.cover_path != null ? String(row.cover_path) : null,
+        creator_id: String(row.creator_id ?? ""),
+        stage_name: String(row.stage_name ?? ""),
+        artist_slug: String(row.artist_slug ?? ""),
+        genre_primary: row.genre_primary != null ? String(row.genre_primary) : null,
+        verified: Boolean(row.verified ?? false),
+        bio_short: row.bio_short != null ? String(row.bio_short) : null,
       };
     });
   }
