@@ -5,19 +5,66 @@
   background-color: transparent;
 }
 
+/* Colonne retour + colonne principale (header + carte = même largeur) */
+.wallet-shell.enterprise-shell--single {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: var(--shell-gap-inner);
+  column-gap: 0.75rem;
+  align-items: start;
+  max-width: min(100%, calc(48rem + 13rem));
+}
+
+.wallet-shell__back {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+}
+
+.wallet-shell__header-band {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.wallet-shell__content {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 0;
+}
+
+.wallet-shell__back .music-nav__back {
+  margin: 0;
+  min-height: var(--shell-header-min-height);
+  white-space: nowrap;
+}
+
 .wallet-shell__header {
+  width: 100%;
   flex-wrap: wrap;
   gap: var(--ds-gap-m);
+}
+
+@media (max-width: 480px) {
+  .wallet-shell.enterprise-shell--single {
+    column-gap: 0.5rem;
+  }
+
+  .wallet-shell__back .music-nav__back-label {
+    display: none;
+  }
+
+  .wallet-shell__back .music-nav__back {
+    padding: 0.5rem;
+  }
 }
 
 .wallet-shell__header .wallet-nav {
   margin-bottom: 0;
   flex: 1 1 auto;
   min-width: min(100%, 16rem);
-}
-
-.wallet-shell__content {
-  flex: 1;
 }
 
 .wallet-shell__inner {
@@ -53,7 +100,7 @@
 
 .wallet-nav__link {
   flex: 1 1 auto;
-  min-width: max(5.5rem, 28%);
+  min-width: max(4.75rem, 22%);
   min-height: var(--touch-target-min);
   display: flex;
   align-items: center;
@@ -133,4 +180,129 @@
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+/* ─── Historique recharges (page dédiée) ───────────────────────────── */
+.wallet-recharge-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.wallet-recharge-page__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.wallet-recharge-page__sub {
+  margin: 0;
+  font-size: var(--text-fluid-sm);
+  color: var(--color-texte-secondaire);
+}
+
+.wallet-recharge-page__list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  background: var(--color-card);
+  border: 1px solid var(--color-bordure);
+}
+
+.wallet-recharge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--color-elevated);
+}
+
+.wallet-recharge-row:last-child {
+  border-bottom: none;
+}
+
+.wallet-recharge-row--skeleton {
+  min-height: 3.75rem;
+  background: var(--color-card);
+}
+
+.wallet-recharge-row__main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.wallet-recharge-row__icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.wallet-recharge-row__copy {
+  min-width: 0;
+}
+
+.wallet-recharge-row__provider {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.wallet-recharge-row__date {
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-texte-desactive);
+}
+
+.wallet-recharge-row__meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.wallet-recharge-row__amount {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-texte-principal);
+}
+
+.wallet-recharge-row__status {
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.wallet-recharge-page__empty {
+  border-radius: 0.875rem;
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  background: var(--color-card);
+  border: 1px solid var(--color-bordure);
+  color: var(--color-texte-secondaire);
+  font-size: 0.875rem;
+}
+
+.wallet-recharge-page__empty-icon {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.wallet-recharge-page__retry {
+  margin-top: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--color-bordure);
+  background: var(--color-surface);
+  color: var(--color-texte-principal);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wallet-recharge-page__retry:hover {
+  border-color: var(--color-vert-energie-border);
+  color: var(--color-vert-energie);
 }

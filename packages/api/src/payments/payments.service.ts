@@ -7,6 +7,7 @@ import {
   PAYMENT_PROVIDER_LABELS as PROVIDER_LABELS,
   PAYMENT_PROVIDER_ICONS as PROVIDER_ICONS,
 } from "@sonafrik/types";
+import { isDevBypassActive } from "@sonafrik/shared/auth";
 import { PaymentError } from "./errors";
 import { initiatePaymentSchema, type InitiatePaymentInput } from "./schemas";
 
@@ -122,9 +123,18 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
      * Liste les payment_intents récents de l'utilisateur.
      */
     async listUserIntents(limit = 10): Promise<PaymentIntent[]> {
+      if (isDevBypassActive()) return [];
+
+      const {
+        data: { user },
+        error: authError,
+      } = await client.auth.getUser();
+      if (authError || !user) return [];
+
       const { data, error } = await client
         .from("payment_intents")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(limit);
 

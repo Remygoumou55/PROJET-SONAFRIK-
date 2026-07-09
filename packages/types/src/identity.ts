@@ -16,6 +16,7 @@ export type NotificationType =
   | "royalty_paid"
   | "verification_updated"
   | "rights_claim_updated"
+  | "publication_review"
   | "system";
 
 export type AppLanguage = "fr" | "en";
@@ -199,6 +200,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   royalty_paid:         "Royalties",
   verification_updated: "Vérification",
   rights_claim_updated: "Droits",
+  publication_review:   "Publication",
   system:               "Système",
 };
 

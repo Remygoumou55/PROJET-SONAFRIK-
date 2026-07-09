@@ -258,6 +258,11 @@ export class CatalogService {
     return this.repository.countCreatorTracks(creatorId);
   }
 
+  async getPublicationInsights(trackIds: string[]) {
+    await this.requireCreatorId();
+    return this.repository.getPublicationInsightsBatch(trackIds);
+  }
+
   async getTrackGenreIds(trackId: string): Promise<string[]> {
     await this.requireUserId();
     return this.repository.getTrackGenreIds(trackId);

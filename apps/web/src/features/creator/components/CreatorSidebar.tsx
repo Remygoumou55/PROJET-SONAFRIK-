@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   MusicSidebar,
   MusicNavFromSections,
@@ -17,10 +18,10 @@ function isNavActive(href: string, pathname: string, exact?: boolean): boolean {
 
 interface CreatorSidebarProps {
   navEntries: CreatorNavEntry[];
-  pathname: string;
 }
 
-export function CreatorSidebar({ navEntries, pathname }: CreatorSidebarProps) {
+export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
+  const pathname = usePathname();
   const sections = useMemo(() => groupCreatorNavEntries(navEntries), [navEntries]);
   const navHrefs = useMemo(() => getCreatorNavLinks(navEntries).map((l) => l.href), [navEntries]);
   const { prefetchOnHover } = useSmartPrefetch(navHrefs);

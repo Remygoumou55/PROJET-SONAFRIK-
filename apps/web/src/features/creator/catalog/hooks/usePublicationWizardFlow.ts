@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ensureAlbumHasCover } from "../lib/ensureAlbumCover";
 import { resolveWizardLanguageLabel } from "../lib/publicationWizardConstants";
 import type { CreatedRelease, WizardMetadataForm } from "../lib/publicationWizardTypes";
+import type { ReviewAudioInfo } from "../components/WizardStep4Panel";
 import type { AudioUploaderHandle } from "../components/AudioUploader";
 import type { CoverUploaderHandle } from "../components/CoverUploader";
 import {
+  type WizardProgressFlags,
   type WizardStep,
   canNavigateToStep,
   clearWizardSession,
@@ -23,6 +25,7 @@ import { useCatalogService } from "./useCatalog";
 import { usePublicationWizardSrtsp } from "./usePublicationWizardSrtsp";
 import type { Genre } from "@sonafrik/types";
 import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
+import { wizardErrorMessage } from "../lib/wizardErrorMessage";
 
 interface UsePublicationWizardFlowOptions {
   creatorId: string;
@@ -58,13 +61,19 @@ export function usePublicationWizardFlow({
   });
   const [savingMeta, setSavingMeta] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [published, setPublished] = useState(false);
+  const publishingRef = useRef(false);
+  const [savingReview, setSavingReview] = useState(false);
+  const [replacingMedia, setReplacingMedia] = useState(false);
+  const [audioFileInfo, setAudioFileInfo] = useState<ReviewAudioInfo | null>(null);
+  const [audioInfoLoading, setAudioInfoLoading] = useState(false);
   const [filesCompleted, setFilesCompleted] = useState(false);
   const [metadataCompleted, setMetadataCompleted] = useState(false);
   const [step2Mounted, setStep2Mounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionCreatorId, setSessionCreatorId] = useState<string | null>(null);
   const savedMetaSnapshotRef = useRef("");
+  const metaRef = useRef(meta);
+  metaRef.current = meta;
   const [initialized, setInitialized] = useState(false);
 
   const stepRef = useRef(step);
@@ -103,7 +112,7 @@ export function usePublicationWizardFlow({
   }, [meta, metadataCompleted]);
 
   useEffect(() => {
-    if (published || initialized) return;
+    if (initialized) return;
 
     const session = readWizardSession();
     let flags = {
@@ -139,14 +148,10 @@ export function usePublicationWizardFlow({
     setStep(initial);
     replaceWizardHistoryStep(initial);
     setInitialized(true);
-  }, [published, initialized]);
+  }, [initialized]);
 
   useEffect(() => {
     if (!initialized) return;
-    if (published) {
-      clearWizardSession();
-      return;
-    }
     if (!release) return;
     writeWizardSession({
       release,
@@ -158,7 +163,6 @@ export function usePublicationWizardFlow({
     });
   }, [
     initialized,
-    published,
     release,
     titleInput,
     filesCompleted,
@@ -168,8 +172,14 @@ export function usePublicationWizardFlow({
   ]);
 
   const goToStep = useCallback(
-    (target: WizardStep, options?: { replace?: boolean }) => {
-      if (!canNavigateToStep(target, maxValidatedRef.current)) return;
+    (
+      target: WizardStep,
+      options?: { replace?: boolean; progressFlags?: WizardProgressFlags },
+    ) => {
+      const maxValidated = options?.progressFlags
+        ? computeMaxValidatedStep(options.progressFlags)
+        : maxValidatedRef.current;
+      if (!canNavigateToStep(target, maxValidated)) return;
       if (target === stepRef.current) return;
       setStep(target);
       setError(null);
@@ -199,7 +209,6 @@ export function usePublicationWizardFlow({
   }, [goToStep, onCancel, release, srtsp]);
 
   useEffect(() => {
-    if (published) return;
     const onPopState = (event: PopStateEvent) => {
       const target = readWizardStepFromHistoryState(event.state);
       if (target === null) return;
@@ -212,10 +221,10 @@ export function usePublicationWizardFlow({
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [published]);
+  }, []);
 
   useEffect(() => {
-    if (step === 2 && release) setStep2Mounted(true);
+    if ((step === 2 || step === 4) && release) setStep2Mounted(true);
   }, [step, release]);
 
   useEffect(() => {
@@ -289,6 +298,161 @@ export function usePublicationWizardFlow({
     return () => { cancelled = true; };
   }, [step, release, catalog, uploadCreatorId]);
 
+  useEffect(() => {
+    if (step !== 4 || !release) return;
+    let cancelled = false;
+    setAudioInfoLoading(true);
+    void (async () => {
+      try {
+        const [files, track] = await Promise.all([
+          catalog.getTrackFiles(release.trackId),
+          catalog.getTrack(release.trackId),
+        ]);
+        if (cancelled) return;
+        const primary = files.find((f) => f.is_primary) ?? files[0];
+        if (!primary) {
+          setAudioFileInfo(null);
+          return;
+        }
+        const sizeMb = (primary.file_size_bytes ?? 0) / 1024 / 1024;
+        setAudioFileInfo({
+          fileName: primary.file_path.split("/").pop() ?? "audio",
+          durationSeconds: track.duration_seconds ?? primary.duration_seconds ?? 0,
+          format: primary.format,
+          sizeLabel: `${sizeMb.toFixed(1)} Mo`,
+        });
+      } catch {
+        if (!cancelled) setAudioFileInfo(null);
+      } finally {
+        if (!cancelled) setAudioInfoLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [step, release, catalog]);
+
+  const handleReviewTitleSave = useCallback(
+    async (title: string) => {
+      if (!release || title.length < 2 || title === release.title) return;
+      setSavingReview(true);
+      setError(null);
+      try {
+        await Promise.all([
+          catalog.updateTrack(release.trackId, { title }),
+          catalog.updateAlbum(release.albumId, { title }),
+        ]);
+        setRelease({ ...release, title });
+        setTitleInput(title);
+        srtsp.draftUpdated({
+          albumId: release.albumId,
+          trackId: release.trackId,
+          creatorId: release.creatorId,
+          title,
+        });
+      } catch (err) {
+        setError(wizardErrorMessage(err, "Impossible de mettre à jour le titre."));
+      } finally {
+        setSavingReview(false);
+      }
+    },
+    [catalog, release, srtsp],
+  );
+
+  const handleReviewMetaSave = useCallback(async (patch?: Partial<WizardMetadataForm>) => {
+    if (!release) return;
+    const effectiveMeta = patch ? { ...metaRef.current, ...patch } : metaRef.current;
+    if (!effectiveMeta.genreId) return;
+    setSavingReview(true);
+    setError(null);
+    try {
+      await catalog.saveWizardUserMetadata({
+        trackId: release.trackId,
+        genreId: effectiveMeta.genreId,
+        language: effectiveMeta.language,
+        lyrics: effectiveMeta.lyrics.trim() || undefined,
+        explicit: effectiveMeta.explicit || undefined,
+      });
+      savedMetaSnapshotRef.current = JSON.stringify(effectiveMeta);
+      srtsp.draftUpdated({
+        albumId: release.albumId,
+        trackId: release.trackId,
+        creatorId: release.creatorId,
+        title: release.title,
+      });
+    } catch (err) {
+      setError(wizardErrorMessage(err, "Impossible de sauvegarder les métadonnées."));
+    } finally {
+      setSavingReview(false);
+    }
+  }, [catalog, release, srtsp]);
+
+  const handleReplaceCover = useCallback(() => {
+    setReplacingMedia(true);
+    coverRef.current?.openFilePicker();
+  }, []);
+
+  const handleReplaceAudio = useCallback(() => {
+    setReplacingMedia(true);
+    audioRef.current?.openFilePicker();
+  }, []);
+
+  const handleReviewAudioReady = useCallback(async () => {
+    setAudioReady(true);
+    if (stepRef.current !== 4 || !release) return;
+    setReplacingMedia(true);
+    setError(null);
+    try {
+      const album = await catalog.getAlbum(release.albumId);
+      await new Promise<void>((resolve, reject) => {
+        queueMicrotask(() => {
+          void (async () => {
+            try {
+              await audioRef.current?.triggerUpload(album.creator_id);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          })();
+        });
+      });
+      srtsp.audioUploaded({
+        albumId: release.albumId,
+        trackId: release.trackId,
+        creatorId: album.creator_id,
+        title: release.title,
+      });
+      const track = await catalog.getTrack(release.trackId);
+      const files = await catalog.getTrackFiles(release.trackId);
+      const primary = files.find((f) => f.is_primary) ?? files[0];
+      if (primary) {
+        const sizeMb = (primary.file_size_bytes ?? 0) / 1024 / 1024;
+        setAudioFileInfo({
+          fileName: primary.file_path.split("/").pop() ?? "audio",
+          durationSeconds: track.duration_seconds ?? primary.duration_seconds ?? 0,
+          format: primary.format,
+          sizeLabel: `${sizeMb.toFixed(1)} Mo`,
+        });
+      }
+    } catch (err) {
+      setError(wizardErrorMessage(err, "Impossible de remplacer l'audio."));
+    } finally {
+      setReplacingMedia(false);
+    }
+  }, [catalog, release, srtsp]);
+
+  const handleReviewCoverSuccess = useCallback(() => {
+    invalidateCoverPreview();
+    setReplacingMedia(false);
+    if (!release) return;
+    srtsp.coverUploaded({
+      albumId: release.albumId,
+      trackId: release.trackId,
+      creatorId: release.creatorId,
+      title: release.title,
+    });
+  }, [invalidateCoverPreview, release, srtsp]);
+
   const handleCreateRelease = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (titleInput.trim().length < 2) return;
@@ -315,13 +479,19 @@ export function usePublicationWizardFlow({
         creatorId: album.creator_id,
         title: titleInput.trim(),
       });
-      goToStep(2);
+      goToStep(2, {
+        progressFlags: {
+          hasRelease: true,
+          filesCompleted,
+          metadataCompleted,
+        },
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de créer le morceau. Réessayez.");
+      setError(wizardErrorMessage(err, "Impossible de créer le morceau. Réessayez."));
     } finally {
       setCreating(false);
     }
-  }, [catalog, titleInput, release, goToStep, srtsp]);
+  }, [catalog, titleInput, release, goToStep, srtsp, filesCompleted, metadataCompleted]);
 
   const handleContinueStep2 = useCallback(async () => {
     if (!release) return;
@@ -359,13 +529,19 @@ export function usePublicationWizardFlow({
         title: release.title,
       });
       setFilesCompleted(true);
-      goToStep(3);
+      goToStep(3, {
+        progressFlags: {
+          hasRelease: true,
+          filesCompleted: true,
+          metadataCompleted,
+        },
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi. Réessayez.");
+      setError(wizardErrorMessage(err, "Erreur lors de l'envoi. Réessayez."));
     } finally {
       setUploading2(false);
     }
-  }, [release, stageName, catalog, goToStep, filesCompleted, srtsp]);
+  }, [release, stageName, catalog, goToStep, filesCompleted, metadataCompleted, srtsp]);
 
   const handleSaveMeta = useCallback(async () => {
     if (!release) return;
@@ -398,19 +574,27 @@ export function usePublicationWizardFlow({
       srtsp.metadataCompleted(ctx);
       savedMetaSnapshotRef.current = JSON.stringify(meta);
       setMetadataCompleted(true);
-      goToStep(4);
+      goToStep(4, {
+        progressFlags: {
+          hasRelease: true,
+          filesCompleted: true,
+          metadataCompleted: true,
+        },
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de sauvegarder. Réessayez.");
+      setError(wizardErrorMessage(err, "Impossible de sauvegarder. Réessayez."));
     } finally {
       setSavingMeta(false);
     }
   }, [catalog, release, meta, goToStep, metadataCompleted, srtsp]);
 
-  const handlePublish = useCallback(async () => {
-    if (!release) return;
+  const handlePublish = useCallback(async (): Promise<boolean> => {
+    if (!release || publishingRef.current) return false;
+    publishingRef.current = true;
     setPublishing(true);
     setError(null);
     try {
+      await handleReviewMetaSave();
       const album = await catalog.getAlbum(release.albumId);
       await ensureAlbumHasCover(catalog, {
         albumId: release.albumId,
@@ -426,13 +610,15 @@ export function usePublicationWizardFlow({
         title: release.title,
       });
       clearWizardSession();
-      setPublished(true);
+      return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de publier. Réessayez.");
+      setError(wizardErrorMessage(err, "Impossible de publier. Réessayez."));
+      return false;
     } finally {
+      publishingRef.current = false;
       setPublishing(false);
     }
-  }, [catalog, release, stageName, srtsp]);
+  }, [catalog, release, stageName, srtsp, handleReviewMetaSave]);
 
   return {
     step,
@@ -448,8 +634,11 @@ export function usePublicationWizardFlow({
     coverPreviewUrl,
     meta,
     savingMeta,
+    savingReview,
+    replacingMedia,
+    audioFileInfo,
+    audioInfoLoading,
     publishing,
-    published,
     step2Mounted,
     error,
     uploadCreatorId,
@@ -469,5 +658,11 @@ export function usePublicationWizardFlow({
     handleContinueStep2,
     handleSaveMeta,
     handlePublish,
+    handleReviewTitleSave,
+    handleReviewMetaSave,
+    handleReplaceCover,
+    handleReplaceAudio,
+    handleReviewAudioReady,
+    handleReviewCoverSuccess,
   };
 }

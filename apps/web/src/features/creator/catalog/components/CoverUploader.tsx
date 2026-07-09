@@ -26,6 +26,7 @@ export type EnsureCoverContext = {
 export interface CoverUploaderHandle {
   triggerUpload: () => Promise<void>;
   ensureCover: (ctx: EnsureCoverContext) => Promise<{ source: "user" | "auto" }>;
+  openFilePicker: () => void;
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -225,6 +226,15 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     () => ({
       triggerUpload: async () => undefined,
       ensureCover,
+      openFilePicker: () => {
+        const s = stateRef.current;
+        if (s.status === "success") {
+          setState({ status: "idle" });
+          requestAnimationFrame(() => inputRef.current?.click());
+          return;
+        }
+        inputRef.current?.click();
+      },
     }),
     [ensureCover],
   );
@@ -236,6 +246,18 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
     onFileCleared?.();
   }, [onFileCleared]);
 
+  const hiddenInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept={accept}
+      className="sr-only"
+      aria-hidden="true"
+      tabIndex={-1}
+      onChange={(e) => void onInputChange(e)}
+    />
+  );
+
   if (state.status === "success") {
     return (
       <>
@@ -243,6 +265,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
           <span className="cover-up__success-icon">✓</span>
           <span>{state.message}</span>
         </div>
+        {hiddenInput}
       </>
     );
   }
@@ -254,6 +277,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
           <span className="cover-up__processing-spin" aria-hidden="true">◌</span>
           <span>{state.message}</span>
         </div>
+        {hiddenInput}
       </>
     );
   }
@@ -297,6 +321,7 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             )}
           </div>
         </div>
+        {hiddenInput}
       </>
     );
   }
@@ -342,17 +367,8 @@ export const CoverUploader = forwardRef<CoverUploaderHandle, Props>(function Cov
             {state.status === "error" ? state.message : error}
           </p>
         )}
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept={accept}
-          className="sr-only"
-          aria-hidden="true"
-          tabIndex={-1}
-          onChange={(e) => void onInputChange(e)}
-        />
       </div>
+      {hiddenInput}
     </>
   );
 });

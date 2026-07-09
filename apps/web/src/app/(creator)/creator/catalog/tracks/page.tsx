@@ -2,12 +2,16 @@ import {
   createCatalogService,
   normalizePublicationSort,
   parsePublicationLibraryQuery,
+  shouldLoadPublicationInsight,
 } from "@sonafrik/api/catalog";
 import { PublicationsLibrary } from "@/features/creator/publications";
+import { resolvePublicationsPageSize } from "@/features/creator/publications/lib/publicationsPageSize";
 import { requireCreatorContext } from "@/features/creator/lib/requireCreator";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-const PAGE_SIZE = 50;
+export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = resolvePublicationsPageSize();
 
 export default async function CatalogTracksPage({
   searchParams,
@@ -19,7 +23,7 @@ export default async function CatalogTracksPage({
   const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
   const search = q?.trim() ?? "";
   const status = statusParam ?? "all";
-  const sortUi = sortParam === "title" ? "title" : "updated";
+  const sortUi = sortParam === "title" || sortParam === "alpha" ? "alpha" : sortParam ?? "updated";
 
   const supabase = await getSupabaseServerClient();
   const catalog = createCatalogService(supabase);
@@ -27,6 +31,7 @@ export default async function CatalogTracksPage({
   let total = 0;
   let catalogTotal = 0;
   let albumsById: Record<string, Awaited<ReturnType<typeof catalog.listAlbumsByIds>>[number]> = {};
+  let insights: Awaited<ReturnType<typeof catalog.getPublicationInsights>> = [];
 
   const libraryQuery = parsePublicationLibraryQuery({
     q: search,
@@ -35,6 +40,8 @@ export default async function CatalogTracksPage({
     page,
     pageSize: PAGE_SIZE,
   });
+
+  let loadError: string | null = null;
 
   try {
     const [pageResult, unfilteredTotal] = await Promise.all([
@@ -52,17 +59,35 @@ export default async function CatalogTracksPage({
     catalogTotal = unfilteredTotal;
 
     const albumIds = [...new Set(tracks.map((t) => t.album_id).filter((id): id is string => Boolean(id)))];
-    const albums = albumIds.length > 0 ? await catalog.listAlbumsByIds(albumIds) : [];
-    albumsById = Object.fromEntries(albums.map((album) => [album.id, album]));
-  } catch {
+    try {
+      const albums = albumIds.length > 0 ? await catalog.listAlbumsByIds(albumIds) : [];
+      albumsById = Object.fromEntries(albums.map((album) => [album.id, album]));
+    } catch {
+      albumsById = {};
+    }
+
+    try {
+      const insightTrackIds = tracks
+        .filter((track) => shouldLoadPublicationInsight(track.publication_status))
+        .map((track) => track.id);
+      insights =
+        insightTrackIds.length > 0 ? await catalog.getPublicationInsights(insightTrackIds) : [];
+    } catch {
+      insights = [];
+    }
+  } catch (err) {
+    loadError =
+      err instanceof Error ? err.message : "Impossible de charger vos publications.";
     tracks = [];
     total = 0;
     catalogTotal = 0;
     albumsById = {};
+    insights = [];
   }
 
   return (
     <PublicationsLibrary
+      key={`pub-lib:${page}:${search}:${status}:${sortUi}`}
       tracks={tracks}
       total={total}
       catalogTotal={catalogTotal}
@@ -73,6 +98,8 @@ export default async function CatalogTracksPage({
       status={status}
       sort={sortUi}
       albumsById={albumsById}
+      insights={insights}
+      loadError={loadError}
     />
   );
 }

@@ -54,7 +54,11 @@
     "test:srtsp": "pnpm --filter @sonafrik/realtime test",
     "probe:cors": "npx tsx scripts/probe-cors-infrastructure.ts",
     "analyze:web": "pnpm --filter @sonafrik/web analyze",
-    "dev:clean": "pnpm --filter @sonafrik/web dev:clean"
+    "dev:clean": "pnpm --filter @sonafrik/web dev:clean",
+    "perf:cwv": "pnpm --filter @sonafrik/web perf:cwv",
+    "perf:lighthouse": "node scripts/perf/run-lighthouse.mjs",
+    "perf:bundle": "node scripts/perf/extract-bundle.mjs",
+    "perf:report": "node scripts/perf/generate-report.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

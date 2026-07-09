@@ -144,7 +144,35 @@ export async function globalSetup(_config: FullConfig) {
     })),
   );
   const page = await context.newPage();
-  await page.goto(baseURL);
+  // Cold Next compile (middleware + first route) can exceed 2 min on Windows CI/dev.
+  let lastGotoError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await page.goto(baseURL, { waitUntil: "domcontentloaded", timeout: 180_000 });
+      lastGotoError = undefined;
+      break;
+    } catch (err) {
+      lastGotoError = err;
+      await new Promise((r) => setTimeout(r, 3_000 * (attempt + 1)));
+    }
+  }
+  if (lastGotoError) {
+    throw lastGotoError;
+  }
+
+  // Warm Mes publications (compile + auth cookies) so Phase 3 gate avoids cold-start false empty.
+  try {
+    await page.goto(`${baseURL.replace(/\/$/, "")}/creator/catalog/tracks`, {
+      waitUntil: "domcontentloaded",
+      timeout: 180_000,
+    });
+  } catch (warmErr) {
+    console.warn(
+      `[E2E] Warm /creator/catalog/tracks échoué (non bloquant): ${
+        warmErr instanceof Error ? warmErr.message : String(warmErr)
+      }`,
+    );
+  }
 
   await context.storageState({ path: AUTH_STATE_PATH });
   await browser.close();

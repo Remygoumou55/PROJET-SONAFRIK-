@@ -56,12 +56,14 @@ export function WizardStep2Panel({
   onCoverCleared,
   onCoverSuccess,
 }: WizardStep2PanelProps) {
-  return (
-    <div className="pub-wiz__step-panel" hidden={hidden}>
-      <div className="pub-wiz__body pub-wiz__body--step2">
-        <div className="pub-wiz__card pub-wiz__card--compact">
-          <h3 className="pub-wiz__card-title">Fichier audio</h3>
-          <p className="pub-wiz__card-sub">Choisissez le morceau à publier.</p>
+  const canContinue = !uploading2 && audioReady;
+
+  const body = (
+    <div className="pub-wiz__body pub-wiz__body--step2">
+      <div className="pub-wiz__card pub-wiz__card--compact">
+        <h3 className="pub-wiz__card-title">Fichier audio</h3>
+        <p className="pub-wiz__card-sub">Choisissez le morceau à publier.</p>
+        <div className="pub-wiz__upload-slot">
           <AudioUploader
             ref={audioRef}
             trackId={release.trackId}
@@ -70,12 +72,14 @@ export function WizardStep2Panel({
             onFileCleared={onAudioCleared}
           />
         </div>
+      </div>
 
-        <div className="pub-wiz__card pub-wiz__card--compact">
-          <h3 className="pub-wiz__card-title">Pochette</h3>
-          <p className="pub-wiz__card-sub">
-            Optionnel — SONAFRIK optimise automatiquement votre image.
-          </p>
+      <div className="pub-wiz__card pub-wiz__card--compact">
+        <h3 className="pub-wiz__card-title">Pochette</h3>
+        <p className="pub-wiz__card-sub">
+          Optionnel — SONAFRIK optimise automatiquement votre image.
+        </p>
+        <div className="pub-wiz__upload-slot">
           <CoverUploader
             ref={coverRef}
             coverEngine="smart"
@@ -86,19 +90,36 @@ export function WizardStep2Panel({
           />
         </div>
       </div>
+    </div>
+  );
 
-      <div className="pub-wiz__actions">
-        <button type="button" className="pub-wiz__btn pub-wiz__btn--ghost" onClick={onGoBack}>
-          ← Retour
-        </button>
-        <button
-          type="button"
-          className="pub-wiz__btn pub-wiz__btn--primary"
-          disabled={uploading2 || !audioReady}
-          onClick={onContinue}
-        >
-          {uploading2 ? "Envoi en cours…" : "Continuer →"}
-        </button>
+  if (hidden) {
+    return (
+      <div className="pub-wiz__step-panel pub-wiz__step-panel--upload-host" hidden aria-hidden="true">
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <div className="pub-wiz__step-panel">
+      <div className="pub-wiz__step-form">
+        {body}
+        <div className="pub-wiz__actions">
+          <button type="button" className="pub-wiz__btn pub-wiz__btn--ghost" onClick={onGoBack}>
+            ← Retour
+          </button>
+          <button
+            type="button"
+            className="pub-wiz__btn pub-wiz__btn--primary"
+            disabled={!canContinue}
+            onClick={() => {
+              if (canContinue) onContinue();
+            }}
+          >
+            {uploading2 ? "Envoi en cours…" : "Continuer →"}
+          </button>
+        </div>
       </div>
     </div>
   );

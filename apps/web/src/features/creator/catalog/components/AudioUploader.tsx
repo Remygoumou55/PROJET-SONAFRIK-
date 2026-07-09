@@ -18,6 +18,7 @@ type AudioFormat = "mp3" | "aac" | "wav";
 
 export interface AudioUploaderHandle {
   triggerUpload: (creatorIdOverride?: string) => Promise<void>;
+  openFilePicker: () => void;
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -144,6 +145,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
       }
 
       setState({ status: "ready", file, durationSeconds, format });
+      stateRef.current = { status: "ready", file, durationSeconds, format };
       setPlaying(false);
       setCurrentTime(0);
       onFileReady?.();
@@ -213,6 +215,15 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
       if (s.status !== "ready") throw new Error("Aucun fichier audio sélectionné.");
       await doUpload(s.file, s.durationSeconds, s.format, creatorIdOverride);
     },
+    openFilePicker: () => {
+      const s = stateRef.current;
+      if (s.status === "success") {
+        setState({ status: "idle" });
+        requestAnimationFrame(() => inputRef.current?.click());
+        return;
+      }
+      inputRef.current?.click();
+    },
   }), [doUpload]);
 
   // ── Reset ────────────────────────────────────────────────────────────────────
@@ -245,14 +256,29 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
   // ── Success ───────────────────────────────────────────────────────────────────
 
+  const hiddenInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept={AUDIO_ACCEPT}
+      className="sr-only"
+      aria-hidden="true"
+      tabIndex={-1}
+      onChange={handleInputChange}
+    />
+  );
+
   if (state.status === "success") {
     return (
-      <div className="audio-up__success">
-        <span className="audio-up__success-icon">✓</span>
-        <span className="audio-up__success-text">
-          Audio validé{state.durationSeconds > 0 ? ` — ${formatDuration(state.durationSeconds)}` : ""}
-        </span>
-      </div>
+      <>
+        <div className="audio-up__success">
+          <span className="audio-up__success-icon">✓</span>
+          <span className="audio-up__success-text">
+            Audio validé{state.durationSeconds > 0 ? ` — ${formatDuration(state.durationSeconds)}` : ""}
+          </span>
+        </div>
+        {hiddenInput}
+      </>
     );
   }
 
@@ -260,10 +286,13 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
 
   if (state.status === "analyzing" || state.status === "validating") {
     return (
-      <div className="audio-up__analyzing">
-        <div className="audio-up__spinner" aria-hidden="true" />
-        <span>{state.status === "analyzing" ? "Analyse du fichier…" : "Validation serveur…"}</span>
-      </div>
+      <>
+        <div className="audio-up__analyzing">
+          <div className="audio-up__spinner" aria-hidden="true" />
+          <span>{state.status === "analyzing" ? "Analyse du fichier…" : "Validation serveur…"}</span>
+        </div>
+        {hiddenInput}
+      </>
     );
   }
 
@@ -275,6 +304,7 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
     const seekPct = state.durationSeconds > 0 ? (currentTime / state.durationSeconds) * 100 : 0;
 
     return (
+      <>
       <div className="audio-up__player">
         <audio
           ref={audioElRef}
@@ -356,12 +386,15 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
           </button>
         )}
       </div>
+      {hiddenInput}
+      </>
     );
   }
 
   // ── Idle / Error — Drop zone ──────────────────────────────────────────────────
 
   return (
+    <>
     <div className="audio-up__wrap">
       <div
         role="button"
@@ -387,16 +420,8 @@ export const AudioUploader = forwardRef<AudioUploaderHandle, Props>(function Aud
       {state.status === "error" && (
         <p className="audio-up__error" role="alert">{state.message}</p>
       )}
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept={AUDIO_ACCEPT}
-        className="sr-only"
-        aria-hidden="true"
-        tabIndex={-1}
-        onChange={handleInputChange}
-      />
     </div>
+    {hiddenInput}
+    </>
   );
 });

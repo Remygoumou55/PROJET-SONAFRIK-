@@ -1,0 +1,188 @@
+name: Performance Certification
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SONAFRIK — Enterprise Performance CI Pipeline (B3.2)
+# Référence officielle réutilisable pour certifier la performance d'un module.
+# Chaîne : Build → next start → Auth Perf Tests → Lighthouse → Core Web Vitals
+#          → Bundle → Rapport → Artifacts → Décision de certification.
+#
+# Paramétrable via inputs (workflow_dispatch) pour d'autres modules :
+#   route, slug, baseline_first_load_kb.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:
+    inputs:
+      route:
+        description: "Route authentifiée à certifier"
+        required: false
+        default: "/creator/catalog/tracks"
+      slug:
+        description: "Slug d'artefacts (nom court du module)"
+        required: false
+        default: "publications"
+      baseline_first_load_kb:
+        description: "Baseline First Load JS (kB) pour détection de régression"
+        required: false
+        default: "268"
+  push:
+    branches:
+      - "perf/**"
+    paths:
+      - ".github/workflows/performance-cert.yml"
+      - "scripts/perf/**"
+      - "apps/web/tests/perf/**"
+      - "apps/web/playwright.perf.config.ts"
+
+concurrency:
+  group: perf-cert-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  PERF_ROUTE: ${{ github.event.inputs.route || '/creator/catalog/tracks' }}
+  PERF_SLUG: ${{ github.event.inputs.slug || 'publications' }}
+  PERF_BASELINE_KB: ${{ github.event.inputs.baseline_first_load_kb || '268' }}
+  ARTIFACT_DIR: apps/web/perf-artifacts
+
+jobs:
+  performance-cert:
+    name: Enterprise Performance Certification
+    runs-on: ubuntu-latest
+    # QG1 — Requiert un environnement Supabase (route authentifiée + provisioning compte).
+    if: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
+    steps:
+      # ── QG1 — CI Environment ────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies (frozen)
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright chromium
+        working-directory: apps/web
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Prepare artifact dir
+        run: mkdir -p "${ARTIFACT_DIR}"
+
+      # ── QG2 — Quality (lint + typecheck + unit) ─────────────────────────────
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      # ── QG2 — Production Build (log capturé pour l'analyse bundle) ──────────
+      - name: Production build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          set -o pipefail
+          pnpm build 2>&1 | tee "${ARTIFACT_DIR}/build.log"
+
+      # ── QG6 — Bundle analysis (comparaison baseline B3) ─────────────────────
+      - name: Extract bundle metrics
+        run: |
+          node scripts/perf/extract-bundle.mjs \
+            --log "${ARTIFACT_DIR}/build.log" \
+            --out "${ARTIFACT_DIR}" \
+            --route "${PERF_ROUTE}" \
+            --baseline "${PERF_BASELINE_KB}"
+          node scripts/perf/set-context.mjs --out "${ARTIFACT_DIR}" \
+            buildTestsPassed=true \
+            "buildTestsDetail=lint+typecheck+unit+build PASS (ubuntu-latest, Node 22)" \
+            "environment=CI ubuntu-latest · next start production · route authentifiée"
+
+      # ── QG3 — Production Runtime (next start + health check) ────────────────
+      - name: Start production server
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          nohup pnpm --filter @sonafrik/web start > "${ARTIFACT_DIR}/server.log" 2>&1 &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for server health
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/ || echo 000)
+            echo "attempt $i → HTTP $code"
+            if [ "$code" = "200" ] || [ "$code" = "307" ] || [ "$code" = "308" ]; then
+              echo "Server ready."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Server not ready in time." >&2
+          cat "${ARTIFACT_DIR}/server.log" >&2 || true
+          exit 1
+
+      # ── QG4/5/7/8 — Auth Perf Test (CWV + runtime + network + cookies) ──────
+      - name: Capture Core Web Vitals (authenticated)
+        working-directory: apps/web
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL || 's13b-playwright-listener@sonafrik.test' }}
+          PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD || 'S13BCert2026!' }}
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: pnpm perf:cwv
+
+      # ── QG4 — Authenticated Lighthouse (desktop + mobile) ───────────────────
+      - name: Lighthouse (desktop + mobile, authenticated)
+        run: |
+          node scripts/perf/run-lighthouse.mjs \
+            --url "http://localhost:3000${PERF_ROUTE}" \
+            --out "${ARTIFACT_DIR}" \
+            --headers "${ARTIFACT_DIR}/auth-headers.json" \
+            --form-factor both \
+            --slug "${PERF_SLUG}"
+
+      # ── QG9/QG10 — Rapport agrégé + décision ────────────────────────────────
+      - name: Generate certification report
+        run: |
+          node scripts/perf/generate-report.mjs \
+            --dir "${ARTIFACT_DIR}" \
+            --slug "${PERF_SLUG}"
+
+      - name: Stop production server
+        if: always()
+        run: |
+          if [ -n "${SERVER_PID:-}" ]; then kill "${SERVER_PID}" 2>/dev/null || true; fi
+
+      # ── QG9 — Artifacts (toujours publiés, même en échec) ───────────────────
+      - name: Upload performance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-cert-${{ env.PERF_SLUG }}
+          path: apps/web/perf-artifacts/
+          retention-days: 90
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f "${ARTIFACT_DIR}/PERFORMANCE_CI_REPORT.md" ]; then
+            cat "${ARTIFACT_DIR}/PERFORMANCE_CI_REPORT.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ── QG10 — Gate de certification (bloquant) ─────────────────────────────
+      - name: Certification gate
+        run: |
+          node -e "const c=require('./apps/web/perf-artifacts/certification.json'); console.log('certified=',c.certified,'score=',c.score10); process.exit(c.certified?0:1)"

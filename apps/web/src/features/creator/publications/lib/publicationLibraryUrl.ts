@@ -1,6 +1,8 @@
 /** URL builder Mes publications — single source (pagination, filtres, tri serveur). */
 
-export type PublicationsSortUi = "updated" | "title";
+import type { PublicationsSortUi } from "./publicationConstants";
+
+export type { PublicationsSortUi };
 
 export interface PublicationsUrlParams {
   page?: number;
@@ -25,5 +27,9 @@ export function buildPublicationsLibraryUrl({
 }
 
 export function parsePublicationsSortUi(raw?: string | null): PublicationsSortUi {
-  return raw === "title" ? "title" : "updated";
+  if (raw === "oldest") return "oldest";
+  if (raw === "streams") return "streams";
+  if (raw === "revenue") return "revenue";
+  if (raw === "alpha") return "alpha";
+  return "updated";
 }

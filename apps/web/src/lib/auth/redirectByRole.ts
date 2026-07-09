@@ -1,4 +1,4 @@
-import type { RouteRole } from "./getSessionAndRole";
+import type { RouteRole } from "./accountType";
 
 export function getHomeByRole(role: RouteRole): string {
   switch (role) {

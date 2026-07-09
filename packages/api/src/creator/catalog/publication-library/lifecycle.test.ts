@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Track } from "@sonafrik/types";
-import { getPublicationActions } from "./actions";
+import { getPublicationActions, getPublicationMenuActions } from "./actions";
 import { buildPublicationLifecycleTimeline } from "./lifecycle";
 
 const baseTrack: Track = {
@@ -71,6 +71,23 @@ describe("publicationActions", () => {
     const actions = getPublicationActions("archived");
     expect(actions).toHaveLength(1);
     expect(actions[0]?.id).toBe("view");
+  });
+
+  it("menu en revue — aligné panneau détail (sans actions fantômes)", () => {
+    const menu = getPublicationMenuActions("pending_review");
+    expect(menu.map((a) => a.id)).toEqual(["view"]);
+  });
+
+  it("menu publié — actions actives uniquement", () => {
+    const menu = getPublicationMenuActions("published");
+    expect(menu.every((a) => !a.disabled)).toBe(true);
+    expect(menu.map((a) => a.id)).toEqual([
+      "view",
+      "share",
+      "consult",
+      "analytics",
+      "revenue",
+    ]);
   });
 });
 

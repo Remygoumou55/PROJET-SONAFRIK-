@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { mapAccountType } from "@/lib/auth/accountType";
 import { getHomeByRole } from "@/lib/auth/redirectByRole";
-import { mapAccountType } from "@/lib/auth/getSessionAndRole";
 import { isMiddlewareBypassActive } from "@/lib/auth/guards";
 import { applySecurityHeaders, buildContentSecurityPolicy } from "@/lib/security/csp";
 

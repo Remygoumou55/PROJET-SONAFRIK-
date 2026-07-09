@@ -7,9 +7,36 @@ import { COVER_SOURCE_METADATA_KEY, type CoverSource, type CoverStatus } from ".
 import {
   applyPublicationSearchFilter,
   type PublicationLibrarySort,
+  type PublicationLibraryStatusFilter,
   type PublicationSearchField,
+  type PublicationTrackInsight,
   publicationSortToOrder,
+  resolvePublicationStatusDbFilter,
 } from "./publication-library";
+
+function applyPublicationStatusFilter<
+  T extends {
+    eq: (col: string, val: string) => T;
+    not: (col: string, op: string, val: null) => T;
+    filter: (col: string, op: string, val: string) => T;
+  },
+>(query: T, status?: PublicationLibraryStatusFilter | string): T {
+  const resolved = resolvePublicationStatusDbFilter(
+    (status ?? "all") as PublicationLibraryStatusFilter,
+  );
+  if (resolved === "all") return query;
+  if (resolved === "validation") {
+    return query
+      .eq("publication_status", "pending_review")
+      .not("submitted_at", "is", null);
+  }
+  if (resolved === "scheduled") {
+    return query
+      .eq("publication_status", "draft")
+      .not("metadata->scheduled_publish_at", "is", null);
+  }
+  return query.eq("publication_status", resolved);
+}
 
 function slugify(value: string): string {
   return value
@@ -245,7 +272,7 @@ export class CatalogRepository {
       options?.searchFields ?? ["title"],
     );
     if (options?.status && options.status !== "all") {
-      query = query.eq("publication_status", options.status);
+      query = applyPublicationStatusFilter(query, options.status);
     }
 
     const { count, error } = await query;
@@ -278,7 +305,7 @@ export class CatalogRepository {
       options?.searchFields ?? ["title"],
     );
     if (options?.status && options.status !== "all") {
-      query = query.eq("publication_status", options.status);
+      query = applyPublicationStatusFilter(query, options.status);
     }
 
     query = query.order(column, { ascending }).range(offset, offset + limit - 1);
@@ -289,6 +316,76 @@ export class CatalogRepository {
       ...(row as Track),
       metadata: (row.metadata as Record<string, unknown>) ?? {},
     }));
+  }
+
+  async getPublicationInsightsBatch(trackIds: string[]): Promise<PublicationTrackInsight[]> {
+    if (trackIds.length === 0) return [];
+
+    // B3 perf : 1 requête agrégée pour N tracks (remplace le N+1 historique).
+    const { data, error } = await this.client.rpc("get_publication_insights_batch", {
+      p_track_ids: trackIds,
+    });
+
+    if (!error && Array.isArray(data)) {
+      const byId = new Map(
+        (data as { track_id: string; streams: number; last_activity_at: string | null }[]).map(
+          (row) => [row.track_id, row],
+        ),
+      );
+      return trackIds.map((trackId) => {
+        const row = byId.get(trackId);
+        return {
+          track_id: trackId,
+          streams: Number(row?.streams ?? 0),
+          revenue_gnf: null,
+          last_activity_at: row?.last_activity_at ?? null,
+        } satisfies PublicationTrackInsight;
+      });
+    }
+
+    // Fallback tolérant si le RPC batch est indisponible (déploiement DB en retard).
+    return this.getPublicationInsightsBatchFallback(trackIds);
+  }
+
+  private async getPublicationInsightsBatchFallback(
+    trackIds: string[],
+  ): Promise<PublicationTrackInsight[]> {
+    const results = await Promise.all(
+      trackIds.map(async (trackId) => {
+        try {
+          const [countsRes, sessionsRes] = await Promise.all([
+            this.client.rpc("get_track_listen_counts", { p_track_id: trackId }),
+            this.client
+              .from("stream_sessions")
+              .select("started_at")
+              .eq("track_id", trackId)
+              .eq("is_valid_listen", true)
+              .order("started_at", { ascending: false })
+              .limit(1)
+              .maybeSingle(),
+          ]);
+
+          const row = countsRes.data as Record<string, unknown> | null;
+          const session = sessionsRes.data as { started_at: string } | null;
+
+          return {
+            track_id: trackId,
+            streams: Number(row?.all_time ?? 0),
+            revenue_gnf: null,
+            last_activity_at: session?.started_at ?? null,
+          } satisfies PublicationTrackInsight;
+        } catch {
+          return {
+            track_id: trackId,
+            streams: 0,
+            revenue_gnf: null,
+            last_activity_at: null,
+          } satisfies PublicationTrackInsight;
+        }
+      }),
+    );
+
+    return results;
   }
 
   async listTracks(creatorId: string, albumId?: string, limit = 100, offset = 0): Promise<Track[]> {

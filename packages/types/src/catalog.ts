@@ -140,7 +140,7 @@ export const PUBLICATION_STATUS_LABELS: Record<PublicationStatus, string> = {
   draft: "Brouillon",
   pending_review: "En revue",
   published: "Publié",
-  rejected: "Rejeté",
+  rejected: "Refusé",
   archived: "Archivé",
 };
 

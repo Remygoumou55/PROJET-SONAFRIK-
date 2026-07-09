@@ -14,7 +14,12 @@
     "test": "vitest run --config ../../scripts/vitest.web-navigation.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:smoke": "playwright test smoke"
+    "test:e2e:smoke": "playwright test smoke",
+    "test:e2e:publications": "cross-env PUBLICATIONS_E2E_PAGE_SIZE=10 playwright test publications-library publications-certification-gate publications-pagination-ui",
+    "test:e2e:publications-cert": "cross-env PUBLICATIONS_E2E_PAGE_SIZE=10 playwright test publications-certification-gate publications-pagination-ui",
+    "test:e2e:publications-stress": "cross-env PUBLICATIONS_E2E_PAGE_SIZE=10 playwright test publications-long-session",
+    "test:e2e:publications-stress-long": "cross-env PUBLICATIONS_E2E_PAGE_SIZE=10 PLAYWRIGHT_STRESS_DURATION_MS=1800000 playwright test publications-long-session",
+    "perf:cwv": "cross-env PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test --config playwright.perf.config.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.58.0",

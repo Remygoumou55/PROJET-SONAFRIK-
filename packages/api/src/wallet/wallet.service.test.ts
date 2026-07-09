@@ -265,4 +265,45 @@ describe("WalletService", () => {
     expect(context.wallet.id).toBe("w1");
     expect(plans.length).toBeGreaterThan(0);
   });
+
+  it("getRoyaltyCalculations retourne [] pour un identifiant non-UUID (dev-mock-id)", async () => {
+    const service = new WalletService(createMockClient({}));
+    const rows = await service.getRoyaltyCalculations("dev-mock-id");
+    expect(rows).toEqual([]);
+  });
+
+  it("getRoyaltyCalculations délègue au repository avec l'UUID session", async () => {
+    const royaltyRow = {
+      id: "rc-1",
+      artist_id: "44444444-4444-4444-8444-444444444444",
+      net_amount_gnf: 12_000,
+      valid_listen_count: 42,
+      listen_share_percent: 1.5,
+      status: "pending",
+      created_at: "2026-01-01T00:00:00Z",
+    };
+    const from = vi.fn((table: string) => {
+      const chain = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        range: vi.fn().mockResolvedValue({ data: [], error: null }),
+      };
+      if (table === "royalty_calculations") {
+        chain.range.mockResolvedValue({ data: [royaltyRow], error: null });
+      }
+      return chain;
+    });
+    const client = {
+      auth: { getUser: vi.fn() },
+      from,
+      rpc: vi.fn(),
+    } as unknown as SupabaseClient<Database>;
+    const service = new WalletService(client);
+
+    const rows = await service.getRoyaltyCalculations("44444444-4444-4444-8444-444444444444");
+
+    expect(rows).toHaveLength(1);
+    expect(from).toHaveBeenCalledWith("royalty_calculations");
+  });
 });

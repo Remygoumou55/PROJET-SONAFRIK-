@@ -23,7 +23,11 @@ interface ArtistHeroProps {
 
 function fmtMemberSince(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    return new Date(iso).toLocaleDateString("fr-FR", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    });
   } catch {
     return "";
   }

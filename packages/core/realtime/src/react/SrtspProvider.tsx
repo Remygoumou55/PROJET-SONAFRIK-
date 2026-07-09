@@ -151,38 +151,69 @@ export function useLiveQuery<T>(
   },
 ): { data: T | undefined; loading: boolean; error: Error | null; refresh: () => void } {
   const { subscribe } = useSrtsp();
+  const skipInitialFetch = Boolean(
+    options?.skipInitialFetch && options.initialData !== undefined,
+  );
+  const enabled = options?.enabled !== false;
   const [data, setData] = useState<T | undefined>(options?.initialData);
-  const [loading, setLoading] = useState(options?.enabled !== false);
+  const [loading, setLoading] = useState(() => enabled && !skipInitialFetch);
   const [error, setError] = useState<Error | null>(null);
   const mounted = useRef(true);
+  const requestIdRef = useRef(0);
+  const inFlightRef = useRef(false);
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
   const shouldInvalidateRef = useRef(options?.shouldInvalidate);
   shouldInvalidateRef.current = options?.shouldInvalidate;
+  const initialDataRef = useRef(options?.initialData);
+  initialDataRef.current = options?.initialData;
   const invalidateKey = useMemo(() => stableEventKey(invalidateOn), [invalidateOn]);
 
   const refresh = useCallback(() => {
+    if (inFlightRef.current) return;
+    const requestId = ++requestIdRef.current;
+    inFlightRef.current = true;
     setLoading(true);
     void fetcherRef
       .current()
       .then((result) => {
-        if (mounted.current) {
+        if (mounted.current && requestId === requestIdRef.current) {
           setData(result);
           setError(null);
         }
       })
       .catch((err: unknown) => {
-        if (mounted.current) setError(err instanceof Error ? err : new Error(String(err)));
+        if (mounted.current && requestId === requestIdRef.current) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+        }
       })
       .finally(() => {
-        if (mounted.current) setLoading(false);
+        if (requestId === requestIdRef.current) {
+          inFlightRef.current = false;
+        }
+        if (mounted.current && requestId === requestIdRef.current) setLoading(false);
       });
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
+    if (initialDataRef.current !== undefined) {
+      setData(initialDataRef.current);
+      setError(null);
+    }
+  }, [key, enabled]);
+
+  useEffect(() => {
     mounted.current = true;
-    if (options?.enabled === false) return;
-    if (options?.skipInitialFetch && options.initialData !== undefined) {
+    requestIdRef.current += 1;
+    inFlightRef.current = false;
+    if (!enabled) {
+      setLoading(false);
+      return () => {
+        mounted.current = false;
+      };
+    }
+    if (skipInitialFetch) {
       setLoading(false);
       return () => {
         mounted.current = false;
@@ -192,16 +223,16 @@ export function useLiveQuery<T>(
     return () => {
       mounted.current = false;
     };
-  }, [key, refresh, options?.enabled, options?.skipInitialFetch, options?.initialData]);
+  }, [key, refresh, enabled, skipInitialFetch]);
 
   useEffect(() => {
-    if (options?.enabled === false) return;
+    if (!enabled) return;
     const names = invalidateKey.includes("|") ? invalidateKey.split("|") : invalidateKey;
     return subscribe({ eventName: names }, (event) => {
       if (shouldInvalidateRef.current && !shouldInvalidateRef.current(event)) return;
       refresh();
     });
-  }, [subscribe, invalidateKey, refresh, options?.enabled]);
+  }, [subscribe, invalidateKey, refresh, enabled]);
 
   return { data, loading, error, refresh };
 }

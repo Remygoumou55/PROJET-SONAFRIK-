@@ -97,6 +97,30 @@ Audit final, corrections de clôture, certification officielle, FREEZE fonctionn
 
 ---
 
+## 2026-07-09 — Mes publications B3.1 Enterprise Performance Validation
+
+### Objectif
+Valider (pas optimiser) les gains B3 en environnement propre reproductible. Ne jamais inventer de score.
+
+### Méthode
+Env propre : `.next` supprimé → build production → **serveur `next start`** (pas dev, qui corrompt `.next` sous Windows) → e2e via `PLAYWRIGHT_SKIP_WEBSERVER`.
+
+### Mesuré & PASS
+- Build ✅ · TypeScript (web+api) ✅ · ESLint (web+api) ✅ · **330 tests unitaires** ✅
+- Bundle `/creator/catalog/tracks` : **6,86 kB / 268 kB** = identique B3 → **aucune régression** (reproductible)
+- E2E sur serveur production : **9/10 au 1ᵉ run propre**. Le 10ᵉ (`filtres alignés URLs`) = **flake d'hydratation React du harnais** confirmé (`--retries=1` → `1 flaky`, passe au retry) → **durci** dans `publications-library.spec.ts` (test-only, 0 ligne produit). Serveur = 200 tout du long.
+- Réseau : refresh borné `< 100` requêtes (mesuré) ; N+1→1 (B3, vérifié DB)
+
+### Non mesuré (refus d'inventer — procédure CI documentée)
+Lighthouse Desktop/Mobile, Core Web Vitals, React Profiler, Runtime flamegraph. Raisons : route authentifiée (bypass = liste vide non représentative), aucun outillage Lighthouse installé, et **hôte Windows prouvé non soutenable** (runs e2e répétés : 4,4 min → 13,2 min, ×3, timeouts par saturation ressources — pas de régression produit).
+
+### Décision
+Score mesurable ≈ **9,45 / 10**. **VALIDATION PARTIELLE — Enterprise ≥ 9,8 NON prononcé.** B3 **non clôturé** formellement tant que les mesures Lighthouse/CWV ne sont pas obtenues sur **CI Linux** (job perf à créer).
+Rapport : `docs/functional-quality/reports/SONAFRIK_PUBLICATIONS_B3_1_VALIDATION.md`
+Fichier touché : `apps/web/tests/e2e/publications-library.spec.ts` (durcissement flake, test-only).
+
+---
+
 ## 2026-07-08 — Mes publications B3 Enterprise Performance Certification
 
 ### Objectif

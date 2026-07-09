@@ -1,4 +1,9 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MusicHeader } from "@/features/shared/navigation";
+import { buttonVariants } from "@sonafrik/ui";
 import {
   resolveCreatorPageSubtitle,
   resolveCreatorPageTitle,
@@ -6,18 +11,20 @@ import {
 import { CreatorHeaderUtilities } from "../dashboard/components/enterprise/CreatorHeaderUtilities";
 
 interface CreatorWorkspaceHeaderProps {
-  pathname: string;
   userId: string;
   initialUnreadCount: number;
+  pendingVerifications?: number;
 }
 
 export function CreatorWorkspaceHeader({
-  pathname,
   userId,
   initialUnreadCount,
+  pendingVerifications = 0,
 }: CreatorWorkspaceHeaderProps) {
+  const pathname = usePathname();
   const pageTitle = resolveCreatorPageTitle(pathname);
   const pageSubtitle = resolveCreatorPageSubtitle(pathname);
+  const isCatalogManager = pathname === "/creator/catalog/tracks";
 
   return (
     <MusicHeader
@@ -25,7 +32,21 @@ export function CreatorWorkspaceHeader({
       title={pageTitle}
       subtitle={pageSubtitle ?? undefined}
       right={
-        <CreatorHeaderUtilities userId={userId} initialUnreadCount={initialUnreadCount} />
+        <div className="creator-header__utilities">
+          {isCatalogManager ? (
+            <Link
+              href="/creator/catalog/tracks/new"
+              className={buttonVariants({ variant: "primary", size: "sm" })}
+            >
+              Nouvelle publication
+            </Link>
+          ) : null}
+          <CreatorHeaderUtilities
+            userId={userId}
+            initialUnreadCount={initialUnreadCount}
+            pendingVerifications={pendingVerifications}
+          />
+        </div>
       }
     />
   );

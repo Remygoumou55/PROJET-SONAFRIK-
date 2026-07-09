@@ -2,9 +2,10 @@
 
 import dynamic from "next/dynamic";
 import { WizardProgress } from "./WizardProgress";
-import { WizardPublishedSuccess } from "./WizardPublishedSuccess";
 import { WizardStep1Panel } from "./WizardStep1Panel";
 import { usePublicationWizardFlow } from "../hooks/usePublicationWizardFlow";
+import { usePublicationPublishToast } from "../hooks/usePublicationPublishToast";
+import { runWizardTask } from "../lib/wizardErrorMessage";
 
 const WizardStep2Panel = dynamic(
   () => import("./WizardStep2Panel").then((mod) => ({ default: mod.WizardStep2Panel })),
@@ -51,12 +52,16 @@ interface Props {
 
 export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }: Props) {
   const flow = usePublicationWizardFlow({ creatorId, stageName, onCancel });
+  const showPublishToast = usePublicationPublishToast();
 
-  if (flow.published) {
-    return (
-      <WizardPublishedSuccess title={flow.release?.title ?? "Votre morceau"} onComplete={onComplete} />
-    );
-  }
+  const handlePublish = () => {
+    runWizardTask(async () => {
+      const ok = await flow.handlePublish();
+      if (!ok) return;
+      showPublishToast();
+      requestAnimationFrame(() => onComplete());
+    });
+  };
 
   return (
     <div className="pub-wiz">
@@ -80,7 +85,7 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
         />
       )}
 
-      {flow.step2Mounted && flow.release && (
+      {(flow.step2Mounted || flow.step === 4) && flow.release && (
         <WizardStep2Panel
           hidden={flow.step !== 2}
           release={flow.release}
@@ -91,7 +96,10 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
           audioReady={flow.audioReady}
           onGoBack={flow.goBack}
           onContinue={() => void flow.handleContinueStep2()}
-          onAudioReady={() => flow.setAudioReady(true)}
+          onAudioReady={() => {
+            flow.setAudioReady(true);
+            if (flow.step === 4) runWizardTask(() => flow.handleReviewAudioReady());
+          }}
           onAudioCleared={() => {
             flow.setAudioReady(false);
             if (flow.filesCompleted) flow.setFilesCompleted(false);
@@ -100,7 +108,13 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
             if (flow.filesCompleted) flow.setFilesCompleted(false);
             flow.invalidateCoverPreview();
           }}
-          onCoverSuccess={() => flow.invalidateCoverPreview()}
+          onCoverSuccess={() => {
+            if (flow.step === 4) {
+              flow.handleReviewCoverSuccess();
+            } else {
+              flow.invalidateCoverPreview();
+            }
+          }}
         />
       )}
 
@@ -121,12 +135,20 @@ export function PublicationWizard({ creatorId, stageName, onComplete, onCancel }
         <WizardStep4Panel
           release={flow.release}
           stageName={stageName}
-          genreLabel={flow.genreLabel}
-          languageLabel={flow.languageLabel}
+          meta={flow.meta}
+          genres={flow.genres}
           coverPreviewUrl={flow.coverPreviewUrl}
+          audioInfo={flow.audioFileInfo}
+          audioInfoLoading={flow.audioInfoLoading}
+          savingReview={flow.savingReview}
+          replacingMedia={flow.replacingMedia}
           publishing={flow.publishing}
-          onBackToMeta={() => flow.goToStep(3)}
-          onPublish={() => void flow.handlePublish()}
+          onTitleSave={flow.handleReviewTitleSave}
+          onMetaChange={(patch) => flow.setMeta((m) => ({ ...m, ...patch }))}
+          onMetaSave={flow.handleReviewMetaSave}
+          onReplaceCover={flow.handleReplaceCover}
+          onReplaceAudio={flow.handleReplaceAudio}
+          onPublish={handlePublish}
         />
       )}
     </div>

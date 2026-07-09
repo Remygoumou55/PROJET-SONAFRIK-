@@ -12,6 +12,7 @@ type UseAutoImageUploadOptions = {
   variant: AutoImageVariant;
   onUpload: (prepared: AutoImagePrepared) => Promise<void>;
   onSuccess?: () => void;
+  onError?: (message: string) => void;
   successMessage?: string | null;
 };
 
@@ -19,6 +20,7 @@ export function useAutoImageUpload({
   variant,
   onUpload,
   onSuccess,
+  onError,
   successMessage = null,
 }: UseAutoImageUploadOptions) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,11 +46,16 @@ export function useAutoImageUpload({
       if (successMessage) setSuccess(successMessage);
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Échec de l'enregistrement.");
+      const message = err instanceof Error ? err.message : "Échec de l'enregistrement.";
+      if (onError) {
+        onError(message);
+      } else {
+        setError(message);
+      }
     } finally {
       setUploading(false);
     }
-  }, [clearMessages, onSuccess, onUpload, successMessage, variant]);
+  }, [clearMessages, onError, onSuccess, onUpload, successMessage, variant]);
 
   const handleInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

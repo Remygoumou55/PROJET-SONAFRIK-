@@ -1,16 +1,17 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { useCreatorService } from "../../hooks/useCreator";
 import {
+  assertBrowserSessionForUpload,
   resolveCreatorIdForUpload,
-  resolveCreatorUploadError,
   useEffectiveCreatorId,
 } from "../../hooks/useEffectiveCreatorId";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useSuccessToast } from "@/features/shared/feedback/useSuccessToast";
+import { useUploadErrorToast } from "@/features/shared/feedback/useErrorToast";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import {
   AUTO_IMAGE_VARIANTS,
@@ -32,10 +33,12 @@ export function ArtistProfilePhoto({
   const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
   const showSuccessToast = useSuccessToast();
-
+  const showUploadError = useUploadErrorToast();
   const [localPhotoPath, setLocalPhotoPath] = useState(photoPath);
-  const [removeError, setRemoveError] = useState<string | null>(null);
-  const [removing, setRemoving] = useState(false);
+
+  useEffect(() => {
+    setLocalPhotoPath(photoPath);
+  }, [photoPath]);
 
   const initials = stageName
     .split(/\s+/)
@@ -44,40 +47,36 @@ export function ArtistProfilePhoto({
     .join("");
 
   const uploadAvatar = useCallback(async (prepared: AutoImagePrepared) => {
-    try {
-      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
-      const { signedUrl, token, path } =
-        await creatorService.requestAssetUploadUrl({
-          creatorId,
-          assetKind: "gallery",
-          contentType: prepared.contentType,
-        });
-      await uploadAssetToSignedUrl(signedUrl, prepared.file, {
-        contentType: prepared.contentType,
-        token,
-      });
-
-      await creatorService.saveAvatarCrop({
+    await assertBrowserSessionForUpload();
+    const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
+    const { signedUrl, token, path } =
+      await creatorService.requestAssetUploadUrl({
         creatorId,
-        croppedPath: path,
-        originalPath: path,
-        cropX: 0,
-        cropY: 0,
-        cropZoom: 1,
+        assetKind: "gallery",
+        contentType: prepared.contentType,
       });
+    await uploadAssetToSignedUrl(signedUrl, prepared.file, {
+      contentType: prepared.contentType,
+      token,
+    });
 
-      invalidateCreatorAssetUrl(creatorId);
-      setLocalPhotoPath(path);
-      publishArtistProfileUpdate(creatorId);
-    } catch (err) {
-      throw new Error(resolveCreatorUploadError(err, "Échec de l'enregistrement de l'avatar."));
-    }
+    await creatorService.saveAvatarCrop({
+      creatorId,
+      croppedPath: path,
+      originalPath: path,
+      cropX: 0,
+      cropY: 0,
+      cropZoom: 1,
+    });
+
+    invalidateCreatorAssetUrl(creatorId);
+    setLocalPhotoPath(path);
+    publishArtistProfileUpdate(creatorId);
   }, [creatorIdProp, creatorService]);
 
   const {
     inputRef,
     uploading,
-    error: uploadError,
     accept,
     openFilePicker,
     handleInputChange,
@@ -85,33 +84,15 @@ export function ArtistProfilePhoto({
     variant: AUTO_IMAGE_VARIANTS.avatar,
     onUpload: uploadAvatar,
     onSuccess: () => showSuccessToast("Avatar enregistré"),
+    onError: (message) => showUploadError(new Error(message), "Échec de l'enregistrement de l'avatar."),
     successMessage: null,
   });
 
-  const handleRemove = useCallback(async () => {
-    setRemoving(true);
-    setRemoveError(null);
-    try {
-      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
-      await creatorService.removeProfilePhoto(creatorId);
-      invalidateCreatorAssetUrl(creatorId);
-      setLocalPhotoPath(null);
-      publishArtistProfileUpdate(creatorId);
-      showSuccessToast("Avatar supprimé");
-    } catch (err) {
-      setRemoveError(resolveCreatorUploadError(err, "Impossible de supprimer la photo."));
-    } finally {
-      setRemoving(false);
-    }
-  }, [creatorIdProp, creatorService, showSuccessToast]);
-
-  const error = removeError ?? uploadError;
-  const busy = uploading || removing;
+  const busy = uploading;
 
   return (
-    <>
-      <div className="ahero__avatar-wrap">
-        <button
+    <div className="ahero__avatar-wrap">
+      <button
           type="button"
           className="ahero__avatar ahero__avatar-button"
           onClick={openFilePicker}
@@ -124,7 +105,9 @@ export function ArtistProfilePhoto({
               path={localPhotoPath}
               assetKind="gallery"
               alt={stageName}
+              fit="contain"
               layout="bounded"
+              className="ahero__avatar-img"
               priority
               fallback={
                 <span className="ahero__avatar-initials" aria-hidden="true">
@@ -137,33 +120,13 @@ export function ArtistProfilePhoto({
               {initials || "🎤"}
             </span>
           )}
-          {busy && (
+          {busy ? (
             <div className="ahero__avatar-loading" aria-live="polite">
               <span>◌</span>
             </div>
-          )}
+          ) : null}
           <span className="ahero__avatar-edit" aria-hidden="true">Modifier</span>
         </button>
-      </div>
-
-      <div className="ahero__avatar-actions">
-        {localPhotoPath && (
-          <button
-            type="button"
-            className="ahero__btn ahero__btn--danger"
-            onClick={() => void handleRemove()}
-            disabled={busy}
-            aria-label="Supprimer la photo de profil"
-          >
-            🗑
-          </button>
-        )}
-      </div>
-
-      {error ? (
-        <p className="ahero__photo-error" role="alert">{error}</p>
-      ) : null}
-
       <input
         ref={inputRef}
         type="file"
@@ -173,6 +136,6 @@ export function ArtistProfilePhoto({
         tabIndex={-1}
         onChange={(e) => void handleInputChange(e)}
       />
-    </>
+    </div>
   );
 }

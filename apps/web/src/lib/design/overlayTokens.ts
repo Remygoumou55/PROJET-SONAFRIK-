@@ -48,13 +48,19 @@ export const GENRE_CHIP_COLORS = [
 ] as const;
 
 export const NOTIFICATION_TYPE_STYLES: Record<
-  "stream_milestone" | "royalty_paid" | "verification_updated" | "rights_claim_updated" | "system",
+  | "stream_milestone"
+  | "royalty_paid"
+  | "verification_updated"
+  | "rights_claim_updated"
+  | "publication_review"
+  | "system",
   { bg: string; text: string }
 > = {
   stream_milestone: { bg: OVERLAY.bleuSoft, text: "var(--color-accent-bleu-clair)" },
   royalty_paid: { bg: OVERLAY.orSoft, text: "var(--color-or-solaire)" },
   verification_updated: { bg: OVERLAY.vertSoft, text: "var(--color-vert-energie)" },
   rights_claim_updated: { bg: OVERLAY.avertissementSoft, text: "var(--color-avertissement)" },
+  publication_review: { bg: OVERLAY.orSoft, text: "var(--color-or-solaire)" },
   system: { bg: OVERLAY.neutreSoft, text: "var(--color-texte-secondaire)" },
 };
 

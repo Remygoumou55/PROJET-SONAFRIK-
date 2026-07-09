@@ -3,17 +3,22 @@
 import { useEffect, useState } from "react";
 import { DEV_MOCK_CREATOR_ID } from "@sonafrik/shared/auth";
 import type { createCreatorService } from "@sonafrik/api/creator";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useCreatorService } from "./useCreator";
+import { toUserFacingUploadError } from "@/features/shared/feedback/userFacingError";
 
 type CreatorService = ReturnType<typeof createCreatorService>;
 
 export function resolveCreatorUploadError(err: unknown, fallback: string): string {
-  if (err instanceof Error && err.message.trim()) return err.message;
-  if (err && typeof err === "object" && "message" in err) {
-    const message = (err as { message: unknown }).message;
-    if (typeof message === "string" && message.trim()) return message;
+  return toUserFacingUploadError(err, fallback);
+}
+
+/** Bloque l'upload si le navigateur n'a pas de session JWT (edge functions). */
+export async function assertBrowserSessionForUpload(): Promise<void> {
+  const { data: { session } } = await getSupabaseBrowserClient().auth.getSession();
+  if (!session?.access_token) {
+    throw new Error("Connectez-vous pour enregistrer vos images.");
   }
-  return fallback;
 }
 
 export async function resolveCreatorIdForUpload(

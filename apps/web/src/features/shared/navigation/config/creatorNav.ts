@@ -13,25 +13,16 @@ export type CreatorNavLink = {
 
 export type CreatorNavEntry = CreatorNavSection | CreatorNavLink;
 
-export function buildCreatorNavEntries(pendingVerifications = 0): CreatorNavEntry[] {
+export function buildCreatorNavEntries(_pendingVerifications = 0): CreatorNavEntry[] {
   return [
-    { type: "section", label: "Créer" },
-    { href: "/creator/catalog/tracks/new", label: "Publier", icon: "publish", exact: false },
-    { href: "/creator/catalog/tracks", label: "Mes publications", icon: "publications", exact: true },
     { type: "section", label: "Comprendre" },
     { href: "/creator", label: "Vue d'ensemble", icon: "overview", exact: true },
     { href: "/creator/analytics", label: "Analytics", icon: "analytics", exact: true },
+    { type: "section", label: "Créer" },
+    { href: "/creator/catalog/tracks/new", label: "Publier", icon: "publish", exact: false },
+    { href: "/creator/catalog/tracks", label: "Mes publications", icon: "publications", exact: true },
     { type: "section", label: "Revenus" },
     { href: "/wallet", label: "Wallet", icon: "wallet", exact: false },
-    { type: "section", label: "" },
-    {
-      href: "/creator/identity",
-      label: "Paramètres",
-      icon: "settings",
-      exact: false,
-      badge: pendingVerifications > 0 ? pendingVerifications : undefined,
-    },
-    { href: "/settings/help", label: "Aide & Support", icon: "help", exact: false },
   ];
 }
 

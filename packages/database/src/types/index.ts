@@ -3856,6 +3856,15 @@ export type Database = {
       get_system_setting: { Args: { p_key: string }; Returns: Json }
       get_top_guinea_feed: { Args: { p_limit?: number }; Returns: Json }
       get_track_listen_counts: { Args: { p_track_id: string }; Returns: Json }
+      get_publication_insights_batch: {
+        Args: { p_track_ids: string[] }
+        Returns: {
+          track_id: string
+          streams: number
+          last_activity_at: string | null
+        }[]
+      }
+      get_trending_artists_mixed: { Args: { p_limit?: number }; Returns: Json }
       get_trending_tracks: {
         Args: { p_limit?: number; p_window?: string }
         Returns: Json

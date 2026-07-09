@@ -7,9 +7,11 @@ export function formatDashboardGnf(n: number): string {
 
 export function formatActivityDate(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString("fr-FR", {
+    const d = new Date(iso);
+    return d.toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "short",
+      timeZone: "UTC",
     });
   } catch {
     return "";

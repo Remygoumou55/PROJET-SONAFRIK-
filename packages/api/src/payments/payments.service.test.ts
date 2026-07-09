@@ -114,10 +114,15 @@ describe("PaymentsService", () => {
 
   it("listUserIntents propage l'erreur DB", async () => {
     const limit = vi.fn().mockResolvedValue({ data: null, error: { message: "db" } });
+    const eq = vi.fn().mockReturnValue({ order: vi.fn().mockReturnValue({ limit }) });
     const client = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } }, error: null }),
+      },
       functions: { invoke: vi.fn() },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
+        eq,
         order: vi.fn().mockReturnThis(),
         limit,
       })),

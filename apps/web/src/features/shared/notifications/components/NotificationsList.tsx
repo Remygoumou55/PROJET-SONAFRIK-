@@ -84,16 +84,16 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
       {items.map((notif) => {
         const style = NOTIFICATION_TYPE_STYLES[notif.type] ?? NOTIFICATION_TYPE_STYLES.system;
         const isUnread = notif.read_at === null;
+        const actionUrl = typeof notif.data?.action_url === "string" ? notif.data.action_url : null;
+        const actionLabel = typeof notif.data?.action_label === "string" ? notif.data.action_label : null;
 
         return (
-          <button
+          <div
             key={notif.id}
-            onClick={() => { if (isUnread) void markRead(notif.id); }}
             className="w-full text-left rounded-xl p-4 transition-opacity"
             style={{
               backgroundColor: isUnread ? "var(--color-card)" : "var(--color-surface)",
               border: `1px solid ${isUnread ? "var(--color-elevated)" : "var(--color-surface)"}`,
-              cursor: isUnread ? "pointer" : "default",
             }}
           >
             <div className="flex items-start gap-3">
@@ -114,15 +114,36 @@ export function NotificationsList({ initialNotifications, userId }: Props) {
                     {formatDateTime(notif.created_at)}
                   </span>
                 </div>
-                <p className="text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>
-                  {notif.title}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
-                  {notif.body}
-                </p>
+                <button
+                  type="button"
+                  className="w-full text-left"
+                  onClick={() => { if (isUnread) void markRead(notif.id); }}
+                  style={{ cursor: isUnread ? "pointer" : "default" }}
+                >
+                  <p className="text-sm font-semibold" style={{ color: "var(--color-texte-principal)" }}>
+                    {notif.title}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--color-texte-secondaire)" }}>
+                    {notif.body}
+                  </p>
+                </button>
+                {actionUrl && actionLabel ? (
+                  <a
+                    href={actionUrl}
+                    className="mt-2 inline-flex rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors"
+                    style={{
+                      borderColor: "var(--overlay-or-25)",
+                      backgroundColor: "var(--overlay-or-05)",
+                      color: "var(--color-texte-principal)",
+                    }}
+                    onClick={() => { if (isUnread) void markRead(notif.id); }}
+                  >
+                    {actionLabel}
+                  </a>
+                ) : null}
               </div>
             </div>
-          </button>
+          </div>
         );
       })}
     </div>

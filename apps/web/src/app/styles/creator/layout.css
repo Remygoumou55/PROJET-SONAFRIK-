@@ -380,7 +380,10 @@
 }
 
 .ch-menu__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   width: 100%;
   text-align: left;
   padding: 0.5rem 0.75rem;
@@ -393,6 +396,25 @@
   border: none;
   cursor: pointer;
   transition: background 0.12s ease, color 0.12s ease;
+}
+
+.ch-menu__item-label {
+  min-width: 0;
+}
+
+.ch-menu__badge {
+  flex-shrink: 0;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.3125rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--color-noir-profond);
+  background: var(--color-vert-energie);
 }
 
 .ch-menu__item:hover {

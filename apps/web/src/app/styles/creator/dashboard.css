@@ -71,6 +71,10 @@
     color-mix(in srgb, var(--color-vert-energie) 6%, var(--ds-color-card)) 0%,
     var(--ds-color-card) 55%
   );
+  padding: 0.75rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .dashboard-panel--coach {
@@ -380,18 +384,29 @@
   line-height: 1.2;
 }
 
-/* ─── Portefeuille ────────────────────────────────────────────────────── */
+/* ─── Portefeuille — compact ───────────────────────────────────────────── */
 
 .dash-wallet__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+}
+
+.dash-wallet__balance-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.dash-wallet__balance-copy {
+  min-width: 0;
 }
 
 .dash-wallet__link {
-  font-size: 0.75rem;
+  flex-shrink: 0;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--color-vert-energie);
   text-decoration: none;
@@ -401,22 +416,14 @@
   text-decoration: underline;
 }
 
-.dash-wallet__balance-block {
-  text-align: center;
-  padding: 0.75rem 0 1rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--overlay-blanc-08);
-}
-
 .dash-wallet__balance-icon {
-  display: block;
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .dash-wallet__balance-label {
   margin: 0;
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -424,40 +431,41 @@
 }
 
 .dash-wallet__balance-value {
-  margin: 0.25rem 0 0;
-  font-size: clamp(1.375rem, 4vw, 1.75rem);
+  margin: 0.1rem 0 0;
+  font-size: 1.125rem;
   font-weight: 800;
   color: var(--color-vert-energie);
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
 .dash-wallet__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.625rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem;
 }
 
 .dash-wallet__cell {
-  padding: 0.55rem 0.65rem;
-  border-radius: calc(var(--dash-radius) - 0.35rem);
+  padding: 0.4rem 0.45rem;
+  border-radius: calc(var(--dash-radius) - 0.4rem);
   background: var(--overlay-blanc-04);
   border: 1px solid var(--overlay-blanc-06);
-}
-
-.dash-wallet__cell--wide {
-  grid-column: 1 / -1;
+  min-width: 0;
 }
 
 .dash-wallet__cell-label {
-  margin: 0 0 0.2rem;
-  font-size: 0.625rem;
+  margin: 0 0 0.15rem;
+  font-size: 0.5625rem;
   font-weight: 600;
   color: var(--color-texte-desactive);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dash-wallet__cell-value {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-texte-principal);
   font-variant-numeric: tabular-nums;
@@ -468,28 +476,29 @@
 }
 
 .dash-wallet__cell-value--sm {
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.25;
 }
 
-.dash-wallet__cell-meta {
-  font-weight: 500;
-  color: var(--color-texte-desactive);
+.dash-wallet__cell-value--clip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dash-wallet__cell-muted {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   color: var(--color-texte-desactive);
 }
 
 .dash-wallet__status {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.45rem;
+  padding: 0.1rem 0.35rem;
   border-radius: 999px;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 700;
 }
 
@@ -504,27 +513,20 @@
 }
 
 .dash-wallet__cta {
-  display: block;
-  margin-top: 0.875rem;
-  text-align: center;
-  padding: 0.6rem 1rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
+  align-self: flex-start;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  color: var(--color-noir-profond);
-  background: var(--color-vert-energie);
+  color: var(--color-vert-energie);
   text-decoration: none;
-  transition: filter var(--dash-transition), transform var(--dash-transition);
 }
 
 .dash-wallet__cta:hover {
-  filter: brightness(1.06);
+  text-decoration: underline;
 }
 
 .dash-wallet__cta--outline {
-  color: var(--color-vert-energie);
-  background: var(--overlay-vert-10);
-  border: 1px solid var(--overlay-vert-25);
+  color: var(--color-or-solaire);
 }
 
 /* ─── Activité récente ────────────────────────────────────────────────── */
@@ -665,7 +667,7 @@
   }
 
   .dash-wallet__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

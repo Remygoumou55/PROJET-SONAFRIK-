@@ -14,7 +14,12 @@ export default async function WalletLayout({ children }: { children: React.React
   return (
     <RealtimeShell>
       <PerformanceProvider flags={performanceFlags}>
-        <WalletLayoutClient>{children}</WalletLayoutClient>
+        <WalletLayoutClient
+          userId={context.profile.id}
+          accountType={context.profile.account_type}
+        >
+          {children}
+        </WalletLayoutClient>
       </PerformanceProvider>
     </RealtimeShell>
   );

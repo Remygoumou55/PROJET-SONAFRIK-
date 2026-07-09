@@ -3,7 +3,6 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { WalletDashboard } from "@/features/wallet/components/WalletDashboard";
-import { PaymentHistory } from "@/features/wallet/components/PaymentHistory";
 import { useWalletPageData } from "@/features/wallet/hooks/useWalletPageData";
 import { isTopupEnabled, isWithdrawalEnabled } from "@/features/wallet/lib/paymentsEnabled";
 
@@ -58,14 +57,10 @@ export function WalletClient() {
         topupEnabled={isTopupEnabled()}
         withdrawalEnabled={isWithdrawalEnabled()}
         plans={plans}
-        plansLoading={isLoading}
+        plansLoading={false}
         onSubscribe={() => setShowSubscription(true)}
         onTopup={() => setShowTopup(true)}
       />
-
-      <div className="mt-8 px-4 max-w-xl mx-auto">
-        <PaymentHistory />
-      </div>
 
       {showSubscription && (
         <SubscriptionModal

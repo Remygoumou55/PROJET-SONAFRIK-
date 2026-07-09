@@ -93,6 +93,44 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: pnpm test:e2e:smoke
 
+  e2e-publications-cert:
+    name: E2E Publications Certification Gate
+    runs-on: ubuntu-latest
+    needs: quality
+    # Phase 3 — Mes publications: multi-viewport + history + pagination (auth artiste requis)
+    if: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright
+        working-directory: apps/web
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Publications library + certification gate
+        working-directory: apps/web
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL || 's13b-playwright-listener@sonafrik.test' }}
+          PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD || 'S13BCert2026!' }}
+          PUBLICATIONS_E2E_PAGE_SIZE: "10"
+        run: pnpm test:e2e:publications
+      - name: Publications long session stress (quick)
+        working-directory: apps/web
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL || 's13b-playwright-listener@sonafrik.test' }}
+          PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD || 'S13BCert2026!' }}
+          PUBLICATIONS_E2E_PAGE_SIZE: "10"
+        run: pnpm test:e2e:publications-stress
+
   finance-sandbox:
     name: Finance Sandbox E2E
     runs-on: ubuntu-latest

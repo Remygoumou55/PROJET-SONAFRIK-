@@ -10,7 +10,7 @@ import {
   getPublicationConsultHref,
   getPublicationResubmitHref,
   type PublicationActionId,
-} from "@sonafrik/api/catalog";
+} from "@sonafrik/api/publication-library";
 
 export function PublicationContextualActions({
   track,

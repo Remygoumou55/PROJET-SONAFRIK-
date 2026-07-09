@@ -11,9 +11,14 @@ interface Props {
 
 export function MusicNavBackLink({ href, label, onNavigate }: Props) {
   return (
-    <Link href={href} className="music-nav__back" onClick={onNavigate}>
+    <Link
+      href={href}
+      className="music-nav__back"
+      aria-label={label}
+      onClick={onNavigate}
+    >
       <MusicNavIcon name="back" size={16} />
-      {label}
+      <span className="music-nav__back-label">{label}</span>
     </Link>
   );
 }

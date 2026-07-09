@@ -4,14 +4,15 @@ import { memo, useCallback, useState } from "react";
 import { CreatorAssetImage } from "./CreatorAssetImage";
 import { useCreatorService } from "../../hooks/useCreator";
 import {
+  assertBrowserSessionForUpload,
   resolveCreatorIdForUpload,
-  resolveCreatorUploadError,
   useEffectiveCreatorId,
 } from "../../hooks/useEffectiveCreatorId";
 import { invalidateCreatorAssetUrl } from "@/lib/image/creator-asset-url-cache";
 import { publishArtistProfileUpdate } from "@/features/creator/identity/lib/publishArtistProfileUpdate";
 import { uploadAssetToSignedUrl } from "@/lib/upload/uploadAsset";
 import { useSuccessToast } from "@/features/shared/feedback/useSuccessToast";
+import { useUploadErrorToast } from "@/features/shared/feedback/useErrorToast";
 import {
   AUTO_IMAGE_VARIANTS,
   type AutoImagePrepared,
@@ -32,45 +33,40 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
   const { creatorId: displayCreatorId, resolving } = useEffectiveCreatorId(creatorIdProp);
   const creatorService = useCreatorService();
   const showSuccessToast = useSuccessToast();
+  const showUploadError = useUploadErrorToast();
   const [localCoverPath, setLocalCoverPath] = useState(primaryCoverPath);
 
   const uploadCover = useCallback(async (prepared: AutoImagePrepared) => {
-    try {
-      const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
-      const { signedUrl, token, path } =
-        await creatorService.requestAssetUploadUrl({
-          creatorId,
-          assetKind: "gallery",
-          contentType: prepared.contentType,
-        });
-      await uploadAssetToSignedUrl(signedUrl, prepared.file, {
-        contentType: prepared.contentType,
-        token,
-      });
-
-      await creatorService.saveCoverPrimaryCrop({
+    await assertBrowserSessionForUpload();
+    const creatorId = await resolveCreatorIdForUpload(creatorService, creatorIdProp);
+    const { signedUrl, token, path } =
+      await creatorService.requestAssetUploadUrl({
         creatorId,
-        croppedPath: path,
-        originalPath: path,
-        cropX: 0,
-        cropY: 0,
-        cropZoom: 1,
+        assetKind: "gallery",
+        contentType: prepared.contentType,
       });
+    await uploadAssetToSignedUrl(signedUrl, prepared.file, {
+      contentType: prepared.contentType,
+      token,
+    });
 
-      invalidateCreatorAssetUrl(creatorId);
-      setLocalCoverPath(path);
-      publishArtistProfileUpdate(creatorId);
-    } catch (err) {
-      throw new Error(
-        resolveCreatorUploadError(err, "Échec de l'enregistrement de la couverture."),
-      );
-    }
+    await creatorService.saveCoverPrimaryCrop({
+      creatorId,
+      croppedPath: path,
+      originalPath: path,
+      cropX: 0,
+      cropY: 0,
+      cropZoom: 1,
+    });
+
+    invalidateCreatorAssetUrl(creatorId);
+    setLocalCoverPath(path);
+    publishArtistProfileUpdate(creatorId);
   }, [creatorIdProp, creatorService]);
 
   const {
     inputRef,
     uploading,
-    error,
     accept,
     openFilePicker,
     handleInputChange,
@@ -78,6 +74,8 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
     variant: AUTO_IMAGE_VARIANTS.hero,
     onUpload: uploadCover,
     onSuccess: () => showSuccessToast("Couverture enregistrée"),
+    onError: (message) =>
+      showUploadError(new Error(message), "Échec de l'enregistrement de la couverture."),
     successMessage: null,
   });
 
@@ -91,8 +89,9 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
             assetKind="gallery"
             alt={`Couverture ${stageName}`}
             fit="cover"
-            layout="bounded"
+            layout="fill"
             className="ahero__cover-img"
+            sizes="100vw"
             priority
             fallback={<div className="ahero__cover-default" aria-hidden="true" />}
           />
@@ -120,10 +119,6 @@ export const ArtistCoverSlider = memo(function ArtistCoverSlider({
         <span aria-hidden="true">🖼</span>
         {localCoverPath ? "Changer la couverture" : "Ajouter une couverture"}
       </button>
-
-      {error ? (
-        <p className="ahero__cover-error" role="alert">{error}</p>
-      ) : null}
 
       <input
         ref={inputRef}

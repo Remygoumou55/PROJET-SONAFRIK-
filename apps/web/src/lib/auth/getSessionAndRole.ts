@@ -1,26 +1,10 @@
+import { mapAccountType, type RouteRole } from "./accountType";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-
-// Rôle de navigation — distinct de @sonafrik/types UserRole (valeurs françaises)
-export type RouteRole = "listener" | "artist" | "superadmin" | null;
 
 export interface SessionAndRole {
   userId: string | null;
   role: RouteRole;
   onboardingCompleted: boolean;
-}
-
-export function mapAccountType(
-  accountType: string | null | undefined,
-): RouteRole {
-  switch (accountType) {
-    case "auditeur":
-      return "listener";
-    case "artiste":
-    case "auditeur_artiste":
-      return "artist";
-    default:
-      return null;
-  }
 }
 
 export async function getSessionAndRole(): Promise<SessionAndRole> {

@@ -40,7 +40,7 @@ const VARIANT_CONFIG: Record<AutoImageVariant, VariantConfig> = {
     maxHeight: 1080,
     quality: 0.88,
     minQuality: 0.48,
-    focalY: 0.42,
+    focalY: 0.45,
   },
   avatar: {
     aspectRatio: 1,
@@ -48,7 +48,7 @@ const VARIANT_CONFIG: Record<AutoImageVariant, VariantConfig> = {
     maxHeight: 800,
     quality: 0.9,
     minQuality: 0.52,
-    focalY: 0.38,
+    focalY: 0.5,
   },
   "square-cover": {
     aspectRatio: 1,
@@ -90,31 +90,52 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function drawHeroCanvas(
+function drawCoverCanvas(
   image: HTMLImageElement,
   config: VariantConfig,
 ): HTMLCanvasElement {
+  const crop = computeCropRegion(image.naturalWidth, image.naturalHeight, config);
   const canvas = document.createElement("canvas");
   canvas.width = config.maxWidth;
   canvas.height = config.maxHeight;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Impossible de traiter cette image.");
 
-  const scale = Math.min(
-    config.maxWidth / image.naturalWidth,
-    config.maxHeight / image.naturalHeight,
+  ctx.drawImage(
+    image,
+    crop.sx,
+    crop.sy,
+    crop.sw,
+    crop.sh,
+    0,
+    0,
+    config.maxWidth,
+    config.maxHeight,
   );
+
+  return canvas;
+}
+
+/** Carré avatar — image entière visible, centrée (pas de crop tête uniquement). */
+function drawAvatarCanvas(
+  image: HTMLImageElement,
+  config: VariantConfig,
+): HTMLCanvasElement {
+  const size = config.maxWidth;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Impossible de traiter cette image.");
+
+  ctx.fillStyle = "rgb(13 13 13)";
+  ctx.fillRect(0, 0, size, size);
+
+  const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
   const drawWidth = image.naturalWidth * scale;
   const drawHeight = image.naturalHeight * scale;
-  const offsetX = (config.maxWidth - drawWidth) / 2;
-  const offsetY = (config.maxHeight - drawHeight) / 2;
-
-  const gradient = ctx.createLinearGradient(0, 0, config.maxWidth, config.maxHeight);
-  gradient.addColorStop(0, "rgb(13 13 13)");
-  gradient.addColorStop(0.5, "rgb(20 32 24)");
-  gradient.addColorStop(1, "rgb(13 13 13)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, config.maxWidth, config.maxHeight);
+  const offsetX = (size - drawWidth) / 2;
+  const offsetY = (size - drawHeight) / 2;
 
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 
@@ -169,7 +190,29 @@ export async function prepareAutoImage(
   const image = await loadImage(file);
 
   if (variant === AUTO_IMAGE_VARIANTS.hero) {
-    const canvas = drawHeroCanvas(image, config);
+    const canvas = drawCoverCanvas(image, config);
+    const contentType = (resolveImageUploadMime(file) ?? "image/jpeg") as ImageMime;
+    let quality = config.quality;
+    let blob = await blobFromCanvas(canvas, contentType, quality);
+
+    while (blob.size > IMAGE_POLICY.maxBytes && quality > config.minQuality) {
+      quality -= 0.08;
+      blob = await blobFromCanvas(canvas, contentType, quality);
+    }
+
+    const ext = contentType === "image/png" ? "png" : contentType === "image/webp" ? "webp" : "jpg";
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "image";
+
+    return {
+      file: new File([blob], `${baseName}.${ext}`, { type: contentType, lastModified: Date.now() }),
+      contentType,
+      width: canvas.width,
+      height: canvas.height,
+    };
+  }
+
+  if (variant === AUTO_IMAGE_VARIANTS.avatar) {
+    const canvas = drawAvatarCanvas(image, config);
     const contentType = (resolveImageUploadMime(file) ?? "image/jpeg") as ImageMime;
     let quality = config.quality;
     let blob = await blobFromCanvas(canvas, contentType, quality);

@@ -42,6 +42,10 @@ export default defineConfig({
         command: "pnpm dev",
         url: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 180_000,
+        env: {
+          ...process.env,
+          PUBLICATIONS_E2E_PAGE_SIZE: process.env.PUBLICATIONS_E2E_PAGE_SIZE ?? "10",
+        },
       },
 });

@@ -20,12 +20,16 @@ import { publishWalletLdseEvent } from "@/features/shared/ldse/wallet/publishWal
 import { useWalletService } from "../lib/walletServiceContext";
 import { useWalletUserId } from "./useWalletUserId";
 import { useWalletSrtspLiveQuery } from "./useWalletSrtspLiveQuery";
+import {
+  EMPTY_WALLET_TRANSACTIONS,
+  EMPTY_WALLET_WITHDRAWALS,
+} from "../lib/walletQueryDefaults";
 
 type PayoutPageBundle = { accounts: PayoutAccount[]; withdrawals: Withdrawal[] };
 
 export function useWallet() {
   const service = useWalletService();
-  const userId = useWalletUserId();
+  const { userId, ready: authReady } = useWalletUserId();
 
   const fetchContext = useCallback(async (): Promise<WalletContext> => {
     return service.getWalletContext();
@@ -40,7 +44,7 @@ export function useWallet() {
     userId,
     queryKey: userId ? `wallet-context:${userId}` : "wallet-context:pending",
     fetcher: fetchContext,
-    enabled: Boolean(userId),
+    enabled: authReady && Boolean(userId),
   });
 
   const subscribePremium = useCallback(
@@ -73,7 +77,7 @@ export function useWallet() {
 
   return {
     context: context ?? null,
-    isLoading: isLoading || !userId,
+    isLoading: !authReady || isLoading,
     error: liveError?.message ?? null,
     subscribePremium,
     topupWallet,
@@ -83,7 +87,7 @@ export function useWallet() {
 
 export function useTransactions() {
   const service = useWalletService();
-  const userId = useWalletUserId();
+  const { userId, ready: authReady } = useWalletUserId();
 
   const fetchTransactions = useCallback(async (): Promise<Transaction[]> => {
     return service.getTransactions(20);
@@ -97,20 +101,20 @@ export function useTransactions() {
     userId,
     queryKey: userId ? `wallet-transactions:${userId}` : "wallet-transactions:pending",
     fetcher: fetchTransactions,
-    initialData: [],
-    enabled: Boolean(userId),
+    initialData: EMPTY_WALLET_TRANSACTIONS,
+    enabled: authReady && Boolean(userId),
   });
 
   return {
     transactions: transactions ?? [],
-    isLoading: isLoading || !userId,
+    isLoading: !authReady || isLoading,
     error: liveError ? "Impossible de charger les transactions." : null,
   };
 }
 
 export function useWithdrawals() {
   const service = useWalletService();
-  const userId = useWalletUserId();
+  const { userId, ready: authReady } = useWalletUserId();
 
   const fetchWithdrawals = useCallback(async (): Promise<Withdrawal[]> => {
     return service.getWithdrawals();
@@ -124,13 +128,13 @@ export function useWithdrawals() {
     userId,
     queryKey: userId ? `wallet-withdrawals:${userId}` : "wallet-withdrawals:pending",
     fetcher: fetchWithdrawals,
-    initialData: [],
-    enabled: Boolean(userId),
+    initialData: EMPTY_WALLET_WITHDRAWALS,
+    enabled: authReady && Boolean(userId),
   });
 
   return {
     withdrawals: withdrawals ?? [],
-    isLoading: isLoading || !userId,
+    isLoading: !authReady || isLoading,
     error: liveError ? "Impossible de charger les retraits." : null,
   };
 }
@@ -196,7 +200,7 @@ export function useRequestWithdrawal() {
 /** Comptes de retrait + historique — consommateur SRTSP (Phase 3.6). */
 export function usePayoutPageData() {
   const service = useWalletService();
-  const userId = useWalletUserId();
+  const { userId, ready: authReady } = useWalletUserId();
   const cacheKey = WALLET_LDSE_KEYS.payoutPage;
 
   const fetchPayoutData = useCallback(async (): Promise<PayoutPageBundle> => {
@@ -219,7 +223,7 @@ export function usePayoutPageData() {
     userId,
     queryKey: userId ? `wallet-payout:${userId}` : "wallet-payout:pending",
     fetcher: fetchPayoutData,
-    enabled: Boolean(userId),
+    enabled: authReady && Boolean(userId),
   });
 
   const addAccount = useCallback(
@@ -251,43 +255,44 @@ export function usePayoutPageData() {
   return {
     accounts: data?.accounts ?? [],
     withdrawals: data?.withdrawals ?? [],
-    isLoading: isLoading || !userId,
+    isLoading: !authReady || isLoading,
     addAccount,
     removeAccount,
   };
 }
 
-/** Royalties — consommateur SRTSP (Phase 3.6). */
+/** Royalties artiste — fetch simple via session layout (évite dev-mock-id en DB). */
 export function useRoyalties() {
   const service = useWalletService();
-  const userId = useWalletUserId();
-  const cacheKey = WALLET_LDSE_KEYS.royalties;
+  const { userId, ready: authReady } = useWalletUserId();
+  const [royalties, setRoyalties] = useState<RoyaltyCalculation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchRoyalties = useCallback(async (): Promise<RoyaltyCalculation[]> => {
-    const cached = ldseCache.get<RoyaltyCalculation[]>(cacheKey);
-    if (cached) return cached;
-    const data = await service.getRoyaltyCalculations();
-    ldseCache.set(cacheKey, data, 60_000);
-    return data;
-  }, [service, cacheKey]);
+  const load = useCallback(async () => {
+    if (!userId) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const rows = await service.getRoyaltyCalculations(userId);
+      setRoyalties(rows);
+    } catch {
+      setRoyalties([]);
+      setError("Impossible de charger les royalties.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [service, userId]);
 
-  const {
-    data: royalties,
-    loading: isLoading,
-    error: liveError,
-    refresh,
-  } = useWalletSrtspLiveQuery<RoyaltyCalculation[]>({
-    userId,
-    queryKey: userId ? `wallet-royalties:${userId}` : "wallet-royalties:pending",
-    fetcher: fetchRoyalties,
-    initialData: [],
-    enabled: Boolean(userId),
-  });
+  useEffect(() => {
+    if (!authReady || !userId) return;
+    void load();
+  }, [authReady, userId, load]);
 
   return {
-    royalties: royalties ?? [],
-    isLoading: isLoading || !userId,
-    error: liveError ? "Impossible de charger les royalties." : null,
-    reload: refresh,
+    royalties,
+    isLoading: !authReady || isLoading,
+    error,
+    reload: load,
   };
 }

@@ -41,6 +41,10 @@
       "types": "./dist/catalog/index.d.ts",
       "default": "./dist/catalog/index.js"
     },
+    "./publication-library": {
+      "types": "./dist/creator/catalog/publication-library/index.d.ts",
+      "default": "./dist/creator/catalog/publication-library/index.js"
+    },
     "./streaming": {
       "types": "./dist/streaming/index.d.ts",
       "default": "./dist/streaming/index.js"

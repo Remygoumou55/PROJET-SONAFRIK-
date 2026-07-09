@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { PUBLICATIONS_HREF } from "../../catalog/hooks/usePublicationPublishToast";
 
 const PublicationWizard = dynamic(
   () => import("./PublicationWizard").then((m) => ({ default: m.PublicationWizard })),
@@ -23,12 +24,18 @@ export default function PublicationWizardPage({
   stageName: string;
 }) {
   const router = useRouter();
+
+  const goToPublications = () => {
+    router.push(PUBLICATIONS_HREF);
+    router.refresh();
+  };
+
   return (
     <PublicationWizard
       creatorId={creatorId}
       stageName={stageName}
-      onComplete={() => router.push("/creator/catalog/tracks")}
-      onCancel={() => router.push("/creator/catalog/tracks")}
+      onComplete={goToPublications}
+      onCancel={goToPublications}
     />
   );
 }

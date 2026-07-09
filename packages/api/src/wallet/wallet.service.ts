@@ -228,9 +228,17 @@ export class WalletService {
     await this.repo.softDeletePayoutAccount(accountId);
   }
 
-  async getRoyaltyCalculations(): Promise<RoyaltyCalculation[]> {
-    const userId = await this.requireUserId();
-    return this.repo.getMyRoyaltyCalculations(userId);
+  async getRoyaltyCalculations(userId?: string): Promise<RoyaltyCalculation[]> {
+    if (isDevBypassActive()) return [];
+
+    const resolvedId = userId ?? (await this.requireUserId());
+    if (!WalletService.isValidUuid(resolvedId)) return [];
+
+    return this.repo.getMyRoyaltyCalculations(resolvedId);
+  }
+
+  private static isValidUuid(value: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
   }
 
   /** Page wallet — contexte + plans en un seul round-trip parallèle. */

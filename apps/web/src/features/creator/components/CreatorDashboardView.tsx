@@ -2,18 +2,15 @@
 import type { CreatorDashboardData } from "@sonafrik/types";
 import { buildDashboardKpiBand } from "@sonafrik/api/creator/presentation";
 import {
-  DashboardActivityCard,
   DashboardCoachCard,
   DashboardKpiBand,
   DashboardWalletCard,
 } from "@/features/shared/dashboard";
 import { useCreatorDashboardSrtspLive } from "../dashboard/hooks/useCreatorDashboardSrtspLive";
-import { DashboardCatalogueCard } from "../dashboard/components/DashboardCatalogueCard";
 import { DashboardPremiumCard } from "../dashboard/components/DashboardPremiumCard";
 import { HeroCard } from "../dashboard/components/HeroCard";
-import { isValidContentName } from "@/lib/content-filter";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const WelcomeModal = dynamic(
   () => import("../dashboard/components/WelcomeModal").then((m) => ({ default: m.WelcomeModal })),
@@ -42,13 +39,20 @@ export function CreatorDashboardView({
     initialData,
   });
 
-  const data = liveData ?? initialData;
+  const [data, setData] = useState(initialData);
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (liveData) setData(liveData);
+  }, [liveData]);
+
   const {
     context,
     hero,
     revenueStats,
-    topTrack,
-    catalogCounts,
     activities,
     assistantTips,
     goals,
@@ -58,7 +62,6 @@ export function CreatorDashboardView({
   } = data;
 
   const kpiItems = useMemo(() => buildDashboardKpiBand(data), [data]);
-  const validTopTrack = topTrack && isValidContentName(topTrack.title) ? topTrack : null;
 
   const stack = (
     <div className="creator-dashboard__stack">
@@ -76,14 +79,6 @@ export function CreatorDashboardView({
         paymentConfigured={paymentConfigured}
         activities={activities}
       />
-
-      <DashboardCatalogueCard
-        topTrack={validTopTrack}
-        tracksPublished={catalogCounts.tracksPublished}
-        creatorId={creatorId}
-      />
-
-      <DashboardActivityCard activities={activities} />
 
       <DashboardPremiumCard />
     </div>

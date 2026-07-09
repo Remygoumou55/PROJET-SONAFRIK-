@@ -18,7 +18,7 @@ type WalletPageBundle = { context: WalletContext; plans: ListenerPremiumPlan[] }
 /** Portefeuille + plans — consommateur SRTSP officiel (Phase 3.6). */
 export function useWalletPageData() {
   const service = useWalletService();
-  const userId = useWalletUserId();
+  const { userId, ready: authReady } = useWalletUserId();
   const cacheKey = WALLET_LDSE_KEYS.pageData;
 
   const fetchPageData = useCallback(async (): Promise<WalletPageBundle> => {
@@ -39,7 +39,7 @@ export function useWalletPageData() {
     userId,
     queryKey: userId ? `wallet-page:${userId}` : "wallet-page:pending",
     fetcher: fetchPageData,
-    enabled: Boolean(userId),
+    enabled: authReady && Boolean(userId),
   });
 
   const context = data?.context ?? null;
@@ -70,7 +70,7 @@ export function useWalletPageData() {
   return {
     context,
     plans,
-    isLoading: isLoading || !userId,
+    isLoading: !authReady || isLoading,
     error,
     plansError,
     subscribePremium,

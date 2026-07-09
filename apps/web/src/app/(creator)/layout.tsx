@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { CreatorLayoutClient } from "@/features/creator/components/CreatorLayoutClient";
 import { CreatorSidebar } from "@/features/creator/components/CreatorSidebar";
 import { CreatorWorkspaceHeader } from "@/features/creator/components/CreatorWorkspaceHeader";
@@ -21,7 +20,6 @@ export default async function CreatorLayout({ children }: { children: React.Reac
   const context = await requireCreatorContext();
   const supabase = await getSupabaseServerClient();
   const notifications = createNotificationsService(supabase);
-  const pathname = (await headers()).get("x-pathname") ?? "/creator";
 
   const [performanceFlags, unreadCount] = await Promise.all([
     getCachedPerformanceFlags(),
@@ -38,13 +36,13 @@ export default async function CreatorLayout({ children }: { children: React.Reac
         <DevAuthBootstrap />
         <div className="enterprise-shell creator-workspace">
           <div className="enterprise-sidebar-card">
-            <CreatorSidebar navEntries={navEntries} pathname={pathname} />
+            <CreatorSidebar navEntries={navEntries} />
           </div>
           <div className="enterprise-main-column creator-workspace__body">
             <CreatorWorkspaceHeader
-              pathname={pathname}
               userId={context.creator.owner_id}
               initialUnreadCount={unreadCount}
+              pendingVerifications={context.pendingVerifications}
             />
             <CreatorLayoutClient navEntries={navEntries}>{children}</CreatorLayoutClient>
           </div>

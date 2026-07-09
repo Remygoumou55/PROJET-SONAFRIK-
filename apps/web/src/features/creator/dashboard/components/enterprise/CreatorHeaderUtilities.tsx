@@ -9,20 +9,20 @@ import { useAuthService } from "@/features/identity/auth/hooks/useAuth";
 interface CreatorHeaderUtilitiesProps {
   userId: string;
   initialUnreadCount: number;
+  pendingVerifications?: number;
 }
 
 const MENU_LINKS = [
-  { label: "Mon Profil",    href: "/creator/identity" },
+  { label: "Paramètres", href: "/creator/identity", showVerificationBadge: true },
+  { label: "Aide & Support", href: "/settings/help" },
   { label: "Mon Catalogue", href: "/creator/catalog" },
-  { label: "Followers",     href: "/creator/analytics" },
-  { label: "Revenus",       href: "/wallet/royalties" },
-  { label: "Paramètres",    href: "/settings/account" },
-  { label: "Aide",          href: "/settings/help" },
+  { label: "Revenus", href: "/wallet/royalties" },
 ] as const;
 
 function CreatorHeaderUtilitiesView({
   userId,
   initialUnreadCount,
+  pendingVerifications = 0,
 }: CreatorHeaderUtilitiesProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -78,7 +78,12 @@ function CreatorHeaderUtilitiesView({
                 role="menuitem"
                 onClick={() => setOpen(false)}
               >
-                {item.label}
+                <span className="ch-menu__item-label">{item.label}</span>
+                {"showVerificationBadge" in item && item.showVerificationBadge && pendingVerifications > 0 ? (
+                  <span className="ch-menu__badge" aria-label={`${pendingVerifications} vérification(s) en attente`}>
+                    {pendingVerifications}
+                  </span>
+                ) : null}
               </Link>
             ))}
             <div className="ch-menu__sep" role="separator" />
