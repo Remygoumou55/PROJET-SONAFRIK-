@@ -21,6 +21,8 @@ if (existsSync(envLocal)) {
  */
 export default defineConfig({
   testDir: "./tests/perf",
+  // Playwright ne matche que *.spec.ts / *.test.ts par défaut — nos tests perf sont *.perf.ts
+  testMatch: "**/*.perf.ts",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
