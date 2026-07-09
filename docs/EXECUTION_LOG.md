@@ -11,6 +11,76 @@
 
 ---
 
+## 2026-07-09 — fix(listen) Sidebar nav + GlobalPlayer disponibles immédiatement
+
+### Objectif
+Corriger deux bugs bloquants sur `/listen` : sidebar sans boutons nav, clicks tracks silencieux.
+
+### Diagnostic
+- **Root cause sidebar** : `chromeReady` (gate FCP, délai ≤2.5s) retardait le rendu de `ListenerSidebarAsync`. Pendant ce délai, `ListenerSidebarPlaceholder` (body vide + pattern seul) s'affichait sans aucun item nav.
+- **Root cause clicks audio** : `GlobalPlayer` (audio element HTML) gated par le même `chromeReady`. Le click appelait `loadQueueAndPlay` → `streaming.startStream` → `player.play` qui mettait l'état à jour, mais sans audio element → silence total, aucune erreur visible.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/StreamingLayoutClient.tsx` — suppression gates chromeReady sidebar + GlobalPlayer + ValidListenToast ; suppression import `ListenerSidebarPlaceholder`
+- `apps/web/src/features/listener/components/ListenerSidebarAsync.tsx` — skeleton opacité 8–10% (était 3%, quasi-invisible sur `#000805`)
+
+### Changements clés
+
+| Avant | Après |
+|---|---|
+| `{chromeReady ? <ListenerSidebarAsync> : <Placeholder>}` | `<ListenerSidebarAsync>` direct |
+| `{chromeReady ? <GlobalPlayer /> : null}` | `<GlobalPlayer />` direct |
+| Skeleton : `rgb(255 255 255 / 0.03)` | Skeleton : `rgb(255 255 255 / 0.08–0.10)` |
+
+`chromeReady` conservé pour `runtimeReady` (SRTSP transport + LDSE init).
+
+### Validation
+- pnpm typecheck : ✅ 0 erreur
+- pnpm lint : ✅ 0 warning
+
+### Commit
+`92e5aa9` sur `perf/b3-2-performance-ci`
+
+---
+
+## 2026-07-09 — Mes publications · Enterprise Root Cause Verification
+
+### Objectif
+Transformer chaque métrique bloquante restante de `Mes publications` en cause racine démontrée,
+sans appliquer de correction produit ni optimisation.
+
+### Fichiers touchés
+- `docs/performance/ENTERPRISE_ROOT_CAUSE_VERIFICATION_REPORT.md` — rapport causal complet run `29008531041`
+- `docs/performance/ENTERPRISE_CERTIFICATION_ACTION_PLAN.md` — backlog final de remédiation priorisé
+
+### Preuves vérifiées
+- `apps/web/perf-artifacts-final-29008531041/lighthouse-publications-desktop.report.json`
+- `apps/web/perf-artifacts-final-29008531041/lighthouse-publications-mobile.report.json`
+- `apps/web/perf-artifacts-final-29008531041/cwv-publications.json`
+- `docs/performance/B3_4_ENTERPRISE_FINAL_CERTIFICATION_REPORT.md`
+
+### Causes racines validées
+- Desktop Performance `52` : blocage dominé par `TBT 1774 ms`, charge JS initiale, hydratation et shell client transverse
+- Main Thread : coût cumulé des wrappers `RealtimeShell` / `RootLdseShell` / `RootSrtspShell` / `LdseProvider` / layout créateur / `PublicationsLibrary`
+- Accessibility `91` desktop : absence de landmark `main`, ARIA `tablist` invalide dans les filtres, contrastes insuffisants sidebar
+- SEO `91` desktop/mobile : `meta-description` absente dans le document audité malgré `metadata` déclarée côté route
+- Best Practices mobile `96` : échec Lighthouse `bf-cache` causé par WebSocket + `Cache-Control: no-store`
+- FCP CWV `1880 ms` : chemin critique encore trop chargé (CSS bloquant, CSS inutile, rendu dynamique, shell client)
+
+### Validation
+- pnpm build : ✅ PASS
+- pnpm lint : ✅ PASS
+- pnpm typecheck : ❌ FAIL — drift `.next/types/**/*.ts` préexistant dans `apps/web/tsconfig.json` (fichiers `.next/types` référencés mais absents)
+
+### Dette technique
+Aucune nouvelle dette créée dans le produit. Dette de diagnostic résiduelle : absence d'artefact trace brute
+séparé dans la pipeline, documentée dans le plan d'action.
+
+### Prochaine étape
+→ Exécuter l’ultime remédiation ciblée à partir de `ENTERPRISE_CERTIFICATION_ACTION_PLAN.md`, puis relancer une seule certification finale.
+
+---
+
 ## 2026-07-09 — Hero Discovery Experience — Enterprise Product Polish
 
 ### Objectif
@@ -103,6 +173,58 @@ résiduels identifiés lors de la clôture officielle, atteindre le score 10/10 
 
 ### Prochaine étape
 → Passer à **Priorité 2** (selon roadmap Enterprise / PLAN-CORRECTION-360-V2.md)
+
+---
+
+## 2026-07-09 — Mes publications · B3.4 Enterprise Performance Final Certification
+
+### Objectif
+Prononcer la décision finale B3 sur **preuves CI uniques et reproductibles**, sans nouvelle optimisation.
+
+### Préparation
+- Branche certifiée : `perf/b3-2-performance-ci`
+- Secrets GitHub configurés : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- Branche synchronisée avec `origin` (0/0), 9 commits en avance sur `main`
+- Run officiel unique : **`29008531041`**
+
+### Résultats run officiel
+- Preflight : ✅
+- Lint / Typecheck / Unit tests / Build : ✅
+- Capture CWV : ✅
+- Lighthouse desktop/mobile : ✅
+- Bundle : ✅ **239 kB** (`/creator/catalog/tracks`, baseline 268 kB, Δ -29 kB)
+- Certification gate : ❌
+
+### Mesures finales
+- **Desktop** : Perf **52** · A11y **91** · BP **100** · SEO **91**
+- **Mobile** : Perf **85** · A11y **95** · BP **96** · SEO **91**
+- **CWV** : LCP **1880 ms** ✅ · FCP **1880 ms** ❌ · CLS **0** ✅ · INP **32 ms** ✅ · TTFB **218 ms** ✅
+- Runtime : long tasks **0** · 14 requêtes Supabase chargement
+
+### Décision
+**MES PUBLICATIONS — ENTERPRISE PERFORMANCE NOT CERTIFIED**
+
+Seuils non atteints :
+- Desktop Performance 52 < 95
+- Desktop Accessibility 91 < 95
+- Desktop SEO 91 < 95
+- Mobile Performance 85 < 95
+- Mobile Best Practices 96 < 100
+- Mobile SEO 91 < 95
+- FCP 1880 ms ≥ 1800 ms
+
+### Causes démontrées
+- TBT desktop très élevé (**1774 ms**) malgré bundle réduit
+- LCP mobile Lighthouse encore à **3760 ms**
+- `meta-description` absente dans l'artifact final
+- Contrastes insuffisants restants sur certains labels du catalogue
+
+### Livrable
+- `docs/performance/B3_4_ENTERPRISE_FINAL_CERTIFICATION_REPORT.md`
+
+### FREEZE
+- Certification produit B3 : **NON ACTIVÉ**
+- Pipeline infrastructure : inchangée, opérationnelle
 
 ---
 
