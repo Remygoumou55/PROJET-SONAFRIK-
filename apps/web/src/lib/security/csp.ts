@@ -16,10 +16,11 @@ export function buildContentSecurityPolicy(nonce: string, isProd: boolean): stri
   const supabaseOrigin = resolveSupabaseOrigin();
   const supabaseWss = supabaseOrigin.replace("https://", "wss://");
 
-  const devScriptExtras = isProd ? "" : " 'unsafe-eval'";
+  // En dev : pas de 'strict-dynamic' — il annule 'self' et 'unsafe-inline' (spec CSP3),
+  // ce qui bloque les chunks webpack HMR qui n'ont pas de nonce.
   const scriptSrc = isProd
     ? `'self' 'nonce-${nonce}' 'strict-dynamic' ${supabaseOrigin} https://vitals.vercel-insights.com`
-    : `'self' 'nonce-${nonce}' 'strict-dynamic'${devScriptExtras} 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`;
+    : `'self' 'unsafe-eval' 'unsafe-inline' ${supabaseOrigin} https://vitals.vercel-insights.com`;
 
   return [
     "default-src 'self'",
