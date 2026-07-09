@@ -21,7 +21,7 @@ test.describe("Pages listener étendues", () => {
     await page.goto(`/listen?track=${CERTIFIED_TRACK_ID}`);
     await expect(page).not.toHaveURL(/\/auth\//, { timeout: 12_000 });
     await expect(page.locator("body")).toBeVisible();
-    const status = page.locator("text=/Lancement de la lecture|Impossible|introuvable/i").first();
+    const status = page.locator("text=/Lancement de la lecture|Impossible|disponible/i").first();
     await expect(status).toBeVisible({ timeout: 15_000 });
   });
 

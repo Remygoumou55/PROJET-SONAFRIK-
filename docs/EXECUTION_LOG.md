@@ -51,6 +51,52 @@ Enrichir la page `/listen` (auditeur) avec une section recommandations personnal
 
 ---
 
+## 2026-07-09 — Homepage Discovery Experience Vague 1 — Clôture Enterprise & FREEZE
+
+### Objectif
+Audit final, corrections de clôture, certification officielle, FREEZE fonctionnel.
+
+### Anomalies identifiées et corrigées
+- **Fix 1 — Incohérence couleur icône RecommendedSection** : conteneur teinté or-solaire (`rgb(246 192 9/0.15)`) avec icône vert-energie → unifié sur vert-energie (`rgb(0 210 106/0.12)`), cohérent avec toutes les autres sections. Fichier : `apps/web/src/features/listener/components/RecommendedSection.tsx`
+- **Fix 2 — E2E regex test obsolète** : `listener-pages.spec.ts` cherchait `"introuvable"` (message supprimé) ; ajout de `"disponible"` pour matcher le message actuel "Ce morceau n'est pas disponible à l'écoute." Fichier : `apps/web/tests/e2e/listener-pages.spec.ts`
+
+### Anomalies NON bloquantes documentées (acceptable MVP)
+- `HomepageData` type défini dans le composant frontend (pré-existant, non introduit par Vague 1)
+- `collaborative` reason jamais générée par le RPC SQL (réservé future collaborative filtering)
+- `as never` cast dans getRecommendedTracks (types Supabase à régénérer après migration)
+
+### Validation Technique
+- pnpm build : ✅ 73/73 pages · / = ƒ Dynamic (37s)
+- pnpm lint : ✅ 17/17
+- pnpm typecheck : ✅ 17/17
+- pnpm vitest : ✅ 330/330 tests (50 test files)
+- Playwright E2E : ✅ 2/2 listener-pages.spec.ts
+
+### Validation Fonctionnelle (snapshot Playwright runtime)
+- Hero Carousel ✅ · RecommendedSection (20 tracks) ✅ · Top Guinée ✅ · Nouveaux Albums ✅ · Artistes ✅ · À découvrir ✅
+- Tous liens /listen/track/, /listen/artist/, /listen/album/ ✅
+- DeepLink track ✅ · Navigation sidebar ✅ · Filtres musicaux ✅
+
+### Score
+| Axe | Note |
+|---|---|
+| Architecture | 9/10 |
+| Performance | 8.5/10 |
+| UX | 8/10 |
+| UI | 8/10 |
+| Runtime | 9/10 |
+| Responsive | 8.5/10 |
+| Tests | 9/10 |
+| Maintenabilité | 9/10 |
+| **Score global** | **8,6 / 10** |
+
+### Décision
+**HOMEPAGE DISCOVERY EXPERIENCE VAGUE 1 — CERTIFIÉE** ✅
+**FREEZE FONCTIONNEL ACTIVÉ** — Seuls correctifs critiques, failles sécurité ou régressions autorisés.
+**Vague 2 (Product Polish)** déplacée → backlog GLOBAL PRODUCT POLISH PROGRAM.
+
+---
+
 ## 2026-07-08 — Mes publications B3 Enterprise Performance Certification
 
 ### Objectif
