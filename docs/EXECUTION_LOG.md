@@ -11,6 +11,48 @@
 
 ---
 
+## 2026-07-09 — Re-audit P1 · Clôture 10/10 Homepage Discovery Vague 1
+
+### Objectif
+Re-audit exhaustif Priorité 1 (Homepage Discovery Experience Vague 1) — corriger tous les bugs
+résiduels identifiés lors de la clôture officielle, atteindre le score 10/10 avant de passer à P2.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/HomepageContentSections.tsx` — BUG2+3+4+5
+- `apps/web/src/features/listener/components/RecommendedSection.tsx` — BUG1+4
+- `apps/web/src/features/listener/lib/fetchHomepageData.ts` — BUG5 (trending supprimé)
+- `apps/web/tests/e2e/listener-pages.spec.ts` — BUG8 (test E2E RecommendedSection)
+- `packages/api/src/listener/listener.track.repository.ts` — BUG6 (as never supprimés)
+- `packages/database/src/types/index.ts` — BUG6 (pnpm gen:types → get_recommended_tracks_mvp)
+- `packages/api/src/listener/listener.recommended.test.ts` — BUG7 (nouveau, 5 tests unitaires)
+
+### Bugs corrigés
+| # | Description | Fix |
+|---|---|---|
+| BUG1 | RecommendedSection icon — rgb green hardcodé | `var(--color-vert-energie-bg/ring)` CSS tokens |
+| BUG2 | Albums section icon — rgb violet hardcodé | `HOMEPAGE_SECTION_STYLES.discoverIcon` |
+| BUG3 | FeaturedAlbumCard badge — overlay inline | `OVERLAY.noir60` + `var(--color-vert-energie-border)` |
+| BUG4 | scrollbarWidth:none (Firefox only) ×3 | `.scrollbar-hide` class (webkit + Firefox + IE) |
+| BUG5 | Champ `trending` mort dans HomepageData | Supprimé de l'interface, fetch, et composant |
+| BUG6 | Casts `as never` sur rpc() | `pnpm gen:types` → types DB régénérés, casts supprimés |
+| BUG7 | Absence tests unitaires getRecommendedTracks | 5 tests statiques (rpc name, p_limit, no as never) |
+| BUG8 | Absence test E2E RecommendedSection | Test Playwright (render ou absent sans erreur JS) |
+
+### Validation
+- pnpm build : ✅ 73 routes, 0 erreur
+- pnpm lint : ✅ 17/17 tâches
+- pnpm typecheck : ✅ 17/17 tâches
+- pnpm test (packages/api) : ✅ 330 tests, 50 fichiers
+- git push : ✅ `perf/b3-2-performance-ci` 72bfe3f
+
+### Score P1
+**10/10 — CERTIFIÉ ✅** — tous les bugs résiduels corrigés, zéro dette nouvelle.
+
+### Prochaine étape
+→ Passer à **Priorité 2** (selon roadmap Enterprise / PLAN-CORRECTION-360-V2.md)
+
+---
+
 ## 2026-07-09 — Mes publications · B3.2 Enterprise Performance CI Pipeline
 
 ### Objectif
