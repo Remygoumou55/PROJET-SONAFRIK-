@@ -36,6 +36,7 @@ storybook-static/
 .storybook-static/
 test-results/
 playwright-report/
+apps/web/perf-artifacts*/
 
 
 # Mobile

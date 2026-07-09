@@ -126,6 +126,64 @@ séparé dans la pipeline, documentée dans le plan d'action.
 
 ---
 
+## 2026-07-09 — Listener · Track Experience Panel V3
+
+### Objectif
+Transformer la popup track actuelle en **Track Experience Panel** premium orienté découverte,
+communauté et soutien artiste, sans toucher au moteur audio, à SRTSP, aux providers ni aux hooks métier.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/FullPlayerPanel.tsx` — nouvelle architecture visuelle V3, header premium, colonnes enrichies, onglets refondus
+- `apps/web/src/features/listener/components/FullPlayerCreditsTab.tsx` — nouvel onglet crédits lazy-loaded et réellement branché sur `useTrackCredits`
+- `apps/web/src/features/listener/components/FullPlayerCommunityTab.tsx` — nouvel onglet communauté lazy-loaded (avis, tri, réactions live, persistance locale)
+- `apps/web/src/features/listener/components/TipPanel.tsx` — bloc soutien repensé, toast élégant, autre montant UI
+- `apps/web/src/app/styles/listen-home/full-player.css` — refonte complète du design system du panel V3
+
+### UX / UI réalisées
+- Passage d'une popup lecteur à une **fiche musicale en deux colonnes**
+- Grande pochette + méta essentielles + barre d'actions regroupée à gauche
+- Header premium à droite avec preuve sociale visible immédiatement
+- Contrôles player mieux alignés, mieux espacés, et intégrés dans un shell dédié
+- Barre d'onglets avec icône + texte + état actif + hover + animation
+- Onglet détails enrichi (genre, sous-genre, date, qualité, ISRC, fabrication)
+- Onglet crédits réellement exploité
+- Onglet avis & commentaires transformé en expérience communautaire structurée
+- Réactions rapides persistées localement + bloc réactions live existant réutilisé
+- Bloc soutien recentré sur la valeur artiste + toast UI au lieu d'erreurs brutes inline
+- Responsive renforcé : desktop/tablette en 2 colonnes, mobile en 1 colonne avec tabs scrollables
+
+### Performance
+- `LyricsPanel` reste lazy-loaded
+- `FullPlayerCreditsTab` lazy-loaded
+- `FullPlayerCommunityTab` lazy-loaded
+- Aucun changement du moteur audio ni du rythme de re-render de la progression
+
+### Validation
+- `pnpm --filter @sonafrik/web typecheck` : ✅ PASS
+- `pnpm --filter @sonafrik/web lint` : ✅ PASS
+- `pnpm --filter @sonafrik/web build` : ✅ PASS
+- `pnpm --filter @sonafrik/web test` : ✅ PASS
+- `playwright test tests/e2e/streaming-player.spec.ts` : ❌ FAIL sur environnement listener existant
+
+### Notes sur les échecs E2E
+Le smoke Playwright listener existant échoue sur :
+- 404 ressources console sur `/listen`
+- dataset de recherche `S12B Track` introuvable
+- contenu `/creator/analytics` non présent dans le scénario courant
+
+Ces échecs ne pointent pas directement le `Track Experience Panel V3`, mais empêchent de déclarer
+une validation E2E/Playwright/Lighthouse complète dans cette session.
+
+### Dette technique
+Aucune dette métier nouvelle.  
+Point restant : prévoir un scénario E2E dédié au panneau V3, plus stable et plus ciblé que le smoke listener historique.
+
+### Prochaine étape
+→ Ajouter ou adapter un test Playwright dédié à l'ouverture du `Track Experience Panel` sur une donnée listener stable,
+puis rejouer Lighthouse sur la route listener concernée si validation produit demandée.
+
+---
+
 ## 2026-07-09 — Mes publications · Enterprise Final Certification Replay
 
 ### Objectif
@@ -4846,4 +4904,32 @@ Les pages P0 `/listen` et `/creator` ne respectent pas encore la cible officiell
 
 ### Rapport
 - `docs/performance/reports/global-certification/CPU_PRECISION_REMEDIATION_CYCLE1_REPORT.md`
+
+---
+
+## 9 juillet 2026 — Audit complet + Track Experience Panel V3 + Option A auth réelle
+
+### Contexte
+- Mode bypass local (`BYPASS_AUTH=true`) masquait le catalogue Mes publications et bloquait les uploads profil.
+- Passage **Option A** : bypass désactivé en local pour tests MVP réels (session Supabase obligatoire).
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/FullPlayerPanel.tsx` — Track Experience Panel V3 (layout 2 colonnes, onglets lazy)
+- `apps/web/src/features/listener/components/FullPlayerCreditsTab.tsx` — **NEW** crédits lazy
+- `apps/web/src/features/listener/components/FullPlayerCommunityTab.tsx` — **NEW** communauté / avis localStorage
+- `apps/web/src/features/listener/components/TipPanel.tsx` — toasts erreurs + UI montant libre
+- `apps/web/src/app/styles/listen-home/full-player.css` — styles V3
+- `apps/web/src/features/creator/publications/components/PublicationsLibrary.tsx` — skeleton chargement avant live query (perf perçue)
+- `.gitignore` — exclusion `apps/web/perf-artifacts*/`
+
+### Validation audit
+- `pnpm build` : ✅ 10/10 packages
+- `pnpm lint` : ✅ 17/17
+- `pnpm typecheck` : ✅ 17/17
+- `pnpm --filter @sonafrik/web test` : ✅ 13/13
+
+### Tests à faire
+- [ ] Connexion artiste réelle → `/creator/catalog/tracks` affiche le catalogue
+- [ ] Upload couverture / photo profil avec session
+- [ ] Ouvrir Full Player → onglets Détails / Paroles / Crédits / Avis / Soutenir
 

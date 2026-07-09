@@ -207,7 +207,10 @@ export function PublicationsLibrary({
   }, [tracks, librarySort, insightsById, currentSearch]);
 
   const isLibraryEmpty = catalogTotalLive === 0;
-  const showLoadingState = libraryLoading && catalogTotalLive === 0 && !error;
+  const awaitingDeferredLive =
+    !liveReady && catalogTotalLive === 0 && tracks.length === 0 && !error;
+  const showLoadingState =
+    (libraryLoading || awaitingDeferredLive) && catalogTotalLive === 0 && !error;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const pageStart = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const pageEnd = Math.min(currentPage * pageSize, total);

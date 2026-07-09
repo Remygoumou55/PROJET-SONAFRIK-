@@ -19,20 +19,32 @@ export const TipPanel = memo(function TipPanel({ creatorId, artistName, variant 
   const [loading, setLoading]           = useState(false);
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const [error, setError]               = useState<string | null>(null);
+  const [info, setInfo]                 = useState<string | null>(null);
+
+  function showToast(message: string, kind: "success" | "error" | "info") {
+    if (kind === "success") setConfirmation(message);
+    if (kind === "error") setError(message);
+    if (kind === "info") setInfo(message);
+    window.setTimeout(() => {
+      if (kind === "success") setConfirmation(null);
+      if (kind === "error") setError(null);
+      if (kind === "info") setInfo(null);
+    }, 3000);
+  }
 
   async function handleTip(amountGnf: TipAmount) {
     setLoading(true);
     setError(null);
     setConfirmation(null);
+    setInfo(null);
     try {
       const result = await tip.sendTip({ receiverCreatorId: creatorId, amountGnf });
-      setConfirmation(`✓ ${result.receiverName} a reçu votre soutien !`);
-      setTimeout(() => { setConfirmation(null); }, 3000);
+      showToast(`✓ ${result.receiverName} a reçu votre soutien !`, "success");
     } catch (err) {
       if (err instanceof TipsError && err.code === "insufficient_balance") {
-        setError("Solde insuffisant. Rechargez votre wallet.");
+        showToast("Solde insuffisant. Rechargez votre wallet.", "error");
       } else {
-        setError("Impossible d'envoyer le pourboire. Réessayez.");
+        showToast("Impossible d'envoyer le pourboire. Réessayez.", "error");
       }
     } finally {
       setLoading(false);
@@ -42,69 +54,80 @@ export const TipPanel = memo(function TipPanel({ creatorId, artistName, variant 
   if (variant === "full") {
     return (
       <div className="tip-panel">
+        <div className="tip-toast-stack" aria-live="polite">
+          {confirmation ? (
+            <div className="tip-toast tip-toast--success">
+              <span aria-hidden="true">✓</span>
+              <span>{confirmation.replace("✓ ", "")}</span>
+            </div>
+          ) : null}
+          {error ? (
+            <div className="tip-toast tip-toast--error">
+              <span aria-hidden="true">!</span>
+              <span>{error}</span>
+            </div>
+          ) : null}
+          {info ? (
+            <div className="tip-toast tip-toast--info">
+              <span aria-hidden="true">i</span>
+              <span>{info}</span>
+            </div>
+          ) : null}
+        </div>
+
         <div className="tip-header">
           <span className="tip-icon" aria-hidden="true">
             💛
           </span>
           <div>
             <p className="tip-title">Soutenir {artistName}</p>
-            <p className="tip-subtitle">Envoyez directement un pourboire à l&apos;artiste</p>
+            <p className="tip-subtitle">Votre contribution aide directement l&apos;artiste à continuer de créer.</p>
           </div>
         </div>
 
-        {confirmation ? (
-          <div className="tip-success">
-            <span className="tip-success-icon" aria-hidden="true">
-              🎉
-            </span>
-            <p className="tip-success-title">Merci pour votre soutien !</p>
-            <p className="tip-success-sub">{confirmation.replace("✓ ", "")}</p>
-          </div>
-        ) : (
-          <>
-            <div className="tip-amounts">
-              {TIP_AMOUNTS.map((amount) => (
-                <button
-                  key={amount}
-                  type="button"
-                  className={`tip-amount-btn${loading ? " loading" : ""}`}
-                  disabled={loading}
-                  onClick={() => void handleTip(amount)}
-                  aria-label={`Envoyer ${amount.toLocaleString("fr-FR")} GNF à ${artistName}`}
-                >
-                  {loading ? (
-                    <span className="tip-loading-dots" aria-hidden="true">
-                      <span />
-                      <span />
-                      <span />
-                    </span>
-                  ) : (
-                    <>
-                      <span className="tip-amount-value">{amount.toLocaleString("fr-FR")}</span>
-                      <span className="tip-amount-currency">GNF</span>
-                    </>
-                  )}
-                </button>
-              ))}
-            </div>
+        <div className="tip-amounts">
+          {TIP_AMOUNTS.map((amount) => (
+            <button
+              key={amount}
+              type="button"
+              className={`tip-amount-btn${loading ? " loading" : ""}`}
+              disabled={loading}
+              onClick={() => void handleTip(amount)}
+              aria-label={`Envoyer ${amount.toLocaleString("fr-FR")} GNF à ${artistName}`}
+            >
+              {loading ? (
+                <span className="tip-loading-dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              ) : (
+                <>
+                  <span className="tip-amount-value">{amount.toLocaleString("fr-FR")}</span>
+                  <span className="tip-amount-currency">GNF</span>
+                </>
+              )}
+            </button>
+          ))}
+        </div>
 
-            {error ? (
-              <div
-                className={`tip-error${
-                  error.includes("Solde insuffisant") ? " tip-error--wallet" : ""
-                }`}
-              >
-                <span aria-hidden="true">{error.includes("Solde insuffisant") ? "💳" : "⚠️"}</span>
-                <p>{error}</p>
-                {error.includes("Solde insuffisant") ? (
-                  <Link href="/wallet" className="tip-wallet-link">
-                    Recharger mon wallet →
-                  </Link>
-                ) : null}
-              </div>
-            ) : null}
-          </>
-        )}
+        <div className="tip-actions">
+          <button
+            type="button"
+            className="tip-secondary-btn"
+            onClick={() => showToast("Le montant personnalisé arrive bientôt dans cette expérience.", "info")}
+          >
+            Autre montant
+          </button>
+          <p className="tip-wallet-note">
+            Le paiement est effectué directement depuis votre Wallet SONAFRIK.
+          </p>
+          {error?.includes("Solde insuffisant") ? (
+            <Link href="/wallet" className="tip-wallet-link">
+              Recharger mon wallet →
+            </Link>
+          ) : null}
+        </div>
       </div>
     );
   }
