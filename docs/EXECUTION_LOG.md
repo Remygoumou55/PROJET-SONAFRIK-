@@ -4933,3 +4933,14 @@ Les pages P0 `/listen` et `/creator` ne respectent pas encore la cible officiell
 - [ ] Upload couverture / photo profil avec session
 - [ ] Ouvrir Full Player → onglets Détails / Paroles / Crédits / Avis / Soutenir
 
+---
+
+## 9 juillet 2026 — PCI opportuniste : defer full-player.css
+
+### Fichiers touchés
+- `apps/web/src/app/styles/listen-home-bundle.css` — retrait import full-player (réduit CSS initial `/listen`)
+- `apps/web/src/features/listener/components/FullPlayerPanel.tsx` — import CSS co-localisé au chunk dynamique
+
+### Validation
+- `pnpm --filter @sonafrik/web build` : ✅
+

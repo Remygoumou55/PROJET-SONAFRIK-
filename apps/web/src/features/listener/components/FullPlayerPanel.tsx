@@ -1,5 +1,6 @@
 "use client";
 
+import "@/app/styles/listen-home/full-player.css";
 import dynamic from "next/dynamic";
 import { memo, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
