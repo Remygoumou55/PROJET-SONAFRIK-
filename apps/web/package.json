@@ -10,7 +10,7 @@
     "start": "next start",
     "start:prod": "next start -p 3001",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --config ../../scripts/vitest.web-navigation.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

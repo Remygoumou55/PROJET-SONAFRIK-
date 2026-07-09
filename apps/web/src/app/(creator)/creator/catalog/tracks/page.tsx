@@ -14,11 +14,36 @@ export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = resolvePublicationsPageSize();
 
-export const metadata: Metadata = {
-  title: "Mes publications",
-  description:
-    "Gérez vos publications SONAFRIK, filtrez votre catalogue et suivez le statut, l'activite et les performances de chaque morceau.",
-};
+const PAGE_TITLE = "Mes publications";
+const PAGE_DESCRIPTION =
+  "Gérez vos publications SONAFRIK, filtrez votre catalogue et suivez le statut, l'activite et les performances de chaque morceau.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    alternates: {
+      canonical: "/creator/catalog/tracks",
+    },
+    openGraph: {
+      title: `${PAGE_TITLE} — SONAFRIK`,
+      description: PAGE_DESCRIPTION,
+      url: "/creator/catalog/tracks",
+      siteName: "SONAFRIK",
+      locale: "fr_FR",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${PAGE_TITLE} — SONAFRIK`,
+      description: PAGE_DESCRIPTION,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export default async function CatalogTracksPage({
   searchParams,

@@ -21,6 +21,7 @@ interface MusicMobilePillNavProps {
   ariaLabel: string;
   className?: string;
   isActive?: (href: string, activePath: string, exact?: boolean) => boolean;
+  prefetchEnabled?: boolean;
 }
 
 function defaultIsActive(href: string, activePath: string, exact?: boolean): boolean {
@@ -34,10 +35,11 @@ function MusicMobilePillNavView({
   ariaLabel,
   className = "",
   isActive = defaultIsActive,
+  prefetchEnabled = true,
 }: MusicMobilePillNavProps) {
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const navHrefs = useMemo(() => items.map((item) => item.href), [items]);
-  const { prefetchOnHover } = useSmartPrefetch(navHrefs);
+  const { prefetchOnHover } = useSmartPrefetch(navHrefs, { enabled: prefetchEnabled });
 
   useEffect(() => {
     setPendingHref(null);
@@ -53,7 +55,7 @@ function MusicMobilePillNavView({
             <Link
               key={item.href}
               href={item.href}
-              prefetch
+              prefetch={prefetchEnabled}
               scroll
               className={`music-mobile-nav__pill${active ? " music-mobile-nav__pill--active" : ""}${pending ? " music-mobile-nav__pill--pending" : ""}`}
               aria-current={active ? "page" : undefined}

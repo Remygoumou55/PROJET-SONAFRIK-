@@ -13,13 +13,28 @@ export function CreatorLayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const isPublicationsRoute = pathname === "/creator/catalog/tracks";
 
-  return (
-    <ToastProvider>
-      <CreatorMobileNav activePath={pathname} navEntries={navEntries} />
+  const content = (
+    <>
+      <CreatorMobileNav
+        activePath={pathname}
+        navEntries={navEntries}
+        prefetchEnabled={!isPublicationsRoute}
+      />
       <div className="enterprise-content-card creator-workspace__main">
         <div className="enterprise-content-card__inner creator-workspace__frame">{children}</div>
       </div>
+    </>
+  );
+
+  if (isPublicationsRoute) {
+    return content;
+  }
+
+  return (
+    <ToastProvider>
+      {content}
     </ToastProvider>
   );
 }

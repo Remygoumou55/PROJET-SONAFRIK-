@@ -81,6 +81,60 @@ séparé dans la pipeline, documentée dans le plan d'action.
 
 ---
 
+## 2026-07-09 — Mes publications · Enterprise Final Remediation
+
+### Objectif
+Appliquer exclusivement les corrections validées par `ENTERPRISE_ROOT_CAUSE_VERIFICATION_REPORT.md`
+et `ENTERPRISE_CERTIFICATION_ACTION_PLAN.md` avant le replay final de certification Enterprise.
+
+### Fichiers touchés
+- `apps/web/src/app/(creator)/layout.tsx` — ajout du landmark `main`
+- `apps/web/src/features/creator/components/CreatorLayoutClient.tsx` — allègement du shell client sur `Mes publications`
+- `apps/web/src/features/creator/components/CreatorMobileNav.tsx` — contrôle du prefetch mobile
+- `apps/web/src/features/creator/components/CreatorSidebar.tsx` — désactivation du prefetch nav sur `Mes publications`
+- `apps/web/src/features/shared/navigation/MusicMobilePillNav.tsx` — prefetch pilotable
+- `apps/web/src/features/shared/navigation/MusicNavFromSections.tsx` — prefetch pilotable
+- `apps/web/src/features/shared/srtsp/RootSrtspShell.tsx` — connexion realtime différée sur `Mes publications`
+- `apps/web/src/features/shared/ldse/RootLdseShell.tsx` — enregistrement LDSE différé sur `Mes publications`
+- `apps/web/src/features/creator/publications/components/PublicationsLibrary.tsx` — activation live différée + correction ARIA filtres
+- `apps/web/src/app/styles/music-navigation.css` — correction contraste/taille sidebar desktop
+- `apps/web/src/app/(creator)/creator/catalog/tracks/page.tsx` — metadata App Router route-spécifique (description, canonical, OG, Twitter, robots)
+- `apps/web/package.json` — `typecheck` stabilisé avec `next typegen`
+- `apps/web/tsconfig.json` — régénéré/stabilisé par `next typegen`
+
+### Corrections appliquées
+- Landmark `main` ajouté au layout créateur
+- `role="tablist"` retiré des filtres de statut invalides
+- Contrastes desktop sidebar relevés via tokens existants
+- Metadata route `Mes publications` rendue explicite (`description`, `canonical`, `openGraph`, `twitter`, `robots`)
+- Shell client allégé sur la route : `ToastProvider` non monté, prefetch nav désactivé
+- Initialisation realtime/LDSE différée après idle sur `Mes publications`
+- Live query publications différée après idle
+- `typecheck` web stabilisé avec génération explicite des types Next
+
+### Validation
+- `pnpm --filter @sonafrik/web lint` : ✅ PASS
+- `pnpm --filter @sonafrik/web typecheck` : ✅ PASS
+- `pnpm --filter @sonafrik/web build` : ✅ PASS (après nettoyage `.next` local)
+- `pnpm build ; pnpm lint ; pnpm typecheck` : ✅ PASS en exécution séquentielle monorepo
+- `pnpm --filter @sonafrik/web test` : ✅ PASS
+- `pnpm --filter @sonafrik/web test:e2e:publications-cert` : ❌ FAIL local — route chargée avec shell OK mais catalogue de test résolu en état `empty`
+- `pnpm perf:cwv` : ❌ FAIL local — même blocage `empty`
+
+### Blocage restant
+Le blocage local restant n'est plus un échec de build/lint/typecheck, mais une preuve locale publications :
+le compte artiste de test authentifié arrive sur un catalogue vide sur le serveur prod local, ce qui empêche
+la validation E2E/perf locale finale sur cette machine.
+
+### Dette technique
+Aucune nouvelle dette produit introduite. Le seul point ouvert est un écart de preuve locale à arbitrer par le replay CI officiel.
+
+### Prochaine étape
+→ Pousser la branche remédiée puis déclencher **une seule** exécution officielle `performance-cert.yml`
+pour trancher la certification Enterprise sur l’environnement Linux de référence.
+
+---
+
 ## 2026-07-09 — Hero Discovery Experience — Enterprise Product Polish
 
 ### Objectif

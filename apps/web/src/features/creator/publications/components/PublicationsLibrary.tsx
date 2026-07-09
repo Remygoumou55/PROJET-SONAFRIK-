@@ -72,6 +72,7 @@ export function PublicationsLibrary({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
   const [manualRefreshing, setManualRefreshing] = useState(false);
+  const [liveReady, setLiveReady] = useState(false);
   const emptyRecoveryTriggeredRef = useRef(false);
 
   const currentPage = useMemo(() => {
@@ -107,7 +108,23 @@ export function PublicationsLibrary({
       albumsById,
       insights: initialInsights,
     },
+    enabled: liveReady,
   });
+
+  useEffect(() => {
+    const schedule =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(() => setLiveReady(true), { timeout: 1200 })
+        : window.setTimeout(() => setLiveReady(true), 800);
+
+    return () => {
+      if (typeof schedule === "number") {
+        window.clearTimeout(schedule);
+        return;
+      }
+      window.cancelIdleCallback(schedule);
+    };
+  }, []);
 
   useEffect(() => {
     setError(loadError);
@@ -308,7 +325,7 @@ export function PublicationsLibrary({
             </Button>
           </div>
 
-          <div className="pub-catalog__filters" role="tablist" aria-label="Filtrer le catalogue">
+          <div className="pub-catalog__filters" aria-label="Filtrer le catalogue">
             {PUBLICATIONS_STATUS_FILTERS.map((filter) => (
               <Button
                 key={filter.value}

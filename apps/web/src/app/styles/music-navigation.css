@@ -107,11 +107,11 @@
 
 .music-sidebar__story-eyebrow {
   margin: 0;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-vert-casque);
+  color: var(--color-or-solaire);
 }
 
 .music-sidebar__story-hint {
@@ -162,11 +162,11 @@
 .music-nav__section-title {
   margin: 0;
   padding: 0.5rem var(--nav-item-padding-x) 0.25rem;
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-texte-desactive);
+  color: var(--color-texte-secondaire);
 }
 
 .music-sidebar--admin .music-nav__section-title {

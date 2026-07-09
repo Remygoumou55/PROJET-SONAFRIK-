@@ -14,6 +14,7 @@ interface MusicNavFromSectionsProps {
   ) => { kind: MusicNavBadgeKind; label: string | number } | null;
   onNavigate?: () => void;
   onPrefetch?: (href: string) => void;
+  prefetchEnabled?: boolean;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function MusicNavFromSections({
   resolveBadge,
   onNavigate,
   onPrefetch,
+  prefetchEnabled = true,
   className,
 }: MusicNavFromSectionsProps) {
   return (
@@ -48,6 +50,7 @@ export function MusicNavFromSections({
                 active={isActive(item.href, pathname, item.exact)}
                 badge={badge?.label ?? item.badge}
                 badgeKind={badge?.kind ?? item.badgeKind}
+                prefetch={prefetchEnabled}
                 onNavigate={onNavigate}
                 onMouseEnter={() => onPrefetch?.(item.href)}
                 onFocus={() => onPrefetch?.(item.href)}

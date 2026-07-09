@@ -38,14 +38,14 @@ export default async function CreatorLayout({ children }: { children: React.Reac
           <div className="enterprise-sidebar-card">
             <CreatorSidebar navEntries={navEntries} />
           </div>
-          <div className="enterprise-main-column creator-workspace__body">
+          <main className="enterprise-main-column creator-workspace__body">
             <CreatorWorkspaceHeader
               userId={context.creator.owner_id}
               initialUnreadCount={unreadCount}
               pendingVerifications={context.pendingVerifications}
             />
             <CreatorLayoutClient navEntries={navEntries}>{children}</CreatorLayoutClient>
-          </div>
+          </main>
         </div>
       </PerformanceProvider>
     </RealtimeShell>

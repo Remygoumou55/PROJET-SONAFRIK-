@@ -22,9 +22,10 @@ interface CreatorSidebarProps {
 
 export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
   const pathname = usePathname();
+  const isPublicationsRoute = pathname === "/creator/catalog/tracks";
   const sections = useMemo(() => groupCreatorNavEntries(navEntries), [navEntries]);
   const navHrefs = useMemo(() => getCreatorNavLinks(navEntries).map((l) => l.href), [navEntries]);
-  const { prefetchOnHover } = useSmartPrefetch(navHrefs);
+  const { prefetchOnHover } = useSmartPrefetch(navHrefs, { enabled: !isPublicationsRoute });
 
   return (
     <MusicSidebar
@@ -38,6 +39,7 @@ export function CreatorSidebar({ navEntries }: CreatorSidebarProps) {
         ariaLabel="Menu artiste"
         isActive={isNavActive}
         onPrefetch={prefetchOnHover}
+        prefetchEnabled={!isPublicationsRoute}
       />
     </MusicSidebar>
   );

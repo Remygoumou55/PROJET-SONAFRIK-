@@ -11,6 +11,7 @@ import {
 interface CreatorMobileNavProps {
   activePath: string;
   navEntries: CreatorNavEntry[];
+  prefetchEnabled?: boolean;
 }
 
 function isActive(href: string, activePath: string, exact?: boolean): boolean {
@@ -18,7 +19,11 @@ function isActive(href: string, activePath: string, exact?: boolean): boolean {
   return activePath === href || activePath.startsWith(`${href}/`);
 }
 
-export function CreatorMobileNav({ activePath, navEntries }: CreatorMobileNavProps) {
+export function CreatorMobileNav({
+  activePath,
+  navEntries,
+  prefetchEnabled = true,
+}: CreatorMobileNavProps) {
   const items = useMemo<MusicMobileNavItem[]>(
     () =>
       getCreatorNavLinks(navEntries).map((link) => ({
@@ -38,6 +43,7 @@ export function CreatorMobileNav({ activePath, navEntries }: CreatorMobileNavPro
       ariaLabel="Navigation espace artiste"
       className="music-mobile-nav--creator"
       isActive={isActive}
+      prefetchEnabled={prefetchEnabled}
     />
   );
 }
