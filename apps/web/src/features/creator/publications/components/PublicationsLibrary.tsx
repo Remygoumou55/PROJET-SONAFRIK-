@@ -402,14 +402,16 @@ export function PublicationsLibrary({
         </>
       )}
 
-      <PublicationDetailPanel
-        track={selectedTrack}
-        album={selectedTrack?.album_id ? albumsByIdLive[selectedTrack.album_id] : undefined}
-        open={selectedTrack !== null}
-        onClose={handleCloseDetail}
-        onDelete={(track) => void handleDelete(track)}
-        deleting={deletingId === selectedTrack?.id}
-      />
+      {selectedTrack ? (
+        <PublicationDetailPanel
+          track={selectedTrack}
+          album={selectedTrack.album_id ? albumsByIdLive[selectedTrack.album_id] : undefined}
+          open
+          onClose={handleCloseDetail}
+          onDelete={(track) => void handleDelete(track)}
+          deleting={deletingId === selectedTrack.id}
+        />
+      ) : null}
     </div>
   );
 }

@@ -158,8 +158,8 @@
 
 .pub-card__hint {
   margin: 0.25rem 0 0;
-  color: var(--color-or-solaire);
-  font-size: var(--text-fluid-xs);
+  color: var(--color-texte-secondaire);
+  font-size: 0.75rem;
 }
 
 /* Badge statut */
@@ -170,7 +170,7 @@
   align-items: center;
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
-  font-size: var(--text-fluid-xs);
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -551,8 +551,8 @@
 
 .pub-catalog-row__hint {
   margin: 0.2rem 0 0;
-  font-size: var(--text-fluid-xs);
-  color: var(--color-texte-desactive);
+  font-size: 0.75rem;
+  color: var(--color-texte-secondaire);
 }
 
 .pub-catalog-row__dates,

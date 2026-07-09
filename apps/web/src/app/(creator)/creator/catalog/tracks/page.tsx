@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   createCatalogService,
   normalizePublicationSort,
@@ -12,6 +13,12 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = resolvePublicationsPageSize();
+
+export const metadata: Metadata = {
+  title: "Mes publications",
+  description:
+    "Gérez vos publications SONAFRIK, filtrez votre catalogue et suivez le statut, l'activite et les performances de chaque morceau.",
+};
 
 export default async function CatalogTracksPage({
   searchParams,

@@ -106,6 +106,34 @@ résiduels identifiés lors de la clôture officielle, atteindre le score 10/10 
 
 ---
 
+## 2026-07-09 — Infrastructure Readiness Sprint 2 — Secrets + Certification CI
+
+### Objectif
+Configurer les Repository Secrets GitHub depuis `.env.local`, exécuter `performance-cert.yml`,
+télécharger artifacts, prononcer décision B3.2 sur preuves CI réelles.
+
+### Actions
+- `gh secret set` : 3 secrets P0 (URL, anon, service_role) — valeurs jamais loggées
+- Run `29002039029` : échec `No tests found` (Playwright ignore `*.perf.ts`)
+- Fix infra : `playwright.perf.config.ts` → `testMatch: "**/*.perf.ts"` (commit `84b5cd7`)
+- Run `29002772328` : pipeline complète, gate certification ❌
+
+### Mesures CI réelles (run 29002772328)
+- Build/Tests/Bundle : ✅ PASS (First Load 268 kB, Δ0)
+- Lighthouse desktop : Perf 97, A11y 91, BP 100, SEO 91 → FAIL
+- Lighthouse mobile : Perf 88, A11y 91, BP 93, SEO 91 → FAIL
+- CWV : LCP 2040✅ CLS 0✅ INP 32✅ FCP 2040❌ TTFB 388✅
+- `certification.json` : `certified: false`, score indicatif 3/10
+
+### Décision
+- **Infrastructure GitHub : ✅ OPÉRATIONNELLE**
+- **B3 Enterprise Performance : ⛔ NON CERTIFIÉ** (seuils Lighthouse + FCP)
+
+### Rapport
+- `docs/infrastructure/SPRINT2_PERFORMANCE_CERTIFICATION_REPORT.md`
+
+---
+
 ## 2026-07-09 — Infrastructure Readiness Sprint 1 — GitHub Actions Secrets Discovery
 
 ### Objectif

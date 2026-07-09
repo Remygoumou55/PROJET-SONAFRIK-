@@ -7,3 +7,4 @@ tests/e2e/.auth-state.json
 
 # Performance CI artifacts (B3.2) — générés en CI, publiés comme artifacts
 /perf-artifacts/
+/perf-artifacts-ci/
