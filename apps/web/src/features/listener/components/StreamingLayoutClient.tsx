@@ -11,7 +11,6 @@ import { PlayerMuteProvider } from "../lib/playerMuteContext";
 import { useAfterFCP } from "../hooks/useAfterFCP";
 import { ListenerProgressiveRealtimeShell } from "./ListenerProgressiveRealtimeShell";
 import { ListenerSidebarAsync } from "./ListenerSidebarAsync";
-import { ListenerSidebarPlaceholder } from "./ListenerSidebarPlaceholder";
 import { MobileBottomNav } from "./ListenerMobileBottomNav";
 import { ValidListenToast } from "./ValidListenToast";
 
@@ -54,19 +53,13 @@ export function StreamingLayoutClient({
                 className="enterprise-shell enterprise-shell--listener has-global-player md:flex md:overflow-hidden"
                 style={{ minHeight: "100dvh" }}
               >
-                {chromeReady ? (
-                  <div className="enterprise-sidebar-card">
-                    <ListenerSidebarAsync
-                      userId={userId}
-                      initialUnreadCount={initialUnreadCount}
-                      sidebarDataPromise={sidebarDataPromise}
-                    />
-                  </div>
-                ) : (
-                  <div className="enterprise-sidebar-card">
-                    <ListenerSidebarPlaceholder />
-                  </div>
-                )}
+                <div className="enterprise-sidebar-card">
+                  <ListenerSidebarAsync
+                    userId={userId}
+                    initialUnreadCount={initialUnreadCount}
+                    sidebarDataPromise={sidebarDataPromise}
+                  />
+                </div>
                 <div className="enterprise-main-column flex-1 min-h-0">
                   <main className="enterprise-content-card flex-1 md:pb-[88px]">
                     <div className="enterprise-content-card__inner">{children}</div>
@@ -74,8 +67,8 @@ export function StreamingLayoutClient({
                 </div>
               </div>
               <MobileBottomNav />
-              {chromeReady ? <GlobalPlayer /> : null}
-              {chromeReady ? <ValidListenToast /> : null}
+              <GlobalPlayer />
+              <ValidListenToast />
             </ListenerProgressiveRealtimeShell>
           </PlayerMuteProvider>
         </PlayerProvider>
