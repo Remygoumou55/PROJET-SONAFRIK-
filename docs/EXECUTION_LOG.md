@@ -126,6 +126,59 @@ séparé dans la pipeline, documentée dans le plan d'action.
 
 ---
 
+## 2026-07-09 — Mes publications · Enterprise Final Certification Replay
+
+### Objectif
+Exécuter **une unique** replay officielle du pipeline `performance-cert.yml` sur la remédiation finale
+afin de prononcer la décision Enterprise sur preuves CI Linux authentifiées.
+
+### Référence
+- Branche : `perf/b3-2-performance-ci`
+- Commit : `cf7bcd7`
+- Run GitHub Actions : `29017141268`
+
+### Résultats
+- Preflight : ✅ PASS
+- Lint : ✅ PASS
+- Typecheck : ✅ PASS
+- Unit tests : ✅ PASS
+- Production build : ✅ PASS
+- Capture CWV authentifiée : ✅ PASS
+- Lighthouse desktop/mobile : ✅ PASS
+- Generate certification report : ✅ PASS
+- Upload artifacts : ✅ PASS
+- Certification gate : ❌ FAIL
+
+### Mesures officielles
+- Desktop : Perf **63** · A11y **95** · BP **100** · SEO **91**
+- Mobile : Perf **84** · A11y **100** · BP **96** · SEO **91**
+- CWV : LCP **1964 ms** ✅ · CLS **0.0029** ✅ · INP **24 ms** ✅ · FCP **1964 ms** ❌ · TTFB **264 ms** ✅
+- Bundle First Load `/creator/catalog/tracks` : **239 kB** ✅
+- Runtime : long tasks **0** · lignes catalogue **31**
+
+### Décision
+**MES PUBLICATIONS — NOT CERTIFIED**
+
+Blocages restants :
+- Desktop Performance < 95
+- Desktop SEO < 95
+- Mobile Performance < 95
+- Mobile Best Practices < 100
+- Mobile SEO < 95
+- FCP > 1800 ms
+
+### Livrables
+- `docs/performance/ENTERPRISE_FINAL_CERTIFICATION_REPORT.md` — décision finale formalisée
+- `apps/web/perf-artifacts-run-29017141268/performance-cert-publications/*` — preuves CI archivées localement
+
+### FREEZE
+❌ **FREEZE non appliqué** — au moins un seuil Enterprise reste inférieur.
+
+### Prochaine étape
+→ Attendre validation explicite de Rémy avant tout nouveau travail sur `Mes publications`.
+
+---
+
 ## 2026-07-09 — Mes publications · Enterprise Final Remediation
 
 ### Objectif
