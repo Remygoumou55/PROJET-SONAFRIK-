@@ -47,11 +47,33 @@ env:
   ARTIFACT_DIR: apps/web/perf-artifacts
 
 jobs:
+  # Le contexte `secrets` n'est pas autorisé dans un `if:` de job (→ startup_failure).
+  # On détecte la présence des secrets dans un job dédié et on expose des outputs
+  # consommables via le contexte `needs` (autorisé en `if:`).
+  preflight:
+    name: Preflight (secrets)
+    runs-on: ubuntu-latest
+    outputs:
+      has_supabase_full: ${{ steps.check.outputs.has_supabase_full }}
+    steps:
+      - id: check
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON" ] && [ -n "$SERVICE_ROLE" ]; then
+            echo "has_supabase_full=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_supabase_full=false" >> "$GITHUB_OUTPUT"
+          fi
+
   performance-cert:
     name: Enterprise Performance Certification
     runs-on: ubuntu-latest
+    needs: preflight
     # QG1 — Requiert un environnement Supabase (route authentifiée + provisioning compte).
-    if: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
+    if: ${{ needs.preflight.outputs.has_supabase_full == 'true' }}
     steps:
       # ── QG1 — CI Environment ────────────────────────────────────────────────
       - name: Checkout
