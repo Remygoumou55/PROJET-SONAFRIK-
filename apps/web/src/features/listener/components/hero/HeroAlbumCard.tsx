@@ -31,7 +31,7 @@ export function HeroAlbumCard({ item, theme, index, isActive }: Props) {
   const releaseDate = formatReleaseDate(item.release_date);
 
   return (
-    <article className="hcard hcard--album" aria-label={item.album_title}>
+    <article className={`hcard hcard--album${isActive ? " hcard--active" : ""}`} aria-label={item.album_title}>
       {/* Background cover */}
       <div className="hcard__bg" aria-hidden="true">
         <CoverImage
@@ -56,7 +56,7 @@ export function HeroAlbumCard({ item, theme, index, isActive }: Props) {
         {/* Album info */}
         <div className="hcard__info">
           {theme.badge && (
-            <span className="hcard__badge">{theme.badge}</span>
+            <span className={`hcard__badge hcard__badge--${theme.badgeVariant}`}>{theme.badge}</span>
           )}
           <h2 className="hcard__name">{item.album_title}</h2>
           <p className="hcard__meta">
@@ -79,7 +79,10 @@ export function HeroAlbumCard({ item, theme, index, isActive }: Props) {
             tabIndex={isActive ? 0 : -1}
             aria-label={`Écouter ${item.album_title}`}
           >
-            <span aria-hidden="true">▶</span> Écouter l&apos;album
+            <svg className="hcard__play-icon" viewBox="0 0 10 12" fill="currentColor" aria-hidden="true" width="10" height="12">
+              <path d="M0 0L10 6L0 12Z" />
+            </svg>
+            Écouter l&apos;album
           </Link>
           <Link
             href={artistHref}
@@ -87,7 +90,7 @@ export function HeroAlbumCard({ item, theme, index, isActive }: Props) {
             tabIndex={isActive ? 0 : -1}
             aria-label={`Voir le profil de ${item.stage_name}`}
           >
-            <span aria-hidden="true">👤</span> Voir l&apos;artiste
+            Voir l&apos;artiste
           </Link>
         </div>
       </div>

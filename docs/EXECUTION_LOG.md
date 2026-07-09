@@ -11,6 +11,59 @@
 
 ---
 
+## 2026-07-09 — Hero Discovery Experience — Enterprise Product Polish
+
+### Objectif
+Transformer le Hero en expérience éditoriale premium : storytelling africain, hiérarchie visuelle,
+micro-interactions, responsive complet. Zéro changement backend/API/DB/algorithmes.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/hero/heroEditorial.ts` — thèmes data-driven + `formatListenCount`
+- `apps/web/src/features/listener/components/hero/HeroArtistCard.tsx` — `hcard--active`, meta combinée, SVG play, badge variant
+- `apps/web/src/features/listener/components/hero/HeroAlbumCard.tsx` — `hcard--active`, SVG play, badge variant
+- `apps/web/src/app/styles/listen-home/hero-carousel.css` — refonte visuelle complète
+
+### Changements clés
+
+**heroEditorial.ts :**
+- `formatListenCount(n)` exporté (K/M compacts)
+- Artiste : 6 cas data-driven — `verified+>5K` → "🏆 incontournable", `>10K` → "🔥 tendance", `>2K` → "ascension", `>200` → "émergent", `verified` → "officiel", fallback pool rotatif 5 thèmes
+- `HeroTheme.badgeVariant: "verified" | "trending" | "emerging" | "new"` — nouveau champ sémantique
+
+**Cards (artiste + album) :**
+- Classe `hcard--active` conditionnelle → déclenche animation CSS d'entrée par slide
+- Meta combinée artiste : `"Afrobeat · 12K écoutes"` (genre + listen_count)
+- Badge sémantique : 4 variantes CSS (`--verified`, `--trending`, `--emerging`, `--new`)
+- `▶` / `👤` emoji → SVG play propre + texte pur
+
+**hero-carousel.css — African Golden Hour :**
+
+| Élément | Avant | Après |
+|---|---|---|
+| Hauteur mobile | 13rem | 17rem |
+| Hauteur 420px | 14.5rem | 19.5rem |
+| Hauteur 600px | 16rem | 22rem |
+| Hauteur 1100px | 18rem | 25rem |
+| Nom mobile | 1.125rem | 1.5rem |
+| Nom 1100px | 1.875rem | 2.75rem |
+| Overlay | 2 gradients plats | 3 couches : noir profond + ombre diagonale + chaleur or (#f6c009/11%) |
+| CTA primaire | 0.625rem / 5px pad | 0.6875rem / 7px pad + halo doré |
+| Animation active | aucune | `translateY 8px→0 + opacity` 450ms |
+| Dot actif | 22px gold | 28px gold |
+
+### Validation
+- pnpm build : ✅ 0 erreur
+- pnpm lint : ✅ 0 warning
+- pnpm typecheck : ✅ 0 erreur TypeScript
+
+### Dette technique
+Aucune. Changement purement visuel, aucun composant partagé modifié, aucun type local redéfini.
+
+### Prochaine étape
+→ Continuer Enterprise Polish (wallet, creator sidebar, responsive global) ou valider visuellement le Hero en dev.
+
+---
+
 ## 2026-07-09 — Re-audit P1 · Clôture 10/10 Homepage Discovery Vague 1
 
 ### Objectif
@@ -50,6 +103,38 @@ résiduels identifiés lors de la clôture officielle, atteindre le score 10/10 
 
 ### Prochaine étape
 → Passer à **Priorité 2** (selon roadmap Enterprise / PLAN-CORRECTION-360-V2.md)
+
+---
+
+## 2026-07-09 — Infrastructure Readiness Sprint 1 — GitHub Actions Secrets Discovery
+
+### Objectif
+Certifier l'infrastructure GitHub Actions (pas le produit). Inventorier secrets, variables,
+workflows, scripts CI ; produire documentation Enterprise ; identifier le blocage certification B3.2.
+
+### Livraisons
+- `docs/infrastructure/GITHUB_ACTIONS_SECRETS.md` — inventaire 9 secrets, matrices workflow, comparaison dispo
+- `docs/infrastructure/INFRASTRUCTURE_READINESS_REPORT.md` — rapport Enterprise readiness
+- `docs/infrastructure/GITHUB_SETUP_GUIDE.md` — guide propriétaire dépôt (config secrets + relance CI)
+
+### Mesures (factuelles)
+- Workflows audités : **2** (`ci.yml`, `performance-cert.yml`)
+- Secrets détectés dans workflows : **9** · Repository Secrets configurés : **0**
+- Variables `vars.*` : **0** · Environments GitHub : 2 (Preview, Production) — non liés aux jobs
+- Scripts analysés : **69** · Fichiers audités (workflows + configs + scripts + tests) : **~101**
+- `gh secret list` / `gh variable list` : vides (2026-07-09)
+
+### Décision infrastructure
+Pipeline **prête structurellement** · **non opérationnelle** (secrets manquants).
+Action manuelle unique : copier valeurs Vercel/Supabase/.env.local → Repository Secrets (3 P0).
+
+### Dette technique
+- Fix `preflight` sur `perf/b3-2-performance-ci` — merge sur `main` recommandé pour CI verte historique
+- `e2e-smoke` sans gate `preflight` (mineur)
+
+### Tests à faire
+- [ ] Propriétaire : configurer 3 secrets P0 puis `gh workflow run performance-cert.yml`
+- [ ] Valider artifact `certification.json` sur mesures réelles
 
 ---
 

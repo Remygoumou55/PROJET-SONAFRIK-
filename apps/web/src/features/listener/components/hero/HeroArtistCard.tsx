@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CoverImage } from "@/components/CoverImage";
 import type { HeroItemArtist } from "@sonafrik/types";
 import type { HeroTheme } from "./heroEditorial";
+import { formatListenCount } from "./heroEditorial";
 
 interface Props {
   item: HeroItemArtist;
@@ -15,8 +16,12 @@ interface Props {
 export function HeroArtistCard({ item, theme, index, isActive }: Props) {
   const artistHref = `/listen/artist/${item.creator_id}`;
 
+  const metaParts: string[] = [];
+  if (item.genre_primary) metaParts.push(item.genre_primary);
+  if (item.listen_count > 50) metaParts.push(`${formatListenCount(item.listen_count)} écoutes`);
+
   return (
-    <article className="hcard hcard--artist" aria-label={item.stage_name}>
+    <article className={`hcard hcard--artist${isActive ? " hcard--active" : ""}`} aria-label={item.stage_name}>
       {/* Background cover */}
       <div className="hcard__bg" aria-hidden="true">
         <CoverImage
@@ -41,11 +46,11 @@ export function HeroArtistCard({ item, theme, index, isActive }: Props) {
         {/* Artist info */}
         <div className="hcard__info">
           {theme.badge && (
-            <span className="hcard__badge">{theme.badge}</span>
+            <span className={`hcard__badge hcard__badge--${theme.badgeVariant}`}>{theme.badge}</span>
           )}
           <h2 className="hcard__name">{item.stage_name}</h2>
-          {item.genre_primary && (
-            <p className="hcard__meta">{item.genre_primary}</p>
+          {metaParts.length > 0 && (
+            <p className="hcard__meta">{metaParts.join(" · ")}</p>
           )}
           {item.bio_short && (
             <p className="hcard__bio">{item.bio_short}</p>
@@ -60,7 +65,10 @@ export function HeroArtistCard({ item, theme, index, isActive }: Props) {
             tabIndex={isActive ? 0 : -1}
             aria-label={`Écouter ${item.stage_name}`}
           >
-            <span aria-hidden="true">▶</span> Écouter
+            <svg className="hcard__play-icon" viewBox="0 0 10 12" fill="currentColor" aria-hidden="true" width="10" height="12">
+              <path d="M0 0L10 6L0 12Z" />
+            </svg>
+            Écouter
           </Link>
           <Link
             href={artistHref}
@@ -68,7 +76,7 @@ export function HeroArtistCard({ item, theme, index, isActive }: Props) {
             tabIndex={isActive ? 0 : -1}
             aria-label={`Voir le profil de ${item.stage_name}`}
           >
-            <span aria-hidden="true">👤</span> Voir l&apos;artiste
+            Voir l&apos;artiste
           </Link>
         </div>
       </div>
