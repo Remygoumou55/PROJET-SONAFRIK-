@@ -221,17 +221,17 @@ export type Database = {
       }
       artist_profiles: {
         Row: {
-          avatar_crop_x: number
-          avatar_crop_y: number
-          avatar_crop_zoom: number
+          avatar_crop_x: number | null
+          avatar_crop_y: number | null
+          avatar_crop_zoom: number | null
           avatar_original_path: string | null
           banner_path: string | null
           bio: string | null
           cover_images: string[]
           cover_path: string | null
-          cover_primary_crop_x: number
-          cover_primary_crop_y: number
-          cover_primary_crop_zoom: number
+          cover_primary_crop_x: number | null
+          cover_primary_crop_y: number | null
+          cover_primary_crop_zoom: number | null
           cover_primary_original: string | null
           cover_updated_at: string | null
           created_at: string
@@ -248,17 +248,17 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
-          avatar_crop_x?: number
-          avatar_crop_y?: number
-          avatar_crop_zoom?: number
+          avatar_crop_x?: number | null
+          avatar_crop_y?: number | null
+          avatar_crop_zoom?: number | null
           avatar_original_path?: string | null
           banner_path?: string | null
           bio?: string | null
           cover_images?: string[]
           cover_path?: string | null
-          cover_primary_crop_x?: number
-          cover_primary_crop_y?: number
-          cover_primary_crop_zoom?: number
+          cover_primary_crop_x?: number | null
+          cover_primary_crop_y?: number | null
+          cover_primary_crop_zoom?: number | null
           cover_primary_original?: string | null
           cover_updated_at?: string | null
           created_at?: string
@@ -275,17 +275,17 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
-          avatar_crop_x?: number
-          avatar_crop_y?: number
-          avatar_crop_zoom?: number
+          avatar_crop_x?: number | null
+          avatar_crop_y?: number | null
+          avatar_crop_zoom?: number | null
           avatar_original_path?: string | null
           banner_path?: string | null
           bio?: string | null
           cover_images?: string[]
           cover_path?: string | null
-          cover_primary_crop_x?: number
-          cover_primary_crop_y?: number
-          cover_primary_crop_zoom?: number
+          cover_primary_crop_x?: number | null
+          cover_primary_crop_y?: number | null
+          cover_primary_crop_zoom?: number | null
           cover_primary_original?: string | null
           cover_updated_at?: string | null
           created_at?: string
@@ -1087,6 +1087,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      hero_slides: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          display_order: number
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          starts_at: string | null
+          subtitle: string | null
+          title: string
+          track_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          starts_at?: string | null
+          subtitle?: string | null
+          title: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          starts_at?: string | null
+          subtitle?: string | null
+          title?: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hero_slides_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       label_members: {
         Row: {
@@ -3604,6 +3654,14 @@ export type Database = {
         Returns: undefined
       }
       _is_privileged_admin: { Args: never; Returns: boolean }
+      _notify_publication_review: {
+        Args: {
+          p_rejection_reason?: string
+          p_status: string
+          p_track_id: string
+        }
+        Returns: undefined
+      }
       add_payout_account: {
         Args: {
           p_account_holder_name: string
@@ -3819,6 +3877,10 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: number
       }
+      get_hero_featured_albums: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: Json
+      }
       get_landing_public_stats: {
         Args: { p_heartbeat_since: string; p_month_start: string }
         Returns: Json
@@ -3845,7 +3907,16 @@ export type Database = {
         Args: { p_creator_id: string }
         Returns: Json
       }
+      get_publication_insights_batch: {
+        Args: { p_track_ids: string[] }
+        Returns: {
+          last_activity_at: string
+          streams: number
+          track_id: string
+        }[]
+      }
       get_recommendations: { Args: { p_limit?: number }; Returns: Json }
+      get_recommended_tracks_mvp: { Args: { p_limit?: number }; Returns: Json }
       get_royalty_cycle_summary: { Args: { p_cycle_id: string }; Returns: Json }
       get_similar_tracks: {
         Args: { p_limit?: number; p_track_id: string }
@@ -3856,14 +3927,6 @@ export type Database = {
       get_system_setting: { Args: { p_key: string }; Returns: Json }
       get_top_guinea_feed: { Args: { p_limit?: number }; Returns: Json }
       get_track_listen_counts: { Args: { p_track_id: string }; Returns: Json }
-      get_publication_insights_batch: {
-        Args: { p_track_ids: string[] }
-        Returns: {
-          track_id: string
-          streams: number
-          last_activity_at: string | null
-        }[]
-      }
       get_trending_artists_mixed: { Args: { p_limit?: number }; Returns: Json }
       get_trending_tracks: {
         Args: { p_limit?: number; p_window?: string }
@@ -4129,6 +4192,7 @@ export type Database = {
         | "verification_updated"
         | "rights_claim_updated"
         | "system"
+        | "publication_review"
       ownership_type: "master" | "publishing" | "neighboring"
       rights_claim_status: "pending" | "accepted" | "rejected" | "escalated"
       rights_claim_type: "ownership" | "infringement" | "takedown"
@@ -4284,6 +4348,7 @@ export const Constants = {
         "verification_updated",
         "rights_claim_updated",
         "system",
+        "publication_review",
       ],
       ownership_type: ["master", "publishing", "neighboring"],
       rights_claim_status: ["pending", "accepted", "rejected", "escalated"],

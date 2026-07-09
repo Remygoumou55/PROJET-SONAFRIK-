@@ -92,7 +92,7 @@ export function RecommendedSection() {
       <div className="flex items-center justify-between px-6 mb-4">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgb(0 210 106 / 0.12)", border: "1px solid rgb(0 210 106 / 0.2)" }}>
+            style={{ background: "var(--color-vert-energie-bg)", border: "1px solid var(--color-vert-energie-ring)" }}>
             <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-vert-energie)" strokeWidth="2">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
@@ -109,7 +109,7 @@ export function RecommendedSection() {
           Voir tout →
         </Link>
       </div>
-      <div className="flex gap-4 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
+      <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 px-6">
         {tracks.map((track, i) => (
           <TrackRecommendedCard key={track.track_id} track={track} index={i} />
         ))}

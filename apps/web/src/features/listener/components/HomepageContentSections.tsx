@@ -39,7 +39,7 @@ function SectionRowSkeleton() {
   );
 }
 
-import { ERROR_BANNER_STYLE, GENRE_CHIP_COLORS, HOMEPAGE_SECTION_STYLES } from "@/lib/design/overlayTokens";
+import { ERROR_BANNER_STYLE, GENRE_CHIP_COLORS, HOMEPAGE_SECTION_STYLES, OVERLAY } from "@/lib/design/overlayTokens";
 import { CoverImage } from "@/components/CoverImage";
 
 export interface HomepageData {
@@ -49,7 +49,6 @@ export interface HomepageData {
   discoveryTracks: DiscoveryTrack[];
   topGuineaTracks: TrendingTrack[];
   topGuineaPeriodLabel?: string;
-  trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
   suggestedArtists: DiscoveryArtist[];
   featuredAlbums: HeroItemAlbum[];
@@ -122,7 +121,7 @@ function FeaturedAlbumCard({ album, index }: { album: HeroItemAlbum; index: numb
           imgSizes="120px"
         />
         <span className="absolute top-1.5 left-1.5 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-          style={{ background: "rgb(0 0 0 / 0.6)", color: "var(--color-vert-energie)", border: "1px solid rgb(246 192 9 / 0.3)" }}>
+          style={{ background: OVERLAY.noir60, color: "var(--color-vert-energie)", border: "1px solid var(--color-vert-energie-border)" }}>
           {releaseTypeLabel}
         </span>
       </div>
@@ -144,7 +143,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     artists,
     genres,
     topGuineaTracks,
-    trending,
     discoveries,
     suggestedArtists,
     featuredAlbums,
@@ -153,7 +151,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
 
   const hasMusicContent =
     topGuineaTracks.length > 0 ||
-    trending.length > 0 ||
     playlists.length > 0 ||
     artists.length > 0 ||
     discoveries.length > 0 ||
@@ -164,7 +161,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
 
   const filledCount = [
     topGuineaTracks.length > 0,
-    trending.length > 0,
     playlists.length > 0,
     artists.length > 0,
     discoveries.length > 0,
@@ -222,7 +218,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
           <div className="flex items-center justify-between px-6 mb-4">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ background: "rgb(139 92 246 / 0.15)", border: "1px solid rgb(139 92 246 / 0.2)" }}>
+                style={HOMEPAGE_SECTION_STYLES.discoverIcon}>
                 <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-violet)" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" />
                 </svg>
@@ -239,7 +235,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
               Voir tout →
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
+          <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 px-6">
             {featuredAlbums.map((album, i) => (
               <FeaturedAlbumCard key={album.album_id} album={album} index={i} />
             ))}
@@ -286,7 +282,7 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
               Voir tout →
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 px-6" style={{ scrollbarWidth: "none" }}>
+          <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 px-6">
             {playlists.map((pl, i) => {
               const grad = CARD_GRADIENTS[i % CARD_GRADIENTS.length]!;
               return (

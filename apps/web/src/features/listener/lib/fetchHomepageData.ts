@@ -104,7 +104,7 @@ export async function fetchHomepageData(
       discoveryTracks: filterValidTracks(discoveryTracks).slice(0, 20),
       topGuineaTracks: filterValidTracks(topGuineaTracks).slice(0, 10),
       topGuineaPeriodLabel: topGuineaFeed.periodLabel,
-      trending: [],
+
       discoveries: filterValidTracks(discoveries).slice(0, 8),
       suggestedArtists: filterValidArtists(suggestedArtists).slice(0, 8),
       featuredAlbums: featuredAlbumsRaw.slice(0, 8),
@@ -117,7 +117,7 @@ export async function fetchHomepageData(
       genres: [],
       discoveryTracks: [],
       topGuineaTracks: [],
-      trending: [],
+
       discoveries: [],
       suggestedArtists: [],
       featuredAlbums: [],
