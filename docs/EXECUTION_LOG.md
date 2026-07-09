@@ -11,6 +11,51 @@
 
 ---
 
+## 2026-07-09 — feat(listen): Music Experience Panel v2
+
+### Objectif
+Transformer la popup de lecture en véritable "Music Experience Panel" : deux colonnes, onglets enrichis (Détails / Paroles / Crédits / Avis / Soutenir), réactions rapides, barre d'actions, preuve sociale. Zéro changement moteur audio, SRTSP, Providers, hooks métier.
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/FullPlayerPanel.tsx` — réécriture complète (~330 lignes)
+- `apps/web/src/app/styles/listen-home/full-player.css` — réécriture complète (~700 lignes)
+
+### Architecture nouvelle
+
+| Élément | Avant | Après |
+|---|---|---|
+| Positionnement | `bottom: 80px`, colonne unique | `top: 50% / left: 50%`, centré |
+| Dimensions desktop | `min(600px, …) × max-height 100dvh` | `min(860px, …) × min(580px, …)` |
+| Réduction hauteur | — | ~28% plus compact |
+| Layout | Colonne unique | Grille 2 colonnes (236px + flex-1) |
+| Colonne gauche | — | Pochette 196px · titre · artiste · badges · stats · actions |
+| Colonne droite | — | Progress · contrôles · volume · réactions · onglets |
+| Onglets | Actions / Réactions / 💛 | Détails / Paroles / Crédits / Avis / 💛 |
+| Réactions rapides | — | 5 boutons emoji (🔥❤️🎶👏🇬🇳) toggle local |
+| Tab Détails | — | album, année, durée, langue, BPM, tonalité, ISRC |
+| Tab Paroles | Sheet overlay | Inline via `LyricsPanelConnected` (context isolé) |
+| Tab Crédits | — | Empty state structuré (branchement futur) |
+| Tab Avis | — | Rating 5★ + textarea + submit (UI complète) |
+| Mobile ≤699px | Slide-up colonne unique | Idem + cover 88px en ligne avec infos |
+
+### Décisions techniques
+- `LyricsPanelConnected` isole `usePlayerPosition()` → FullPlayerPanel ne re-rend pas à 4 Hz
+- `formatTime()` importé de `PlayerProgressBar` pour le tab Détails
+- `TrackWithMeta` expose `duration_seconds`, `bpm`, `musical_key`, `isrc`, `language`, `album_title`, `explicit`, `published_at` → tous affichés dans Détails
+- CSS : aucun hex direct, 100% `var(--color-*)` / `var(--overlay-*)`
+
+### Validation
+- pnpm typecheck : ✅ 0 erreur
+- pnpm lint : ✅ 0 warning
+- Commit : `73c0950` sur `perf/b3-2-performance-ci`
+
+### Dette technique
+- Comments/Avis : UI complète mais sans persistance (pas de table DB reviews)
+- Crédits : empty state uniquement (branchement via `TrackCredit` table quand besoin)
+- Réactions rapides : toggle local, non persistées (SRTSP LiveReactions toujours accessible en renommant un onglet)
+
+---
+
 ## 2026-07-09 — fix(listen) Sidebar nav + GlobalPlayer disponibles immédiatement
 
 ### Objectif
