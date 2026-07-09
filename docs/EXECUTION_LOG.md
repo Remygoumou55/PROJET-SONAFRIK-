@@ -11,6 +11,56 @@
 
 ---
 
+## 2026-07-09 — Mes publications · B3.2 Enterprise Performance CI Pipeline
+
+### Objectif
+Livrer une **Performance CI Pipeline** réutilisable (référence officielle SONAFRIK) et capturer
+en CI Linux les preuves officielles de performance pour clôturer B3. Phase de **preuve** :
+aucune feature, aucune modif UX/UI, aucune mesure inventée.
+
+### Livraisons
+- `.github/workflows/performance-cert.yml` — workflow dédié : Build → `next start` → tests perf
+  authentifiés → Lighthouse desktop/mobile → Core Web Vitals → bundle → rapport → artifacts (90 j)
+  → décision (QG1-QG10). Paramétrable (`route`, `slug`, `baseline_first_load_kb`).
+- `scripts/perf/run-lighthouse.mjs` — Lighthouse authentifié via `npx` (aucune dépendance ajoutée),
+  extra-headers cookies, seuils Enterprise (Perf ≥ 95, A11y ≥ 95, BP = 100, SEO ≥ 95).
+- `apps/web/tests/perf/publications-cwv.perf.ts` + `apps/web/playwright.perf.config.ts` — CWV natifs
+  (PerformanceObserver : LCP/CLS/FCP/TTFB + INP proxy + long tasks), runtime, network, dump cookies.
+- `scripts/perf/extract-bundle.mjs`, `set-context.mjs`, `generate-report.mjs` — bundle vs baseline B3,
+  contexte build/tests, rapport `PERFORMANCE_CI_REPORT.md` + `certification.json`.
+- `docs/performance/ENTERPRISE_PERF_CI_PIPELINE.md` — exploitation + repro locale + réutilisation.
+- `docs/functional-quality/reports/SONAFRIK_PUBLICATIONS_B3_2_CI_CERTIFICATION.md` — rapport B3.2.
+
+### Fix racine CI (bloquant, hors périmètre initial)
+`ci.yml` en **startup_failure (0 s) sur `main`** depuis plusieurs commits : le contexte `secrets`
+est **interdit dans un `if:` de job**. Corrigé par un job `preflight` exposant la présence des
+secrets en `outputs` (contexte `needs` autorisé en `if:`). Appliqué à `ci.yml` + `performance-cert.yml`.
+
+### Validation
+- lint 17/17 · typecheck 17/17 · tests unitaires 330/330 (local, monorepo)
+- Workflow perf **valide** en CI (run 28987091794 : job `preflight` exécuté, plus de startup_failure)
+- Logique rapport vérifiée sur jeu de données factice (desktop PASS / mobile FAIL → non certifié)
+
+### Blocage (factuel — pas de mesure inventée)
+Job `Enterprise Performance Certification` **SKIPPÉ** en CI : le dépôt **n'a aucun secret GitHub
+Actions** (`gh secret list` vide). Sans `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+/ `SUPABASE_SERVICE_ROLE_KEY`, la route authentifiée `/creator/catalog/tracks` ne peut être mesurée
+en CI (Lighthouse + CWV impossibles). Les intégrations Vercel/Supabase Preview ne sont pas des
+secrets Actions.
+
+### Décision
+**B3 = NON CERTIFIÉ (en attente preuves CI).** Pipeline livrée, valide, prête. Il manque uniquement
+l'exécution CI, débloquée en ajoutant les secrets Actions puis `gh workflow run performance-cert.yml`.
+
+### Dette technique
+- Certification B3 en attente de secrets CI (aucun score prononcé sans mesure réelle).
+
+### Tests à faire
+- [ ] Ajouter les secrets Actions puis relancer `performance-cert.yml` et archiver les preuves.
+- [ ] Vérifier `ci.yml` vert sur `main` après le fix `preflight` (quality PASS, jobs secrets skip).
+
+---
+
 ## 2026-07-08 — Homepage Discovery Experience Vague 1
 
 ### Objectif
