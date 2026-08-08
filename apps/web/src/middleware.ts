@@ -33,6 +33,13 @@ function nextWithNonce(request: NextRequest, nonce: string): NextResponse {
   return response;
 }
 
+function resolveSafeNextPath(nextParam: string | null): string | null {
+  if (!nextParam) return null;
+  if (!nextParam.startsWith("/") || nextParam.startsWith("//")) return null;
+  if (nextParam.startsWith("/auth")) return null;
+  return nextParam;
+}
+
 function getSupabaseEnv(): { url: string; anonKey: string } | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -52,6 +59,31 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
     promise,
     new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
   ]);
+}
+
+// withTimeout + garde-fou : le fetch injecté (SUPABASE_FETCH_TIMEOUT_MS) peut désormais
+// REJETER (AbortError) au lieu de rester bloqué indéfiniment comme avant le fix RCA.
+// Sans ce catch, un rejet remonterait non-géré et ferait planter le middleware (500)
+// au lieu du fallback fail-closed attendu.
+async function safeTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  try {
+    return await withTimeout(promise, ms, fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+// Root cause MIDDLEWARE_INVOCATION_TIMEOUT (RCA 2026-08-07) : le SDK @supabase/auth-js
+// n'applique AUCUN timeout sur son `fetch` interne (getSession → refresh token, getUser,
+// rpc, from().select() passent tous par le même fetch non borné, avec retry+backoff en cas
+// d'erreur réseau). Sur cold start Supabase (10-30s), un seul appel peut donc dépasser le
+// plafond Edge Middleware de Vercel (25s) — indépendamment des withTimeout() applicatifs
+// ci-dessus, qui ne protègent que l'appelant, pas le fetch sous-jacent ni ses retries.
+// Fix recommandé par Vercel : borner l'appel réseau lui-même via AbortSignal.timeout.
+const SUPABASE_FETCH_TIMEOUT_MS = 4500;
+
+function createTimeoutFetch(ms: number): typeof fetch {
+  return (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(ms) });
 }
 
 export async function middleware(request: NextRequest) {
@@ -86,6 +118,12 @@ export async function middleware(request: NextRequest) {
         });
       },
     },
+    // Borne CHAQUE fetch réseau du SDK (refresh token inclus) — voir commentaire
+    // SUPABASE_FETCH_TIMEOUT_MS ci-dessus. Sans ça, un cold start Supabase peut
+    // bloquer le middleware au-delà du plafond Vercel (25s) → 504 MIDDLEWARE_INVOCATION_TIMEOUT.
+    global: {
+      fetch: createTimeoutFetch(SUPABASE_FETCH_TIMEOUT_MS),
+    },
   });
 
   const isAuthRoute =
@@ -108,30 +146,30 @@ export async function middleware(request: NextRequest) {
 
   // Session cookie (rapide, local) puis validation réseau avec timeout.
   // Évite les redirects auth intempestifs quand Supabase cold-start dépasse le délai.
-  const { data: { session } } = await supabase.auth.getSession();
+  // getSession() peut déclencher un refresh token réseau en interne (SDK) si le JWT est
+  // expiré — c'était l'unique appel non protégé du fichier (root cause du 504, voir RCA
+  // ci-dessus). Le fetch est désormais borné par SUPABASE_FETCH_TIMEOUT_MS ; ce withTimeout
+  // reste une seconde ligne de défense (retries/backoff internes du SDK).
+  const session = await safeTimeout(
+    supabase.auth.getSession().then((r) => r.data.session),
+    5000,
+    null,
+  );
   let user = session?.user ?? null;
 
   if (!user) {
-    try {
-      user = await withTimeout(
-        supabase.auth.getUser().then((r) => r.data.user),
-        4000,
-        null,
-      );
-    } catch {
-      // Supabase indisponible — pas de session locale
-    }
+    user = await safeTimeout(
+      supabase.auth.getUser().then((r) => r.data.user),
+      4000,
+      null,
+    );
   } else if (isAdminRoute) {
-    try {
-      const verified = await withTimeout(
-        supabase.auth.getUser().then((r) => r.data.user),
-        4000,
-        session!.user,
-      );
-      user = verified ?? session!.user;
-    } catch {
-      user = session!.user;
-    }
+    const verified = await safeTimeout(
+      supabase.auth.getUser().then((r) => r.data.user),
+      4000,
+      session!.user,
+    );
+    user = verified ?? session!.user;
   }
 
   // Pas de session → connexion (routes protégées), landing (onboarding)
@@ -149,7 +187,7 @@ export async function middleware(request: NextRequest) {
 
   // Routes admin : session + is_admin (RPC). Fail-closed si RPC timeout/erreur.
   if (isAdminRoute) {
-    const isAdmin = await withTimeout(
+    const isAdmin = await safeTimeout(
       Promise.resolve(
         supabase.rpc("is_admin", { p_user_id: user.id }).then((r) => (r.error ? null : r.data === true)),
       ),
@@ -168,7 +206,7 @@ export async function middleware(request: NextRequest) {
 
   // Espace artiste : profil + onboarding avant le layout (évite skeleton infini + redirect RSC).
   if (isCreatorRoute) {
-    const profile = await withTimeout(
+    const profile = await safeTimeout(
       Promise.resolve(
         supabase
           .from("profiles")
@@ -208,7 +246,7 @@ export async function middleware(request: NextRequest) {
   if (
     (isAuthRoute || isOnboarding)
   ) {
-    const profile = await withTimeout(
+    const profile = await safeTimeout(
       Promise.resolve(
         supabase
           .from("profiles")
@@ -222,12 +260,15 @@ export async function middleware(request: NextRequest) {
     const role = mapAccountType(profile?.account_type);
     const onboardingCompleted = profile?.onboarding_completed ?? false;
 
+    const postAuthDest =
+      resolveSafeNextPath(request.nextUrl.searchParams.get("next")) ?? getHomeByRole(role);
+
     if (isAuthRoute && onboardingCompleted) {
-      return secure(NextResponse.redirect(new URL(getHomeByRole(role), request.url)));
+      return secure(NextResponse.redirect(new URL(postAuthDest, request.url)));
     }
 
     if (isOnboarding && onboardingCompleted) {
-      return secure(NextResponse.redirect(new URL(getHomeByRole(role), request.url)));
+      return secure(NextResponse.redirect(new URL(postAuthDest, request.url)));
     }
 
     return secure(response);

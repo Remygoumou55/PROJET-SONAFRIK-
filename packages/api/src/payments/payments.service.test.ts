@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
+import type { PaymentProvider } from "@sonafrik/types";
 import { createPaymentsService } from "./payments.service";
 import { PaymentError } from "./errors";
 
@@ -125,5 +126,124 @@ describe("PaymentsService", () => {
 
     const service = createPaymentsService(client);
     await expect(service.listUserIntents()).rejects.toBeInstanceOf(PaymentError);
+  });
+
+  it("initiatePayment traduit invalid_provider", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: null,
+        error: { message: "invalid_provider" },
+      },
+    }));
+
+    await expect(service.initiatePayment({
+      provider: "invalid_provider" as unknown as PaymentProvider,
+      purpose: "topup",
+      amountGnf: 5_000,
+      phone: "+224620000000",
+    })).rejects.toMatchObject({ code: "invalid_provider" });
+  });
+
+  it("initiatePayment traduit invalid_amount", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: null,
+        error: { message: "invalid_amount" },
+      },
+    }));
+
+    await expect(service.initiatePayment({
+      provider: "wave_gn",
+      purpose: "topup",
+      amountGnf: 5_000,
+      phone: "+224620000000",
+    })).rejects.toMatchObject({ code: "invalid_amount" });
+  });
+
+  it("initiatePayment traduit wallet_not_found", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: null,
+        error: { message: "wallet_not_found" },
+      },
+    }));
+
+    await expect(service.initiatePayment({
+      provider: "orange_money_gn",
+      purpose: "topup",
+      amountGnf: 5_000,
+      phone: "+224620000000",
+    })).rejects.toMatchObject({ code: "provider_error" });
+  });
+
+  it("initiatePayment avec Wave retourne checkoutUrl", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: { intentId: "intent-1", sandbox: false, checkoutUrl: "https://pay.wave.com/xyz" },
+        error: null,
+      },
+    }));
+
+    const result = await service.initiatePayment({
+      provider: "wave_gn",
+      purpose: "topup",
+      amountGnf: 10_000,
+      phone: "+224620000000",
+    });
+
+    expect(result.checkoutUrl).toBe("https://pay.wave.com/xyz");
+    expect(result.instructions).toContain("page Wave");
+  });
+
+  it("initiatePayment avec Orange Money génère instructions USSD", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: { intentId: "intent-1", sandbox: false, ussdPush: true },
+        error: null,
+      },
+    }));
+
+    const result = await service.initiatePayment({
+      provider: "orange_money_gn",
+      purpose: "topup",
+      amountGnf: 10_000,
+      phone: "+224620000000",
+    });
+
+    expect(result.ussdPush).toBe(true);
+    expect(result.instructions).toContain("#144#");
+  });
+
+  it("initiatePayment avec MTN MoMo génère instructions push", async () => {
+    const service = createPaymentsService(createMockClient({
+      invokeResult: {
+        data: { intentId: "intent-1", sandbox: false, ussdPush: true },
+        error: null,
+      },
+    }));
+
+    const result = await service.initiatePayment({
+      provider: "mtn_momo_gn",
+      purpose: "topup",
+      amountGnf: 5_000,
+      phone: "+224620000000",
+    });
+
+    expect(result.ussdPush).toBe(true);
+    expect(result.instructions).toContain("MTN");
+  });
+
+  it("listUserIntents retourne tableau vide si non authentifié", async () => {
+    const client = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: { message: "unauthorized" } }),
+      },
+      functions: { invoke: vi.fn() },
+      from: vi.fn(),
+    } as unknown as SonafrikSupabaseClient;
+
+    const service = createPaymentsService(client);
+    const intents = await service.listUserIntents();
+    expect(intents).toEqual([]);
   });
 });
