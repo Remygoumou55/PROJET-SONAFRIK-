@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedLandingStats } from "@/lib/landing/getCachedLandingStats";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const stats = await getCachedLandingStats();

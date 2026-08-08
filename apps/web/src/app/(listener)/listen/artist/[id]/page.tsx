@@ -11,7 +11,7 @@ import {
 
 /** Revalidate statically-generated artist pages every hour. */
 export const revalidate = 3600;
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 /** Pre-render the top 24 suggested artists at build time for fast initial load. */
 export async function generateStaticParams() {
