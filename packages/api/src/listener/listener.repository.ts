@@ -1,33 +1,50 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import { ListenerArtistRepository } from "./listener.artist.repository";
+import { ListenerDiscoveryRepository } from "./listener.discovery.repository";
 import { ListenerTrackRepository } from "./listener.track.repository";
 
 /**
- * Thin facade — delegates to ListenerArtistRepository and ListenerTrackRepository.
- * Public API unchanged so listener.service.ts requires no modification.
+ * Facade auditeur — délègue aux 3 repositories métier : artiste, track/album, discovery/homepage.
+ * L'API publique est inchangée, donc `listener.service.ts` n'est pas modifié.
  */
 export class ListenerRepository {
   private readonly artist: ListenerArtistRepository;
   private readonly track: ListenerTrackRepository;
+  private readonly discovery: ListenerDiscoveryRepository;
 
   constructor(client: SonafrikSupabaseClient) {
     this.artist = new ListenerArtistRepository(client);
     this.track = new ListenerTrackRepository(client);
+    this.discovery = new ListenerDiscoveryRepository(client);
   }
 
-  // ── Track / Album / Discovery ─────────────────────────────────────────────
+  // ── Discovery / Homepage ────────────────────────────────────────────────────
 
-  getLatestPublishedTracks = (...args: Parameters<ListenerTrackRepository["getLatestPublishedTracks"]>) =>
-    this.track.getLatestPublishedTracks(...args);
+  getLatestPublishedTracks = (...args: Parameters<ListenerDiscoveryRepository["getLatestPublishedTracks"]>) =>
+    this.discovery.getLatestPublishedTracks(...args);
 
-  getTopGuineaTracks = (...args: Parameters<ListenerTrackRepository["getTopGuineaTracks"]>) =>
-    this.track.getTopGuineaTracks(...args);
+  getTopGuineaTracks = (...args: Parameters<ListenerDiscoveryRepository["getTopGuineaTracks"]>) =>
+    this.discovery.getTopGuineaTracks(...args);
+
+  getHomepageCurated = (...args: Parameters<ListenerDiscoveryRepository["getHomepageCurated"]>) =>
+    this.discovery.getHomepageCurated(...args);
+
+  getDiscoverModeTracks = (...args: Parameters<ListenerDiscoveryRepository["getDiscoverModeTracks"]>) =>
+    this.discovery.getDiscoverModeTracks(...args);
+
+  getTrendingArtistsMixed = (...args: Parameters<ListenerDiscoveryRepository["getTrendingArtistsMixed"]>) =>
+    this.discovery.getTrendingArtistsMixed(...args);
+
+  getHeroFeaturedAlbums = (...args: Parameters<ListenerDiscoveryRepository["getHeroFeaturedAlbums"]>) =>
+    this.discovery.getHeroFeaturedAlbums(...args);
+
+  getRecommendedTracks = (...args: Parameters<ListenerDiscoveryRepository["getRecommendedTracks"]>) =>
+    this.discovery.getRecommendedTracks(...args);
+
+  // ── Track / Album ───────────────────────────────────────────────────────────
 
   getTrackListenCounts = (...args: Parameters<ListenerTrackRepository["getTrackListenCounts"]>) =>
     this.track.getTrackListenCounts(...args);
-
-  getHomepageCurated = (...args: Parameters<ListenerTrackRepository["getHomepageCurated"]>) =>
-    this.track.getHomepageCurated(...args);
 
   getPublishedAlbumMeta = (...args: Parameters<ListenerTrackRepository["getPublishedAlbumMeta"]>) =>
     this.track.getPublishedAlbumMeta(...args);
@@ -53,9 +70,6 @@ export class ListenerRepository {
   getSidebarCounts = (...args: Parameters<ListenerTrackRepository["getSidebarCounts"]>) =>
     this.track.getSidebarCounts(...args);
 
-  getDiscoverModeTracks = (...args: Parameters<ListenerTrackRepository["getDiscoverModeTracks"]>) =>
-    this.track.getDiscoverModeTracks(...args);
-
   getTrackReactionCounts = (...args: Parameters<ListenerTrackRepository["getTrackReactionCounts"]>) =>
     this.track.getTrackReactionCounts(...args);
 
@@ -68,7 +82,7 @@ export class ListenerRepository {
   getTrackLyrics = (...args: Parameters<ListenerTrackRepository["getTrackLyrics"]>) =>
     this.track.getTrackLyrics(...args);
 
-  // ── Artist Profile / Catalog / Geo ────────────────────────────────────────
+  // ── Artist Profile / Catalog / Geo ──────────────────────────────────────────
 
   getPublicArtistProfile = (...args: Parameters<ListenerArtistRepository["getPublicArtistProfile"]>) =>
     this.artist.getPublicArtistProfile(...args);
@@ -85,8 +99,9 @@ export class ListenerRepository {
   getPinnedTracksForArtist = (...args: Parameters<ListenerArtistRepository["getPinnedTracksForArtist"]>) =>
     this.artist.getPinnedTracksForArtist(...args);
 
-  getPublishedTracksForArtistSorted = (...args: Parameters<ListenerArtistRepository["getPublishedTracksForArtistSorted"]>) =>
-    this.artist.getPublishedTracksForArtistSorted(...args);
+  getPublishedTracksForArtistSorted = (
+    ...args: Parameters<ListenerArtistRepository["getPublishedTracksForArtistSorted"]>
+  ) => this.artist.getPublishedTracksForArtistSorted(...args);
 
   getCreatorGeoMap = (...args: Parameters<ListenerArtistRepository["getCreatorGeoMap"]>) =>
     this.artist.getCreatorGeoMap(...args);
@@ -96,13 +111,4 @@ export class ListenerRepository {
 
   filterTrendingByCategory = (...args: Parameters<ListenerArtistRepository["filterTrendingByCategory"]>) =>
     this.artist.filterTrendingByCategory(...args);
-
-  getTrendingArtistsMixed = (...args: Parameters<ListenerTrackRepository["getTrendingArtistsMixed"]>) =>
-    this.track.getTrendingArtistsMixed(...args);
-
-  getHeroFeaturedAlbums = (...args: Parameters<ListenerTrackRepository["getHeroFeaturedAlbums"]>) =>
-    this.track.getHeroFeaturedAlbums(...args);
-
-  getRecommendedTracks = (...args: Parameters<ListenerTrackRepository["getRecommendedTracks"]>) =>
-    this.track.getRecommendedTracks(...args);
 }
