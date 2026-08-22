@@ -67,3 +67,8 @@ docs/audio/remediation-report.json
 
 # Fichiers temporaires racine
 tmp-creator.html
+
+# Rapports de performance locaux (non committables)
+apps/web/perf-artifacts*
+apps/web/playwright-report*
+apps/web/test-results*
