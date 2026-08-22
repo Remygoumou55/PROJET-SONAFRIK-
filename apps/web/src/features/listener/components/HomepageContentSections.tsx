@@ -49,7 +49,6 @@ export interface HomepageData {
   discoveryTracks: DiscoveryTrack[];
   topGuineaTracks: TrendingTrack[];
   topGuineaPeriodLabel?: string;
-  trending: TrendingTrack[];
   discoveries: DiscoveryTrack[];
   suggestedArtists: DiscoveryArtist[];
   featuredAlbums: HeroItemAlbum[];
@@ -144,7 +143,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
     artists,
     genres,
     topGuineaTracks,
-    trending,
     discoveries,
     suggestedArtists,
     featuredAlbums,
@@ -153,7 +151,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
 
   const hasMusicContent =
     topGuineaTracks.length > 0 ||
-    trending.length > 0 ||
     playlists.length > 0 ||
     artists.length > 0 ||
     discoveries.length > 0 ||
@@ -164,7 +161,6 @@ export function HomepageContentSections({ content }: { content: HomepageData }) 
 
   const filledCount = [
     topGuineaTracks.length > 0,
-    trending.length > 0,
     playlists.length > 0,
     artists.length > 0,
     discoveries.length > 0,
