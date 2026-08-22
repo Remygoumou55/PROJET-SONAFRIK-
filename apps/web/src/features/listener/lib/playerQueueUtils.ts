@@ -24,8 +24,8 @@ export function resolveNextQueueIndex(
     const nextPos = pos + 1;
     if (nextPos >= shuffledOrder.length) {
       if (repeatMode === "all") {
-        const order = buildShuffledOrder(queueLength, shuffledOrder[0] ?? 0);
-        return { nextIndex: order[0] ?? 0, shuffledOrder: order };
+        const order = buildShuffledOrder(queueLength, queueIndex);
+        return { nextIndex: order[1] ?? queueIndex, shuffledOrder: order };
       }
       return null;
     }
