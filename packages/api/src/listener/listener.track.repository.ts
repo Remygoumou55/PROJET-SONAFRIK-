@@ -458,11 +458,10 @@ export class ListenerTrackRepository {
   }
 
   async getHeroFeaturedAlbums(days = 30, limit = 6): Promise<HeroItemAlbum[]> {
-    // get_hero_featured_albums n'est pas encore dans les types générés Supabase
-    const { data, error } = await this.client.rpc("get_hero_featured_albums" as never, {
+    const { data, error } = await this.client.rpc("get_hero_featured_albums", {
       p_days: days,
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
     const rows = (data as unknown[]) ?? [];
     return rows.map((r) => {
@@ -485,10 +484,9 @@ export class ListenerTrackRepository {
   }
 
   async getRecommendedTracks(limit = 20): Promise<RecommendedTrack[]> {
-    // get_recommended_tracks_mvp n'est pas encore dans les types générés Supabase
-    const { data, error } = await this.client.rpc("get_recommended_tracks_mvp" as never, {
+    const { data, error } = await this.client.rpc("get_recommended_tracks_mvp", {
       p_limit: limit,
-    } as never);
+    });
     if (error) throw error;
     const rows = (data as unknown[]) ?? [];
     return rows.map((r) => {

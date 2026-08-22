@@ -3819,6 +3819,10 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string }
         Returns: number
       }
+      get_hero_featured_albums: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: Json
+      }
       get_landing_public_stats: {
         Args: { p_heartbeat_since: string; p_month_start: string }
         Returns: Json
@@ -3845,6 +3849,7 @@ export type Database = {
         Args: { p_creator_id: string }
         Returns: Json
       }
+      get_recommended_tracks_mvp: { Args: { p_limit?: number }; Returns: Json }
       get_recommendations: { Args: { p_limit?: number }; Returns: Json }
       get_royalty_cycle_summary: { Args: { p_cycle_id: string }; Returns: Json }
       get_similar_tracks: {
