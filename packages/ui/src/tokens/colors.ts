@@ -17,6 +17,23 @@ export const colors = {
   error: "#FF4444",
   success: "#00D26A",
   warning: "#FFC20E",
+
+  // Couleurs avec alpha — issues de la charte, uniques tokens
+  vertEnergie10: "rgba(0, 210, 106, 0.10)",
+  vertEnergie13: "rgba(0, 210, 106, 0.13)",
+  vertEnergie20: "rgba(0, 210, 106, 0.20)",
+  orSolaire10: "rgba(255, 194, 14, 0.10)",
+  orSolaire13: "rgba(255, 194, 14, 0.13)",
+  orSolaire20: "rgba(255, 194, 14, 0.20)",
+  orSolaire27: "rgba(255, 194, 14, 0.27)",
+  blanc13: "rgba(255, 255, 255, 0.13)",
+  blanc53: "rgba(255, 255, 255, 0.53)",
+  blanc60: "rgba(255, 255, 255, 0.60)",
+  blanc80: "rgba(255, 255, 255, 0.80)",
+  noir20: "rgba(0, 0, 0, 0.20)",
+  error10: "rgba(255, 68, 68, 0.10)",
+  error13: "rgba(255, 68, 68, 0.13)",
+  orNoir: "rgba(31, 26, 0, 1)",
 } as const;
 
 export type SonafrikColor = keyof typeof colors;
@@ -37,4 +54,19 @@ export const cssVarMap: Record<SonafrikColor, string> = {
   error: "var(--color-error, #FF4444)",
   success: "var(--color-success, #00D26A)",
   warning: "var(--color-warning, #FFC20E)",
+  vertEnergie10: "var(--color-vert-energie-10, rgba(0, 210, 106, 0.10))",
+  vertEnergie13: "var(--color-vert-energie-13, rgba(0, 210, 106, 0.13))",
+  vertEnergie20: "var(--color-vert-energie-20, rgba(0, 210, 106, 0.20))",
+  orSolaire10: "var(--color-or-solaire-10, rgba(255, 194, 14, 0.10))",
+  orSolaire13: "var(--color-or-solaire-13, rgba(255, 194, 14, 0.13))",
+  orSolaire20: "var(--color-or-solaire-20, rgba(255, 194, 14, 0.20))",
+  orSolaire27: "var(--color-or-solaire-27, rgba(255, 194, 14, 0.27))",
+  blanc13: "var(--color-blanc-13, rgba(255, 255, 255, 0.13))",
+  blanc53: "var(--color-blanc-53, rgba(255, 255, 255, 0.53))",
+  blanc60: "var(--color-blanc-60, rgba(255, 255, 255, 0.60))",
+  blanc80: "var(--color-blanc-80, rgba(255, 255, 255, 0.80))",
+  noir20: "var(--color-noir-20, rgba(0, 0, 0, 0.20))",
+  error10: "var(--color-error-10, rgba(255, 68, 68, 0.10))",
+  error13: "var(--color-error-13, rgba(255, 68, 68, 0.13))",
+  orNoir: "var(--color-or-noir, rgba(31, 26, 0, 1))",
 };

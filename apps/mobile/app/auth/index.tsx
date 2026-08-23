@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     borderColor: colors.bordure,
     backgroundColor: colors.card,
   },
-  optionSelected: { borderColor: colors.vertEnergie, backgroundColor: "rgba(0,210,106,0.1)" },
+  optionSelected: { borderColor: colors.vertEnergie, backgroundColor: colors.vertEnergie10 },
   emoji: { fontSize: 24 },
   optionText: { flex: 1 },
   optionLabel: { color: colors.textePrincipal, fontWeight: "600" },

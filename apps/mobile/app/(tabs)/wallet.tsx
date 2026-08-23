@@ -99,9 +99,9 @@ export default function WalletTab() {
                 style={styles.planCard}
                 onPress={() => subscribePremium(plan.type)}
               >
-                <Text style={styles.planLabel}>{plan.label}</Text>
-                <Text style={styles.planPrice}>{new Intl.NumberFormat("fr-GN").format(plan.price_gnf)} GNF</Text>
-                <Text style={styles.planMeta}>{plan.duration_days} jours</Text>
+                <Text style={styles.planLabel} numberOfLines={1}>{plan.label}</Text>
+                <Text style={styles.planPrice} numberOfLines={1}>{new Intl.NumberFormat("fr-GN").format(plan.price_gnf)} GNF</Text>
+                <Text style={styles.planMeta} numberOfLines={1}>{plan.duration_days} jours</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -124,14 +124,14 @@ export default function WalletTab() {
             const isCredit = ["royalty_payout", "topup", "refund"].includes(tx.type);
             return (
               <View key={tx.id} style={styles.txRow}>
-                <View style={[styles.txIcon, { backgroundColor: isCredit ? "rgba(0, 210, 106, 0.13)" : "rgba(255, 68, 68, 0.13)" }]}>
-                  <Text style={{ color: isCredit ? colors.vertEnergie : "rgba(255, 102, 102, 1)", fontSize: 12, fontWeight: "700" }}>
+                <View style={[styles.txIcon, { backgroundColor: isCredit ? colors.vertEnergie13 : colors.error13 }]}>
+                  <Text style={{ color: isCredit ? colors.vertEnergie : colors.error, fontSize: 12, fontWeight: "700" }}>
                     {isCredit ? "+" : "−"}
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.txLabel}>{TRANSACTION_TYPE_LABELS[tx.type] ?? tx.type}</Text>
-                  <Text style={styles.txDate}>{new Date(tx.created_at).toLocaleDateString("fr-FR")}</Text>
+                  <Text style={styles.txLabel} numberOfLines={1}>{TRANSACTION_TYPE_LABELS[tx.type] ?? tx.type}</Text>
+                  <Text style={styles.txDate} numberOfLines={1}>{new Date(tx.created_at).toLocaleDateString("fr-FR")}</Text>
                 </View>
                 <Text style={[styles.txAmount, { color: isCredit ? colors.vertEnergie : colors.textePrincipal }]}>
                   {isCredit ? "+" : "−"}{formatGnf(tx.amount_gnf)}
@@ -157,12 +157,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: colors.vertProfond,
   },
-  balanceLabel: { color: "rgba(255, 255, 255, 0.60)", fontSize: 13 },
+  balanceLabel: { color: colors.blanc60, fontSize: 13 },
   balanceAmount: { color: colors.textePrincipal, fontSize: 30, fontWeight: "700", marginTop: 4 },
   balanceActions: { flexDirection: "row", gap: 8, marginTop: 16 },
   actionBtn: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.13)",
+    backgroundColor: colors.blanc13,
     borderRadius: 12,
     paddingVertical: 10,
     alignItems: "center",
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   subscribeBtnText: { color: colors.noirProfond, fontWeight: "700", fontSize: 13 },
   premiumBadge: {
-    backgroundColor: "rgba(0, 210, 106, 0.13)",
+    backgroundColor: colors.vertEnergie13,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -215,11 +215,11 @@ const styles = StyleSheet.create({
   planPrice: { color: colors.orSolaire, fontWeight: "700", fontSize: 16, marginTop: 4 },
   planMeta: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
   poolCard: {
-    backgroundColor: "rgba(31, 26, 0, 1)",
+    backgroundColor: colors.orNoir,
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "rgba(255, 194, 14, 0.20)",
+    borderColor: colors.orSolaire20,
     marginTop: 12,
     marginBottom: 4,
   },

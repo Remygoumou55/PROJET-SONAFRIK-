@@ -48,8 +48,8 @@ export default function CreatorDashboardScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{artistProfile.stage_name}</Text>
-      <Text style={styles.subtitle}>
+      <Text style={styles.title} numberOfLines={1}>{artistProfile.stage_name}</Text>
+      <Text style={styles.subtitle} numberOfLines={1}>
         {c.tier} · {c.status} · {artistProfile.verified ? "Vérifié" : "Non vérifié"}
       </Text>
 

@@ -70,9 +70,10 @@ export default function AccountScreen() {
       <Row label="Rôles" value={context.roles.join(", ") || "—"} />
 
       <View style={styles.danger}>
-        <Text style={styles.dangerTitle}>Zone de danger</Text>
+        <Text style={styles.dangerTitle}>Supprimer mon compte</Text>
         <Text style={styles.dangerText}>
-          Suppression soft-delete avec audit INSERT ONLY (CDC V9).
+          Cette action désactive définitivement votre profil SONAFRIK. Vos écoutes,
+          playlists et contenus associés ne seront plus accessibles.
         </Text>
         <Pressable style={styles.deleteButton} onPress={confirmDelete} disabled={deleting}>
           <Text style={styles.deleteText}>

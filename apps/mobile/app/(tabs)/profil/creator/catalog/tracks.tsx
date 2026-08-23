@@ -72,8 +72,8 @@ export default function CatalogTracksScreen() {
       }
       renderItem={({ item }) => (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-          <Text style={styles.meta}>
+          <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+          <Text style={styles.meta} numberOfLines={1}>
             {PUBLICATION_STATUS_LABELS[item.publication_status]}
             {item.isrc ? ` · ${item.isrc}` : ""}
           </Text>

@@ -49,7 +49,6 @@ export default function ExplorerTab() {
                     </View>
                   </View>
                 )}
-                scrollEnabled={false}
                 initialNumToRender={10}
                 maxToRenderPerBatch={5}
                 windowSize={5}

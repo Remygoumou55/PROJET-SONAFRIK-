@@ -18,6 +18,7 @@ export default defineConfig({
       "src/creator/**/*.test.ts",
       "src/catalog/**/*.test.ts",
       "src/shared/**/*.test.ts",
+      "src/listener/**/*.test.ts",
     ],
     coverage: {
       provider: "v8",

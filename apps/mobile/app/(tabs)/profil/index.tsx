@@ -83,12 +83,12 @@ export default function ProfilScreen() {
             <Text style={styles.avatarInitial}>{displayName.charAt(0).toUpperCase()}</Text>
           </View>
         )}
-        <Text style={styles.name}>{displayName}</Text>
-        <Text style={styles.meta}>
+        <Text style={styles.name} numberOfLines={1}>{displayName}</Text>
+        <Text style={styles.meta} numberOfLines={1}>
           {profile.city ?? "Conakry"} · {profile.country_code ?? "GN"}
         </Text>
-        {accountLabel ? <Text style={styles.badge}>{accountLabel}</Text> : null}
-        <Text style={styles.bio}>{profile.bio ?? "Aucune bio pour le moment."}</Text>
+        {accountLabel ? <Text style={styles.badge} numberOfLines={1}>{accountLabel}</Text> : null}
+        <Text style={styles.bio} numberOfLines={3}>{profile.bio ?? "Aucune bio pour le moment."}</Text>
       </View>
 
       <View style={styles.stats}>

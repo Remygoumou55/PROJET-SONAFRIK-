@@ -66,7 +66,7 @@ export default function BibliothequeTab() {
               <View style={styles.playlistInfo}>
                 <Text style={styles.playlistTitle} numberOfLines={1}>{item.title}</Text>
                 <Text style={styles.playlistMeta}>
-                  {item.track_count} morceau{item.track_count !== 1 ? "x" : ""}
+                  {item.track_count} morceau{item.track_count !== 1 ? "s" : ""}
                 </Text>
               </View>
             </View>
