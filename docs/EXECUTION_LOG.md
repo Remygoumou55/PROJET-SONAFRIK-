@@ -130,6 +130,30 @@ return { nextIndex: order[1] ?? queueIndex, shuffledOrder: order };
 
 ---
 
+## 2026-08-22 — test(listener): tests unitaires ListenerDiscoveryRepository + playerQueueUtils
+
+### Fichiers touchés
+- `packages/api/src/listener/listener.discovery.repository.test.ts` — 10 tests unitaires pour `ListenerDiscoveryRepository`.
+- `apps/web/src/features/listener/lib/playerQueueUtils.test.ts` — 15 tests unitaires pour `buildShuffledOrder`, `resolveNextQueueIndex`, `resolvePrevQueueIndex`.
+- `scripts/vitest.web-navigation.config.ts` — inclusion du pattern `apps/web/src/features/listener/lib/**/*.test.ts`.
+
+### Décisions
+- Mocks Supabase légers avec `vi.fn()` et chain builders pour tester les repositories RPC.
+- Couverture des cas : payload valide, payload null, fallback nouveautés, agrégation homepage, filtre discover mode, reshuffle repeat-all.
+
+### Validation
+- `pnpm lint` : ✅ 17/17
+- `pnpm typecheck` : ✅ 17/17
+- `pnpm build` : ✅ 10/10 packages, 72/72 pages web
+- `pnpm --filter @sonafrik/api test` : ✅ 326/328 (2 échecs préexistants `payments.service.test.ts`)
+- `pnpm --filter @sonafrik/web test` : ✅ 28/28 (incl. 15 tests playerQueueUtils)
+- Commit : `f5ab0b4` sur `main`.
+
+### Dette technique
+- Aucune créée. Dette payments préexistante inchangée.
+
+---
+
 ## 2026-08-22 — audit supervision: re-vérification post-Vague A + corrections gouvernance
 
 ### Contexte
@@ -142,9 +166,9 @@ Mission de supervision suite aux 3 commits Vague A (listener) et au rapport audi
 ### Anomalies détectées
 - `EXECUTION_LOG.md` non mis à jour pour les commits `0deef52`, `5ae7ba8`, `8957a03`, `01eb7c6`.
 - `RAPPORT-AUDIT-360-22-AOUT-2026.md` orphelin (non dans README).
-- Tests unitaires manquants `ListenerDiscoveryRepository`.
-- Build web bloqué par `fonts.gstatic.com` inaccessible (problème d'environnement, pas de code).
-- Tests payments préexistants en échec (`packages/api/src/payments/payments.service.test.ts` — hors scope Vague A).
+- ✅ Résolu : tests unitaires `ListenerDiscoveryRepository` et `playerQueueUtils` créés (commit `f5ab0b4`).
+- Build web bloqué par `fonts.gstatic.com` inaccessible (problème d'environnement, pas de code) — ✅ résolu au second essai.
+- Tests payments préexistants en échec (`packages/api/src/payments/payments.service.test.ts` — hors scope Vague A) — non corrigé.
 - `reorder_hero_slides` RPC appelé mais absent des migrations/types (détecté en architecture — Vague C admin).
 
 ### Validation
