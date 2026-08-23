@@ -97,8 +97,13 @@ export function ConnexionPageClient({
       return;
     }
     let cancelled = false;
-    void auth
-      .getCurrentProfile()
+    const getProfileWithTimeout = Promise.race([
+      auth.getCurrentProfile(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("profile_timeout")), 8_000),
+      ),
+    ]);
+    void getProfileWithTimeout
       .then((profile) => {
         if (cancelled) return;
         if (!profile) {
@@ -122,8 +127,7 @@ export function ConnexionPageClient({
     return () => {
       cancelled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, router, roleParam, bypassAuth]);
+  }, [searchParams, router, roleParam, bypassAuth, auth]);
 
   function requireConsent(): boolean {
     if (acceptedTerms) {

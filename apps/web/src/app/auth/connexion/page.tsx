@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import { AuthPageLoading } from "@/features/identity/auth/components/AuthPageLoading";
 import { isDevBypassActive } from "@/lib/auth/guards";
-import { resolveAuthFeatureFlags } from "@/lib/auth/auth-feature-flags";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ConnexionPageClient } from "./ConnexionPageClient";
 
 export const metadata = {
@@ -25,14 +23,16 @@ export default async function ConnexionPage({
   const params = await searchParams;
   const bypassAuth = isDevBypassActive();
   const initialRole = roleFromParam(params.role);
-  const supabase = await getSupabaseServerClient();
-  const authFlags = await resolveAuthFeatureFlags(supabase);
+
+  // Google-only en production : on évite l'appel RPC get_auth_feature_flags au rendu serveur
+  // pour éliminer le long skeleton et les cold-starts Supabase sur la page de connexion.
+  const phoneAuthEnabled = false;
 
   return (
     <Suspense fallback={<AuthPageLoading />}>
       <ConnexionPageClient
         bypassAuth={bypassAuth}
-        phoneAuthEnabled={authFlags.phoneAuthEnabled}
+        phoneAuthEnabled={phoneAuthEnabled}
         initialRole={initialRole}
       />
     </Suspense>

@@ -11,6 +11,60 @@
 
 ---
 
+## 2026-08-23 — auth/connexion: suppression de l'appel serveur RPC et timeout client
+
+### Fichiers touchés
+- `apps/web/src/app/auth/connexion/page.tsx` — retiré `getSupabaseServerClient` et `resolveAuthFeatureFlags`; `phoneAuthEnabled` forçé à `false` (Google-only stable).
+- `apps/web/src/app/auth/connexion/ConnexionPageClient.tsx` — ajout d'un timeout de 8s sur `getCurrentProfile` pour éviter le spinner infini; nettoyage du `eslint-disable` inutile.
+
+### Code avant (extrait)
+```before
+const supabase = await getSupabaseServerClient();
+const authFlags = await resolveAuthFeatureFlags(supabase);
+
+return (
+  <Suspense fallback={<AuthPageLoading />}>
+    <ConnexionPageClient
+      bypassAuth={bypassAuth}
+      phoneAuthEnabled={authFlags.phoneAuthEnabled}
+      initialRole={initialRole}
+    />
+  </Suspense>
+);
+```
+
+### Code après (extrait)
+```after
+const phoneAuthEnabled = false;
+
+return (
+  <Suspense fallback={<AuthPageLoading />}>
+    <ConnexionPageClient
+      bypassAuth={bypassAuth}
+      phoneAuthEnabled={phoneAuthEnabled}
+      initialRole={initialRole}
+    />
+  </Suspense>
+);
+```
+
+### Validation
+- `pnpm --filter @sonafrik/web build` : ✅
+- `pnpm --filter @sonafrik/web lint` : ✅
+- `pnpm --filter @sonafrik/web typecheck` : ✅
+
+### Décision
+- La page de connexion n'effectue plus d'appel Supabase côté serveur, ce qui supprime le risque de skeleton figé dû aux cold-starts / timeouts RPC.
+- `phoneAuthEnabled` est géré en dur à `false` car le feature flag DB est `false` par défaut et non critique pour le MVP.
+- Le timeout client garantit que la page affiche le formulaire Google si `getCurrentProfile` dépasse 8 secondes.
+
+### Tests à faire
+- [ ] Rafraîchir `/auth/connexion` en prod après redéploiement.
+- [ ] Vérifier que le bouton « Continuer avec Google » s'affiche sous 8s.
+- [ ] Vérifier que le skeleton de chargement ne reste pas figé.
+
+---
+
 ## 2026-08-23 — vague-g(web): audit Lighthouse /listen et /lancement
 
 ### Fichiers concernés
