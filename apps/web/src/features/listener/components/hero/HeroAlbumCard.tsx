@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { CoverImage } from "@/components/CoverImage";
 import type { HeroItemAlbum } from "@sonafrik/types";
