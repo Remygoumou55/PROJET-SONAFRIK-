@@ -11,6 +11,51 @@
 
 ---
 
+## 2026-08-22 — vague-d(mobile): Player plein écran mobile
+
+### Fichiers touchés
+- `apps/mobile/features/shared/components/FullPlayer.tsx` — nouveau player plein écran (cover, titre, artiste, progress bar, play/pause).
+- `apps/mobile/app/(tabs)/_layout.tsx` — MiniPlayerBar cliquable, ouverture du `FullPlayer` via état local.
+
+### Code avant (extrait)
+```before
+// _layout.tsx — mini-player non cliquable
+function MiniPlayerBar({ bottomOffset }: { bottomOffset: number }) {
+  ...
+  return (
+    <View style={[styles.miniPlayer, ...]}>
+      ...
+    </View>
+  );
+}
+```
+
+### Code après (extrait)
+```after
+// _layout.tsx — mini-player cliquable et FullPlayer intégré
+<Pressable style={[styles.miniPlayer, ...]} onPress={onOpen}>
+  ...
+</Pressable>
+...
+<FullPlayer visible={fullPlayerVisible} onClose={() => setFullPlayerVisible(false)} />
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `5b35e64` poussé sur `main`.
+
+### Dette technique
+- Le contrôle de position sur la barre est non-interactif (affichage seul). Le `seek` nécessitera `setPositionAsync` d'`expo-av`.
+
+### Tests à faire
+- [ ] Lire un morceau → cliquer sur le mini-player → vérifier l'ouverture du plein écran.
+- [ ] Vérifier que play/pause fonctionne dans le plein écran.
+- [ ] Vérifier que la barre de progression avance en temps réel.
+
+---
+
 ## 2026-08-22 — vague-c(mobile): favoris, recherche par catégories, covers créateur
 
 ### Fichiers touchés
