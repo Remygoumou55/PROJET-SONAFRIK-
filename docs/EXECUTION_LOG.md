@@ -5523,3 +5523,16 @@ colors.orSolaire = territory8Colors.audioCyan
 ### Tests Ã  faire
 - [ ] RafraÃ®chir la landing et vÃ©rifier qu'il n'y a plus de vert/or/rouge intempestifs.
 - [ ] VÃ©rifier que les overlays et badges restent lisibles.
+
+---
+
+## 2026-08-23 â€” Territory 8 : app.json mobile backgroundColor
+
+### Fichiers touchÃ©s
+- `apps/mobile/app.json` â€” `splash.backgroundColor` et `android.adaptiveIcon.backgroundColor` passÃ©s de `#0D0D0D` Ã  `#07060B` (T8 pearl-black).
+
+### Validation
+- `pnpm --filter @sonafrik/mobile lint` : âœ…
+
+### DÃ©cision
+- Le mobile hÃ©rite dÃ©jÃ  de T8 via `packages/ui/src/tokens/colors.ts` ; `app.json` est maintenant alignÃ© sur le fond T8 officiel.
