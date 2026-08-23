@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
-import { Audio, type AVPlaybackStatus } from "expo-av";
+import { Audio, InterruptionModeIOS, InterruptionModeAndroid, type AVPlaybackStatus } from "expo-av";
 import { createStreamingService } from "@sonafrik/api/streaming";
 import { buildStreamCompletePayload, type StreamCompleteMode } from "@sonafrik/shared/streaming";
 import { STREAM_HEARTBEAT_INTERVAL_MS } from "@sonafrik/types";
@@ -137,6 +137,9 @@ export function usePlayer() {
           staysActiveInBackground: true,
           playsInSilentModeIOS: true,
           shouldDuckAndroid: true,
+          interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+          playThroughEarpieceAndroid: false,
         });
 
         const result = await streaming.startStream({

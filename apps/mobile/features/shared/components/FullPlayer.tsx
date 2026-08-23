@@ -1,9 +1,11 @@
-import { useState } from "react";
-import type { GestureResponderEvent } from "react-native";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, type GestureResponderEvent, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
 import { CoverImage } from "./CoverImage";
 import { usePlayerContext } from "../../streaming/PlayerContext";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const DURATION_MS = 300;
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -29,73 +31,107 @@ export function FullPlayer({ visible, onClose }: FullPlayerProps) {
     playNext,
     playPrevious,
   } = usePlayerContext();
+  const [isVisible, setIsVisible] = useState(visible);
+  const animatedValue = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const progress = duration > 0 ? currentPosition / duration : 0;
+
+  useEffect(() => {
+    if (visible) {
+      setIsVisible(true);
+      Animated.timing(animatedValue, { toValue: 1, duration: DURATION_MS, useNativeDriver: true }).start();
+    }
+  }, [visible, animatedValue]);
+
+  function handleClose() {
+    Animated.timing(animatedValue, { toValue: 0, duration: DURATION_MS, useNativeDriver: true }).start(({ finished }) => {
+      if (finished) {
+        setIsVisible(false);
+        onClose();
+      }
+    });
+  }
+
+  const translateY = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [SCREEN_HEIGHT, 0],
+  });
 
   if (!currentTrack) return null;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.header}>
-          <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
-            <Text style={styles.closeText}>✕</Text>
-          </Pressable>
-          <Text style={styles.headerTitle} numberOfLines={1}>En lecture</Text>
-          <View style={styles.closeBtn} />
-        </View>
-
-        <View style={styles.content}>
-          <View style={styles.coverWrap}>
-            <CoverImage
-              coverPath={currentTrack.cover_url ?? null}
-              label={currentTrack.artist_name ?? currentTrack.title}
-              size={240}
-              borderRadius={24}
-            />
+    <Modal visible={isVisible} transparent animationType="none" onRequestClose={handleClose}>
+      <View style={styles.container}>
+        <Animated.View
+          style={[
+            styles.backdrop,
+            {
+              opacity: animatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 0.7],
+              }),
+            },
+          ]}
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+        </Animated.View>
+        <Animated.View style={[styles.panel, { transform: [{ translateY }] }]}>
+          <View style={styles.header}>
+            <Pressable onPress={handleClose} style={styles.closeBtn} hitSlop={12}>
+              <Text style={styles.closeText}>✕</Text>
+            </Pressable>
+            <Text style={styles.headerTitle} numberOfLines={1}>En lecture</Text>
+            <View style={styles.closeBtn} />
           </View>
 
-          <Text style={styles.title} numberOfLines={2}>{currentTrack.title}</Text>
-          {currentTrack.artist_name && (
-            <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist_name}</Text>
-          )}
-
-          <ProgressBar duration={duration} position={currentPosition} progress={progress} onSeek={seek} />
-
-          <View style={styles.controls}>
-            <Pressable
-              style={[styles.controlBtn, styles.controlBtnSmall]}
-              onPress={playPrevious}
-              disabled={false}
-            >
-              <Text style={styles.controlTextSmall}>⏮</Text>
-            </Pressable>
-            <Pressable style={styles.controlBtn} onPress={isPlaying ? pause : resume}>
-              <Text style={styles.controlText}>{isPlaying ? "⏸" : "▶"}</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.controlBtn, styles.controlBtnSmall]}
-              onPress={playNext}
-              disabled={queue.length === 0}
-            >
-              <Text style={[styles.controlTextSmall, queue.length === 0 && styles.controlTextDisabled]}>⏭</Text>
-            </Pressable>
-          </View>
-
-          {queue.length > 0 && (
-            <View style={styles.queue}>
-              <Text style={styles.queueTitle}>À suivre</Text>
-              {queue.slice(0, 3).map((track, index) => (
-                <View key={`${track.id}-${index}`} style={styles.queueRow}>
-                  <CoverImage coverPath={track.cover_url ?? null} label={track.artist_name ?? track.title} size={40} borderRadius={8} />
-                  <View style={styles.queueInfo}>
-                    <Text style={styles.queueTrack} numberOfLines={1}>{track.title}</Text>
-                    <Text style={styles.queueArtist} numberOfLines={1}>{track.artist_name ?? "Artiste"}</Text>
-                  </View>
-                </View>
-              ))}
+          <View style={styles.content}>
+            <View style={styles.coverWrap}>
+              <CoverImage
+                coverPath={currentTrack.cover_url ?? null}
+                label={currentTrack.artist_name ?? currentTrack.title}
+                size={240}
+                borderRadius={24}
+              />
             </View>
-          )}
-        </View>
+
+            <Text style={styles.title} numberOfLines={2}>{currentTrack.title}</Text>
+            {currentTrack.artist_name && (
+              <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist_name}</Text>
+            )}
+
+            <ProgressBar duration={duration} position={currentPosition} progress={progress} onSeek={seek} />
+
+            <View style={styles.controls}>
+              <Pressable style={[styles.controlBtn, styles.controlBtnSmall]} onPress={playPrevious}>
+                <Text style={styles.controlTextSmall}>⏮</Text>
+              </Pressable>
+              <Pressable style={styles.controlBtn} onPress={isPlaying ? pause : resume}>
+                <Text style={styles.controlText}>{isPlaying ? "⏸" : "▶"}</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.controlBtn, styles.controlBtnSmall]}
+                onPress={playNext}
+                disabled={queue.length === 0}
+              >
+                <Text style={[styles.controlTextSmall, queue.length === 0 && styles.controlTextDisabled]}>⏭</Text>
+              </Pressable>
+            </View>
+
+            {queue.length > 0 && (
+              <View style={styles.queue}>
+                <Text style={styles.queueTitle}>À suivre</Text>
+                {queue.slice(0, 3).map((track, index) => (
+                  <View key={`${track.id}-${index}`} style={styles.queueRow}>
+                    <CoverImage coverPath={track.cover_url ?? null} label={track.artist_name ?? track.title} size={40} borderRadius={8} />
+                    <View style={styles.queueInfo}>
+                      <Text style={styles.queueTrack} numberOfLines={1}>{track.title}</Text>
+                      <Text style={styles.queueArtist} numberOfLines={1}>{track.artist_name ?? "Artiste"}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -135,16 +171,21 @@ function ProgressBar({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
+  container: { flex: 1 },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.noirProfond,
+  },
+  panel: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.noirProfond,
     padding: 24,
+    paddingTop: 48,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 48,
     marginBottom: 24,
   },
   headerTitle: {
