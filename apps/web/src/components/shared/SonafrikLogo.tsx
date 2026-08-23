@@ -1,16 +1,15 @@
-"use client";
-
+﻿
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SONAFRIK_BRAND } from "@sonafrik/types";
 
-/** wordmark = texte seul · nav = marque + texte · full = logo complet · hero = logo XL */
+/** wordmark = texte seul Â· nav = marque + texte Â· full = logo complet Â· hero = logo XL */
 export type SonafrikLogoVariant = "wordmark" | "nav" | "full" | "hero";
 
 export type SonafrikLogoSize = "sm" | "md" | "lg";
 
-/** @deprecated Préférer variant="nav" | variant="wordmark" */
+/** @deprecated PrÃ©fÃ©rer variant="nav" | variant="wordmark" */
 export type LegacySonafrikLogoSize = "nav" | "footer";
 
 interface SonafrikLogoProps {

@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import { CoverImage } from "@/components/CoverImage";
 import type { CreatorTopAlbum } from "@sonafrik/types";
 import { trackEvolutionBadge } from "../lib/analyticsPeriod";
@@ -16,7 +15,7 @@ function TrendIcon({ direction }: { direction: "up" | "down" | "flat" }) {
       : direction === "down"
         ? "analytics-rank__trend analytics-rank__trend--down"
         : "analytics-rank__trend";
-  const glyph = direction === "up" ? "↑" : direction === "down" ? "↓" : "→";
+  const glyph = direction === "up" ? "â†‘" : direction === "down" ? "â†“" : "â†’";
   return <span className={cls} aria-hidden="true">{glyph}</span>;
 }
 
@@ -27,7 +26,7 @@ export function AnalyticsTopAlbums({ albums, maxItems = 5 }: Props) {
     return (
       <section className="analytics-rank" aria-label="Top albums">
         <h2 className="analytics-rank__title">Top albums</h2>
-        <p className="analytics-rank__empty">Aucun album publié pour l&apos;instant.</p>
+        <p className="analytics-rank__empty">Aucun album publiÃ© pour l&apos;instant.</p>
       </section>
     );
   }
@@ -61,7 +60,7 @@ export function AnalyticsTopAlbums({ albums, maxItems = 5 }: Props) {
               <div className="analytics-rank__meta">
                 <p className="analytics-rank__name">{album.title}</p>
                 <p className="analytics-rank__stat">
-                  {album.valid_streams.toLocaleString("fr-FR")} écoutes
+                  {album.valid_streams.toLocaleString("fr-FR")} Ã©coutes
                 </p>
               </div>
               <div className="analytics-rank__evo" title={evo.label}>

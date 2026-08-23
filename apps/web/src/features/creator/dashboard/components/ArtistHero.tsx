@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import { memo } from "react";
 import type {
   ArtistProfile,
@@ -88,7 +87,7 @@ export const ArtistHero = memo(function ArtistHero({
               )}
             </div>
 
-            <div className="ahero__presentation" role="list" aria-label="Présentation">
+            <div className="ahero__presentation" role="list" aria-label="PrÃ©sentation">
               <span className="ahero__chip ahero__chip--gold" role="listitem">
                 {artistType}
               </span>

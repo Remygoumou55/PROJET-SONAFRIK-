@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
     "@sonafrik/api",
     "@sonafrik/database",
     "@sonafrik/realtime",
+    "@sonafrik/web-client",
   ],
   images: {
     formats: ["image/avif", "image/webp"],

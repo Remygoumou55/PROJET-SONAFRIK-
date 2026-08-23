@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import type { MusicNavRole } from "./musicNavTypes";
 
 const ROLE_COPY: Record<
@@ -7,20 +6,20 @@ const ROLE_COPY: Record<
   { eyebrow: string; hint: string }
 > = {
   artist: {
-    eyebrow: "Ta carrière",
-    hint: "Crée, diffuse et comprends ton impact.",
+    eyebrow: "Ta carriÃ¨re",
+    hint: "CrÃ©e, diffuse et comprends ton impact.",
   },
   listener: {
-    eyebrow: "Découverte",
-    hint: "Écoute le meilleur de la scène.",
+    eyebrow: "DÃ©couverte",
+    hint: "Ã‰coute le meilleur de la scÃ¨ne.",
   },
   admin: {
     eyebrow: "Plateforme",
-    hint: "Santé, modération et flux en direct.",
+    hint: "SantÃ©, modÃ©ration et flux en direct.",
   },
   governance: {
     eyebrow: "Gouvernance",
-    hint: "Pilotage stratégique SONAFRIK.",
+    hint: "Pilotage stratÃ©gique SONAFRIK.",
   },
 };
 

@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import { memo } from "react";
 import { MusicMobilePillNav, type MusicMobileNavItem } from "@/features/shared/navigation";
 import { IDENTITY_NAV_ENTRIES, isIdentityNavActive } from "../lib/identityNavConfig";
@@ -25,7 +24,7 @@ function IdentityMobileNavView({ activePath, unreadNotifications = 0 }: Identity
     <MusicMobilePillNav
       items={items}
       activePath={activePath}
-      ariaLabel="Navigation profil et paramètres"
+      ariaLabel="Navigation profil et paramÃ¨tres"
       isActive={isIdentityNavActive}
     />
   );

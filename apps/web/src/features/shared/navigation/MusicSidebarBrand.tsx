@@ -1,16 +1,15 @@
-"use client";
-
+﻿
 import { SONAFRIK_BRAND } from "@sonafrik/types";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 import type { MusicNavRole } from "./musicNavTypes";
 
 interface Props {
   role: MusicNavRole;
-  /** Sous-titre sous le logo — défaut : slogan officiel */
+  /** Sous-titre sous le logo â€” dÃ©faut : slogan officiel */
   subtitle?: string;
 }
 
-/** Lockup sidebar — logo + slogan aligné sous la largeur du logo. */
+/** Lockup sidebar â€” logo + slogan alignÃ© sous la largeur du logo. */
 export function MusicSidebarBrand({ role: _role, subtitle }: Props) {
   const contextLabel = subtitle ?? SONAFRIK_BRAND.slogan;
 

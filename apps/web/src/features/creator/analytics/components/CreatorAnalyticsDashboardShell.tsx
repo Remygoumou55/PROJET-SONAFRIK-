@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import type { CreatorAnalyticsData } from "@sonafrik/types";
@@ -15,7 +15,7 @@ interface Props {
   creatorId: string;
 }
 
-/** Shell client-only — évite mismatch hydration SSR sur dashboard interactif. */
+/** Shell client-only â€” Ã©vite mismatch hydration SSR sur dashboard interactif. */
 export function CreatorAnalyticsDashboardShell({ data, creatorId }: Props) {
   return <CreatorAnalyticsDashboard data={data} creatorId={creatorId} />;
 }

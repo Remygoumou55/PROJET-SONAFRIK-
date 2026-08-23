@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import type { ReactNode } from "react";
 import type { MusicNavRole } from "./musicNavTypes";
 import { MusicSidebarBrand } from "./MusicSidebarBrand";

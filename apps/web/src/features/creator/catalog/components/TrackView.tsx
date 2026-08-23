@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import Link from "next/link";
 import type { Album, Track } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types/catalog";
@@ -23,7 +22,7 @@ export function TrackView({ track, album, genreName }: Props) {
           <PublicationStatusBadge status={track.publication_status} />
         </div>
         <Link href="/creator/catalog/tracks" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          ← Retour à la liste
+          â† Retour Ã  la liste
         </Link>
       </div>
 
@@ -52,7 +51,7 @@ export function TrackView({ track, album, genreName }: Props) {
         ) : null}
         {track.duration_seconds ? (
           <div>
-            <dt className="text-texte-secondaire text-xs font-semibold uppercase">Durée</dt>
+            <dt className="text-texte-secondaire text-xs font-semibold uppercase">DurÃ©e</dt>
             <dd className="text-texte-principal">
               {Math.floor(track.duration_seconds / 60)}:
               {String(track.duration_seconds % 60).padStart(2, "0")}

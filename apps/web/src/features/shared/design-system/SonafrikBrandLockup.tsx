@@ -1,9 +1,8 @@
-"use client";
-
+﻿
 import { SONAFRIK_BRAND } from "@sonafrik/types";
 import { SonafrikLogo } from "@/components/shared/SonafrikLogo";
 
-/** Libellés contexte rôle (header, wallet, etc.) — pas le lockup sidebar. */
+/** LibellÃ©s contexte rÃ´le (header, wallet, etc.) â€” pas le lockup sidebar. */
 export const BRAND_CONTEXT_LABELS = {
   listener: "ESPACE AUDITEUR",
   artist: "ESPACE ARTISTE",
@@ -14,14 +13,14 @@ export const BRAND_CONTEXT_LABELS = {
 export type BrandContextKey = keyof typeof BRAND_CONTEXT_LABELS;
 
 interface SonafrikBrandLockupProps {
-  /** Sous-titre — défaut slogan officiel */
+  /** Sous-titre â€” dÃ©faut slogan officiel */
   contextLabel?: string;
   priority?: boolean;
   className?: string;
 }
 
 /**
- * Lockup officiel SONAFRIK — logo + slogan sous le logo.
+ * Lockup officiel SONAFRIK â€” logo + slogan sous le logo.
  */
 export function SonafrikBrandLockup({
   contextLabel = SONAFRIK_BRAND.slogan,

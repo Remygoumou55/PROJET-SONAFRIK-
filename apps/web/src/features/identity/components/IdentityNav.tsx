@@ -1,5 +1,4 @@
-"use client";
-
+﻿
 import {
   MusicSidebar,
   MusicNavBackLink,
@@ -32,11 +31,11 @@ export function IdentityNav({ activePath, unreadNotifications = 0 }: IdentityNav
 
   return (
     <MusicSidebar role="listener" ariaLabel="Navigation profil" className="music-sidebar--identity">
-      <MusicNavBackLink href="/listen" label="Retour à l'écoute" />
+      <MusicNavBackLink href="/listen" label="Retour Ã  l'Ã©coute" />
       <MusicNavFromSections
         sections={sections}
         pathname={activePath}
-        ariaLabel="Menu profil et paramètres"
+        ariaLabel="Menu profil et paramÃ¨tres"
         isActive={(href, path, exact) =>
           href === "/listen" ? isListenerNavActive(href, path) : isIdentityNavActive(href, path, exact)
         }
