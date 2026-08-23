@@ -9,6 +9,11 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : "*.supabase.co";
 
+const isProd = process.env.NODE_ENV === "production";
+const scriptSrc = isProd
+  ? `'self' 'nonce-__NONCE__' 'strict-dynamic' 'unsafe-inline' https://${supabaseHostname} https://vitals.vercel-insights.com`
+  : `'self' 'nonce-__NONCE__' 'strict-dynamic' 'unsafe-eval' 'unsafe-inline' https://${supabaseHostname} https://vitals.vercel-insights.com`;
+
 const supabaseStorageRemotePatterns = (
   ["/storage/v1/object/public/**", "/storage/v1/object/sign/**"] as const
 ).map((pathname) => ({
