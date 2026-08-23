@@ -220,23 +220,15 @@ export class ListenerTrackRepository {
   }
 
   async getSidebarCounts(userId: string): Promise<{ favoritesCount: number; downloadsCount: number }> {
-    const [likesRes, favoritesRes] = await Promise.all([
-      this.client
-        .from("likes")
-        .select("track_id", { count: "exact", head: true })
-        .eq("user_id", userId),
-      this.client
-        .from("favorites")
-        .select("entity_id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .eq("entity_type", "track"),
-    ]);
+    const { count, error } = await this.client
+      .from("likes")
+      .select("track_id", { count: "exact", head: true })
+      .eq("user_id", userId);
 
-    if (likesRes.error) throw likesRes.error;
-    if (favoritesRes.error) throw favoritesRes.error;
+    if (error) throw error;
 
     return {
-      favoritesCount: Math.max(likesRes.count ?? 0, favoritesRes.count ?? 0),
+      favoritesCount: count ?? 0,
       downloadsCount: 0,
     };
   }
