@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-08-23 — vague-e: re-audit payments et correction tests
+
+### Fichiers touchés
+- `packages/api/src/payments/payments.service.ts` — mapping erreur `invalid_provider` depuis le schema, garde `listUserIntents` sur `client.auth.getUser()`.
+- `packages/api/src/payments/payments.service.test.ts` — test `invalid_provider` avec provider valide, mock `auth.getUser` pour `listUserIntents`.
+
+### Validation
+- `pnpm --filter @sonafrik/api test` : ✅ **53/53** fichiers, **356/356** tests
+- `pnpm --filter @sonafrik/api lint` : ✅
+- `pnpm --filter @sonafrik/api typecheck` : ✅
+- Commit : `58e194f`.
+
+### Dette technique
+- Aucune. Les erreurs `invalid_provider` / `invalid_amount` sont maintenant différenciées. `listUserIntents` est sécurisé côté auth.
+
+---
+
 ## 2026-08-23 — vague-d.3(mobile): file d'attente du player (previous / next / queue)
 
 ### Fichiers touchés
