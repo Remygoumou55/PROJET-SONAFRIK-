@@ -56,7 +56,10 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
      */
     async initiatePayment(input: InitiatePaymentInput): Promise<InitiatePaymentResult> {
       const parsed = initiatePaymentSchema.safeParse(input);
-      if (!parsed.success) throw new PaymentError("invalid_amount");
+      if (!parsed.success) {
+        const hasProviderError = parsed.error.issues.some((i) => i.path[0] === "provider");
+        throw new PaymentError(hasProviderError ? "invalid_provider" : "invalid_amount");
+      }
 
       const { data, error } = await client.functions.invoke("payment-initiate", {
         body: parsed.data,
@@ -122,6 +125,9 @@ export function createPaymentsService(client: SonafrikSupabaseClient) {
      * Liste les payment_intents récents de l'utilisateur.
      */
     async listUserIntents(limit = 10): Promise<PaymentIntent[]> {
+      const { data: authData } = await client.auth.getUser();
+      if (!authData.user) return [];
+
       const { data, error } = await client
         .from("payment_intents")
         .select("*")

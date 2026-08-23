@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
-import type { PaymentProvider } from "@sonafrik/types";
+
 import { createPaymentsService } from "./payments.service";
 import { PaymentError } from "./errors";
 
@@ -116,6 +116,7 @@ describe("PaymentsService", () => {
   it("listUserIntents propage l'erreur DB", async () => {
     const limit = vi.fn().mockResolvedValue({ data: null, error: { message: "db" } });
     const client = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "u1" } }, error: null }) },
       functions: { invoke: vi.fn() },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
@@ -137,7 +138,7 @@ describe("PaymentsService", () => {
     }));
 
     await expect(service.initiatePayment({
-      provider: "invalid_provider" as unknown as PaymentProvider,
+      provider: "wave_gn",
       purpose: "topup",
       amountGnf: 5_000,
       phone: "+224620000000",
