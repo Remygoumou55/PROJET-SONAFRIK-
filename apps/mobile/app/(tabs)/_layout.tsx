@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: colors.bordure,
-    shadowColor: "black",
+    shadowColor: colors.noirProfond,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.4,
     shadowRadius: 8,

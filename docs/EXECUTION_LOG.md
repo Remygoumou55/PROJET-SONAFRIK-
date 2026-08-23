@@ -11,6 +11,44 @@
 
 ---
 
+## 2026-08-23 — vague-b: re-audit, nettoyage et validation
+
+### Fichiers touchés
+- `docs/README.md` — indexe `VAGUE_B_STABILISATION.md`.
+- `docs/VAGUE_B_STABILISATION.md` — document de stabilité Vague B.
+- `apps/web/next.config.ts` — suppression de la variable `scriptSrc` morte (`unsafe-inline` / `unsafe-eval` inutilisée).
+- `apps/mobile/app/(tabs)/_layout.tsx` — `shadowColor: "black"` remplacé par `colors.noirProfond`.
+- `apps/web/src/features/listener/components/HomepageContentSections.tsx` — retrait `use client` inutile.
+- `apps/web/src/features/listener/components/hero/HeroAlbumCard.tsx` — retrait `use client` inutile.
+- `apps/web/src/features/listener/components/hero/HeroArtistCard.tsx` — retrait `use client` inutile.
+
+### Commits Vague B consolidés
+- `5bad579` — Vague B architecture visuelle mobile.
+- `1ae013a` — log Vague B architecture visuelle.
+- `b44fe02` — retrait `use client` HeroAlbumCard/HeroArtistCard.
+- `16c106a` — retrait `use client` HomepageContentSections.
+- `d7e5753` — suppression appels `router.refresh()`.
+- `e4f2046` — RealtimeShell, CSP probe, shim catalog.repository.
+
+### Validation
+- `pnpm lint` : ✅ 17/17
+- `pnpm typecheck` : ✅ 17/17
+- `pnpm build` : ✅ 10/10
+- `pnpm --filter @sonafrik/web test` : ✅ 28/28
+- `pnpm --filter @sonafrik/api test` : ⚠️ 354/356 (2 fail payments, hors Vague B)
+- `pnpm probe:vague-b-stabilisation` : ✅ 11/11
+- `pnpm probe:vague-b` : ✅ 19/19
+- `pnpm probe:certification` Vague A 15/15, Vague B++ ✅
+
+### DETTE TECHNIQUE
+- 46 directives `"use client"` restent dans `apps/web/src/features/listener/components/` — la plupart sont légitimes (interactivité). Les 3 cas Vague B ont été nettoyés.
+
+### Tests à faire
+- [ ] Vérifier CSP en prod (pas de `unsafe-eval`/`unsafe-inline`).
+- [ ] Vérifier `FullPlayer` mobile s'ouvre depuis le mini-player.
+
+---
+
 ## 2026-08-22 — vague-d(mobile): Player plein écran mobile
 
 ### Fichiers touchés
