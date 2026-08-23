@@ -53,7 +53,9 @@ return { ...state, loadAndPlay, pause, resume, seek, stop, addToQueue, playNext,
 - `pnpm build` (mobile) : ✅
 - `pnpm lint` (mobile) : ✅
 - `pnpm typecheck` : ✅
-- `pnpm build` (web) : ❌ échec récurrent du build worker Next.js 15.5.19 sur Windows (race condition cache), non lié aux modifications mobile.
+- `pnpm build` (global, y compris web) : ✅ après nettoyage complet du cache Next.js et relance.
+- `pnpm lint` (global) : ✅
+- `pnpm typecheck` (global) : ✅
 - Commit : `f80ba8f` poussé sur `main`.
 
 ### Dette technique
