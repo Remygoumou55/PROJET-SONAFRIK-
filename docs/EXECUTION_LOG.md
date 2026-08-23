@@ -11,6 +11,29 @@
 
 ---
 
+## 2026-08-23 — vague-c: re-audit, nettoyage forensique et validation
+
+### Fichiers touchés
+- `docs/README.md` — indexe `VAGUE_C_STABILISATION.md` et `VAGUE_C_ORPHAN_TABLES.md`.
+- `packages/api/src/listener/listener.track.repository.ts` — `getSidebarCounts` ne lit plus `favorites`, source `likes` uniquement (C1).
+
+### Validation
+- `pnpm lint` : ✅ 17/17
+- `pnpm typecheck` : ✅ 17/17
+- `pnpm probe:vague-c-stabilisation` : ✅ **16/16**
+- `pnpm probe:vague-c` : ✅ **23/23**
+- `pnpm --filter @sonafrik/web test` : ✅ 28/28
+
+### Dette technique
+- 129 `rgba(...)` hardcodés subsistent dans `apps/web/src/`, concentrés dans `lib/constants.ts` (66) et onboarding/admin/playlist. À migrer vers tokens CSS dans Vague J (design system).
+- 2 `#0D0D0D` dans `apps/mobile/app.json` (non-TSX, acceptable).
+
+### Tests à faire
+- [ ] Vérifier que "Favoris" bibliothèque = `favorites`, et "Aimer" = `likes`.
+- [ ] Confirmer Beat Store masqué en recherche.
+
+---
+
 ## 2026-08-23 — vague-b: re-audit, nettoyage et validation
 
 ### Fichiers touchés
