@@ -1,5 +1,5 @@
 # Documentation SONAFRIK — Index
-## Mis à jour au 26 juin 2026 · Réconciliation v2 complète
+## Mis à jour au 22 août 2026 · Réconciliation v2 complète
 
 ---
 

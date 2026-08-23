@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { createStreamingService } from "@sonafrik/api/streaming";
 import { createListenerService } from "@sonafrik/api/listener";
+import { requireIdentityContext } from "@/features/identity/lib/requireIdentity";
 import { PlaylistDetail } from "@/features/listener/components/PlaylistDetail";
 import type { TrackWithMeta } from "@sonafrik/types";
 
@@ -11,14 +12,12 @@ export default async function PlaylistPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { profile } = await requireIdentityContext();
   const supabase = await getSupabaseServerClient();
   const streaming = createStreamingService(supabase);
   const listener = createListenerService(supabase);
 
-  const [playlist, { data: { user } }] = await Promise.all([
-    streaming.getPlaylist(id).catch(() => null),
-    supabase.auth.getUser(),
-  ]);
+  const playlist = await streaming.getPlaylist(id).catch(() => null);
   if (!playlist) notFound();
 
   const rawTracks = await listener.getPlaylistTracksForPage(id);
@@ -50,7 +49,7 @@ export default async function PlaylistPage({
 
   return (
     <div className="p-6 max-w-2xl">
-      <PlaylistDetail playlist={playlist} initialTracks={initialTracks} currentUserId={user?.id} />
+      <PlaylistDetail playlist={playlist} initialTracks={initialTracks} currentUserId={profile.id} />
     </div>
   );
 }
