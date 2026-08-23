@@ -5,8 +5,8 @@ import { cn } from "../lib/cn";
 const avatarVariants = cva(
   [
     "relative inline-flex shrink-0 items-center justify-center overflow-hidden",
-    "rounded-full bg-elevated text-texte-principal font-semibold",
-    "border border-bordure",
+    "rounded-full bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] font-semibold",
+    "border border-[var(--t8-border-default)]",
   ],
   {
     variants: {

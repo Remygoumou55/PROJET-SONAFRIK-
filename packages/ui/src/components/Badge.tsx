@@ -11,15 +11,15 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-surface text-texte-principal border border-bordure",
-        primary: "bg-vert-energie/15 text-vert-energie border border-vert-energie/30",
-        premium: "bg-or-solaire/15 text-or-solaire border border-or-solaire/30",
-        verified: "bg-vert-profond/20 text-vert-energie",
-        legend: "bg-or-solaire/20 text-or-solaire shadow-[0_0_12px_rgba(255,194,14,0.2)]",
-        founder: "bg-or-profond/20 text-or-solaire border border-or-profond/40",
-        outline: "border border-bordure text-texte-secondaire bg-transparent",
-        genre: "bg-elevated text-texte-secondaire border border-bordure text-xs",
-        nouveau: "bg-or-solaire/10 text-or-solaire border border-or-solaire/40 text-xs font-bold tracking-wide",
+        default: "bg-[var(--t8-surface-02)] text-[var(--t8-pearl)] border border-[var(--t8-border-default)]",
+        primary: "bg-[var(--t8-glow-lavender)] text-[var(--t8-primary-lavender)] border border-[var(--t8-border-hover)]",
+        premium: "bg-[var(--t8-glow-cyan)] text-[var(--t8-audio-cyan)] border border-[var(--t8-border-audio)]",
+        verified: "bg-[var(--t8-success-deep)] text-[var(--t8-success)]",
+        legend: "bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] border border-[var(--t8-border-premium)] shadow-[0_0_12px_var(--t8-glow-lavender)]",
+        founder: "bg-[var(--t8-surface-elevated)] text-[var(--t8-pearl)] border border-[var(--t8-border-premium)]",
+        outline: "border border-[var(--t8-border-default)] text-[var(--t8-silver)] bg-transparent",
+        genre: "bg-[var(--t8-surface-03)] text-[var(--t8-silver)] border border-[var(--t8-border-default)] text-xs",
+        nouveau: "bg-[var(--t8-glow-rose)] text-[var(--t8-soft-rose)] border border-[var(--t8-glow-rose)] text-xs font-bold tracking-wide",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",

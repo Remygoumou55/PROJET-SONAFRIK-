@@ -62,6 +62,55 @@
 
 ---
 
+## 2026-08-23 — Territory 8 : migration Badge + Avatar
+
+### Fichiers touchés
+- `packages/ui/src/components/Badge.tsx` — remap de toutes les variantes (default, primary, premium, verified, legend, founder, outline, genre, nouveau) vers T8
+- `packages/ui/src/components/Avatar.tsx` — fond, texte et bordure T8
+
+### Code avant (extrait clé)
+```before
+// Badge.tsx
+primary: "bg-vert-energie/15 text-vert-energie border border-vert-energie/30",
+premium: "bg-or-solaire/15 text-or-solaire border border-or-solaire/30",
+legend: "bg-or-solaire/20 text-or-solaire shadow-[0_0_12px_rgba(255,194,14,0.2)]",
+```
+
+```before
+// Avatar.tsx
+"rounded-full bg-elevated text-texte-principal font-semibold",
+"border border-bordure",
+```
+
+### Code après (extrait clé)
+```after
+// Badge.tsx
+primary: "bg-[var(--t8-glow-lavender)] text-[var(--t8-primary-lavender)] border border-[var(--t8-border-hover)]",
+premium: "bg-[var(--t8-glow-cyan)] text-[var(--t8-audio-cyan)] border border-[var(--t8-border-audio)]",
+legend: "bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] border border-[var(--t8-border-premium)] shadow-[0_0_12px_var(--t8-glow-lavender)]",
+```
+
+```after
+// Avatar.tsx
+"rounded-full bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] font-semibold",
+"border border-[var(--t8-border-default)]",
+```
+
+### Validation
+- `pnpm --filter @sonafrik/ui typecheck` : ✅
+- `pnpm --filter @sonafrik/ui lint` : ✅
+- `pnpm --filter @sonafrik/web build` : ✅
+
+### Décision
+- Toutes les variantes d'or (premium, legend, founder, nouveau) sont rebranchées sur lavender, cyan, pearl ou rose.
+- Les badges conservent leur API de variants ; seules les couleurs changent.
+
+### Tests à faire
+- [ ] Afficher un Badge de chaque variante côte à côte.
+- [ ] Vérifier qu'un Avatar sans image affiche ses initiales en pearl.
+
+---
+
 ## 2026-08-23 — auth/connexion: suppression de l'appel serveur RPC et timeout client
 
 ### Fichiers touchés
