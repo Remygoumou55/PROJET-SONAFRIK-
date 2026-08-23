@@ -11,6 +11,44 @@
 
 ---
 
+## 2026-08-23 — vague-f(mobile): upload audio mobile créateur
+
+### Fichiers touchés
+- `apps/mobile/package.json` — ajout `expo-document-picker` ~13.0.3.
+- `apps/mobile/app/(tabs)/profil/creator/catalog/upload.tsx` — écran upload complet : picker, lecture durée `expo-av`, `createTrack`, upload signé, confirmation.
+- `apps/mobile/app/(tabs)/profil/creator/catalog/index.tsx` — ajout du menu "Importer un morceau".
+
+### Code avant (extrait)
+```before
+// Catalogue creator — pas d'import mobile
+<MenuItem label="Albums & Singles" ... />
+<MenuItem label="Morceaux" ... />
+```
+
+### Code après (extrait)
+```after
+// Catalogue creator — import mobile
+<MenuItem label="Importer un morceau" onPress={() => router.push("/(tabs)/profil/creator/catalog/upload" as Href)} />
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `a88a0a7` puis `433a837` (cleanup commit_msg.txt) poussés sur `main`.
+
+### Dette technique
+- `expo-document-picker` vient d'être ajouté ; il faudra vérifier les permissions iOS/Android (microphone / lecture fichiers).
+- L'upload est en mémoire via `fetch` + `response.blob()` depuis l'URI ; pour les gros fichiers (> 20Mo), un upload chunked serait préférable.
+
+### Tests à faire
+- [ ] Ouvrir catalogue creator → "Importer un morceau".
+- [ ] Sélectionner un fichier audio → vérifier durée, taille, mime.
+- [ ] Saisir un titre → "Importer".
+- [ ] Vérifier que le track apparaît dans le catalogue.
+
+---
+
 ## 2026-08-23 — vague-e(mobile): interruption audio, animations 300ms, validation globale
 
 ### Fichiers touchés
