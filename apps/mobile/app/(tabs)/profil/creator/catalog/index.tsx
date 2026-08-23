@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -50,6 +50,7 @@ export default function CatalogDashboardScreen() {
       </View>
       <MenuItem label="Albums & Singles" onPress={() => router.push("/(tabs)/profil/creator/catalog/releases")} />
       <MenuItem label="Morceaux" onPress={() => router.push("/(tabs)/profil/creator/catalog/tracks")} />
+      <MenuItem label="Importer un morceau" onPress={() => router.push("/(tabs)/profil/creator/catalog/upload" as Href)} />
     </ScrollView>
   );
 }

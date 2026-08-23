@@ -1,0 +1,9 @@
+feat(mobile): Vague F — upload audio mobile créateur
+
+- Ajoute `expo-document-picker` au mobile.
+- Crée l'écran `catalog/upload.tsx` : sélection audio, durée, titre, upload signé.
+- Utilise `CatalogService` pour `createTrack`, `requestAssetUploadUrl`, `confirmAssetUpload`.
+- Bouton "Importer un morceau" dans le catalogue creator.
+- Validation : pnpm build, pnpm lint, pnpm typecheck OK.
+
+Generated with Devin
