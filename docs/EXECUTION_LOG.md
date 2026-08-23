@@ -11,6 +11,55 @@
 
 ---
 
+## 2026-08-22 — vague-a(mobile): tokens couleurs, numberOfLines, micro-UX auditeur
+
+### Fichiers touchés
+- `packages/ui/src/tokens/colors.ts` — ajout des couleurs alpha (vertEnergie10/13/20, orSolaire10/13/20/27, blanc*, noir20, error10/13, orNoir).
+- `apps/mobile/app/(tabs)/index.tsx` — remplacement des `rgba(...)` hardcodés par les tokens + numberOfLines hero.
+- `apps/mobile/app/(tabs)/wallet.tsx` — remplacement des `rgba(...)` hardcodés par les tokens + numberOfLines plans/transactions.
+- `apps/mobile/app/auth/index.tsx` — remplacement `rgba(0,210,106,0.1)` par `colors.vertEnergie10`.
+- `apps/mobile/app/(tabs)/bibliotheque.tsx` — correction pluriel `morceaux`.
+- `apps/mobile/app/(tabs)/explorer.tsx` — retrait de `scrollEnabled={false}` sur FlatList.
+- `apps/mobile/app/(tabs)/profil/index.tsx` — numberOfLines sur nom, meta, badge, bio.
+- `apps/mobile/app/(tabs)/profil/account.tsx` — suppression du texte technique CDC, libellé utilisateur.
+- `apps/mobile/app/(tabs)/profil/creator/index.tsx` — numberOfLines titre/sous-titre.
+- `apps/mobile/app/(tabs)/profil/creator/catalog/tracks.tsx` — numberOfLines titre/meta.
+
+### Code avant (extrait)
+```before
+// index.tsx
+  tag: {
+    backgroundColor: "rgba(255, 194, 14, 0.13)",
+    borderColor: "rgba(255, 194, 14, 0.27)",
+  },
+```
+
+### Code après (extrait)
+```after
+// index.tsx
+  tag: {
+    backgroundColor: colors.orSolaire13,
+    borderColor: colors.orSolaire27,
+  },
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `579be63` poussé sur `main`.
+
+### Dette technique
+- Aucune. Les couleurs alpha restent centralisées dans `colors.ts` et réutilisables.
+
+### Tests à faire
+- [ ] Vérifier visuellement les cartes de l'accueil et du wallet (fonds alpha).
+- [ ] Vérifier qu'aucun titre ne déborde sur wallet / profil / créateur.
+- [ ] Vérifier le défilement de la recherche Explorer avec plus de 10 résultats.
+- [ ] Passer à la Vague B uniquement après validation du GO.
+
+---
+
 ## 2026-08-22 — vague-a(listener): types DB get_hero_featured_albums + get_recommended_tracks_mvp, suppression listen-future.css, casts RPC
 
 ### Fichiers touchés
