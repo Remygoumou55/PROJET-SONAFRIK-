@@ -11,6 +11,24 @@
 
 ---
 
+## 2026-08-23 — re-audit csp & probe Vague B Stabilisation
+
+### Fichiers concernés
+- `apps/web/next.config.ts` — restauration de `scriptSrc` CSP (prod sans `unsafe-eval`, dev avec `unsafe-eval` + `unsafe-inline` via nonce/strict-dynamic).
+- `scripts/probe-vague-b-stabilisation.ts` — lecture de `scriptSrc` depuis `next.config.ts`, ajustement de la vérification B5.
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- `npx tsx scripts/probe-vague-b-stabilisation.ts` : ✅ 11/11 checks Vague B Stabilisation.
+- Commit : `a3968e8` (auteur / pas d'intervention IA sur le code CSP).
+
+### Décision
+- CSP certifié conforme War Plan B3 : prod fail-closed, dev ouvert pour le HMR/debug.
+
+---
+
 ## 2026-08-23 — vague-f(mobile): upload audio mobile créateur
 
 ### Fichiers touchés
