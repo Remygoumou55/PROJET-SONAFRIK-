@@ -14,6 +14,8 @@ interface MobilePlayerState {
   isLoading: boolean;
   currentPosition: number;
   duration: number;
+  queue: TrackWithMeta[];
+  history: TrackWithMeta[];
 }
 
 function streamingPlatform(): "ios" | "android" | "web" {
@@ -36,6 +38,8 @@ export function usePlayer() {
     isLoading: false,
     currentPosition: 0,
     duration: 0,
+    queue: [],
+    history: [],
   });
 
   const clearHeartbeat = useCallback(() => {
@@ -177,7 +181,11 @@ export function usePlayer() {
           if (status.didJustFinish) {
             clearHeartbeat();
             void completeActiveSessionRef.current("natural");
-            setState((prev) => ({ ...prev, isPlaying: false, sessionId: null }));
+            if (stateRef.current.queue.length > 0) {
+              void playNextRef.current();
+            } else {
+              setState((prev) => ({ ...prev, isPlaying: false, sessionId: null }));
+            }
           }
         });
 
@@ -206,6 +214,48 @@ export function usePlayer() {
     }
   }, [startHeartbeat]);
 
+  const addToQueue = useCallback((track: TrackWithMeta) => {
+    setState((prev) => ({ ...prev, queue: [...prev.queue, track] }));
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setState((prev) => ({ ...prev, queue: [], history: [] }));
+  }, []);
+
+  const playNext = useCallback(async () => {
+    setState((prev) => {
+      if (prev.queue.length === 0) return prev;
+      const [next, ...rest] = prev.queue;
+      return {
+        ...prev,
+        queue: rest,
+        history: prev.currentTrack ? [prev.currentTrack, ...prev.history] : prev.history,
+      };
+    });
+    const next = stateRef.current.queue[0];
+    if (next) await loadAndPlay(next);
+  }, [loadAndPlay]);
+
+  const playPrevious = useCallback(async () => {
+    setState((prev) => {
+      if (prev.history.length === 0) return prev;
+      const [previous, ...rest] = prev.history;
+      return {
+        ...prev,
+        history: rest,
+        queue: prev.currentTrack ? [prev.currentTrack, ...prev.queue] : prev.queue,
+      };
+    });
+    const previous = stateRef.current.history[0];
+    if (previous) await loadAndPlay(previous);
+  }, [loadAndPlay]);
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const playNextRef = useRef(playNext);
+  playNextRef.current = playNext;
+
   const seek = useCallback(async (positionSeconds: number) => {
     if (!soundRef.current) return;
     try {
@@ -227,14 +277,15 @@ export function usePlayer() {
     durationRef.current = 0;
     positionRef.current = 0;
 
-    setState({
+    setState((prev) => ({
+      ...prev,
       currentTrack: null,
       sessionId: null,
       isPlaying: false,
       isLoading: false,
       currentPosition: 0,
       duration: 0,
-    });
+    }));
   }, [unloadSound, streaming, completeActiveSession, getPlaybackPosition]);
 
   useEffect(() => {
@@ -245,5 +296,5 @@ export function usePlayer() {
     };
   }, [clearHeartbeat]);
 
-  return { ...state, loadAndPlay, pause, resume, seek, stop };
+  return { ...state, loadAndPlay, pause, resume, seek, stop, addToQueue, playNext, playPrevious, clearQueue };
 }

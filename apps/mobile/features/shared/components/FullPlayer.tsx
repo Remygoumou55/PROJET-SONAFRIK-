@@ -17,7 +17,18 @@ type FullPlayerProps = {
 };
 
 export function FullPlayer({ visible, onClose }: FullPlayerProps) {
-  const { currentTrack, isPlaying, currentPosition, duration, pause, resume, seek } = usePlayerContext();
+  const {
+    currentTrack,
+    isPlaying,
+    currentPosition,
+    duration,
+    queue,
+    pause,
+    resume,
+    seek,
+    playNext,
+    playPrevious,
+  } = usePlayerContext();
   const progress = duration > 0 ? currentPosition / duration : 0;
 
   if (!currentTrack) return null;
@@ -38,7 +49,7 @@ export function FullPlayer({ visible, onClose }: FullPlayerProps) {
             <CoverImage
               coverPath={currentTrack.cover_url ?? null}
               label={currentTrack.artist_name ?? currentTrack.title}
-              size={280}
+              size={240}
               borderRadius={24}
             />
           </View>
@@ -51,10 +62,39 @@ export function FullPlayer({ visible, onClose }: FullPlayerProps) {
           <ProgressBar duration={duration} position={currentPosition} progress={progress} onSeek={seek} />
 
           <View style={styles.controls}>
+            <Pressable
+              style={[styles.controlBtn, styles.controlBtnSmall]}
+              onPress={playPrevious}
+              disabled={false}
+            >
+              <Text style={styles.controlTextSmall}>⏮</Text>
+            </Pressable>
             <Pressable style={styles.controlBtn} onPress={isPlaying ? pause : resume}>
               <Text style={styles.controlText}>{isPlaying ? "⏸" : "▶"}</Text>
             </Pressable>
+            <Pressable
+              style={[styles.controlBtn, styles.controlBtnSmall]}
+              onPress={playNext}
+              disabled={queue.length === 0}
+            >
+              <Text style={[styles.controlTextSmall, queue.length === 0 && styles.controlTextDisabled]}>⏭</Text>
+            </Pressable>
           </View>
+
+          {queue.length > 0 && (
+            <View style={styles.queue}>
+              <Text style={styles.queueTitle}>À suivre</Text>
+              {queue.slice(0, 3).map((track, index) => (
+                <View key={`${track.id}-${index}`} style={styles.queueRow}>
+                  <CoverImage coverPath={track.cover_url ?? null} label={track.artist_name ?? track.title} size={40} borderRadius={8} />
+                  <View style={styles.queueInfo}>
+                    <Text style={styles.queueTrack} numberOfLines={1}>{track.title}</Text>
+                    <Text style={styles.queueArtist} numberOfLines={1}>{track.artist_name ?? "Artiste"}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -145,7 +185,7 @@ const styles = StyleSheet.create({
   barFill: { height: "100%", backgroundColor: colors.vertEnergie, borderRadius: 4 },
   times: { flexDirection: "row", justifyContent: "space-between" },
   time: { color: colors.texteSecondaire, fontSize: 12 },
-  controls: { flexDirection: "row", alignItems: "center", gap: 32 },
+  controls: { flexDirection: "row", alignItems: "center", gap: 24, marginBottom: 24 },
   controlBtn: {
     width: 72,
     height: 72,
@@ -154,5 +194,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  controlBtnSmall: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.surface,
+  },
   controlText: { color: colors.noirProfond, fontSize: 28 },
+  controlTextSmall: { color: colors.vertEnergie, fontSize: 22 },
+  controlTextDisabled: { color: colors.texteDesactive },
+  queue: { width: "100%", marginTop: 8 },
+  queueTitle: {
+    color: colors.texteSecondaire,
+    fontSize: 12,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
+  queueRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 },
+  queueInfo: { flex: 1 },
+  queueTrack: { color: colors.textePrincipal, fontSize: 14, fontWeight: "500" },
+  queueArtist: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
 });
