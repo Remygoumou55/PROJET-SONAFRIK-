@@ -36,19 +36,19 @@ export function OnboardingPageShell({
         </div>
         {stepLabel ? <OnboardingStepPill label={stepLabel} /> : null}
         {title ? (
-          <h1 className="app-page-title text-2xl font-bold text-texte-principal sm:text-[26px]">
+          <h1 className="app-page-title text-2xl font-bold text-[var(--t8-pearl)] sm:text-[26px]">
             {title}
           </h1>
         ) : null}
         {subtitle ? (
-          <p className="app-page-subtitle mt-2 text-sm text-texte-secondaire">{subtitle}</p>
+          <p className="app-page-subtitle mt-2 text-sm text-[var(--t8-silver)]">{subtitle}</p>
         ) : null}
       </header>
 
       {bare ? (
         children
       ) : (
-        <div className="rounded-2xl border border-bordure bg-card/90 p-4 shadow-lg backdrop-blur-sm sm:p-5">
+        <div className="rounded-2xl border border-[var(--t8-border-default)] bg-[var(--t8-surface-02)]/90 p-4 shadow-lg backdrop-blur-sm sm:p-5">
           {children}
         </div>
       )}

@@ -36,8 +36,8 @@ export default async function MotDePasseOubliePage() {
               <span className="text-sm">G</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-texte-principal">Connexion avec Google</p>
-              <p className="mt-1 text-sm text-texte-secondaire">
+              <p className="text-sm font-semibold text-[var(--t8-pearl)]">Connexion avec Google</p>
+              <p className="mt-1 text-sm text-[var(--t8-silver)]">
                 Cliquez sur « Continuer avec Google », choisissez votre compte et autorisez
                 SONAFRIK. Votre profil est créé automatiquement à la première connexion.
               </p>
@@ -54,8 +54,8 @@ export default async function MotDePasseOubliePage() {
                 <span className="text-sm">📱</span>
               </div>
               <div>
-                <p className="text-sm font-semibold text-texte-principal">Connexion par SMS</p>
-                <p className="mt-1 text-sm text-texte-secondaire">
+                <p className="text-sm font-semibold text-[var(--t8-pearl)]">Connexion par SMS</p>
+                <p className="mt-1 text-sm text-[var(--t8-silver)]">
                   Entrez votre numéro guinéen (+224) et saisissez le code reçu par SMS. Chaque code
                   est valide quelques minutes.
                 </p>
@@ -72,11 +72,11 @@ export default async function MotDePasseOubliePage() {
           Retour à la connexion
         </Link>
 
-        <p className="text-center text-sm text-texte-desactive">
+        <p className="text-center text-sm text-[var(--t8-silver-deep)]">
           Toujours bloqué ?{" "}
           <a
             href="mailto:support@sonafrik.com"
-            className="text-texte-secondaire hover:underline"
+            className="text-[var(--t8-silver)] hover:underline"
           >
             Contacter le support
           </a>

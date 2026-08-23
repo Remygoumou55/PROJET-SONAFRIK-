@@ -9,13 +9,13 @@ export default function AuthError({
 }) {
   return (
     <div className="app-page-content flex flex-col items-center gap-4 px-4 text-center">
-      <p className="text-sm text-texte-secondaire">
+      <p className="text-sm text-[var(--t8-silver)]">
         {"Une erreur est survenue lors de l'authentification."}
       </p>
       <button
         type="button"
         onClick={reset}
-        className="rounded-xl bg-vert-energie px-5 py-2.5 text-sm font-semibold text-noir-profond"
+        className="rounded-xl bg-[var(--t8-primary-lavender)] px-5 py-2.5 text-sm font-semibold text-[var(--t8-deep-black)]"
       >
         Réessayer
       </button>

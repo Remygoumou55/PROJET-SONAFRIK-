@@ -125,8 +125,8 @@ export function PhoneForm({
         aria-disabled={submitDisabled || loading}
         className={`flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg text-sm transition-all duration-300 sm:text-base ${
           submitDisabled
-            ? "cursor-not-allowed bg-vert-energie/30 font-semibold text-white/40"
-            : "cursor-pointer bg-vert-energie font-bold text-noir-profond"
+            ? "cursor-not-allowed bg-[var(--t8-primary-lavender)]/30 font-semibold text-white/40"
+            : "cursor-pointer bg-[var(--t8-primary-lavender)] font-bold text-[var(--t8-deep-black)]"
         }`}
       >
         {loading ? (

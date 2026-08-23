@@ -74,7 +74,7 @@ export function AvatarUpload({ displayName, initialUrl, onUploaded }: AvatarUplo
         >
           {uploading ? "Téléversement…" : "Changer la photo"}
         </Button>
-        <p className="text-texte-desactive text-xs">JPEG, PNG ou WebP · optimisation automatique · URL signée</p>
+        <p className="text-[var(--t8-silver-deep)] text-xs">JPEG, PNG ou WebP · optimisation automatique · URL signée</p>
         {error ? <p className="text-rouge-alerte text-xs">{error}</p> : null}
       </div>
     </div>

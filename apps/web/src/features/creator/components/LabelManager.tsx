@@ -108,11 +108,11 @@ function LabelCard({
         ) : (
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-texte-principal font-semibold">{label.name}</p>
+              <p className="text-[var(--t8-pearl)] font-semibold">{label.name}</p>
               {label.description && (
-                <p className="text-texte-desactive text-xs mt-0.5">{label.description}</p>
+                <p className="text-[var(--t8-silver-deep)] text-xs mt-0.5">{label.description}</p>
               )}
-              <p className="text-texte-desactive text-xs mt-0.5">{label.slug}</p>
+              <p className="text-[var(--t8-silver-deep)] text-xs mt-0.5">{label.slug}</p>
             </div>
             <div className="flex items-center gap-2">
               {label.verified ? (
@@ -235,7 +235,7 @@ export function LabelManager({ labels: initial }: { labels: Label[] }) {
 
       {labels.length === 0 ? (
         <Card>
-          <CardContent className="text-texte-secondaire py-8 text-center text-sm">
+          <CardContent className="text-[var(--t8-silver)] py-8 text-center text-sm">
             Aucun label. Créez-en un ci-dessus.
           </CardContent>
         </Card>

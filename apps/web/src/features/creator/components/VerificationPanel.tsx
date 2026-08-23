@@ -144,7 +144,7 @@ export function VerificationPanel({
 
       {verifications.length === 0 ? (
         <Card>
-          <CardContent className="text-texte-secondaire py-8 text-center text-sm">
+          <CardContent className="text-[var(--t8-silver)] py-8 text-center text-sm">
             Aucune demande de vérification. Créez-en une ci-dessus.
           </CardContent>
         </Card>

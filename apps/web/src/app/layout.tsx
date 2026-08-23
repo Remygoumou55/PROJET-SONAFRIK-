@@ -75,7 +75,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://accounts.google.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
       </head>
-      <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-noir-profond text-texte-principal`}>
+      <body className={`${montserrat.variable} min-h-dvh font-sans antialiased bg-[var(--t8-deep-black)] text-[var(--t8-pearl)]`}>
         {children}
       </body>
     </html>

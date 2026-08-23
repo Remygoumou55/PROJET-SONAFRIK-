@@ -52,7 +52,7 @@ function CreatorDashboardError() {
       className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center"
       role="alert"
     >
-      <p className="text-sm text-texte-secondaire">
+      <p className="text-sm text-[var(--t8-silver)]">
         Impossible de charger votre espace artiste pour le moment.
       </p>
       <Link
@@ -65,7 +65,7 @@ function CreatorDashboardError() {
       >
         Réessayer
       </Link>
-      <Link href="/profile" className="text-sm text-texte-desactive hover:underline">
+      <Link href="/profile" className="text-sm text-[var(--t8-silver-deep)] hover:underline">
         Retour au profil
       </Link>
     </div>

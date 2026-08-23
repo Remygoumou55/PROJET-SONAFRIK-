@@ -68,7 +68,7 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as typeof role)}
-              className="border-bordure bg-elevated text-texte-principal w-full rounded-lg border px-3 py-2 text-sm"
+              className="border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] w-full rounded-lg border px-3 py-2 text-sm"
             >
               {(["manager", "editor", "accountant", "viewer"] as const).map((r) => (
                 <option key={r} value={r}>
@@ -87,7 +87,7 @@ export function TeamManager({ team: initial }: { team: CreatorTeamMember[] }) {
         <Card key={member.id}>
           <CardContent className="flex items-center justify-between py-4">
             <div>
-              <p className="text-texte-principal font-medium">
+              <p className="text-[var(--t8-pearl)] font-medium">
                 {member.profile?.full_name ?? member.profile?.phone ?? member.member_id}
               </p>
               <Badge variant="outline">{CREATOR_TEAM_ROLE_LABELS[member.role]}</Badge>

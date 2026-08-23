@@ -30,7 +30,7 @@ export function LandingArtists({ section }: LandingArtistsProps) {
                 {artist.initials}
               </div>
               <div className="text-left">
-                <p className="m-0 text-[13px] font-semibold leading-snug text-texte-principal">
+                <p className="m-0 text-[13px] font-semibold leading-snug text-[var(--t8-pearl)]">
                   {artist.stageName}
                 </p>
                 <p className="m-0 text-[11px] leading-snug text-white/40">{artist.genre}</p>

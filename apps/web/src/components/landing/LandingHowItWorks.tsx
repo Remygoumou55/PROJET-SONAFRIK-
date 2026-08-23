@@ -53,23 +53,23 @@ export function LandingHowItWorks({ featuredTrack }: LandingHowItWorksProps) {
               <div
                 className={`flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                   index === 0
-                    ? "bg-vert-energie text-noir-profond"
-                    : "border border-bordure bg-surface text-texte-principal"
+                    ? "bg-[var(--t8-primary-lavender)] text-[var(--t8-deep-black)]"
+                    : "border border-[var(--t8-border-default)] bg-[var(--t8-surface-01)] text-[var(--t8-pearl)]"
                 }`}
               >
                 {number}
               </div>
               <div>
-                <h3 className="mb-1.5 text-base font-semibold text-texte-principal">{title}</h3>
-                <p className="m-0 text-sm leading-relaxed text-texte-secondaire">{body}</p>
+                <h3 className="mb-1.5 text-base font-semibold text-[var(--t8-pearl)]">{title}</h3>
+                <p className="m-0 text-sm leading-relaxed text-[var(--t8-silver)]">{body}</p>
               </div>
             </div>
           ))}
 
-          <ul className="mt-5 flex list-none flex-col gap-3 border-t border-bordure p-0 pt-5">
+          <ul className="mt-5 flex list-none flex-col gap-3 border-t border-[var(--t8-border-default)] p-0 pt-5">
             {HIGHLIGHTS.map((text) => (
               <li key={text} className="flex gap-2.5 text-sm leading-snug text-white/65">
-                <span className="font-bold text-vert-energie">✓</span>
+                <span className="font-bold text-[var(--t8-primary-lavender)]">✓</span>
                 {text}
               </li>
             ))}

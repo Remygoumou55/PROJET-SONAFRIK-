@@ -12,8 +12,8 @@ export async function LancementArtistsSection() {
 
   return (
     <div className="lancement-artists text-center">
-      <p className="mb-1 text-base font-bold text-texte-principal">Les artistes fondateurs</p>
-      <p className="mb-6 text-sm text-texte-secondaire">
+      <p className="mb-1 text-base font-bold text-[var(--t8-pearl)]">Les artistes fondateurs</p>
+      <p className="mb-6 text-sm text-[var(--t8-silver)]">
         Les premiers artistes qui font confiance à la plateforme
       </p>
 
@@ -31,10 +31,10 @@ export async function LancementArtistsSection() {
               >
                 {artist.initials}
               </div>
-              <p className="text-xs font-medium leading-snug text-texte-principal">
+              <p className="text-xs font-medium leading-snug text-[var(--t8-pearl)]">
                 {artist.stageName}
               </p>
-              <p className="text-[11px] leading-snug text-texte-secondaire">{artist.genre}</p>
+              <p className="text-[11px] leading-snug text-[var(--t8-silver)]">{artist.genre}</p>
             </Link>
           );
         })}

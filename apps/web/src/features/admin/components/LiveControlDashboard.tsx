@@ -245,7 +245,7 @@ export function LiveControlDashboard({ data }: Props) {
                 {item.text}
               </p>
               {item.link && (
-                <Link href={item.link} className="text-xs font-medium text-vert-energie hover:underline">
+                <Link href={item.link} className="text-xs font-medium text-[var(--t8-primary-lavender)] hover:underline">
                   → Ouvrir
                 </Link>
               )}

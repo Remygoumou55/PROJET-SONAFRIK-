@@ -9,11 +9,11 @@ interface ToggleSettingProps {
 
 export function ToggleSetting({ label, description, checked, onChange }: ToggleSettingProps) {
   return (
-    <label className="border-bordure flex cursor-pointer items-start justify-between gap-4 rounded-lg border px-4 py-3">
+    <label className="border-[var(--t8-border-default)] flex cursor-pointer items-start justify-between gap-4 rounded-lg border px-4 py-3">
       <span>
-        <span className="text-texte-principal block text-sm font-medium">{label}</span>
+        <span className="text-[var(--t8-pearl)] block text-sm font-medium">{label}</span>
         {description ? (
-          <span className="text-texte-desactive mt-0.5 block text-xs">{description}</span>
+          <span className="text-[var(--t8-silver-deep)] mt-0.5 block text-xs">{description}</span>
         ) : null}
       </span>
       <input

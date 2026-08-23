@@ -31,7 +31,7 @@ export default function LancementPage() {
         <SonafrikLogo variant="nav" size="sm" href="/" />
         <Link
           href="/auth/connexion"
-          className="rounded-full border border-elevated bg-surface px-4 py-1.5 text-sm font-medium text-texte-principal transition-opacity hover:opacity-80"
+          className="rounded-full border border-elevated bg-[var(--t8-surface-01)] px-4 py-1.5 text-sm font-medium text-[var(--t8-pearl)] transition-opacity hover:opacity-80"
         >
           Se connecter
         </Link>

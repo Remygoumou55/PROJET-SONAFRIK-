@@ -37,7 +37,7 @@ export function LandingProgress({ subscriberCount, subscriberTarget }: LandingPr
             OBJECTIF DE LANCEMENT
           </div>
           <div className="leading-none">
-            <span className="text-[28px] font-semibold text-texte-principal">
+            <span className="text-[28px] font-semibold text-[var(--t8-pearl)]">
               {subscriberCount.toLocaleString("fr-FR")}
             </span>
             <span className="ml-1 text-base font-normal text-white/35">
@@ -45,7 +45,7 @@ export function LandingProgress({ subscriberCount, subscriberTarget }: LandingPr
             </span>
           </div>
         </div>
-        <div className="whitespace-nowrap rounded-lg bg-vert-energie/15 px-2.5 py-1 text-[13px] font-semibold text-vert-energie">
+        <div className="whitespace-nowrap rounded-lg bg-[var(--t8-primary-lavender)]/15 px-2.5 py-1 text-[13px] font-semibold text-[var(--t8-primary-lavender)]">
           {pctDisplay} %
         </div>
       </div>
@@ -64,7 +64,7 @@ export function LandingProgress({ subscriberCount, subscriberTarget }: LandingPr
             return (
               <div
                 key={threshold}
-                className={`h-1 rounded-sm ${reached ? "bg-vert-energie" : "bg-white/10"}`}
+                className={`h-1 rounded-sm ${reached ? "bg-[var(--t8-primary-lavender)]" : "bg-white/10"}`}
               />
             );
           })}
@@ -75,7 +75,7 @@ export function LandingProgress({ subscriberCount, subscriberTarget }: LandingPr
             return (
               <div
                 key={threshold}
-                className={`text-center text-[10px] ${reached ? "text-vert-energie" : "text-white/30"}`}
+                className={`text-center text-[10px] ${reached ? "text-[var(--t8-primary-lavender)]" : "text-white/30"}`}
               >
                 {label}
               </div>

@@ -16,12 +16,12 @@ export default async function PaymentSettingsPage() {
           <CardTitle>Portefeuille &amp; historique</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-texte-secondaire text-sm">
+          <p className="text-[var(--t8-silver)] text-sm">
             Consultez votre solde, vos transactions et vos recharges SONAFRIK.
           </p>
           <Link
             href="/wallet"
-            className="text-vert-energie text-sm font-medium hover:underline"
+            className="text-[var(--t8-primary-lavender)] text-sm font-medium hover:underline"
           >
             Accéder à mon portefeuille →
           </Link>
@@ -34,7 +34,7 @@ export default async function PaymentSettingsPage() {
             <CardTitle>Comptes de retrait (artiste)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-texte-secondaire text-sm">
+            <p className="text-[var(--t8-silver)] text-sm">
               Numéros enregistrés pour vos retraits de royalties. Pour les
               modifier, mettez à jour votre profil artiste.
             </p>
@@ -50,7 +50,7 @@ export default async function PaymentSettingsPage() {
             </div>
             <Link
               href="/wallet/payout"
-              className="text-vert-energie text-sm font-medium hover:underline"
+              className="text-[var(--t8-primary-lavender)] text-sm font-medium hover:underline"
             >
               Gérer les retraits →
             </Link>
@@ -63,9 +63,9 @@ export default async function PaymentSettingsPage() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-bordure flex flex-col gap-1 border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:justify-between">
-      <span className="text-texte-secondaire text-sm">{label}</span>
-      <span className="text-texte-principal text-sm font-medium">{value}</span>
+    <div className="border-[var(--t8-border-default)] flex flex-col gap-1 border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:justify-between">
+      <span className="text-[var(--t8-silver)] text-sm">{label}</span>
+      <span className="text-[var(--t8-pearl)] text-sm font-medium">{value}</span>
     </div>
   );
 }

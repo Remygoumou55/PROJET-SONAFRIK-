@@ -32,13 +32,13 @@ export function LandingFAQ() {
         {FAQ_ITEMS.map(({ q, a }, index) => (
           <details
             key={q}
-            className="landing-faq-item overflow-hidden rounded-xl border border-bordure bg-white/[0.02]"
+            className="landing-faq-item overflow-hidden rounded-xl border border-[var(--t8-border-default)] bg-white/[0.02]"
             open={index === 0}
           >
-            <summary className="landing-faq-summary flex cursor-pointer list-none items-center justify-between gap-3 px-[18px] py-4 text-[15px] font-semibold text-texte-principal">
+            <summary className="landing-faq-summary flex cursor-pointer list-none items-center justify-between gap-3 px-[18px] py-4 text-[15px] font-semibold text-[var(--t8-pearl)]">
               {q}
             </summary>
-            <p className="m-0 px-[18px] pb-4 text-sm leading-relaxed text-texte-secondaire">{a}</p>
+            <p className="m-0 px-[18px] pb-4 text-sm leading-relaxed text-[var(--t8-silver)]">{a}</p>
           </details>
         ))}
       </div>

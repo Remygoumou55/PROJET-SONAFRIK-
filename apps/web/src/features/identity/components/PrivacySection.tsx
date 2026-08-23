@@ -52,7 +52,7 @@ export function PrivacySection({ preferences }: PrivacySectionProps) {
           onChange={setProfilePublic}
         />
         {message ? (
-          <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-vert-energie"}`}>
+          <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-[var(--t8-primary-lavender)]"}`}>
             {message}
           </p>
         ) : null}

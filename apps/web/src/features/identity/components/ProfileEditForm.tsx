@@ -86,7 +86,7 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
               maxLength={FIELD_LIMITS.BIO}
               rows={4}
               onChange={(event) => setBio(event.target.value)}
-              className="border-bordure bg-elevated text-texte-principal focus:border-vert-energie w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              className="border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] focus:border-[var(--t8-primary-lavender)] w-full rounded-lg border px-3 py-2 text-sm outline-none"
             />
             <FieldCounter value={bio} max={FIELD_LIMITS.BIO} />
           </Field>
@@ -119,7 +119,7 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
 
       {error ? <p className="text-rouge-alerte text-sm">{error}</p> : null}
       {success ? (
-        <p className="text-vert-energie text-sm">Profil enregistré avec succès.</p>
+        <p className="text-[var(--t8-primary-lavender)] text-sm">Profil enregistré avec succès.</p>
       ) : null}
 
       <div className="flex gap-3">
@@ -137,7 +137,7 @@ export function ProfileEditForm({ profile, avatarUrl }: ProfileEditFormProps) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-texte-secondaire text-sm">{label}</span>
+      <span className="text-[var(--t8-silver)] text-sm">{label}</span>
       {children}
     </label>
   );

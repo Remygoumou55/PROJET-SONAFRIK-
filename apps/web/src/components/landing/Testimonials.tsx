@@ -23,7 +23,7 @@ export function Testimonials() {
         {TESTIMONIALS.map(({ name, role, quote, initials, avatarClass, avatarTextClass }) => (
           <article
             key={name}
-            className="shrink-0 basis-[min(300px,85vw)] rounded-[14px] border border-white/[0.06] bg-surface p-5"
+            className="shrink-0 basis-[min(300px,85vw)] rounded-[14px] border border-white/[0.06] bg-[var(--t8-surface-01)] p-5"
           >
             <div className="mb-3 flex items-center gap-3">
               <div
@@ -32,7 +32,7 @@ export function Testimonials() {
                 {initials}
               </div>
               <div>
-                <p className="m-0 text-sm font-semibold text-texte-principal">{name}</p>
+                <p className="m-0 text-sm font-semibold text-[var(--t8-pearl)]">{name}</p>
                 <p className="m-0 text-xs text-white/45">{role}</p>
               </div>
             </div>

@@ -25,7 +25,7 @@ export function CatalogDashboard({ context: initialContext }: { context: Catalog
           <CardTitle>Mon catalogue</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-texte-secondaire text-sm">
+          <p className="text-[var(--t8-silver)] text-sm">
             Gérez vos sorties, ajoutez vos morceaux et suivez leur publication sur SONAFRIK.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -43,7 +43,7 @@ export function CatalogDashboard({ context: initialContext }: { context: Catalog
       </Card>
 
       <Card>
-        <CardContent className="text-texte-secondaire py-4 text-sm">
+        <CardContent className="text-[var(--t8-silver)] py-4 text-sm">
           {context.publishedCount} élément{context.publishedCount !== 1 ? "s" : ""} publié
           {context.publishedCount !== 1 ? "s" : ""} · Fichiers audio et pochettes sécurisés pour la diffusion.
         </CardContent>
@@ -56,8 +56,8 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <Card>
       <CardContent className="py-4">
-        <p className="text-texte-desactive text-xs uppercase">{label}</p>
-        <p className="text-texte-principal mt-1 text-2xl font-bold">{value}</p>
+        <p className="text-[var(--t8-silver-deep)] text-xs uppercase">{label}</p>
+        <p className="text-[var(--t8-pearl)] mt-1 text-2xl font-bold">{value}</p>
       </CardContent>
     </Card>
   );

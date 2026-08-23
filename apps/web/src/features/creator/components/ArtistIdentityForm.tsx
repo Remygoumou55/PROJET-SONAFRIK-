@@ -73,7 +73,7 @@ export function ArtistIdentityForm({
           <CardTitle>Photo & couverture</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-texte-secondaire text-sm">
+          <p className="text-[var(--t8-silver)] text-sm">
             Modifiez votre avatar et votre couverture depuis la vue d&apos;ensemble. Choisissez une image, SONAFRIK optimise et enregistre automatiquement.
           </p>
           <Button type="button" variant="outline" size="sm" asChild>
@@ -88,7 +88,7 @@ export function ArtistIdentityForm({
         </CardHeader>
         <CardContent className="space-y-4">
           <label className="block space-y-1.5">
-            <span className="text-texte-secondaire text-sm">Nom de scène</span>
+            <span className="text-[var(--t8-silver)] text-sm">Nom de scène</span>
             <Input
               value={stageName}
               maxLength={FIELD_LIMITS.STAGE_NAME}
@@ -104,13 +104,13 @@ export function ArtistIdentityForm({
             </div>
           </label>
           <label className="block space-y-1.5">
-            <span className="text-texte-secondaire text-sm">Bio</span>
+            <span className="text-[var(--t8-silver)] text-sm">Bio</span>
             <textarea
               value={bio}
               rows={4}
               maxLength={FIELD_LIMITS.ARTIST_BIO}
               onChange={(e) => setBio(e.target.value)}
-              className="border-bordure bg-elevated text-texte-principal w-full rounded-lg border px-3 py-2 text-sm"
+              className="border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] w-full rounded-lg border px-3 py-2 text-sm"
             />
             <div className="flex justify-end">
               <span
@@ -121,12 +121,12 @@ export function ArtistIdentityForm({
               </span>
             </div>
           </label>
-          <label className="flex items-center gap-2 text-sm text-texte-secondaire">
+          <label className="flex items-center gap-2 text-sm text-[var(--t8-silver)]">
             <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
             Profil public visible sur SONAFRIK
           </label>
           <div>
-            <p className="text-texte-secondaire mb-2 text-sm">Genres</p>
+            <p className="text-[var(--t8-silver)] mb-2 text-sm">Genres</p>
             <div className="flex flex-wrap gap-2">
               {GENRE_OPTIONS.map((genre) => (
                 <button
@@ -135,8 +135,8 @@ export function ArtistIdentityForm({
                   onClick={() => toggleGenre(genre)}
                   className={`rounded-full border px-3 py-1 text-xs ${
                     genres.includes(genre)
-                      ? "border-vert-energie bg-vert-energie/10 text-vert-energie"
-                      : "border-bordure text-texte-secondaire"
+                      ? "border-[var(--t8-primary-lavender)] bg-[var(--t8-primary-lavender)]/10 text-[var(--t8-primary-lavender)]"
+                      : "border-[var(--t8-border-default)] text-[var(--t8-silver)]"
                   }`}
                 >
                   {genre}
@@ -148,7 +148,7 @@ export function ArtistIdentityForm({
       </Card>
 
       {message ? (
-        <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-vert-energie"}`}>
+        <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-[var(--t8-primary-lavender)]"}`}>
           {message}
         </p>
       ) : null}

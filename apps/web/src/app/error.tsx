@@ -22,7 +22,7 @@ export default function RootError({
         <div className="app-page-content flex flex-col items-center gap-4 px-4 text-center">
           {isNoCreator ? (
             <>
-              <div className="mb-2 flex size-16 items-center justify-center rounded-2xl border border-vert-energie/20 bg-vert-energie/10">
+              <div className="mb-2 flex size-16 items-center justify-center rounded-2xl border border-[var(--t8-primary-lavender)]/20 bg-[var(--t8-primary-lavender)]/10">
                 <svg
                   width={28}
                   height={28}
@@ -37,30 +37,30 @@ export default function RootError({
                 </svg>
               </div>
               <div className="space-y-1 text-center">
-                <p className="text-base font-semibold text-texte-principal">
+                <p className="text-base font-semibold text-[var(--t8-pearl)]">
                   Profil artiste introuvable
                 </p>
-                <p className="max-w-xs text-sm text-texte-secondaire">
+                <p className="max-w-xs text-sm text-[var(--t8-silver)]">
                   Vous n&apos;avez pas encore de profil artiste sur SONAFRIK.
                   Configurez votre compte depuis votre profil.
                 </p>
               </div>
               <Link
                 href="/profile"
-                className="rounded-xl bg-vert-energie px-5 py-2.5 text-sm font-semibold text-noir-profond"
+                className="rounded-xl bg-[var(--t8-primary-lavender)] px-5 py-2.5 text-sm font-semibold text-[var(--t8-deep-black)]"
               >
                 Accéder à mon profil
               </Link>
             </>
           ) : (
             <>
-              <p className="text-sm text-texte-secondaire">
+              <p className="text-sm text-[var(--t8-silver)]">
                 {"Une erreur inattendue est survenue."}
               </p>
               <button
                 type="button"
                 onClick={reset}
-                className="rounded-xl bg-vert-energie px-5 py-2.5 text-sm font-semibold text-noir-profond"
+                className="rounded-xl bg-[var(--t8-primary-lavender)] px-5 py-2.5 text-sm font-semibold text-[var(--t8-deep-black)]"
               >
                 Réessayer
               </button>

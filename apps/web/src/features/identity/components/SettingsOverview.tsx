@@ -59,12 +59,12 @@ export function SettingsOverview({ context }: SettingsOverviewProps) {
       <div className="grid gap-4 md:grid-cols-2">
         {SECTIONS.map((section) => (
           <Link key={section.href} href={section.href} className="identity-settings-card-link">
-            <Card className="identity-settings-card h-full transition-colors hover:border-vert-energie/40">
+            <Card className="identity-settings-card h-full transition-colors hover:border-[var(--t8-primary-lavender)]/40">
               <CardHeader>
                 <CardTitle className="text-base">{section.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-texte-secondaire text-sm">{section.description}</p>
+                <p className="text-[var(--t8-silver)] text-sm">{section.description}</p>
               </CardContent>
             </Card>
           </Link>
@@ -77,8 +77,8 @@ export function SettingsOverview({ context }: SettingsOverviewProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-texte-desactive text-xs uppercase tracking-wide">{label}</p>
-      <p className="text-texte-principal mt-1 text-sm font-medium">{value}</p>
+      <p className="text-[var(--t8-silver-deep)] text-xs uppercase tracking-wide">{label}</p>
+      <p className="text-[var(--t8-pearl)] mt-1 text-sm font-medium">{value}</p>
     </div>
   );
 }

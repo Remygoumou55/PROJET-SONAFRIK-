@@ -63,7 +63,7 @@ export function LiveStats() {
   }, [load, inView, pageVisible]);
 
   const shellClass =
-    "mb-12 border-y border-vert-energie/15 bg-vert-energie/5 px-4 py-4 min-h-[72px]";
+    "mb-12 border-y border-[var(--t8-primary-lavender)]/15 bg-[var(--t8-primary-lavender)]/5 px-4 py-4 min-h-[72px]";
 
   if (!loaded) {
     return <div ref={ref} className={shellClass} aria-hidden="true" />;
@@ -77,20 +77,20 @@ export function LiveStats() {
         <StatColumn
           value={stats.activeStreams}
           label="en train d'écouter"
-          colorClass="text-vert-energie"
+          colorClass="text-[var(--t8-primary-lavender)]"
           animate={inView}
           liveDot
         />
         <StatColumn
           value={stats.totalArtists}
           label="artistes inscrits"
-          colorClass="text-or-solaire"
+          colorClass="text-[var(--t8-primary-lavender)]"
           animate={inView}
         />
         <StatColumn
           value={stats.royaltiesPaidGnf}
           label="GNF versés aux artistes"
-          colorClass="text-texte-principal"
+          colorClass="text-[var(--t8-pearl)]"
           animate={inView}
         />
       </div>

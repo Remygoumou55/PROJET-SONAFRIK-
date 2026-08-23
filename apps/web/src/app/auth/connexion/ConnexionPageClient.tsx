@@ -23,7 +23,7 @@ const LEGACY_SUBTITLE = "Écoute · Participe · Prospère";
 const BACK_LINK = (
   <Link
     href="/"
-    className="inline-flex text-sm text-texte-secondaire transition-colors hover:underline"
+    className="inline-flex text-sm text-[var(--t8-silver)] transition-colors hover:underline"
   >
     ← Retour à l&apos;accueil
   </Link>
@@ -179,7 +179,7 @@ export function ConnexionPageClient({
     return (
       <AuthPageShell title={pageTitle} subtitle={pageSubtitle} leading={BACK_LINK} className={shellClass}>
         <div className="flex justify-center py-12" aria-busy="true" aria-label="Chargement">
-          <div className="size-8 animate-spin rounded-full border-2 border-vert-energie border-t-transparent" />
+          <div className="size-8 animate-spin rounded-full border-2 border-[var(--t8-primary-lavender)] border-t-transparent" />
         </div>
       </AuthPageShell>
     );

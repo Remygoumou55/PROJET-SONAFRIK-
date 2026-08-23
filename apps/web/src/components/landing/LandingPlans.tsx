@@ -85,7 +85,7 @@ const PLANS: Plan[] = [
     payments: [PAYMENT_ORANGE, PAYMENT_MTN],
   },
   {
-    badgeClass: "bg-vert-energie/15 text-vert-energie",
+    badgeClass: "bg-[var(--t8-primary-lavender)]/15 text-[var(--t8-primary-lavender)]",
     badgeText: "Le plus populaire",
     title: "Mensuel",
     price: "80 000 GNF",
@@ -103,7 +103,7 @@ const PLANS: Plan[] = [
     featured: true,
   },
   {
-    badgeClass: "bg-or-solaire/15 text-or-solaire",
+    badgeClass: "bg-[var(--t8-primary-lavender)]/15 text-[var(--t8-primary-lavender)]",
     badgeText: "Meilleure valeur",
     title: "Annuel",
     price: "700 000 GNF",
@@ -125,7 +125,7 @@ function PaymentItem({ dotClass, name, sub, detail }: Payment) {
     <div className="mb-1.5 rounded-lg bg-white/5 px-2.5 py-2">
       <div className="mb-0.5 flex items-center gap-1.5">
         <span className={`size-2 shrink-0 rounded-full ${dotClass}`} />
-        <span className="text-xs font-semibold text-texte-principal">{name}</span>
+        <span className="text-xs font-semibold text-[var(--t8-pearl)]">{name}</span>
       </div>
       <p className="m-0 mb-px ml-3.5 text-[10px] text-white/40">{sub}</p>
       <p className="m-0 ml-3.5 text-[10px] text-white/30">{detail}</p>
@@ -145,8 +145,8 @@ function PlanSubscribeLink({ featured = false }: { featured?: boolean }) {
       href="/auth/connexion?role=listener"
       className={`mt-3.5 block rounded-lg px-4 py-2.5 text-center text-[13px] font-semibold no-underline ${
         featured
-          ? "bg-vert-energie text-noir-profond"
-          : "border border-white/20 text-texte-principal"
+          ? "bg-[var(--t8-primary-lavender)] text-[var(--t8-deep-black)]"
+          : "border border-white/20 text-[var(--t8-pearl)]"
       }`}
     >
       S&apos;abonner →
@@ -165,7 +165,7 @@ export function LandingPlans() {
             key={plan.title}
             className={`flex flex-col rounded-[14px] p-[18px] ${
               plan.featured
-                ? "border-[1.5px] border-vert-energie bg-vert-energie/5"
+                ? "border-[1.5px] border-[var(--t8-primary-lavender)] bg-[var(--t8-primary-lavender)]/5"
                 : "border border-white/10 bg-white/[0.03]"
             }`}
           >
@@ -175,13 +175,13 @@ export function LandingPlans() {
               {plan.badgeText}
             </div>
 
-            <p className="mb-1 text-[15px] font-semibold text-texte-principal">{plan.title}</p>
-            <p className="mb-0.5 text-xl font-bold text-texte-principal">
+            <p className="mb-1 text-[15px] font-semibold text-[var(--t8-pearl)]">{plan.title}</p>
+            <p className="mb-0.5 text-xl font-bold text-[var(--t8-pearl)]">
               {plan.price}{" "}
               <span className="text-[13px] font-normal text-white/40">{plan.period}</span>
             </p>
             {plan.saving ? (
-              <p className="mb-2 text-[11px] text-vert-energie">{plan.saving}</p>
+              <p className="mb-2 text-[11px] text-[var(--t8-primary-lavender)]">{plan.saving}</p>
             ) : null}
             <p className="mb-3 text-xs leading-snug text-white/40">{plan.tagline}</p>
 
@@ -193,7 +193,7 @@ export function LandingPlans() {
                 <li key={f.text} className="mb-1.5 flex items-start gap-1.5">
                   <span
                     className={`shrink-0 text-xs font-bold leading-normal ${
-                      f.ok ? "text-vert-energie" : "text-white/20"
+                      f.ok ? "text-[var(--t8-primary-lavender)]" : "text-white/20"
                     }`}
                   >
                     {f.ok ? "✓" : "✗"}
@@ -221,20 +221,20 @@ export function LandingPlans() {
       <div className="mb-7 rounded-[14px] border border-feature-azure/25 bg-feature-azure/5 p-[18px]">
         <div className="landing-diaspora-inner grid grid-cols-[220px_1fr] gap-6">
           <div>
-            <div className="mb-2.5 inline-flex rounded-md border border-or-solaire bg-or-solaire/10 px-2.5 py-1 text-[10px] font-semibold text-or-solaire">
+            <div className="mb-2.5 inline-flex rounded-md border border-[var(--t8-primary-lavender)] bg-[var(--t8-primary-lavender)]/10 px-2.5 py-1 text-[10px] font-semibold text-[var(--t8-primary-lavender)]">
               🌍 Pour les Guinéens de l&apos;étranger
             </div>
             <div className="mb-2.5 ml-2 inline-flex rounded-md bg-feature-azure/15 px-2 py-0.5 text-[10px] font-semibold text-feature-azure">
               Diaspora
             </div>
-            <p className="mb-1.5 text-base font-semibold text-texte-principal">Pack Diaspora</p>
-            <p className="mb-2.5 text-xl font-bold text-vert-energie">5 EUR / mois</p>
+            <p className="mb-1.5 text-base font-semibold text-[var(--t8-pearl)]">Pack Diaspora</p>
+            <p className="mb-2.5 text-xl font-bold text-[var(--t8-primary-lavender)]">5 EUR / mois</p>
             <p className="mb-3.5 max-w-[200px] text-xs leading-snug text-white/40">
               Vous vivez à l&apos;étranger et voulez soutenir la musique guinéenne ? Ce pack est fait pour vous.
             </p>
             <Link
               href="/auth/connexion?role=listener"
-              className="inline-block rounded-lg bg-feature-azure px-5 py-2.5 text-[13px] font-semibold text-noir-profond no-underline"
+              className="inline-block rounded-lg bg-feature-azure px-5 py-2.5 text-[13px] font-semibold text-[var(--t8-deep-black)] no-underline"
             >
               S&apos;abonner Diaspora →
             </Link>
@@ -250,7 +250,7 @@ export function LandingPlans() {
                 "Facturé en devise internationale",
               ].map((f) => (
                 <div key={f} className="mb-1.5 flex items-start gap-1.5">
-                  <span className="shrink-0 text-xs font-bold leading-normal text-vert-energie">✓</span>
+                  <span className="shrink-0 text-xs font-bold leading-normal text-[var(--t8-primary-lavender)]">✓</span>
                   <span className="text-xs leading-snug text-white/70">{f}</span>
                 </div>
               ))}

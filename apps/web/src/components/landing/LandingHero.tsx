@@ -15,18 +15,18 @@ export function LandingHero({ children }: LandingHeroProps) {
           <SonafrikLogo variant="wordmark" size="lg" />
         </div>
 
-        <div className="mb-7 inline-flex items-center gap-1.5 rounded-full border border-vert-energie/25 bg-vert-energie/10 px-3.5 py-1.5 text-xs text-vert-energie">
-          <span className="landing-pulse-dot size-1.5 shrink-0 rounded-full bg-vert-energie" />
+        <div className="mb-7 inline-flex items-center gap-1.5 rounded-full border border-[var(--t8-primary-lavender)]/25 bg-[var(--t8-primary-lavender)]/10 px-3.5 py-1.5 text-xs text-[var(--t8-primary-lavender)]">
+          <span className="landing-pulse-dot size-1.5 shrink-0 rounded-full bg-[var(--t8-primary-lavender)]" />
           Lancement en cours — Guinée Conakry
         </div>
 
         <h1
           id="landing-hero-title"
-          className="landing-hero-h1 mb-4 text-[44px] font-semibold leading-tight text-texte-principal"
+          className="landing-hero-h1 mb-4 text-[44px] font-semibold leading-tight text-[var(--t8-pearl)]"
         >
           La musique guinéenne
           <br />
-          <em className="font-normal not-italic text-vert-energie">mérite sa plateforme</em>
+          <em className="font-normal not-italic text-[var(--t8-primary-lavender)]">mérite sa plateforme</em>
         </h1>
 
         <p className="mx-auto mb-9 max-w-[500px] text-base leading-relaxed text-white/50">

@@ -19,9 +19,9 @@ export function AuthPageShell({ title, subtitle, leading, className, children }:
         <div className="mb-4 flex justify-center">
           <SonafrikLogo variant="full" priority />
         </div>
-        <h1 className="app-page-title text-2xl font-bold text-texte-principal">{title}</h1>
+        <h1 className="app-page-title text-2xl font-bold text-[var(--t8-pearl)]">{title}</h1>
         {subtitle ? (
-          <p className="app-page-subtitle mt-1 text-sm text-texte-secondaire">{subtitle}</p>
+          <p className="app-page-subtitle mt-1 text-sm text-[var(--t8-silver)]">{subtitle}</p>
         ) : null}
       </header>
       {children}

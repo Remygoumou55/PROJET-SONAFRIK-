@@ -30,11 +30,11 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer className="mt-2 border-t border-bordure pt-10">
+    <footer className="mt-2 border-t border-[var(--t8-border-default)] pt-10">
       <div className="landing-footer-grid mb-8 grid grid-cols-[1.2fr_repeat(3,1fr)] gap-8">
         <div>
           <SonafrikLogo variant="nav" size="sm" showTagline href="/" />
-          <p className="m-0 text-[13px] leading-relaxed text-texte-secondaire">
+          <p className="m-0 text-[13px] leading-relaxed text-[var(--t8-silver)]">
             La musique guinéenne mérite sa plateforme.
             <br />
             Notre Bien Commun.
@@ -43,7 +43,7 @@ export function LandingFooter() {
 
         {COLUMNS.map(({ title, links }) => (
           <div key={title}>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-texte-secondaire">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-[var(--t8-silver)]">
               {title}
             </p>
             <ul className="m-0 list-none p-0">
@@ -62,7 +62,7 @@ export function LandingFooter() {
         ))}
       </div>
 
-      <p className="m-0 pb-6 text-center text-xs text-texte-desactive">
+      <p className="m-0 pb-6 text-center text-xs text-[var(--t8-silver-deep)]">
         © {new Date().getFullYear()} SONAFRIK — Guinée Conakry. Tous droits réservés.
       </p>
     </footer>

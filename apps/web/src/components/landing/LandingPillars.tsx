@@ -3,14 +3,14 @@ import { RoyaltiesCounter } from "./RoyaltiesCounter";
 
 const PILLARS = [
   {
-    iconBg: "bg-vert-energie/15",
+    iconBg: "bg-[var(--t8-primary-lavender)]/15",
     icon: "🎵",
     title: "65 % des abonnements pour les artistes",
     body: "Sur chaque abonnement payé, 65 francs sur 100 sont reversés aux artistes — répartis entre eux selon le nombre d'écoutes réelles.",
     note: "Plus votre musique est écoutée, plus votre part est grande. Chaque auditeur contribue à tous les artistes qu'il écoute.",
   },
   {
-    iconBg: "bg-or-solaire/15",
+    iconBg: "bg-[var(--t8-primary-lavender)]/15",
     icon: "🎹",
     title: "Beat Store sans commission",
     body: "Les beatmakers vendent leurs instrumentaux directement sur SONAFRIK, car ils doivent aussi vivre de leur passion et de leurs œuvres.",
@@ -33,7 +33,7 @@ export function LandingPillars() {
       <RoyaltiesCounter />
 
       <div className="mx-auto mb-8 max-w-[600px] text-center">
-        <p className="m-0 text-[17px] font-semibold text-texte-principal">
+        <p className="m-0 text-[17px] font-semibold text-[var(--t8-pearl)]">
           En Guinée, des artistes talentueux créent chaque jour — et ne gagnent presque rien.
         </p>
         <p className="mb-0 mt-2.5 text-[15px] text-white/45">
@@ -52,7 +52,7 @@ export function LandingPillars() {
             >
               {icon}
             </div>
-            <h3 className="mb-2 text-[15px] font-semibold text-texte-principal">{title}</h3>
+            <h3 className="mb-2 text-[15px] font-semibold text-[var(--t8-pearl)]">{title}</h3>
             <p className="mb-2.5 text-[13px] leading-relaxed text-white/50">{body}</p>
             <p className="mb-0 mt-2.5 border-t border-white/[0.06] pt-2.5 text-[11px] leading-snug text-white/30">
               {note}

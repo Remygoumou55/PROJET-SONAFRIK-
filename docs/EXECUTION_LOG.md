@@ -5412,3 +5412,59 @@ Les pages P0 `/listen` et `/creator` ne respectent pas encore la cible officiell
 - [ ] VÃ©rifier visuellement AlbumCard, ArtistCard, TrackCard, PlayerControls, ProgressBar, Modal, Dropdown, Tabs, Toast, Skeleton, SearchInput.
 - [ ] VÃ©rifier que la build Next.js reste stable.
 - [ ] Continuer la migration des consommateurs V5.0 dans `apps/web` et `apps/mobile`.
+
+---
+
+## 2026-08-23 â€” Territory 8 : migration massive de `apps/web` et du token mobile
+
+### Fichiers touchÃ©s
+- 65 fichiers `apps/web/src` remplacÃ©s de la palette V5.0 vers T8 (pages, composants landing, features listener/creator/admin/wallet/identity, lib).
+- `packages/ui/src/tokens/colors.ts` â€” valeurs du legacy `colors` rebranchÃ©es sur `territory8Colors` pour l'application mobile React Native.
+
+### Code avant (extrait clÃ©)
+```before
+// apps/web/src/features/...
+"text-texte-principal bg-elevated border-bordure"
+"rounded-full bg-vert-energie text-noir-profond"
+```
+
+```before
+// packages/ui/src/tokens/colors.ts
+colors.vertEnergie = "#00D26A"
+colors.orSolaire = "#FFC20E"
+```
+
+### Code aprÃ¨s (extrait clÃ©)
+```after
+// apps/web/src/features/...
+"text-[var(--t8-pearl)] bg-[var(--t8-surface-03)] border-[var(--t8-border-default)]"
+"rounded-full bg-[var(--t8-primary-lavender)] text-[var(--t8-pearl)]"
+```
+
+```after
+// packages/ui/src/tokens/colors.ts
+colors.vertEnergie = territory8Colors.primaryLavender
+colors.orSolaire = territory8Colors.audioCyan
+```
+
+### Validation
+- `pnpm --filter @sonafrik/ui typecheck` : âœ…
+- `pnpm --filter @sonafrik/ui lint` : âœ…
+- `pnpm --filter @sonafrik/web lint` : âœ…
+- `pnpm --filter @sonafrik/web build` : âœ… (72/72 pages)
+- `pnpm --filter @sonafrik/mobile typecheck` : âœ…
+- `pnpm lint` : âœ… 19/19
+- `pnpm typecheck` : âœ… 19/19
+
+### DÃ©cision
+- `apps/web` est maintenant entiÃ¨rement en Territory 8 (classes Tailwind `var(--t8-*)`).
+- L'application mobile hÃ©rite de Territory 8 via le token `colors` mis Ã  jour, sans modification de 20+ Ã©crans.
+
+### Dette technique
+- Certains `rgba(...)` et gradients hardcodÃ©s peuvent subsister dans `apps/web/src/lib/constants.ts` et les styles onboarding/admin (hors scope Tailwind).
+- Les noms legacy `vertEnergie`, `orSolaire`, etc. restent en usage mobile ; renommage propre Ã  prÃ©voir.
+
+### Tests Ã  faire
+- [ ] RafraÃ®chir le site en production et vÃ©rifier que les Ã©crans affichent du lavender/cyan/pearl.
+- [ ] Ouvrir l'application mobile et vÃ©rifier la nouvelle teinte (pas de vert/or restant).
+- [ ] VÃ©rifier le contraste sur les boutons d'action lavender et les badges cyan.

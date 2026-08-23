@@ -37,8 +37,8 @@ export default async function BeatStorePage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-texte-principal">Beat Store</h1>
-        <p className="mt-1 text-sm text-texte-desactive">
+        <h1 className="text-2xl font-bold text-[var(--t8-pearl)]">Beat Store</h1>
+        <p className="mt-1 text-sm text-[var(--t8-silver-deep)]">
           Instrumentaux de producteurs guinéens — commission 0% (CDC Règle #4)
         </p>
       </div>

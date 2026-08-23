@@ -28,7 +28,7 @@ export function ConnexionPhoneAuthSection({
 }: ConnexionPhoneAuthSectionProps) {
   return (
     <>
-      <p className="text-center text-xs text-texte-desactive">
+      <p className="text-center text-xs text-[var(--t8-silver-deep)]">
         Nouveau ou déjà inscrit — votre numéro suffit
       </p>
       <LegalConsentCheckbox
@@ -45,7 +45,7 @@ export function ConnexionPhoneAuthSection({
       />
       <div className="flex items-center gap-3" aria-hidden="true">
         <div className="h-px flex-1 bg-bordure" />
-        <span className="text-xs text-texte-desactive">ou</span>
+        <span className="text-xs text-[var(--t8-silver-deep)]">ou</span>
         <div className="h-px flex-1 bg-bordure" />
       </div>
       <GoogleAuthButton

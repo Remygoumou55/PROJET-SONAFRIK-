@@ -6,7 +6,7 @@ const COLUMNS = [
     icon: "✅",
     title: "DISPONIBLE MAINTENANT",
     borderClass: "border-l-vert-energie",
-    textClass: "text-vert-energie",
+    textClass: "text-[var(--t8-primary-lavender)]",
     items: [
       "Streaming musical",
       "Espace artiste complet",
@@ -20,7 +20,7 @@ const COLUMNS = [
     icon: "🔜",
     title: "PROCHAINEMENT",
     borderClass: "border-l-or-solaire",
-    textClass: "text-or-solaire",
+    textClass: "text-[var(--t8-primary-lavender)]",
     items: ["Fan Tribu (commentaires, réactions)", "Marketplace musicale", "Lyrics synchronisées"],
   },
   {

@@ -11,12 +11,12 @@ export default function HelpSettingsPage() {
           <CardTitle>Aide &amp; support</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-texte-secondaire text-sm">
+          <p className="text-[var(--t8-silver)] text-sm">
             Une question ou un problème ? Notre équipe est disponible par email.
           </p>
           <a
             href="mailto:support@sonafrik.com"
-            className="text-vert-energie text-sm font-medium hover:underline"
+            className="text-[var(--t8-primary-lavender)] text-sm font-medium hover:underline"
           >
             Contacter le support → support@sonafrik.com
           </a>
@@ -28,7 +28,7 @@ export default function HelpSettingsPage() {
           <CardTitle>Informations légales</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-texte-desactive text-xs">
+          <p className="text-[var(--t8-silver-deep)] text-xs">
             Les documents légaux complets seront disponibles avant le lancement public.
           </p>
           <div className="space-y-3">
@@ -56,19 +56,19 @@ function LegalLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-texte-secondaire hover:text-texte-principal flex items-center justify-between text-sm transition-colors"
+      className="text-[var(--t8-silver)] hover:text-[var(--t8-pearl)] flex items-center justify-between text-sm transition-colors"
     >
       {label}
-      <span className="text-texte-desactive">→</span>
+      <span className="text-[var(--t8-silver-deep)]">→</span>
     </Link>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-bordure flex flex-col gap-1 border-b pb-2 last:border-0 last:pb-0 sm:flex-row sm:justify-between">
-      <span className="text-texte-secondaire text-sm">{label}</span>
-      <span className="text-texte-principal text-sm font-medium">{value}</span>
+    <div className="border-[var(--t8-border-default)] flex flex-col gap-1 border-b pb-2 last:border-0 last:pb-0 sm:flex-row sm:justify-between">
+      <span className="text-[var(--t8-silver)] text-sm">{label}</span>
+      <span className="text-[var(--t8-pearl)] text-sm font-medium">{value}</span>
     </div>
   );
 }

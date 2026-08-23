@@ -4,11 +4,11 @@ export default function RootLoading() {
       <div className="app-page-main">
         <div className="app-page-content w-full max-w-sm px-4">
           <div className="flex flex-col items-center gap-6">
-            <div className="h-12 w-12 animate-pulse rounded-2xl bg-card" />
+            <div className="h-12 w-12 animate-pulse rounded-2xl bg-[var(--t8-surface-02)]" />
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="h-16 w-full animate-pulse rounded-2xl bg-card"
+                className="h-16 w-full animate-pulse rounded-2xl bg-[var(--t8-surface-02)]"
                 style={{ animationDelay: `${i * 100}ms` }}
               />
             ))}

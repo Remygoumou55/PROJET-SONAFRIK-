@@ -75,7 +75,7 @@ export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
             <input
               value={state.timezone}
               onChange={(event) => update("timezone", event.target.value)}
-              className="border-bordure bg-elevated text-texte-principal w-full rounded-lg border px-3 py-2 text-sm"
+              className="border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] w-full rounded-lg border px-3 py-2 text-sm"
             />
           </Field>
         </CardContent>
@@ -197,7 +197,7 @@ export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
       </Card>
 
       {message ? (
-        <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-vert-energie"}`}>
+        <p className={`text-sm ${message.includes("Erreur") ? "text-rouge-alerte" : "text-[var(--t8-primary-lavender)]"}`}>
           {message}
         </p>
       ) : null}
@@ -212,7 +212,7 @@ export function PreferencesForm({ preferences, userId }: PreferencesFormProps) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-texte-secondaire text-sm">{label}</span>
+      <span className="text-[var(--t8-silver)] text-sm">{label}</span>
       {children}
     </label>
   );
@@ -234,7 +234,7 @@ function SelectField({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="border-bordure bg-elevated text-texte-principal w-full rounded-lg border px-3 py-2 text-sm"
+        className="border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] text-[var(--t8-pearl)] w-full rounded-lg border px-3 py-2 text-sm"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

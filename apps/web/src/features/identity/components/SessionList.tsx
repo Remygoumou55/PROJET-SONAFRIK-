@@ -57,7 +57,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
       <div className="space-y-3">
         {sessions.length === 0 ? (
           <Card>
-            <CardContent className="text-texte-secondaire py-12 text-center text-sm">
+            <CardContent className="text-[var(--t8-silver)] py-12 text-center text-sm">
               Aucun appareil connecté pour le moment.
             </CardContent>
           </Card>
@@ -66,19 +66,19 @@ export function SessionList({ sessions: initial }: SessionListProps) {
             <Card key={session.id}>
               <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                  <p className="text-texte-principal font-medium">
+                  <p className="text-[var(--t8-pearl)] font-medium">
                     {session.device_name ?? "Appareil inconnu"}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {session.platform ? (
                       <Badge variant="outline">{PLATFORM_LABELS[session.platform] ?? session.platform}</Badge>
                     ) : null}
-                    <span className="text-texte-desactive text-xs">
+                    <span className="text-[var(--t8-silver-deep)] text-xs">
                       Dernière activité · {formatDateWithTime(session.last_active_at)}
                     </span>
                   </div>
                   {session.ip_address ? (
-                    <p className="text-texte-desactive text-xs">IP · {session.ip_address}</p>
+                    <p className="text-[var(--t8-silver-deep)] text-xs">IP · {session.ip_address}</p>
                   ) : null}
                 </div>
                 <Button
@@ -94,7 +94,7 @@ export function SessionList({ sessions: initial }: SessionListProps) {
           ))
         )}
 
-        <div className="border-bordure space-y-3 border-t pt-6">
+        <div className="border-[var(--t8-border-default)] space-y-3 border-t pt-6">
           {signOutAllError ? (
             <p className="text-rouge-alerte text-sm">{signOutAllError}</p>
           ) : null}
