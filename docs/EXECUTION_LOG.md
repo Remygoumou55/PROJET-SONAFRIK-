@@ -11,6 +11,44 @@
 
 ---
 
+## 2026-08-22 — vague-c(mobile): favoris, recherche par catégories, covers créateur
+
+### Fichiers touchés
+- `apps/mobile/app/(tabs)/bibliotheque.tsx` — onglets Playlists / Favoris, CoverImage sur playlists et favoris.
+- `apps/mobile/app/(tabs)/explorer.tsx` — résultats de recherche groupés par Morceaux, Albums, Artistes, avec CoverImage.
+- `apps/mobile/app/(tabs)/profil/creator/index.tsx` — ScreenHeader + sous-titre.
+- `apps/mobile/app/(tabs)/profil/creator/catalog/index.tsx` — ScreenHeader.
+- `apps/mobile/app/(tabs)/profil/creator/catalog/tracks.tsx` — CoverImage placeholder sur les morceaux créateur.
+
+### Code avant (extrait)
+```before
+// bibliotheque.tsx — une seule liste de playlists
+<FlatList data={playlists} ... />
+```
+
+### Code après (extrait)
+```after
+// bibliotheque.tsx — sélecteur d'onglets + listes Playlists / Favoris
+<TabBar active={activeTab} onChange={setActiveTab} />
+{activeTab === "playlists" ? <FlatList data={playlists} ... /> : <FlatList data={library} ... />}
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `a327454` poussé sur `main`.
+
+### Dette technique
+- Aucune. Composants partagés `CoverImage` et `ScreenHeader` réutilisés.
+
+### Tests à faire
+- [ ] Ouvrir Bibliothèque, basculer entre Playlists et Favoris.
+- [ ] Faire une recherche et vérifier que les sections Morceaux/Albums/Artistes s'affichent.
+- [ ] Vérifier les covers dans l'Explorer sur les vrais morceaux/albums.
+
+---
+
 ## 2026-08-22 — vague-b(mobile): architecture visuelle mobile (CoverImage, headers, profil, wallet)
 
 ### Fichiers touchés
