@@ -11,6 +11,45 @@
 
 ---
 
+## 2026-08-23 — vague-d.3(mobile): file d'attente du player (previous / next / queue)
+
+### Fichiers touchés
+- `apps/mobile/features/streaming/usePlayer.ts` — `queue`, `history`, `playNext`, `playPrevious`, `addToQueue`, `clearQueue`, auto-play du morceau suivant.
+- `apps/mobile/features/shared/components/FullPlayer.tsx` — boutons previous / next, aperçu de la file d'attente "À suivre".
+
+### Code avant (extrait)
+```before
+// usePlayer.ts — lecture mono-morceau
+return { ...state, loadAndPlay, pause, resume, seek, stop };
+```
+
+### Code après (extrait)
+```after
+// usePlayer.ts — file d'attente et navigation
+const playNext = useCallback(async () => { ... });
+const playPrevious = useCallback(async () => { ... });
+const addToQueue = useCallback((track: TrackWithMeta) => { ... });
+return { ...state, loadAndPlay, pause, resume, seek, stop, addToQueue, playNext, playPrevious, clearQueue };
+```
+
+### Validation
+- `pnpm build` (mobile) : ✅
+- `pnpm lint` (mobile) : ✅
+- `pnpm typecheck` : ✅
+- `pnpm build` (web) : ❌ échec récurrent du build worker Next.js 15.5.19 sur Windows (race condition cache), non lié aux modifications mobile.
+- Commit : `f80ba8f` poussé sur `main`.
+
+### Dette technique
+- La file d'attente est gérée en mémoire uniquement. Elle n'est pas persistée ni synchronisée avec le web.
+- Le `previous` remet le morceau en tête de file mais ne restaure la position d'écoute exacte.
+
+### Tests à faire
+- [ ] Lire un morceau → ajouter d'autres morceaux à la queue → vérifier `playNext`.
+- [ ] Vérifier que le morceau suivant démarre automatiquement à la fin.
+- [ ] Vérifier le `previous` depuis la file d'attente.
+
+---
+
 ## 2026-08-23 — vague-d.1(api): caps, shims rights/analytics, clean web `as any`
 
 ### Fichiers touchés
