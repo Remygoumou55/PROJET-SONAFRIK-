@@ -154,6 +154,60 @@ return { nextIndex: order[1] ?? queueIndex, shuffledOrder: order };
 
 ---
 
+## 2026-08-22 — vague-a(listener): suppression composant HomepageTrendingRow non utilisé
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/HomepageTrendingRow.tsx` — suppression (158 lignes).
+
+### Décisions
+- Composant non importé / non utilisé dans le listener homepage actuel.
+- Nettoyage du bundle listen-home et réduction de la surface de maintenance.
+
+### Validation
+- `grep HomepageTrendingRow` : 0 référence restante dans `apps/web/src`.
+- `pnpm build` : ✅ (validation re-lancée dans le commit de tests suivant).
+- Commit : `9a569ba` poussé sur `main`.
+
+### Dette technique
+- Aucune.
+
+---
+
+## 2026-08-23 — vague-a(listener/library): appel identity context au lieu de supabase.auth.getUser()
+
+### Fichiers touchés
+- `apps/web/src/app/(listener)/library/playlist/[id]/page.tsx` — remplacement `supabase.auth.getUser()` par `requireIdentityContext()`.
+
+### Code avant
+```before
+const [playlist, { data: { user } }] = await Promise.all([
+  streaming.getPlaylist(id).catch(() => null),
+  supabase.auth.getUser(),
+]);
+```
+
+### Code après
+```after
+const { profile } = await requireIdentityContext();
+const playlist = await streaming.getPlaylist(id).catch(() => null);
+```
+
+### Décisions
+- Suppression d'un appel direct `supabase.auth.getUser()` dans un Server Component.
+- Utilisation du guard/facade `requireIdentityContext()` du silo `identity`.
+- Passe `currentUserId={profile.id}` au composant `PlaylistDetail`.
+
+### Validation
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- `pnpm build` : ✅
+- Commit : `e1e4660` poussé sur `main`.
+
+### Dette technique
+- Aucune.
+
+---
+
 ## 2026-08-22 — audit supervision: re-vérification post-Vague A + corrections gouvernance
 
 ### Contexte
