@@ -4,17 +4,18 @@ import { Tabs, Redirect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@sonafrik/ui/tokens";
 import { CoverImage } from "../../features/shared/components/CoverImage";
+import { FullPlayer } from "../../features/shared/components/FullPlayer";
 import { PlayerProvider, usePlayerContext } from "../../features/streaming/PlayerContext";
 import { getSupabaseMobileClient } from "../../lib/supabase";
 
 const TAB_BAR_BASE_HEIGHT = 56;
 
-function MiniPlayerBar({ bottomOffset }: { bottomOffset: number }) {
+function MiniPlayerBar({ bottomOffset, onOpen }: { bottomOffset: number; onOpen: () => void }) {
   const { currentTrack, isPlaying, pause, resume } = usePlayerContext();
   if (!currentTrack) return null;
 
   return (
-    <View style={[styles.miniPlayer, { bottom: bottomOffset }]}>
+    <Pressable style={[styles.miniPlayer, { bottom: bottomOffset }]} onPress={onOpen}>
       <CoverImage coverPath={currentTrack.cover_url ?? null} label={currentTrack.artist_name ?? currentTrack.title} size={44} borderRadius={8} />
       <View style={styles.miniInfo}>
         <Text style={styles.miniTitle} numberOfLines={1}>
@@ -27,7 +28,10 @@ function MiniPlayerBar({ bottomOffset }: { bottomOffset: number }) {
         ) : null}
       </View>
       <Pressable
-        onPress={isPlaying ? pause : resume}
+        onPress={(e) => {
+          e.stopPropagation();
+          if (isPlaying) { pause(); } else { resume(); }
+        }}
         style={styles.miniBtn}
         hitSlop={12}
         accessibilityRole="button"
@@ -35,7 +39,7 @@ function MiniPlayerBar({ bottomOffset }: { bottomOffset: number }) {
       >
         <Text style={styles.miniBtnText}>{isPlaying ? "⏸" : "▶"}</Text>
       </Pressable>
-    </View>
+    </Pressable>
   );
 }
 
@@ -43,6 +47,7 @@ function TabsInner() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
   const miniPlayerBottom = tabBarHeight + 8;
+  const [fullPlayerVisible, setFullPlayerVisible] = useState(false);
 
   return (
     <>
@@ -70,7 +75,8 @@ function TabsInner() {
         <Tabs.Screen name="wallet" options={{ title: "Wallet" }} />
         <Tabs.Screen name="profil" options={{ title: "Profil" }} />
       </Tabs>
-      <MiniPlayerBar bottomOffset={miniPlayerBottom} />
+      <MiniPlayerBar bottomOffset={miniPlayerBottom} onOpen={() => setFullPlayerVisible(true)} />
+      <FullPlayer visible={fullPlayerVisible} onClose={() => setFullPlayerVisible(false)} />
     </>
   );
 }
