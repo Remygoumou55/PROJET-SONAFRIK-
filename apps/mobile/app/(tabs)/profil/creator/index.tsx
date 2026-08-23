@@ -11,6 +11,7 @@ import {
 import { CreatorError } from "@sonafrik/api/creator";
 import type { CreatorContext } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
+import { ScreenHeader } from "../../../../features/shared/components/ScreenHeader";
 import { useCreatorService } from "../../../../features/creator/useCreator";
 
 export default function CreatorDashboardScreen() {
@@ -48,9 +49,9 @@ export default function CreatorDashboardScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title} numberOfLines={1}>{artistProfile.stage_name}</Text>
+      <ScreenHeader title={artistProfile.stage_name} subtitle={`${c.tier} · ${c.status}`} />
       <Text style={styles.subtitle} numberOfLines={1}>
-        {c.tier} · {c.status} · {artistProfile.verified ? "Vérifié" : "Non vérifié"}
+        {artistProfile.verified ? "✓ Vérifié" : "Non vérifié"}
       </Text>
 
       <View style={styles.stats}>

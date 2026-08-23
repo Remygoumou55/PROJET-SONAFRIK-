@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import type { CatalogContext } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
+import { ScreenHeader } from "../../../../../features/shared/components/ScreenHeader";
 import { useCatalogService } from "../../../../../features/catalog/useCatalog";
 
 export default function CatalogDashboardScreen() {
@@ -41,7 +42,7 @@ export default function CatalogDashboardScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Catalog OS</Text>
+      <ScreenHeader title="Catalog OS" />
       <View style={styles.stats}>
         <Stat label="Albums" value={String(context.albumsCount)} />
         <Stat label="Singles" value={String(context.singlesCount)} />

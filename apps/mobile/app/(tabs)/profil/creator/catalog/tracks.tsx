@@ -11,6 +11,7 @@ import {
 import type { Track } from "@sonafrik/types";
 import { PUBLICATION_STATUS_LABELS } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
+import { CoverImage } from "../../../../../features/shared/components/CoverImage";
 import { useCatalogService } from "../../../../../features/catalog/useCatalog";
 
 export default function CatalogTracksScreen() {
@@ -72,11 +73,16 @@ export default function CatalogTracksScreen() {
       }
       renderItem={({ item }) => (
         <View style={styles.card}>
-          <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
-          <Text style={styles.meta} numberOfLines={1}>
-            {PUBLICATION_STATUS_LABELS[item.publication_status]}
-            {item.isrc ? ` · ${item.isrc}` : ""}
-          </Text>
+          <View style={styles.row}>
+            <CoverImage coverPath={null} label={item.title} size={48} borderRadius={10} />
+            <View style={styles.info}>
+              <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={styles.meta} numberOfLines={1}>
+                {PUBLICATION_STATUS_LABELS[item.publication_status]}
+                {item.isrc ? ` · ${item.isrc}` : ""}
+              </Text>
+            </View>
+          </View>
         </View>
       )}
     />
@@ -106,6 +112,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: colors.surface,
   },
+  row: { flexDirection: "row", alignItems: "center", gap: 12 },
+  info: { flex: 1 },
   cardTitle: { color: colors.textePrincipal, fontWeight: "600" },
   meta: { color: colors.texteSecondaire, marginTop: 4, fontSize: 12 },
 });
