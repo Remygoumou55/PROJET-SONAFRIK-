@@ -11,6 +11,37 @@
 
 ---
 
+## 2026-08-23 — vague-g(web): audit Lighthouse /listen et /lancement
+
+### Fichiers concernés
+- `lighthouse-lancement.json` — rapport Lighthouse pour `/lancement`.
+- `lighthouse-listen.json` — rapport Lighthouse pour `/listen`.
+
+### Résultats /lancement (desktop)
+- Performance : 0.42
+- LCP : 5.8 s | FCP : 5.7 s | SI : 8.0 s | TBT : 330 ms | CLS : 0.015
+- A11y : 0.95 | Best-practices : 0.96 | SEO : 0.91
+
+### Résultats /listen (desktop)
+- Performance : 0.70
+- LCP : 4.2 s | FCP : 1.7 s | SI : 1.7 s | TBT : 0 ms | CLS : 0
+- A11y : 0.96 | Best-practices : 0.92 | SEO : 0.90
+
+### Analyse
+- `/lancement` pâtit du chargement des fonts et assets marketing.
+- `/listen` a un LCP de 4.2 s, au-dessus du budget 3.5 s. Le hero `HomepageHero` / `HeroCarousel` est probablement le LCP.
+- A11y, best-practices et SEO restent bons (> 0.90).
+
+### Dette technique
+- Pas d'optimisation effectuée sur cette passe — seulement mesure.
+- `HeroCarousel` est `use client` et fetch 20 items côté client ; à passer en RSC avec preload SSR pour améliorer LCP.
+
+### Tests à faire
+- [ ] Re-Lighthouse après optimisation LCP sur `/listen`.
+- [ ] Mesurer mobile (3G) si possible.
+
+---
+
 ## 2026-08-23 — re-audit csp & probe Vague B Stabilisation
 
 ### Fichiers concernés
