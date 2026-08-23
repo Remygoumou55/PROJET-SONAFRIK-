@@ -5,6 +5,7 @@ import { getListenSidebarData } from "@/features/listener/lib/getListenSidebarDa
 import { PerformanceProvider } from "@/lib/performance";
 import { getCachedPerformanceFlags } from "@/lib/performance/server";
 import { getCachedListenFeatureFlags } from "@/lib/listen/get-cached-listen-feature-flags";
+import { RealtimeShell } from "@/features/shared/rendering/RealtimeShell";
 import "@/app/styles/listen-home-bundle.css";
 
 /**
@@ -22,18 +23,20 @@ export default async function StreamingLayout({ children }: { children: React.Re
   const sidebarDataPromise = getListenSidebarData(context.profile.id);
 
   return (
-    <ListenerLayoutShell>
-      <PerformanceProvider flags={performanceFlags}>
-        <StreamingLayoutClient
-          userId={context.profile.id}
-          initialUnreadCount={context.unreadNotifications}
-          audioQualityPreference={context.preferences.audio_quality}
-          sidebarDataPromise={sidebarDataPromise}
-          listenFeatures={listenFeatures}
-        >
-          {children}
-        </StreamingLayoutClient>
-      </PerformanceProvider>
-    </ListenerLayoutShell>
+    <RealtimeShell>
+      <ListenerLayoutShell>
+        <PerformanceProvider flags={performanceFlags}>
+          <StreamingLayoutClient
+            userId={context.profile.id}
+            initialUnreadCount={context.unreadNotifications}
+            audioQualityPreference={context.preferences.audio_quality}
+            sidebarDataPromise={sidebarDataPromise}
+            listenFeatures={listenFeatures}
+          >
+            {children}
+          </StreamingLayoutClient>
+        </PerformanceProvider>
+      </ListenerLayoutShell>
+    </RealtimeShell>
   );
 }
