@@ -31,6 +31,7 @@
 || **[`VAGUE_B_STABILISATION.md`](./VAGUE_B_STABILISATION.md)** | Stabilisation Vague B — probes, flags, CSP |
 || **[`VAGUE_C_STABILISATION.md`](./VAGUE_C_STABILISATION.md)** | Stabilisation Vague C — forensics, likes/favorites, beat store |
 || **[`VAGUE_C_ORPHAN_TABLES.md`](./VAGUE_C_ORPHAN_TABLES.md)** | Audit tables infrastructure Vague C4 |
+|| **[`VAGUE_D_STABILISATION.md`](./VAGUE_D_STABILISATION.md)** | Stabilisation Vague D — tokens, typage strict, caps |
 | [`MVP_SCOPE_LOCK.md`](./MVP_SCOPE_LOCK.md) | Périmètre produit MVP · chaîne E2E |
 | [`AI_GOVERNANCE.md`](./AI_GOVERNANCE.md) | Comportement IA · ordre de lecture |
 | [`NOUVELLE_REGLE_DE_TRAVAIL.md`](./NOUVELLE_REGLE_DE_TRAVAIL.md) | Workflow S0–S23 page par page |

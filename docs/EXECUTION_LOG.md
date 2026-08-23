@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-08-23 — vague-d.1(api): caps, shims rights/analytics, clean web `as any`
+
+### Fichiers touchés
+- `packages/api/src/analytics/schemas.ts` — caps `periodDays≤90`, `days≤50`.
+- `packages/api/src/payout/schemas.ts` — caps `max(200)`, `max(100)`.
+- `packages/api/src/rights/rights.repository.ts` — shim propre `RightsRepository`.
+- `packages/api/src/analytics/analytics.repository.ts` — shim propre `AnalyticsRepository`.
+- Nettoyage `as any` / `as never` dans `packages/api` et `apps/web`.
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `639270c` poussé sur `main`.
+
+---
+
 ## 2026-08-23 — vague-d.2(mobile): seek tactile dans le player plein écran
 
 ### Fichiers touchés
