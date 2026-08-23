@@ -11,6 +11,47 @@
 
 ---
 
+## 2026-08-22 — vague-b(mobile): architecture visuelle mobile (CoverImage, headers, profil, wallet)
+
+### Fichiers touchés
+- `apps/mobile/features/shared/components/CoverImage.tsx` — nouveau composant pochettes/avatars.
+- `apps/mobile/features/shared/components/ScreenHeader.tsx` — en-tête de page unifié.
+- `apps/mobile/features/shared/components/SectionHeader.tsx` — en-tête de section avec action optionnelle.
+- `apps/mobile/app/(tabs)/index.tsx` — refonte Accueil : 1 Hero + 3 sections max, CoverImage sur cartes/artistes/nouveautés.
+- `apps/mobile/app/(tabs)/wallet.tsx` — refonte Wallet : solde, statut premium/abonnements, historique.
+- `apps/mobile/app/(tabs)/_layout.tsx` — MiniPlayerBar amélioré avec cover du morceau.
+- `apps/mobile/app/(tabs)/profil/index.tsx` — ScreenHeader, avatar via CoverImage, suppression des stats techniques.
+
+### Code avant (extrait)
+```before
+// index.tsx — cover emoji grisé
+<View style={styles.trackCover}>
+  <Text style={styles.trackCoverIcon}>♪</Text>
+</View>
+```
+
+### Code après (extrait)
+```after
+// index.tsx — cover réelle ou placeholder généré
+<CoverImage coverPath={track.cover_path} label={track.artist_name ?? track.title} size={140} borderRadius={10} />
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `5bad579` poussé sur `main`.
+
+### Dette technique
+- Aucune. Les composants sont réutilisables pour Vague C.
+
+### Tests à faire
+- [ ] Vérifier le rendu des covers sur l'accueil, le wallet et le profil.
+- [ ] Vérifier le MiniPlayerBar avec un morceau en lecture.
+- [ ] Vérifier que le wallet reste lisible avec solde > 0 GNF.
+
+---
+
 ## 2026-08-22 — vague-a(mobile): tokens couleurs, numberOfLines, micro-UX auditeur
 
 ### Fichiers touchés
