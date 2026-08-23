@@ -206,6 +206,18 @@ export function usePlayer() {
     }
   }, [startHeartbeat]);
 
+  const seek = useCallback(async (positionSeconds: number) => {
+    if (!soundRef.current) return;
+    try {
+      const ms = positionSeconds * 1000;
+      await soundRef.current.setPositionAsync(ms);
+      positionRef.current = positionSeconds;
+      setState((prev) => ({ ...prev, currentPosition: positionSeconds }));
+    } catch {
+      // silencieux
+    }
+  }, []);
+
   const stop = useCallback(async () => {
     const playhead = await getPlaybackPosition();
     positionRef.current = Math.max(positionRef.current, playhead);
@@ -233,5 +245,5 @@ export function usePlayer() {
     };
   }, [clearHeartbeat]);
 
-  return { ...state, loadAndPlay, pause, resume, stop };
+  return { ...state, loadAndPlay, pause, resume, seek, stop };
 }
