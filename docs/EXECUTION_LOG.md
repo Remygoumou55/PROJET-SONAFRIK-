@@ -11,6 +11,40 @@
 
 ---
 
+## 2026-08-23 — vague-d.2(mobile): seek tactile dans le player plein écran
+
+### Fichiers touchés
+- `apps/mobile/features/streaming/usePlayer.ts` — ajout de la méthode `seek(positionSeconds)` via `expo-av setPositionAsync`.
+- `apps/mobile/features/shared/components/FullPlayer.tsx` — barre de progression tactile utilisant `onPressIn` + `seek`.
+
+### Code avant (extrait)
+```before
+// usePlayer.ts — pas de contrôle de position
+return { ...state, loadAndPlay, pause, resume, stop };
+```
+
+### Code après (extrait)
+```after
+// usePlayer.ts — seek exposé
+const seek = useCallback(async (positionSeconds: number) => { ... });
+return { ...state, loadAndPlay, pause, resume, seek, stop };
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `007e826` poussé sur `main`.
+
+### Dette technique
+- Aucune. `seek` réutilise directement `expo-av`.
+
+### Tests à faire
+- [ ] Lire un morceau → ouvrir FullPlayer → toucher la barre de progression pour avancer/reculer.
+- [ ] Vérifier que la position audio se met à jour en temps réel.
+
+---
+
 ## 2026-08-23 — vague-c: re-audit, nettoyage forensique et validation
 
 ### Fichiers touchés
