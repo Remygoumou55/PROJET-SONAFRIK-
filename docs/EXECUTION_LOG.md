@@ -78,6 +78,50 @@ export class ListenerTrackRepository { /* track/album only */ }
 
 ---
 
+## 2026-08-22 — vague-a(listener): suppression du champ `trending` non utilisé sur l'accueil
+
+### Fichiers touchés
+- `apps/web/src/features/listener/components/HomepageContentSections.tsx` — suppression du champ `trending` de l'interface `HomepageData`, de la destructuration et des compteurs de contenu.
+- `apps/web/src/features/listener/lib/fetchHomepageData.ts` — suppression des assignations `trending: []`.
+
+### Code avant (extrait)
+```before
+export interface HomepageData {
+  ...
+  trending: TrendingTrack[];
+  ...
+}
+
+trending: [],
+```
+
+### Code après (extrait)
+```after
+export interface HomepageData {
+  ...
+  // trending supprimé
+  ...
+}
+```
+
+### Décisions
+- Le champ `trending` était toujours un tableau vide et n'était jamais affiché.
+- Suppression pour réduire le bruit et la surface d'erreur du homepage listener.
+
+### Validation
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- `pnpm build` : ✅
+- Commit : `b86c054` poussé sur `main`.
+
+### Dette technique
+- Aucune.
+
+### Tests à faire
+- [ ] Vérifier que la page `/listen` s'affiche sans erreur après suppression de `trending`.
+
+---
+
 ## 2026-08-22 — vague-a(listener): correction reshuffle file d'attente lecteur en mode repeat-all/shuffle
 
 ### Fichiers touchés
