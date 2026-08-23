@@ -18,6 +18,7 @@ export default defineConfig({
       "apps/web/src/features/shared/ldse/**/*.test.ts",
       "apps/web/src/lib/performance/**/*.test.ts",
       "apps/web/src/lib/security/**/*.test.ts",
+      "apps/web/src/features/listener/lib/**/*.test.ts",
     ],
   },
 });
