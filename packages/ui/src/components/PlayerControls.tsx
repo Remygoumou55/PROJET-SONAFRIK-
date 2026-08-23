@@ -41,7 +41,7 @@ export function PlayerControls({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl border border-bordure bg-card p-4 md:flex-row md:items-center md:gap-6",
+        "flex flex-col gap-3 rounded-xl border border-[var(--t8-border-default)] bg-[var(--t8-surface-02)] p-4 md:flex-row md:items-center md:gap-6",
         className,
       )}
       role="group"
@@ -57,11 +57,11 @@ export function PlayerControls({
             aria-hidden="true"
           />
         ) : (
-          <div className="h-12 w-12 shrink-0 rounded-md bg-elevated md:h-14 md:w-14" aria-hidden="true" />
+          <div className="h-12 w-12 shrink-0 rounded-md bg-[var(--t8-surface-03)] md:h-14 md:w-14" aria-hidden="true" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-texte-principal">{title}</p>
-          <p className="truncate text-sm text-texte-secondaire">{artist}</p>
+          <p className="truncate font-semibold text-[var(--t8-pearl)]">{title}</p>
+          <p className="truncate text-sm text-[var(--t8-silver)]">{artist}</p>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export function PlayerControls({
             <button
               type="button"
               onClick={onPlayPause}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-vert-energie text-noir-profond transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vert-energie"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--t8-primary-lavender)] text-[var(--t8-pearl)] transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t8-primary-lavender)]"
               aria-label={isPlaying ? "Pause" : "Lecture"}
             >
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
@@ -99,7 +99,7 @@ export function PlayerControls({
           ) : null}
         </div>
         <div className="flex w-full max-w-md items-center gap-2">
-          <span className="w-10 shrink-0 text-right text-xs tabular-nums text-texte-secondaire">
+          <span className="w-10 shrink-0 text-right text-xs tabular-nums text-[var(--t8-silver)]">
             {currentTime}
           </span>
           <ProgressBar
@@ -107,7 +107,7 @@ export function PlayerControls({
             label={`Progression — ${title}`}
             className="flex-1"
           />
-          <span className="w-10 shrink-0 text-xs tabular-nums text-texte-secondaire">
+          <span className="w-10 shrink-0 text-xs tabular-nums text-[var(--t8-silver)]">
             {totalTime}
           </span>
         </div>
@@ -129,7 +129,7 @@ function ControlButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center rounded-full text-texte-secondaire transition-colors duration-300 hover:text-texte-principal focus-visible:outline focus-visible:outline-2 focus-visible:outline-vert-energie"
+      className="flex h-11 w-11 items-center justify-center rounded-full text-[var(--t8-silver)] transition-colors duration-300 hover:text-[var(--t8-pearl)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--t8-primary-lavender)]"
       aria-label={label}
     >
       {children}

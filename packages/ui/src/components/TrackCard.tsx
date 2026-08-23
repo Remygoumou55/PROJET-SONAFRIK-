@@ -28,15 +28,15 @@ export function TrackCard({
       className={cn(
         "group flex items-center gap-3 rounded-lg p-2 md:gap-4 md:p-3",
         "transition-all duration-300 ease-in-out",
-        "hover:bg-elevated focus-within:bg-elevated",
-        isPlaying && "bg-elevated border-l-2 border-vert-energie",
+        "hover:bg-[var(--t8-surface-03)] focus-within:bg-[var(--t8-surface-03)]",
+        isPlaying && "bg-[var(--t8-surface-03)] border-l-2 border-[var(--t8-audio-cyan)]",
         className,
       )}
       {...props}
     >
-      <div className="flex w-8 shrink-0 items-center justify-center text-sm text-texte-desactive">
+      <div className="flex w-8 shrink-0 items-center justify-center text-sm text-[var(--t8-silver-deep)]">
         {isPlaying ? (
-          <span className="text-vert-energie" aria-label="En lecture">
+          <span className="text-[var(--t8-audio-cyan)]" aria-label="En lecture">
             <EqualizerIcon />
           </span>
         ) : (
@@ -46,7 +46,7 @@ export function TrackCard({
           <button
             type="button"
             onClick={onPlay}
-            className="hidden h-8 w-8 items-center justify-center rounded-full text-vert-energie group-hover:flex focus-visible:flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-vert-energie"
+            className="hidden h-8 w-8 items-center justify-center rounded-full text-[var(--t8-audio-cyan)] group-hover:flex focus-visible:flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--t8-audio-cyan)]"
             aria-label={`Lire ${title}`}
           >
             <PlayIcon />
@@ -55,13 +55,13 @@ export function TrackCard({
       </div>
       <Avatar src={coverUrl} alt={title} size="md" fallback={title.charAt(0) || "?"} />
       <div className="min-w-0 flex-1">
-        <p className={cn("truncate font-medium", isPlaying ? "text-vert-energie" : "text-texte-principal")}>
+        <p className={cn("truncate font-medium", isPlaying ? "text-[var(--t8-audio-cyan)]" : "text-[var(--t8-pearl)]")}>
           {title}
         </p>
-        <p className="truncate text-sm text-texte-secondaire">{artist}</p>
+        <p className="truncate text-sm text-[var(--t8-silver)]">{artist}</p>
       </div>
       {duration ? (
-        <span className="shrink-0 text-sm tabular-nums text-texte-secondaire">{duration}</span>
+        <span className="shrink-0 text-sm tabular-nums text-[var(--t8-silver)]">{duration}</span>
       ) : null}
     </div>
   );

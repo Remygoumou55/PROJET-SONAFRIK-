@@ -28,11 +28,11 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const variantStyles: Record<ToastVariant, string> = {
-  default: "border-bordure bg-elevated",
-  success: "border-vert-energie/40 bg-vert-energie/10",
-  error: "border-red-500/40 bg-red-500/10",
-  warning: "border-or-solaire/40 bg-or-solaire/10",
-  premium: "border-or-solaire/50 bg-or-solaire/15",
+  default: "border-[var(--t8-border-default)] bg-[var(--t8-surface-03)]",
+  success: "border-[var(--t8-success)] bg-[var(--t8-success-deep)]",
+  error: "border-[var(--t8-error)] bg-[var(--t8-error-deep)]",
+  warning: "border-[var(--t8-warning)] bg-[var(--t8-warning-deep)]",
+  premium: "border-[var(--t8-primary-lavender)] bg-[var(--t8-primary-lavender-deep)]",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -65,16 +65,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               variantStyles[t.variant ?? "default"],
             )}
           >
-            <ToastPrimitive.Title className="text-sm font-semibold text-texte-principal">
+            <ToastPrimitive.Title className="text-sm font-semibold text-[var(--t8-pearl)]">
               {t.title}
             </ToastPrimitive.Title>
             {t.description ? (
-              <ToastPrimitive.Description className="mt-1 text-sm text-texte-secondaire">
+              <ToastPrimitive.Description className="mt-1 text-sm text-[var(--t8-silver)]">
                 {t.description}
               </ToastPrimitive.Description>
             ) : null}
             <ToastPrimitive.Close
-              className="absolute right-2 top-2 rounded p-1 text-texte-secondaire hover:text-texte-principal focus-visible:outline focus-visible:outline-2 focus-visible:outline-vert-energie"
+              className="absolute right-2 top-2 rounded p-1 text-[var(--t8-silver)] hover:text-[var(--t8-pearl)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--t8-primary-lavender)]"
               aria-label="Fermer la notification"
             >
               ×

@@ -30,16 +30,16 @@ export function AlbumCard({
       className={cn("group overflow-hidden", className)}
       {...props}
     >
-      <div className="relative aspect-square w-full bg-elevated">
+      <div className="relative aspect-square w-full bg-[var(--t8-surface-03)]">
         {coverUrl ? (
           <img src={coverUrl} alt={`Couverture de ${title}`} className="h-full w-full object-cover" loading="lazy" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface to-elevated">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--t8-surface-01)] to-[var(--t8-surface-03)]">
             <AlbumIcon />
           </div>
         )}
         {isPremiumExclusive ? (
-          <span className="absolute left-2 top-2 rounded-md bg-or-solaire px-2 py-0.5 text-xs font-bold text-noir-profond">
+          <span className="absolute left-2 top-2 rounded-md bg-[var(--t8-audio-cyan)] px-2 py-0.5 text-xs font-bold text-[var(--t8-deep-black)]">
             Premium
           </span>
         ) : null}
@@ -47,7 +47,7 @@ export function AlbumCard({
           <button
             type="button"
             onClick={onPlay}
-            className="absolute bottom-2 right-2 flex h-11 w-11 items-center justify-center rounded-full bg-vert-energie text-noir-profond opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vert-energie"
+            className="absolute bottom-2 right-2 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--t8-primary-lavender)] text-[var(--t8-pearl)] opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t8-primary-lavender)]"
             aria-label={`Lire l'album ${title}`}
           >
             <PlayIcon />
@@ -55,10 +55,10 @@ export function AlbumCard({
         ) : null}
       </div>
       <div className="p-3 md:p-4">
-        <h4 className="truncate font-semibold text-texte-principal">{title}</h4>
-        <p className="truncate text-sm text-texte-secondaire">{artist}</p>
+        <h4 className="truncate font-semibold text-[var(--t8-pearl)]">{title}</h4>
+        <p className="truncate text-sm text-[var(--t8-silver)]">{artist}</p>
         {(year ?? trackCount) ? (
-          <p className="mt-1 text-xs text-texte-desactive">
+          <p className="mt-1 text-xs text-[var(--t8-silver-deep)]">
             {[year, trackCount ? `${trackCount} titres` : null].filter(Boolean).join(" · ")}
           </p>
         ) : null}
@@ -77,7 +77,7 @@ function PlayIcon() {
 
 function AlbumIcon() {
   return (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-texte-desactive">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--t8-silver-deep)]">
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="3" />
     </svg>

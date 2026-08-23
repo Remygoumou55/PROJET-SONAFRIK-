@@ -20,7 +20,7 @@ export function SearchInput({
   return (
     <div className="relative w-full">
       <span
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-texte-desactive"
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--t8-silver-deep)]"
         aria-hidden="true"
       >
         <SearchIcon />
@@ -38,7 +38,7 @@ export function SearchInput({
         <button
           type="button"
           onClick={onClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-texte-secondaire hover:text-texte-principal focus-visible:outline focus-visible:outline-2 focus-visible:outline-vert-energie"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[var(--t8-silver)] hover:text-[var(--t8-pearl)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--t8-primary-lavender)]"
           aria-label="Effacer la recherche"
         >
           <ClearIcon />

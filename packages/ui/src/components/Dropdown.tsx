@@ -28,7 +28,7 @@ export function Dropdown({ trigger, items, label = "Menu", align = "end" }: Drop
           align={align}
           sideOffset={8}
           className={cn(
-            "z-50 min-w-[180px] overflow-hidden rounded-lg border border-bordure bg-elevated p-1 shadow-lg",
+            "z-50 min-w-[180px] overflow-hidden rounded-lg border border-[var(--t8-border-default)] bg-[var(--t8-surface-03)] p-1 shadow-lg",
             "duration-300",
           )}
           aria-label={label}
@@ -41,8 +41,8 @@ export function Dropdown({ trigger, items, label = "Menu", align = "end" }: Drop
               className={cn(
                 "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none",
                 "transition-colors duration-150",
-                "focus:bg-surface data-[highlighted]:bg-surface",
-                item.destructive ? "text-red-500" : "text-texte-principal",
+                "focus:bg-[var(--t8-surface-02)] data-[highlighted]:bg-[var(--t8-surface-02)]",
+                item.destructive ? "text-[var(--t8-error)]" : "text-[var(--t8-pearl)]",
                 item.disabled && "pointer-events-none opacity-50",
               )}
             >

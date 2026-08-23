@@ -36,7 +36,7 @@ export function ProgressBar({
   return (
     <div className={cn("w-full", className)}>
       {showLabel ? (
-        <div className="mb-1 flex justify-between text-xs text-texte-secondaire">
+        <div className="mb-1 flex justify-between text-xs text-[var(--t8-silver)]">
           <span>{label}</span>
           <span aria-hidden="true">{Math.round(clamped)}%</span>
         </div>
@@ -49,7 +49,7 @@ export function ProgressBar({
         aria-label={label}
         tabIndex={-1}
         className={cn(
-          "pointer-events-none cursor-default select-none overflow-hidden rounded-full bg-bordure",
+          "pointer-events-none cursor-default select-none overflow-hidden rounded-full bg-[var(--t8-surface-03)]",
           sizeClasses[size],
         )}
         {...props}
@@ -57,7 +57,7 @@ export function ProgressBar({
         <div
           className={cn(
             "h-full rounded-full transition-all duration-300 ease-in-out",
-            variant === "premium" ? "bg-or-solaire" : "bg-vert-energie",
+            variant === "premium" ? "bg-[var(--t8-primary-lavender)]" : "bg-[var(--t8-audio-cyan)]",
           )}
           style={{ width: `${clamped}%` }}
           aria-hidden="true"

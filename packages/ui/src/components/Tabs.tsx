@@ -31,7 +31,7 @@ export function Tabs({ items, defaultValue, value, onValueChange, className }: T
     >
       <TabsPrimitive.List
         className={cn(
-          "flex gap-1 overflow-x-auto border-b border-bordure pb-px",
+          "flex gap-1 overflow-x-auto border-b border-[var(--t8-border-default)] pb-px",
           "scrollbar-none",
         )}
         aria-label="Onglets"
@@ -43,10 +43,10 @@ export function Tabs({ items, defaultValue, value, onValueChange, className }: T
             disabled={item.disabled}
             className={cn(
               "shrink-0 px-4 py-2.5 text-sm font-medium transition-all duration-300",
-              "text-texte-desactive hover:text-texte-principal",
+              "text-[var(--t8-silver-deep)] hover:text-[var(--t8-pearl)]",
               "border-b-2 border-transparent",
-              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vert-energie",
-              "data-[state=active]:border-vert-energie data-[state=active]:text-vert-energie",
+              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t8-primary-lavender)]",
+              "data-[state=active]:border-[var(--t8-primary-lavender)] data-[state=active]:text-[var(--t8-primary-lavender)]",
               "disabled:pointer-events-none disabled:opacity-50",
               "min-h-[44px]",
             )}

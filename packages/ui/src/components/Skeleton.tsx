@@ -20,7 +20,7 @@ export function Skeleton({
       aria-label="Chargement…"
       aria-busy="true"
       className={cn(
-        "animate-pulse bg-elevated",
+        "animate-pulse bg-[var(--t8-surface-03)]",
         variant === "text" && "h-4 w-full rounded-md",
         variant === "circular" && "rounded-full",
         variant === "rectangular" && "rounded-lg",

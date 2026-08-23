@@ -5351,3 +5351,64 @@ Les pages P0 `/listen` et `/creator` ne respectent pas encore la cible officiell
 
 ### Rapport
 - `docs/performance/reports/global-certification/CPU_PRECISION_REMEDIATION_CYCLE1_REPORT.md`
+
+---
+
+## 2026-08-23 â€” Territory 8 : migration de tous les composants `packages/ui` restants
+
+### Fichiers touchÃ©s
+- `packages/ui/src/components/AlbumCard.tsx`
+- `packages/ui/src/components/ArtistCard.tsx`
+- `packages/ui/src/components/Dropdown.tsx`
+- `packages/ui/src/components/Modal.tsx`
+- `packages/ui/src/components/PlayerControls.tsx`
+- `packages/ui/src/components/ProgressBar.tsx`
+- `packages/ui/src/components/SearchInput.tsx`
+- `packages/ui/src/components/Skeleton.tsx`
+- `packages/ui/src/components/Tabs.tsx`
+- `packages/ui/src/components/Toast.tsx`
+- `packages/ui/src/components/TrackCard.tsx`
+
+### Code avant (extrait clÃ©)
+```before
+// PlayerControls.tsx
+"flex flex-col gap-3 rounded-xl border border-bordure bg-card"
+"rounded-full bg-vert-energie text-noir-profond"
+"text-texte-secondaire hover:text-texte-principal"
+```
+
+```before
+// ProgressBar.tsx
+"bg-bordure"
+"variant === \"premium\" ? \"bg-or-solaire\" : \"bg-vert-energie\""
+```
+
+### Code aprÃ¨s (extrait clÃ©)
+```after
+// PlayerControls.tsx
+"flex flex-col gap-3 rounded-xl border border-[var(--t8-border-default)] bg-[var(--t8-surface-02)]"
+"rounded-full bg-[var(--t8-primary-lavender)] text-[var(--t8-pearl)]"
+"text-[var(--t8-silver)] hover:text-[var(--t8-pearl)]"
+```
+
+```after
+// ProgressBar.tsx
+"bg-[var(--t8-surface-03)]"
+"variant === \"premium\" ? \"bg-[var(--t8-primary-lavender)]\" : \"bg-[var(--t8-audio-cyan)]\""
+```
+
+### Validation
+- `pnpm --filter @sonafrik/ui typecheck` : âœ…
+- `pnpm --filter @sonafrik/ui lint` : âœ…
+- `pnpm --filter @sonafrik/web build` : âœ…
+
+### DÃ©cision
+- Tous les composants de `packages/ui/src/components` sont maintenant migrÃ©s vers Territory 8 (coexistence avec la charte V5.0 via variables CSS `--t8-*`).
+
+### Dette technique
+- La charte V5.0 reste encore rÃ©fÃ©rencÃ©e par `apps/web/src` et `apps/mobile`.
+
+### Tests Ã  faire
+- [ ] VÃ©rifier visuellement AlbumCard, ArtistCard, TrackCard, PlayerControls, ProgressBar, Modal, Dropdown, Tabs, Toast, Skeleton, SearchInput.
+- [ ] VÃ©rifier que la build Next.js reste stable.
+- [ ] Continuer la migration des consommateurs V5.0 dans `apps/web` et `apps/mobile`.
