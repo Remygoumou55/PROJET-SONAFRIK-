@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import type { DiscoveryArtist, DiscoveryTrack, HeroItemAlbum, TrendingTrack } from "@sonafrik/types";
