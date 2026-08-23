@@ -4,8 +4,8 @@
   "description": "Music Operating System Africain — Écouter, publier et monétiser la musique africaine.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#010a06",
-  "theme_color": "#010a06",
+  "background_color": "#07060B",
+  "theme_color": "#07060B",
   "orientation": "portrait-primary",
   "lang": "fr",
   "icons": [

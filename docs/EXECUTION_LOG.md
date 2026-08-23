@@ -5536,3 +5536,30 @@ colors.orSolaire = territory8Colors.audioCyan
 
 ### DÃ©cision
 - Le mobile hÃ©rite dÃ©jÃ  de T8 via `packages/ui/src/tokens/colors.ts` ; `app.json` est maintenant alignÃ© sur le fond T8 officiel.
+
+---
+
+## 2026-08-23 â€” Favicon + brand assets officiels Territory 8
+
+### Fichiers touchÃ©s
+- `apps/web/public/favicon.png` â€” nouvelle icÃ´ne S nÃ©on (512x512)
+- `apps/web/public/apple-icon.png` â€” icÃ´ne Apple Touch (180x180)
+- `apps/web/public/brand/sonafrik-mark.png` â€” mark S (1024x1024)
+- `apps/web/public/brand/sonafrik-logo-full.png` â€” logo complet noir SONAFRIK
+- `apps/web/src/app/icon.png` â€” app icon Next.js (512x512)
+- `apps/web/public/manifest.webmanifest` â€” `background_color`/`theme_color` passÃ©s Ã  `#07060B`
+- `apps/mobile/assets/icon.png`, `splash-icon.png`, `adaptive-icon.png` â€” nouveaux assets Expo
+- Nettoyage des fichiers temporaires `SONAFRIK (4).png`, `SONAFRIK (5).png`, `WhatsApp Image...`.
+
+### Validation
+- `pnpm build` : âœ…
+- `pnpm lint` : âœ… 19/19
+- `pnpm typecheck` : âœ… 19/19
+
+### DÃ©cision
+- Le favicon est l'icÃ´ne S seule, lisible en petit.
+- Le logo complet est conservÃ© dans `brand/sonafrik-logo-full.png`.
+- Les assets mobile Expo sont gÃ©nÃ©rÃ©s depuis la mÃªme icÃ´ne S.
+
+### Dette technique
+- Aucune.
