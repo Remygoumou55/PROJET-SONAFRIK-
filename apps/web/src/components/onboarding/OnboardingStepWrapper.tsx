@@ -24,7 +24,7 @@ export function OnboardingStepWrapper({ title, subtitle, children, onBack, showB
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(247, 243, 255,0.5)',
             fontSize: '13px',
             padding: '0 0 20px 0',
             fontFamily: 'inherit',
@@ -46,7 +46,7 @@ export function OnboardingStepWrapper({ title, subtitle, children, onBack, showB
           {title}
         </h2>
         {subtitle && (
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+          <p style={{ fontSize: '13px', color: 'rgba(247, 243, 255,0.4)', margin: 0 }}>
             {subtitle}
           </p>
         )}

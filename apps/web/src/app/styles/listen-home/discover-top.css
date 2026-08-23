@@ -76,8 +76,8 @@
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  background: rgb(255 255 255 / 0.03);
-  border: 1px solid rgb(255 255 255 / 0.07);
+  background: rgb(247 243 255 / 0.03);
+  border: 1px solid rgb(247 243 255 / 0.07);
   border-radius: 14px;
 }
 
@@ -117,8 +117,8 @@
 
 .sl-cta {
   padding: 8px 20px;
-  background: rgb(0 136 48 / 0.1);
-  border: 1px solid rgb(0 136 48 / 0.25);
+  background: rgb(200 75 255 / 0.1);
+  border: 1px solid rgb(200 75 255 / 0.25);
   border-radius: 99px;
   color: var(--color-vert-energie);
   font-size: 13px;
@@ -129,7 +129,7 @@
 }
 
 .sl-cta:hover {
-  background: rgb(0 136 48 / 0.2);
+  background: rgb(200 75 255 / 0.2);
 }
 
 /* ===== DÉCOUVERTES (fusion Nouveautés + Dernières sorties) ===== */
@@ -170,8 +170,8 @@
 .discoveries-filters {
   display: flex;
   gap: 4px;
-  background: rgb(255 255 255 / 0.04);
-  border: 1px solid rgb(255 255 255 / 0.07);
+  background: rgb(247 243 255 / 0.04);
+  border: 1px solid rgb(247 243 255 / 0.07);
   border-radius: 99px;
   padding: 3px;
 }
@@ -181,7 +181,7 @@
   border-radius: 99px;
   font-size: 12px;
   font-weight: 500;
-  color: rgb(255 255 255 / 0.45);
+  color: rgb(247 243 255 / 0.45);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -190,7 +190,7 @@
 }
 
 .disc-filter-btn:hover {
-  color: rgb(255 255 255 / 0.75);
+  color: rgb(247 243 255 / 0.75);
 }
 
 .disc-filter-btn.active {
@@ -262,7 +262,7 @@
 .player-expanded-overlay {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 0.75);
+  background: rgb(7 6 11 / 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 200;
@@ -280,7 +280,7 @@
 .player-expanded-panel {
   position: relative;
   background: var(--color-surface);
-  border: 1px solid rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(247 243 255 / 0.08);
   border-radius: 24px 24px 0 0;
   padding: 24px;
   width: 100%;
@@ -303,7 +303,7 @@
   position: absolute;
   top: 16px;
   right: 20px;
-  background: rgb(255 255 255 / 0.08);
+  background: rgb(247 243 255 / 0.08);
   border: none;
   color: var(--color-texte-secondaire);
   width: 32px;
@@ -318,7 +318,7 @@
 }
 
 .pep-close:hover {
-  background: rgb(255 255 255 / 0.15);
+  background: rgb(247 243 255 / 0.15);
   color: var(--color-texte-principal);
 }
 
@@ -327,7 +327,7 @@
   height: 240px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+  box-shadow: 0 20px 60px rgb(7 6 11 / 0.5);
 }
 
 .pep-meta {
@@ -422,7 +422,7 @@
 .section-period {
   font-size: 12px;
   color: var(--color-texte-subtil);
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(247 243 255 / 0.05);
   padding: 3px 10px;
   border-radius: 99px;
 }
@@ -450,15 +450,15 @@
 }
 
 .top-track-row:hover {
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(247 243 255 / 0.04);
 }
 
 .top-track-row--podium {
-  background: rgb(255 255 255 / 0.025);
+  background: rgb(247 243 255 / 0.025);
 }
 
 .top-track-row--podium:hover {
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(247 243 255 / 0.05);
 }
 
 .top-pos {
@@ -535,7 +535,7 @@
 
 .top-bar-track {
   height: 3px;
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.06);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -545,7 +545,7 @@
   background: linear-gradient(
     90deg,
     var(--color-vert-energie) 0%,
-    rgb(0 136 48 / 0.4) 100%
+    rgb(200 75 255 / 0.4) 100%
   );
   border-radius: 99px;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);

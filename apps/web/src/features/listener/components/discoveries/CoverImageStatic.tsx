@@ -41,7 +41,7 @@ function GradientPlaceholder({
         className="font-extrabold leading-none"
         style={{
           fontSize: "clamp(12px, 28%, 28px)",
-          color: "rgba(255,255,255,0.9)",
+          color: "rgba(247, 243, 255,0.9)",
           letterSpacing: "-0.5px",
         }}
       >

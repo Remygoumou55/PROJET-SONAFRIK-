@@ -6,8 +6,8 @@ import type { ListenerWizard } from './types'
 
 const fieldStyle: CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(255,255,255,0.05)',
-  border: '1px solid rgba(255,194,14,0.25)',
+  backgroundColor: 'rgba(247, 243, 255,0.05)',
+  border: '1px solid rgba(69, 230, 255,0.25)',
   borderRadius: '10px',
   padding: '12px 14px',
   fontSize: '14px',
@@ -19,7 +19,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '12px',
-  color: 'rgba(255,255,255,0.5)',
+  color: 'rgba(247, 243, 255,0.5)',
   marginBottom: '6px',
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
@@ -51,7 +51,7 @@ export function Step4Backup({ wizard }: Props) {
           <p
             style={{
               fontSize: '11px',
-              color: 'rgba(255,194,14,0.6)',
+              color: 'rgba(69, 230, 255,0.6)',
               marginTop: '5px',
               marginBottom: 0,
             }}
@@ -86,7 +86,7 @@ export function Step4Backup({ wizard }: Props) {
           style={{
             background: 'none',
             border: 'none',
-            color: 'rgba(255,255,255,0.35)',
+            color: 'rgba(247, 243, 255,0.35)',
             fontSize: '13px',
             cursor: 'pointer',
             padding: '4px',

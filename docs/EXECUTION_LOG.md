@@ -5468,3 +5468,58 @@ colors.orSolaire = territory8Colors.audioCyan
 - [ ] RafraÃ®chir le site en production et vÃ©rifier que les Ã©crans affichent du lavender/cyan/pearl.
 - [ ] Ouvrir l'application mobile et vÃ©rifier la nouvelle teinte (pas de vert/or restant).
 - [ ] VÃ©rifier le contraste sur les boutons d'action lavender et les badges cyan.
+
+---
+
+## 2026-08-23 â€” Territory 8 : nettoyage des valeurs V5.0 cachÃ©es (globals.css, styles, rgba)
+
+### Fichiers touchÃ©s
+- `apps/web/src/app/globals.css` â€” rÃ©asignation des tokens V5.0 vers les valeurs T8 (hex, rgb, surfaces, overlays).
+- 24 feuilles CSS `apps/web/src/app/styles/*.css` â€” conversion des `rgb(...)` V5.0 en T8.
+- `apps/web/src/lib/constants.ts` â€” conversion des `rgba(...)` du placeholder cover en T8.
+- ~15 composants `.tsx` restants (`PlayerMockup`, `CoverImage`, `TrackCredits`, `Onboarding*`, etc.) â€” conversion des `rgba(...)` V5.0 en T8.
+
+### Code avant (extrait clÃ©)
+```before
+// globals.css
+--color-vert-energie: #f6c009;
+--color-or-solaire: #f6c009;
+--color-noir-profond: #010a06;
+--overlay-vert-soft: rgb(246 192 9 / 0.13);
+```
+
+```before
+// lib/constants.ts
+"rgba(0, 210, 106, 0.16)"
+"rgba(255, 194, 14, 0.13)"
+```
+
+### Code aprÃ¨s (extrait clÃ©)
+```after
+// globals.css
+--color-vert-energie: #C84BFF;
+--color-or-solaire: #C84BFF;
+--color-noir-profond: #07060B;
+--overlay-vert-soft: rgb(200 75 255 / 0.13);
+```
+
+```after
+// lib/constants.ts
+"rgba(200, 75, 255, 0.16)"
+"rgba(69, 230, 255, 0.13)"
+```
+
+### Validation
+- `pnpm --filter @sonafrik/web build` : âœ… (72/72 pages)
+- `pnpm --filter @sonafrik/web lint` : âœ…
+
+### DÃ©cision
+- Les tokens V5.0 existent toujours mais produisent dÃ©sormais des couleurs T8 (lavender/cyan/pearl/rose).
+- Tous les `var(--color-*)` et `rgba(...)` V5.0 de l'app web sont neutralisÃ©s.
+
+### Dette technique
+- Quelques noms de tokens V5.0 subsistent (alias) ; un nettoyage de noms sera nÃ©cessaire quand on voudra supprimer totalement V5.0.
+
+### Tests Ã  faire
+- [ ] RafraÃ®chir la landing et vÃ©rifier qu'il n'y a plus de vert/or/rouge intempestifs.
+- [ ] VÃ©rifier que les overlays et badges restent lisibles.

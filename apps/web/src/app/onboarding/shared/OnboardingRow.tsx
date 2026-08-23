@@ -6,7 +6,7 @@ export function OnboardingRow({ label, value }: { label: string; value: string }
       <span
         style={{
           fontSize: '12px',
-          color: 'rgba(255,255,255,0.4)',
+          color: 'rgba(247, 243, 255,0.4)',
           textTransform: 'uppercase',
           letterSpacing: '0.5px',
           flexShrink: 0,

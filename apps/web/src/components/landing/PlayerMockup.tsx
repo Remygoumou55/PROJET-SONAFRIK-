@@ -11,7 +11,7 @@ export function PlayerMockup({ featuredTrack }: PlayerMockupProps) {
   const initials = featuredTrack?.initials ?? "SA";
 
   return (
-    <div className="landing-player-mockup mx-auto w-full max-w-[380px] rounded-3xl border border-white/10 bg-[var(--t8-surface-01)] p-6 shadow-[0_40px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,210,106,0.1)]">
+    <div className="landing-player-mockup mx-auto w-full max-w-[380px] rounded-3xl border border-white/10 bg-[var(--t8-surface-01)] p-6 shadow-[0_40px_80px_rgba(7, 6, 11,0.6),0_0_0_1px_rgba(200, 75, 255,0.1)]">
       <p className="mb-4 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--t8-primary-lavender)]">
         En cours de lecture
       </p>

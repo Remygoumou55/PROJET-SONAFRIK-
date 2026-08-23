@@ -43,7 +43,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
               <span
                 className="absolute bottom-1.5 right-1.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
                 style={{
-                  backgroundColor: "rgba(0,210,106,0.15)",
+                  backgroundColor: "rgba(200, 75, 255,0.15)",
                   color: "var(--color-vert-energie)",
                   backdropFilter: "blur(4px)",
                 }}
@@ -61,7 +61,7 @@ export function AppearsOnSection({ appearances }: AppearsOnSectionProps) {
             </p>
 
             {/* Artiste principal */}
-            <p className="text-[10px] mt-0.5 truncate" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-[10px] mt-0.5 truncate" style={{ color: "rgba(247, 243, 255,0.4)" }}>
               {item.mainArtistName}
             </p>
           </Link>

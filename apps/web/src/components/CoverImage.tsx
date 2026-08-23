@@ -56,7 +56,7 @@ function GradientPlaceholder({
           fontWeight: 900,
           lineHeight: 1,
           letterSpacing: "-0.03em",
-          color: "rgba(255,255,255,0.15)",
+          color: "rgba(247, 243, 255,0.15)",
           userSelect: "none",
           pointerEvents: "none",
         }}

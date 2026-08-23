@@ -17,8 +17,8 @@ export function PlaylistPrivacyToggle({ isPublic, onChange }: PlaylistPrivacyTog
         justifyContent: "space-between",
         gap: "12px",
         width: "100%",
-        backgroundColor: isPublic ? "rgba(255,194,14,0.06)" : "rgba(0,210,106,0.06)",
-        border: `1px solid ${isPublic ? "rgba(255,194,14,0.2)" : "rgba(0,210,106,0.2)"}`,
+        backgroundColor: isPublic ? "rgba(69, 230, 255,0.06)" : "rgba(200, 75, 255,0.06)",
+        border: `1px solid ${isPublic ? "rgba(69, 230, 255,0.2)" : "rgba(200, 75, 255,0.2)"}`,
         borderRadius: "10px",
         padding: "12px 14px",
         cursor: "pointer",
@@ -46,7 +46,7 @@ export function PlaylistPrivacyToggle({ isPublic, onChange }: PlaylistPrivacyTog
           <p
             style={{
               fontSize: "11px",
-              color: "rgba(255,255,255,0.4)",
+              color: "rgba(247, 243, 255,0.4)",
               margin: "2px 0 0",
               lineHeight: 1.3,
             }}
@@ -64,7 +64,7 @@ export function PlaylistPrivacyToggle({ isPublic, onChange }: PlaylistPrivacyTog
           width: "40px",
           height: "22px",
           borderRadius: "11px",
-          backgroundColor: isPublic ? "var(--color-vert-energie)" : "rgba(255,255,255,0.12)",
+          backgroundColor: isPublic ? "var(--color-vert-energie)" : "rgba(247, 243, 255,0.12)",
           position: "relative",
           flexShrink: 0,
           transition: "background-color 0.2s",

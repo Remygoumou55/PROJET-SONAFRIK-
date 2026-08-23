@@ -17,57 +17,57 @@
 
 @theme {
   /* ── SONAFRIK Brand 2026 — palette jungle sombre ── */
-  /* Fond #010a06 · Sidebar #000805 · Marque #012413 · Or #f6c009 · Lueur #008830 */
-  --color-vert-casque: #008830;
-  --color-vert-energie: #f6c009;
-  --color-vert-profond: #012413;
-  --color-cta-principal: #008830;
-  --color-or-solaire: #f6c009;
-  --color-or-profond: #c99a07;
-  --color-noir-profond: #010a06;
-  --color-surface: #01120c;
-  --color-card: #011a10;
-  --color-elevated: #012218;
-  --color-bordure: #023524;
-  --color-texte-principal: #eef5f0;
-  --color-texte-secondaire: #94b0a0;
-  --color-texte-desactive: #5a7568;
-  --color-erreur: #ff4444;
-  --color-danger: #ff4444;
-  --color-info: #3b82f6;
+  /* Fond #07060B · Sidebar #07060B · Marque #8B2BCB · Or #C84BFF · Lueur #C84BFF */
+  --color-vert-casque: #C84BFF;
+  --color-vert-energie: #C84BFF;
+  --color-vert-profond: #8B2BCB;
+  --color-cta-principal: #C84BFF;
+  --color-or-solaire: #C84BFF;
+  --color-or-profond: #159DB8;
+  --color-noir-profond: #07060B;
+  --color-surface: #0B0912;
+  --color-card: #0F0C18;
+  --color-elevated: #14101F;
+  --color-bordure: rgba(255, 255, 255, 0.07);
+  --color-texte-principal: #F7F3FF;
+  --color-texte-secondaire: #B8B2C2;
+  --color-texte-desactive: #817A89;
+  --color-erreur: #FF5C78;
+  --color-danger: #FF5C78;
+  --color-info: #6EA8FF;
 
-  --color-accent-violet: #a855f7;
-  --color-accent-orange: #f97316;
-  --color-accent-rose: #ec4899;
-  --color-accent-bleu-clair: #60a5fa;
+  --color-accent-violet: #C84BFF;
+  --color-accent-orange: #FF5CCF;
+  --color-accent-rose: #FF5CCF;
+  --color-accent-bleu-clair: #6EA8FF;
 
-  --color-texte-subtil: #456055;
-  --color-skeleton: #010d08;
+  --color-texte-subtil: #817A89;
+  --color-skeleton: #14101F;
 
-  --color-avertissement: #f59e0b;
-  --color-accent-violet-clair: #c084fc;
+  --color-avertissement: #F4B95E;
+  --color-accent-violet-clair: #C84BFF;
 
-  --color-provider-orange: #ff6600;
-  --color-provider-mtn: #ffcc00;
+  --color-provider-orange: #FF5CCF;
+  --color-provider-mtn: #45E6FF;
 
-  --color-feature-azure: #378add;
-  --color-feature-indigo: #7f77dd;
-  --color-feature-brique: #d85a30;
-  --color-feature-navy: #185fa5;
+  --color-feature-azure: #6EA8FF;
+  --color-feature-indigo: #6EA8FF;
+  --color-feature-brique: #FF5CCF;
+  --color-feature-navy: #6EA8FF;
 
-  --color-flag-rouge: #ce1126;
-  --color-flag-jaune: #fcd116;
-  --color-flag-vert: #009460;
+  --color-flag-rouge: #FF5C78;
+  --color-flag-jaune: #F4B95E;
+  --color-flag-vert: #55D98B;
 
-  --color-pending: #f5a623;
+  --color-pending: #F4B95E;
 
   /* ── Enterprise Shell — layout global SONAFRIK ── */
   --shell-bg: var(--color-noir-profond);
   --shell-sidebar: var(--color-admin-sidebar);
-  --shell-header: #010d08;
-  --shell-content: #010f0a;
+  --shell-header: #14101F;
+  --shell-content: #0B0912;
   --shell-card: var(--color-card);
-  --shell-card-hover: #011f14;
+  --shell-card-hover: #14101F;
   --shell-card-active: var(--color-elevated);
   --shell-border: var(--color-bordure);
   --shell-border-hover: #033d2a;
@@ -87,9 +87,9 @@
   --shell-radius-m: 1rem;
   --shell-radius-l: 1.25rem;
   --shell-radius-xl: 1.5rem;
-  --shell-shadow-light: 0 1px 0 rgb(255 255 255 / 0.035), 0 4px 18px rgb(0 0 0 / 0.3);
-  --shell-shadow-medium: 0 1px 0 rgb(255 255 255 / 0.045), 0 8px 28px rgb(0 0 0 / 0.36);
-  --shell-shadow-strong: 0 2px 0 rgb(255 255 255 / 0.05), 0 14px 42px rgb(0 0 0 / 0.44);
+  --shell-shadow-light: 0 1px 0 rgb(247 243 255 / 0.035), 0 4px 18px rgb(7 6 11 / 0.3);
+  --shell-shadow-medium: 0 1px 0 rgb(247 243 255 / 0.045), 0 8px 28px rgb(7 6 11 / 0.36);
+  --shell-shadow-strong: 0 2px 0 rgb(247 243 255 / 0.05), 0 14px 42px rgb(7 6 11 / 0.44);
 
   /* ── Music Navigation Experience — langage officiel Music OS ── */
   --nav-icon-size: 1.25rem;
@@ -106,7 +106,7 @@
   --nav-sidebar-brand-padding: 1.25rem 1rem 0.875rem;
   --nav-story-padding: 0.625rem 1rem 0.875rem;
   --nav-link-active-bg: var(--overlay-vert-nav);
-  --nav-link-hover-bg: rgb(255 255 255 / 0.04);
+  --nav-link-hover-bg: rgb(247 243 255 / 0.04);
   --nav-bottom-height: 3.75rem;
 
   /* ── Enterprise Design System — tokens officiels (--ds-*) ── */
@@ -206,9 +206,9 @@
   --ds-z-overlay: 300;
 
   /* Admin back-office */
-  --color-admin-sidebar: #000805;
-  --color-admin-warning: #ff8c00;
-  --color-admin-info: #378add;
+  --color-admin-sidebar: #07060B;
+  --color-admin-warning: #F4B95E;
+  --color-admin-info: #6EA8FF;
   --color-admin-card-bg: var(--overlay-blanc-03);
   --color-admin-card-border: var(--overlay-blanc-08);
   --color-admin-border-subtle: var(--overlay-blanc-06);
@@ -217,152 +217,152 @@
   --color-admin-section-gold: var(--overlay-or-55);
 
   /* Google Sign-In brand (guidelines officielles — usage SVG auth uniquement) */
-  --color-google-blue: #4285f4;
-  --color-google-green: #34a853;
-  --color-google-yellow: #fbbc05;
-  --color-google-red: #ea4335;
+  --color-google-blue: #6EA8FF;
+  --color-google-green: #55D98B;
+  --color-google-yellow: #F4B95E;
+  --color-google-red: #FF5C78;
 
-  --overlay-casque-04: rgb(0 136 48 / 0.04);
-  --overlay-casque-06: rgb(0 136 48 / 0.06);
-  --overlay-casque-08: rgb(0 136 48 / 0.08);
-  --overlay-casque-12: rgb(0 136 48 / 0.12);
-  --overlay-casque-18: rgb(0 136 48 / 0.18);
-  --overlay-vert-soft: rgb(246 192 9 / 0.13);
-  --overlay-erreur-soft: rgb(255 68 68 / 0.13);
-  --overlay-vert-nav: rgb(246 192 9 / 0.09);
-  --overlay-blanc-60: rgb(255 255 255 / 0.60);
-  --overlay-blanc-55: rgb(255 255 255 / 0.55);
-  --overlay-blanc-13: rgb(255 255 255 / 0.13);
-  --overlay-or-soft: rgb(255 194 14 / 0.13);
-  --overlay-or-medium: rgb(255 194 14 / 0.20);
-  --overlay-erreur-25: rgb(255 68 68 / 0.25);
-  --overlay-neutre-soft: rgb(85 85 85 / 0.13);
-  --overlay-bleu-soft: rgb(59 130 246 / 0.13);
-  --overlay-modal-backdrop: rgb(1 10 6 / 0.88);
-  --overlay-avertissement-soft: rgb(245 158 11 / 0.13);
-  --overlay-violet-soft: rgb(168 85 247 / 0.13);
-  --overlay-vert-row: rgb(246 192 9 / 0.07);
-  --overlay-noir-50: rgb(0 0 0 / 0.5);
-  --overlay-noir-70: rgb(0 0 0 / 0.7);
-  --overlay-noir-75: rgb(0 0 0 / 0.75);
-  --overlay-erreur-09: rgb(255 68 68 / 0.09);
-  --overlay-vert-04: rgb(246 192 9 / 0.04);
-  --chip-vert-bg: rgb(246 192 9 / 0.14);
-  --chip-vert-glow: rgb(0 136 48 / 0.10);
-  --chip-vert-ring: rgb(246 192 9 / 0.31);
-  --chip-vert-inner: rgb(246 192 9 / 0.20);
-  --chip-or-bg: rgb(255 194 14 / 0.14);
-  --chip-or-glow: rgb(255 194 14 / 0.06);
-  --chip-or-ring: rgb(255 194 14 / 0.31);
-  --chip-or-inner: rgb(255 194 14 / 0.20);
-  --chip-violet-bg: rgb(168 85 247 / 0.14);
-  --chip-violet-glow: rgb(168 85 247 / 0.06);
-  --chip-violet-ring: rgb(168 85 247 / 0.31);
-  --chip-violet-inner: rgb(168 85 247 / 0.20);
-  --chip-info-bg: rgb(59 130 246 / 0.14);
-  --chip-info-glow: rgb(59 130 246 / 0.06);
-  --chip-info-ring: rgb(59 130 246 / 0.31);
-  --chip-info-inner: rgb(59 130 246 / 0.20);
-  --chip-orange-bg: rgb(249 115 22 / 0.14);
-  --chip-orange-glow: rgb(249 115 22 / 0.06);
-  --chip-orange-ring: rgb(249 115 22 / 0.31);
-  --chip-orange-inner: rgb(249 115 22 / 0.20);
-  --chip-rose-bg: rgb(236 72 153 / 0.14);
-  --chip-rose-glow: rgb(236 72 153 / 0.06);
-  --chip-rose-ring: rgb(236 72 153 / 0.31);
-  --chip-rose-inner: rgb(236 72 153 / 0.20);
-  --badge-genre-vert-bg: rgb(246 192 9 / 0.08);
-  --badge-genre-vert-border: rgb(246 192 9 / 0.19);
-  --badge-genre-or-bg: rgb(255 194 14 / 0.08);
-  --badge-genre-or-border: rgb(255 194 14 / 0.19);
-  --badge-genre-violet-bg: rgb(168 85 247 / 0.08);
-  --badge-genre-violet-border: rgb(168 85 247 / 0.19);
-  --badge-genre-info-bg: rgb(59 130 246 / 0.08);
-  --badge-genre-info-border: rgb(59 130 246 / 0.19);
-  --badge-genre-orange-bg: rgb(249 115 22 / 0.08);
-  --badge-genre-orange-border: rgb(249 115 22 / 0.19);
-  --badge-genre-rose-bg: rgb(236 72 153 / 0.08);
-  --badge-genre-rose-border: rgb(236 72 153 / 0.19);
-  --badge-pill-vert-bg: rgb(246 192 9 / 0.08);
-  --badge-pill-vert-border: rgb(246 192 9 / 0.13);
-  --section-icon-or-bg: rgb(255 194 14 / 0.10);
-  --section-icon-or-border: rgb(255 194 14 / 0.20);
-  --section-icon-violet-bg: rgb(168 85 247 / 0.10);
-  --section-icon-violet-border: rgb(168 85 247 / 0.20);
-  --section-icon-info-bg: rgb(59 130 246 / 0.10);
-  --section-icon-info-border: rgb(59 130 246 / 0.20);
-  --section-icon-rose-bg: rgb(236 72 153 / 0.10);
-  --section-icon-rose-border: rgb(236 72 153 / 0.20);
-  --gradient-vert-section: linear-gradient(135deg, rgb(246 192 9 / 0.13), rgb(246 192 9 / 0.07));
-  --gradient-vert-empty: linear-gradient(135deg, rgb(246 192 9 / 0.10), rgb(246 192 9 / 0.04));
-  --shadow-vert-glow: 0 0 24px rgb(0 136 48 / 0.38);
-  --shadow-vert-glow-strong: 0 0 16px rgb(0 136 48 / 0.62);
-  --shadow-casque-glow: 0 0 32px rgb(0 136 48 / 0.28);
-  --shadow-or-highlight: 0 0 16px rgb(255 194 14 / 0.25);
-  --overlay-noir-40: rgb(0 0 0 / 0.4);
-  --overlay-noir-45: rgb(0 0 0 / 0.45);
-  --overlay-noir-55: rgb(0 0 0 / 0.55);
-  --overlay-noir-60: rgb(0 0 0 / 0.6);
-  --overlay-scrim-crop: rgb(0 0 0 / 0.72);
-  --overlay-blanc-30: rgb(255 255 255 / 0.3);
+  --overlay-casque-04: rgb(200 75 255 / 0.04);
+  --overlay-casque-06: rgb(200 75 255 / 0.06);
+  --overlay-casque-08: rgb(200 75 255 / 0.08);
+  --overlay-casque-12: rgb(200 75 255 / 0.12);
+  --overlay-casque-18: rgb(200 75 255 / 0.18);
+  --overlay-vert-soft: rgb(200 75 255 / 0.13);
+  --overlay-erreur-soft: rgb(255 92 120 / 0.13);
+  --overlay-vert-nav: rgb(200 75 255 / 0.09);
+  --overlay-blanc-60: rgb(247 243 255 / 0.60);
+  --overlay-blanc-55: rgb(247 243 255 / 0.55);
+  --overlay-blanc-13: rgb(247 243 255 / 0.13);
+  --overlay-or-soft: rgb(69 230 255 / 0.13);
+  --overlay-or-medium: rgb(69 230 255 / 0.20);
+  --overlay-erreur-25: rgb(255 92 120 / 0.25);
+  --overlay-neutre-soft: rgb(129 122 137 / 0.13);
+  --overlay-bleu-soft: rgb(110 168 255 / 0.13);
+  --overlay-modal-backdrop: rgb(7 6 11 / 0.88);
+  --overlay-avertissement-soft: rgb(244 185 94 / 0.13);
+  --overlay-violet-soft: rgb(200 75 255 / 0.13);
+  --overlay-vert-row: rgb(200 75 255 / 0.07);
+  --overlay-noir-50: rgb(7 6 11 / 0.5);
+  --overlay-noir-70: rgb(7 6 11 / 0.7);
+  --overlay-noir-75: rgb(7 6 11 / 0.75);
+  --overlay-erreur-09: rgb(255 92 120 / 0.09);
+  --overlay-vert-04: rgb(200 75 255 / 0.04);
+  --chip-vert-bg: rgb(200 75 255 / 0.14);
+  --chip-vert-glow: rgb(200 75 255 / 0.10);
+  --chip-vert-ring: rgb(200 75 255 / 0.31);
+  --chip-vert-inner: rgb(200 75 255 / 0.20);
+  --chip-or-bg: rgb(69 230 255 / 0.14);
+  --chip-or-glow: rgb(69 230 255 / 0.06);
+  --chip-or-ring: rgb(69 230 255 / 0.31);
+  --chip-or-inner: rgb(69 230 255 / 0.20);
+  --chip-violet-bg: rgb(200 75 255 / 0.14);
+  --chip-violet-glow: rgb(200 75 255 / 0.06);
+  --chip-violet-ring: rgb(200 75 255 / 0.31);
+  --chip-violet-inner: rgb(200 75 255 / 0.20);
+  --chip-info-bg: rgb(110 168 255 / 0.14);
+  --chip-info-glow: rgb(110 168 255 / 0.06);
+  --chip-info-ring: rgb(110 168 255 / 0.31);
+  --chip-info-inner: rgb(110 168 255 / 0.20);
+  --chip-orange-bg: rgb(255 92 207 / 0.14);
+  --chip-orange-glow: rgb(255 92 207 / 0.06);
+  --chip-orange-ring: rgb(255 92 207 / 0.31);
+  --chip-orange-inner: rgb(255 92 207 / 0.20);
+  --chip-rose-bg: rgb(255 92 207 / 0.14);
+  --chip-rose-glow: rgb(255 92 207 / 0.06);
+  --chip-rose-ring: rgb(255 92 207 / 0.31);
+  --chip-rose-inner: rgb(255 92 207 / 0.20);
+  --badge-genre-vert-bg: rgb(200 75 255 / 0.08);
+  --badge-genre-vert-border: rgb(200 75 255 / 0.19);
+  --badge-genre-or-bg: rgb(69 230 255 / 0.08);
+  --badge-genre-or-border: rgb(69 230 255 / 0.19);
+  --badge-genre-violet-bg: rgb(200 75 255 / 0.08);
+  --badge-genre-violet-border: rgb(200 75 255 / 0.19);
+  --badge-genre-info-bg: rgb(110 168 255 / 0.08);
+  --badge-genre-info-border: rgb(110 168 255 / 0.19);
+  --badge-genre-orange-bg: rgb(255 92 207 / 0.08);
+  --badge-genre-orange-border: rgb(255 92 207 / 0.19);
+  --badge-genre-rose-bg: rgb(255 92 207 / 0.08);
+  --badge-genre-rose-border: rgb(255 92 207 / 0.19);
+  --badge-pill-vert-bg: rgb(200 75 255 / 0.08);
+  --badge-pill-vert-border: rgb(200 75 255 / 0.13);
+  --section-icon-or-bg: rgb(69 230 255 / 0.10);
+  --section-icon-or-border: rgb(69 230 255 / 0.20);
+  --section-icon-violet-bg: rgb(200 75 255 / 0.10);
+  --section-icon-violet-border: rgb(200 75 255 / 0.20);
+  --section-icon-info-bg: rgb(110 168 255 / 0.10);
+  --section-icon-info-border: rgb(110 168 255 / 0.20);
+  --section-icon-rose-bg: rgb(255 92 207 / 0.10);
+  --section-icon-rose-border: rgb(255 92 207 / 0.20);
+  --gradient-vert-section: linear-gradient(135deg, rgb(200 75 255 / 0.13), rgb(200 75 255 / 0.07));
+  --gradient-vert-empty: linear-gradient(135deg, rgb(200 75 255 / 0.10), rgb(200 75 255 / 0.04));
+  --shadow-vert-glow: 0 0 24px rgb(200 75 255 / 0.38);
+  --shadow-vert-glow-strong: 0 0 16px rgb(200 75 255 / 0.62);
+  --shadow-casque-glow: 0 0 32px rgb(200 75 255 / 0.28);
+  --shadow-or-highlight: 0 0 16px rgb(69 230 255 / 0.25);
+  --overlay-noir-40: rgb(7 6 11 / 0.4);
+  --overlay-noir-45: rgb(7 6 11 / 0.45);
+  --overlay-noir-55: rgb(7 6 11 / 0.55);
+  --overlay-noir-60: rgb(7 6 11 / 0.6);
+  --overlay-scrim-crop: rgb(7 6 11 / 0.72);
+  --overlay-blanc-30: rgb(247 243 255 / 0.3);
   --overlay-texte-soft: rgb(160 160 160 / 0.13);
-  --overlay-vert-10: rgb(246 192 9 / 0.10);
+  --overlay-vert-10: rgb(200 75 255 / 0.10);
   /* ── Overlay tokens Vague J — SSOT complet (2026-07-06) ── */
   /* Blanc (255 255 255) — série complète */
-  --overlay-blanc-01: rgb(255 255 255 / 0.01);
-  --overlay-blanc-02: rgb(255 255 255 / 0.02);
-  --overlay-blanc-03: rgb(255 255 255 / 0.03);
-  --overlay-blanc-04: rgb(255 255 255 / 0.04);
-  --overlay-blanc-05: rgb(255 255 255 / 0.05);
-  --overlay-blanc-06: rgb(255 255 255 / 0.06);
-  --overlay-blanc-07: rgb(255 255 255 / 0.07);
-  --overlay-blanc-08: rgb(255 255 255 / 0.08);
-  --overlay-blanc-09: rgb(255 255 255 / 0.09);
-  --overlay-blanc-10: rgb(255 255 255 / 0.10);
-  --overlay-blanc-12: rgb(255 255 255 / 0.12);
-  --overlay-blanc-14: rgb(255 255 255 / 0.14);
-  --overlay-blanc-15: rgb(255 255 255 / 0.15);
-  --overlay-blanc-18: rgb(255 255 255 / 0.18);
-  --overlay-blanc-20: rgb(255 255 255 / 0.20);
-  --overlay-blanc-22: rgb(255 255 255 / 0.22);
-  --overlay-blanc-24: rgb(255 255 255 / 0.24);
-  --overlay-blanc-25: rgb(255 255 255 / 0.25);
-  --overlay-blanc-35: rgb(255 255 255 / 0.35);
-  --overlay-blanc-40: rgb(255 255 255 / 0.40);
-  --overlay-blanc-45: rgb(255 255 255 / 0.45);
-  --overlay-blanc-50: rgb(255 255 255 / 0.50);
-  --overlay-blanc-65: rgb(255 255 255 / 0.65);
-  --overlay-blanc-70: rgb(255 255 255 / 0.70);
-  --overlay-blanc-75: rgb(255 255 255 / 0.75);
-  --overlay-blanc-78: rgb(255 255 255 / 0.78);
-  --overlay-blanc-80: rgb(255 255 255 / 0.80);
+  --overlay-blanc-01: rgb(247 243 255 / 0.01);
+  --overlay-blanc-02: rgb(247 243 255 / 0.02);
+  --overlay-blanc-03: rgb(247 243 255 / 0.03);
+  --overlay-blanc-04: rgb(247 243 255 / 0.04);
+  --overlay-blanc-05: rgb(247 243 255 / 0.05);
+  --overlay-blanc-06: rgb(247 243 255 / 0.06);
+  --overlay-blanc-07: rgb(247 243 255 / 0.07);
+  --overlay-blanc-08: rgb(247 243 255 / 0.08);
+  --overlay-blanc-09: rgb(247 243 255 / 0.09);
+  --overlay-blanc-10: rgb(247 243 255 / 0.10);
+  --overlay-blanc-12: rgb(247 243 255 / 0.12);
+  --overlay-blanc-14: rgb(247 243 255 / 0.14);
+  --overlay-blanc-15: rgb(247 243 255 / 0.15);
+  --overlay-blanc-18: rgb(247 243 255 / 0.18);
+  --overlay-blanc-20: rgb(247 243 255 / 0.20);
+  --overlay-blanc-22: rgb(247 243 255 / 0.22);
+  --overlay-blanc-24: rgb(247 243 255 / 0.24);
+  --overlay-blanc-25: rgb(247 243 255 / 0.25);
+  --overlay-blanc-35: rgb(247 243 255 / 0.35);
+  --overlay-blanc-40: rgb(247 243 255 / 0.40);
+  --overlay-blanc-45: rgb(247 243 255 / 0.45);
+  --overlay-blanc-50: rgb(247 243 255 / 0.50);
+  --overlay-blanc-65: rgb(247 243 255 / 0.65);
+  --overlay-blanc-70: rgb(247 243 255 / 0.70);
+  --overlay-blanc-75: rgb(247 243 255 / 0.75);
+  --overlay-blanc-78: rgb(247 243 255 / 0.78);
+  --overlay-blanc-80: rgb(247 243 255 / 0.80);
   /* Vert energie (0 210 106) — série complète */
-  --overlay-vert-00: rgb(246 192 9 / 0.00);
-  --overlay-vert-08: rgb(246 192 9 / 0.08);
-  --overlay-vert-12: rgb(246 192 9 / 0.12);
-  --overlay-vert-14: rgb(246 192 9 / 0.14);
-  --overlay-vert-15: rgb(246 192 9 / 0.15);
-  --overlay-vert-18: rgb(246 192 9 / 0.18);
-  --overlay-vert-20: rgb(246 192 9 / 0.20);
-  --overlay-vert-25: rgb(246 192 9 / 0.25);
-  --overlay-vert-30: rgb(246 192 9 / 0.30);
-  --overlay-vert-40: rgb(246 192 9 / 0.40);
-  --overlay-vert-45: rgb(246 192 9 / 0.45);
-  --overlay-vert-50: rgb(246 192 9 / 0.50);
-  --overlay-vert-75: rgb(246 192 9 / 0.75);
+  --overlay-vert-00: rgb(200 75 255 / 0.00);
+  --overlay-vert-08: rgb(200 75 255 / 0.08);
+  --overlay-vert-12: rgb(200 75 255 / 0.12);
+  --overlay-vert-14: rgb(200 75 255 / 0.14);
+  --overlay-vert-15: rgb(200 75 255 / 0.15);
+  --overlay-vert-18: rgb(200 75 255 / 0.18);
+  --overlay-vert-20: rgb(200 75 255 / 0.20);
+  --overlay-vert-25: rgb(200 75 255 / 0.25);
+  --overlay-vert-30: rgb(200 75 255 / 0.30);
+  --overlay-vert-40: rgb(200 75 255 / 0.40);
+  --overlay-vert-45: rgb(200 75 255 / 0.45);
+  --overlay-vert-50: rgb(200 75 255 / 0.50);
+  --overlay-vert-75: rgb(200 75 255 / 0.75);
   /* Or solaire (255 194 14) — série complète */
-  --overlay-or-04: rgb(255 194 14 / 0.04);
-  --overlay-or-05: rgb(255 194 14 / 0.05);
-  --overlay-or-06: rgb(255 194 14 / 0.06);
-  --overlay-or-07: rgb(255 194 14 / 0.07);
-  --overlay-or-08: rgb(255 194 14 / 0.08);
-  --overlay-or-10: rgb(255 194 14 / 0.10);
-  --overlay-or-12: rgb(255 194 14 / 0.12);
-  --overlay-or-15: rgb(255 194 14 / 0.15);
-  --overlay-or-25: rgb(255 194 14 / 0.25);
-  --overlay-or-40: rgb(255 194 14 / 0.40);
-  --overlay-or-50: rgb(255 194 14 / 0.50);
-  --overlay-or-55: rgb(255 194 14 / 0.55);
+  --overlay-or-04: rgb(69 230 255 / 0.04);
+  --overlay-or-05: rgb(69 230 255 / 0.05);
+  --overlay-or-06: rgb(69 230 255 / 0.06);
+  --overlay-or-07: rgb(69 230 255 / 0.07);
+  --overlay-or-08: rgb(69 230 255 / 0.08);
+  --overlay-or-10: rgb(69 230 255 / 0.10);
+  --overlay-or-12: rgb(69 230 255 / 0.12);
+  --overlay-or-15: rgb(69 230 255 / 0.15);
+  --overlay-or-25: rgb(69 230 255 / 0.25);
+  --overlay-or-40: rgb(69 230 255 / 0.40);
+  --overlay-or-50: rgb(69 230 255 / 0.50);
+  --overlay-or-55: rgb(69 230 255 / 0.55);
   /* Admin warning (255 140 0) */
   --overlay-admin-warning-04: rgb(255 140 0 / 0.04);
   --overlay-admin-warning-07: rgb(255 140 0 / 0.07);
@@ -381,24 +381,24 @@
   --overlay-admin-danger-20: rgb(255 77 79 / 0.20);
   --overlay-admin-danger-30: rgb(255 77 79 / 0.30);
   /* Erreur (255 68 68) — compléments */
-  --overlay-erreur-04: rgb(255 68 68 / 0.04);
-  --overlay-erreur-07: rgb(255 68 68 / 0.07);
-  --overlay-erreur-10: rgb(255 68 68 / 0.10);
-  --overlay-erreur-12: rgb(255 68 68 / 0.12);
-  --overlay-erreur-15: rgb(255 68 68 / 0.15);
-  --overlay-erreur-20: rgb(255 68 68 / 0.20);
-  --overlay-erreur-30: rgb(255 68 68 / 0.30);
-  --overlay-erreur-35: rgb(255 68 68 / 0.35);
-  --overlay-erreur-65: rgb(255 68 68 / 0.65);
+  --overlay-erreur-04: rgb(255 92 120 / 0.04);
+  --overlay-erreur-07: rgb(255 92 120 / 0.07);
+  --overlay-erreur-10: rgb(255 92 120 / 0.10);
+  --overlay-erreur-12: rgb(255 92 120 / 0.12);
+  --overlay-erreur-15: rgb(255 92 120 / 0.15);
+  --overlay-erreur-20: rgb(255 92 120 / 0.20);
+  --overlay-erreur-30: rgb(255 92 120 / 0.30);
+  --overlay-erreur-35: rgb(255 92 120 / 0.35);
+  --overlay-erreur-65: rgb(255 92 120 / 0.65);
   /* Admin info (55 138 221) */
   --overlay-admin-info-12: rgb(55 138 221 / 0.12);
   --overlay-admin-info-15: rgb(55 138 221 / 0.15);
   --overlay-admin-info-25: rgb(55 138 221 / 0.25);
   /* Noir pur (0 0 0) — compléments */
-  --overlay-noir-20: rgb(0 0 0 / 0.20);
-  --overlay-noir-25: rgb(0 0 0 / 0.25);
-  --overlay-noir-80: rgb(0 0 0 / 0.80);
-  --overlay-noir-85: rgb(0 0 0 / 0.85);
+  --overlay-noir-20: rgb(7 6 11 / 0.20);
+  --overlay-noir-25: rgb(7 6 11 / 0.25);
+  --overlay-noir-80: rgb(7 6 11 / 0.80);
+  --overlay-noir-85: rgb(7 6 11 / 0.85);
   /* Noir profond (13 13 13) — série complète */
   --overlay-noir-profond-15: rgb(13 13 13 / 0.15);
   --overlay-noir-profond-55: rgb(13 13 13 / 0.55);
@@ -415,58 +415,58 @@
   --overlay-teal-95: rgb(15 110 86 / 0.95);
   --overlay-vert-fonce-90: rgb(0 120 64 / 0.90);
   /* Compléments Vague J — round 2 */
-  --overlay-vert-06: rgb(246 192 9 / 0.06);
-  --overlay-vert-07: rgb(246 192 9 / 0.07);
-  --overlay-vert-35: rgb(246 192 9 / 0.35);
-  --overlay-vert-60: rgb(246 192 9 / 0.60);
-  --overlay-vert-65: rgb(246 192 9 / 0.65);
-  --overlay-vert-70: rgb(246 192 9 / 0.70);
-  --overlay-or-18: rgb(255 194 14 / 0.18);
-  --overlay-or-35: rgb(255 194 14 / 0.35);
-  --overlay-or-60: rgb(255 194 14 / 0.60);
-  --overlay-or-85: rgb(255 194 14 / 0.85);
+  --overlay-vert-06: rgb(200 75 255 / 0.06);
+  --overlay-vert-07: rgb(200 75 255 / 0.07);
+  --overlay-vert-35: rgb(200 75 255 / 0.35);
+  --overlay-vert-60: rgb(200 75 255 / 0.60);
+  --overlay-vert-65: rgb(200 75 255 / 0.65);
+  --overlay-vert-70: rgb(200 75 255 / 0.70);
+  --overlay-or-18: rgb(69 230 255 / 0.18);
+  --overlay-or-35: rgb(69 230 255 / 0.35);
+  --overlay-or-60: rgb(69 230 255 / 0.60);
+  --overlay-or-85: rgb(69 230 255 / 0.85);
   --overlay-admin-warning-06: rgb(255 140 0 / 0.06);
   --overlay-admin-warning-12: rgb(255 140 0 / 0.12);
   --overlay-admin-warning-20: rgb(255 140 0 / 0.20);
   --overlay-admin-warning-25: rgb(255 140 0 / 0.25);
   --overlay-admin-info-07: rgb(55 138 221 / 0.07);
   --overlay-admin-info-30: rgb(55 138 221 / 0.30);
-  --overlay-erreur-06: rgb(255 68 68 / 0.06);
-  --overlay-noir-65: rgb(0 0 0 / 0.65);
+  --overlay-erreur-06: rgb(255 92 120 / 0.06);
+  --overlay-noir-65: rgb(7 6 11 / 0.65);
   --overlay-noir-profond-35: rgb(13 13 13 / 0.35);
   --overlay-rouge-25: rgb(206 17 38 / 0.25);
   --overlay-indigo-20: rgb(30 0 80 / 0.20);
   --overlay-bleu-clair-13: rgb(96 165 250 / 0.13);
-  --live-warn-bg: rgb(255 194 14 / 0.08);
-  --live-warn-border: rgb(255 194 14 / 0.25);
-  --live-warn-section-bg: rgb(255 194 14 / 0.06);
-  --live-warn-section-border: rgb(255 194 14 / 0.2);
-  --live-warn-pill: rgb(255 194 14 / 0.2);
-  --live-ok-bg: rgb(0 136 48 / 0.12);
-  --live-ok-border: rgb(0 136 48 / 0.32);
+  --live-warn-bg: rgb(69 230 255 / 0.08);
+  --live-warn-border: rgb(69 230 255 / 0.25);
+  --live-warn-section-bg: rgb(69 230 255 / 0.06);
+  --live-warn-section-border: rgb(69 230 255 / 0.2);
+  --live-warn-pill: rgb(69 230 255 / 0.2);
+  --live-ok-bg: rgb(200 75 255 / 0.12);
+  --live-ok-border: rgb(200 75 255 / 0.32);
   --live-err-bg: rgb(255 77 79 / 0.08);
   --live-err-border: rgb(255 77 79 / 0.25);
-  --day-accent-morning: rgb(255 194 14 / 0.15);
-  --day-accent-day: rgb(0 136 48 / 0.12);
+  --day-accent-morning: rgb(69 230 255 / 0.15);
+  --day-accent-day: rgb(200 75 255 / 0.12);
   --day-accent-evening: rgb(120 60 0 / 0.15);
   --day-accent-night: rgb(30 0 80 / 0.2);
-  --color-vert-energie-bg: rgb(246 192 9 / 0.15);
-  --color-vert-energie-ring: rgb(246 192 9 / 0.2);
-  --color-vert-energie-border: rgb(246 192 9 / 0.25);
+  --color-vert-energie-bg: rgb(200 75 255 / 0.15);
+  --color-vert-energie-ring: rgb(200 75 255 / 0.2);
+  --color-vert-energie-border: rgb(200 75 255 / 0.25);
   --color-erreur-banner: rgb(206 17 38 / 0.08);
-  --color-accent-violet-bg: rgb(168 85 247 / 0.12);
-  --color-info-bg: rgb(59 130 246 / 0.12);
-  --color-accent-orange-bg: rgb(249 115 22 / 0.12);
+  --color-accent-violet-bg: rgb(200 75 255 / 0.12);
+  --color-info-bg: rgb(110 168 255 / 0.12);
+  --color-accent-orange-bg: rgb(255 92 207 / 0.12);
 
   --font-sans: var(--font-montserrat), Montserrat, system-ui, sans-serif;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 12px 0 rgb(0 0 0 / 0.45);
-  --shadow-lg: 0 8px 24px 0 rgb(0 0 0 / 0.5);
-  --shadow-xl: 0 16px 48px 0 rgb(0 0 0 / 0.55);
+  --shadow-sm: 0 1px 2px 0 rgb(7 6 11 / 0.4);
+  --shadow-md: 0 4px 12px 0 rgb(7 6 11 / 0.45);
+  --shadow-lg: 0 8px 24px 0 rgb(7 6 11 / 0.5);
+  --shadow-xl: 0 16px 48px 0 rgb(7 6 11 / 0.55);
 
   --t8-pearl-black: #07060B;
   --t8-deep-black: #040309;
@@ -551,7 +551,7 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Lueur casque #008830 — ~60 % plus discrète */
+/* Lueur casque #C84BFF — ~60 % plus discrète */
 body::before {
   content: "";
   position: fixed;
@@ -559,10 +559,10 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 45% 38% at 0% 0%, rgb(0 136 48 / 0.07) 0%, transparent 72%),
-    radial-gradient(ellipse 45% 38% at 100% 0%, rgb(0 136 48 / 0.05) 0%, transparent 72%),
-    radial-gradient(ellipse 42% 36% at 100% 100%, rgb(0 136 48 / 0.06) 0%, transparent 74%),
-    radial-gradient(ellipse 42% 36% at 0% 100%, rgb(0 136 48 / 0.05) 0%, transparent 74%);
+    radial-gradient(ellipse 45% 38% at 0% 0%, rgb(200 75 255 / 0.07) 0%, transparent 72%),
+    radial-gradient(ellipse 45% 38% at 100% 0%, rgb(200 75 255 / 0.05) 0%, transparent 72%),
+    radial-gradient(ellipse 42% 36% at 100% 100%, rgb(200 75 255 / 0.06) 0%, transparent 74%),
+    radial-gradient(ellipse 42% 36% at 0% 100%, rgb(200 75 255 / 0.05) 0%, transparent 74%);
 }
 
 /* Shells pleine page — CSS pur (fallback si utilitaires Tailwind absents en dev/mobile). */

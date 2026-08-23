@@ -26,7 +26,7 @@ export function TrackCredits({ credits }: TrackCreditsProps) {
     <div className="mt-3 space-y-2">
       <p
         className="text-xs font-semibold uppercase"
-        style={{ color: "rgba(255,255,255,0.4)", letterSpacing: "0.5px" }}
+        style={{ color: "rgba(247, 243, 255,0.4)", letterSpacing: "0.5px" }}
       >
         Crédits
       </p>
@@ -35,7 +35,7 @@ export function TrackCredits({ credits }: TrackCreditsProps) {
           const group = byRole.get(role)!;
           return (
             <div key={role}>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p className="text-xs" style={{ color: "rgba(247, 243, 255,0.35)" }}>
                 {TRACK_CREDIT_ROLE_LABELS[role]}
               </p>
               <p className="text-sm font-medium" style={{ color: "var(--color-texte-principal)" }}>

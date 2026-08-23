@@ -323,7 +323,7 @@
   border-radius: 12px;
   background: var(--color-elevated);
   border: 1px solid var(--color-admin-card-border);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+  box-shadow: 0 12px 32px rgb(7 6 11 / 0.45);
 }
 
 .fraud-incident-menu__item {
@@ -436,7 +436,7 @@
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgb(0 0 0 / 0.55);
+  background: rgb(7 6 11 / 0.55);
   display: flex;
   justify-content: flex-end;
 }
@@ -448,7 +448,7 @@
   border-left: 1px solid var(--color-admin-card-border);
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 40px rgb(0 0 0 / 0.4);
+  box-shadow: -8px 0 40px rgb(7 6 11 / 0.4);
   animation: fraud-drawer-in 0.22s ease;
 }
 

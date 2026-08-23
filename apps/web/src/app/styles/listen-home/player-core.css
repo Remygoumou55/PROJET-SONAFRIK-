@@ -24,7 +24,7 @@
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.06);
 }
 
 .ls-mp-cover img,
@@ -50,7 +50,7 @@
 
 .ls-mp-artist {
   font-size: 11px;
-  color: rgb(255 255 255 / 0.4);
+  color: rgb(247 243 255 / 0.4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -67,7 +67,7 @@
 .ls-mp-btn {
   background: none;
   border: none;
-  color: rgb(255 255 255 / 0.5);
+  color: rgb(247 243 255 / 0.5);
   font-size: 15px;
   cursor: pointer;
   padding: 5px;

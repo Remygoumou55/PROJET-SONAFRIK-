@@ -5,7 +5,7 @@
   border: 1px solid var(--color-bordure);
   border-radius: 1.25rem;
   background:
-    radial-gradient(ellipse 70% 50% at 0% 0%, rgb(0 136 48 / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 0% 0%, rgb(200 75 255 / 0.05) 0%, transparent 55%),
     radial-gradient(ellipse 60% 45% at 100% 100%, rgb(255 193 7 / 0.04) 0%, transparent 55%),
     var(--color-surface);
   padding: 1.5rem;
@@ -41,9 +41,9 @@
 /* ── Summary ── */
 
 .identity-musical-summary {
-  border: 1px solid rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(247 243 255 / 0.06);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.02);
+  background: rgb(247 243 255 / 0.02);
   padding: 1.125rem 1rem;
 }
 
@@ -88,7 +88,7 @@
   height: 0.5rem;
   overflow: hidden;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.06);
 }
 
 .identity-musical-summary__fill {
@@ -158,9 +158,9 @@
   display: flex;
   flex-direction: column;
   min-height: 5.5rem;
-  border: 1px solid rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(247 243 255 / 0.06);
   border-radius: 0.875rem;
-  background: rgb(255 255 255 / 0.02);
+  background: rgb(247 243 255 / 0.02);
   padding: 0.875rem;
   transition:
     border-color 0.2s ease,
@@ -170,18 +170,18 @@
 
 .identity-musical-dimension:hover,
 .identity-musical-dimension:focus-within {
-  border-color: rgb(255 255 255 / 0.12);
+  border-color: rgb(247 243 255 / 0.12);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+  box-shadow: 0 4px 16px rgb(7 6 11 / 0.15);
 }
 
 .identity-musical-dimension--filled {
-  border-color: rgb(0 136 48 / 0.15);
+  border-color: rgb(200 75 255 / 0.15);
 }
 
 .identity-musical-dimension--filled:hover,
 .identity-musical-dimension--filled:focus-within {
-  border-color: rgb(0 136 48 / 0.28);
+  border-color: rgb(200 75 255 / 0.28);
 }
 
 .identity-musical-dimension__header {
@@ -231,14 +231,14 @@
 
 .identity-musical-pill--default {
   color: var(--color-texte-principal);
-  border: 1px solid rgb(255 255 255 / 0.12);
-  background: rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(247 243 255 / 0.12);
+  background: rgb(247 243 255 / 0.06);
 }
 
 .identity-musical-pill--accent {
   color: var(--color-vert-energie);
-  border: 1px solid rgb(0 136 48 / 0.3);
-  background: rgb(0 136 48 / 0.1);
+  border: 1px solid rgb(200 75 255 / 0.3);
+  background: rgb(200 75 255 / 0.1);
 }
 
 .identity-musical-pill--guinea {
@@ -249,7 +249,7 @@
 
 .identity-musical-pill--placeholder {
   color: var(--color-texte-secondaire);
-  border: 1px dashed rgb(255 255 255 / 0.12);
+  border: 1px dashed rgb(247 243 255 / 0.12);
   background: transparent;
   font-weight: 500;
   font-style: italic;

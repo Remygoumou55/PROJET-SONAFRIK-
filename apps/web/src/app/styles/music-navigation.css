@@ -56,7 +56,7 @@
   background-image: url("/brand/listen-pattern-strip.svg");
   background-repeat: repeat-y;
   background-size: var(--nav-sidebar-pattern-width) 5rem;
-  border-right: 1px solid rgb(246 192 9 / 0.08);
+  border-right: 1px solid rgb(200 75 255 / 0.08);
 }
 
 .music-sidebar--admin .music-sidebar__pattern {
@@ -286,7 +286,7 @@
   letter-spacing: 0.06em;
   color: var(--color-or-solaire);
   background: var(--overlay-casque-12);
-  border: 1px solid rgb(0 136 48 / 0.35);
+  border: 1px solid rgb(200 75 255 / 0.35);
 }
 
 /* ── Back link ───────────────────────────────────────────────────────────── */
@@ -522,7 +522,7 @@
 
 .music-mobile-nav__pill--active {
   color: var(--color-or-solaire);
-  border-color: rgb(246 192 9 / 0.35);
+  border-color: rgb(200 75 255 / 0.35);
   background: var(--nav-link-active-bg);
   font-weight: 600;
 }

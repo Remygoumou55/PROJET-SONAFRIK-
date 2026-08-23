@@ -11,8 +11,8 @@ const CITY_SUGGESTIONS = [
 
 const fieldStyle: CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(255,255,255,0.05)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'rgba(247, 243, 255,0.05)',
+  border: '1px solid rgba(247, 243, 255,0.1)',
   borderRadius: '10px',
   padding: '12px 14px',
   fontSize: '14px',
@@ -24,7 +24,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '12px',
-  color: 'rgba(255,255,255,0.5)',
+  color: 'rgba(247, 243, 255,0.5)',
   marginBottom: '6px',
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
@@ -73,7 +73,7 @@ export function Step2Location({ wizard }: Props) {
           disabled={!canContinue}
           style={{
             width: '100%',
-            backgroundColor: canContinue ? 'var(--color-vert-energie)' : 'rgba(0,210,106,0.25)',
+            backgroundColor: canContinue ? 'var(--color-vert-energie)' : 'rgba(200, 75, 255,0.25)',
             color: 'var(--color-noir-profond)',
             fontWeight: 700,
             fontSize: '15px',

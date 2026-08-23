@@ -70,7 +70,7 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
         >
           Bienvenue sur SONAFRIK, {data.fullName} 👋
         </h2>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: 'rgba(247, 243, 255,0.4)', margin: 0 }}>
           Tout est prêt. Voici un récapitulatif de votre profil.
         </p>
       </div>
@@ -78,8 +78,8 @@ export function Step5Confirm({ wizard, router, bypassAuth = false }: Props) {
       {/* Récapitulatif */}
       <div
         style={{
-          backgroundColor: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          backgroundColor: 'rgba(247, 243, 255,0.04)',
+          border: '1px solid rgba(247, 243, 255,0.08)',
           borderRadius: '12px',
           padding: '16px',
           marginBottom: '24px',

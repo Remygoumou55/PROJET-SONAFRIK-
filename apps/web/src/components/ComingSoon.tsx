@@ -17,7 +17,7 @@ export function ComingSoon({ title, description, emoji = "🔒" }: ComingSoonPro
       <p className="text-sm max-w-xs mb-6" style={{ color: "var(--color-texte-secondaire)" }}>{description}</p>
       <div
         className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
-        style={{ backgroundColor: "rgba(255, 194, 14, 0.13)", color: "var(--color-or-solaire)", border: "1px solid rgba(255, 194, 14, 0.27)" }}
+        style={{ backgroundColor: "rgba(69, 230, 255, 0.13)", color: "var(--color-or-solaire)", border: "1px solid rgba(69, 230, 255, 0.27)" }}
       >
         <span>🔒</span>
         <span>Bientôt disponible</span>

@@ -12,7 +12,7 @@ export function AmbientBackgroundGlow({ className }: { className?: string }) {
           left: "-150px",
           width: "600px",
           height: "600px",
-          background: "radial-gradient(circle, rgba(0,210,106,0.07) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(200, 75, 255,0.07) 0%, transparent 70%)",
         }}
         aria-hidden="true"
       />
@@ -23,7 +23,7 @@ export function AmbientBackgroundGlow({ className }: { className?: string }) {
           right: "-150px",
           width: "500px",
           height: "500px",
-          background: "radial-gradient(circle, rgba(255,194,14,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(69, 230, 255,0.05) 0%, transparent 70%)",
         }}
         aria-hidden="true"
       />
@@ -36,7 +36,7 @@ export function AmbientBackgroundGlow({ className }: { className?: string }) {
           width: "900px",
           height: "500px",
           background:
-            "radial-gradient(ellipse, rgba(0,210,106,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(200, 75, 255,0.04) 0%, transparent 70%)",
         }}
         aria-hidden="true"
       />
@@ -48,7 +48,7 @@ export function AmbientBackgroundGlow({ className }: { className?: string }) {
           width: "600px",
           height: "400px",
           background:
-            "radial-gradient(ellipse, rgba(255,194,14,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(69, 230, 255,0.04) 0%, transparent 70%)",
         }}
         aria-hidden="true"
       />

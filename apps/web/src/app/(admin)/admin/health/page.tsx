@@ -70,9 +70,9 @@ export default async function AdminHealthPage() {
         <span
           className="px-3 py-1.5 rounded-lg text-xs font-bold"
           style={{
-            backgroundColor: allOk ? "rgba(0, 210, 106, 0.13)" : "rgba(255, 102, 102, 0.13)",
+            backgroundColor: allOk ? "rgba(200, 75, 255, 0.13)" : "rgba(255, 102, 102, 0.13)",
             color: allOk ? "var(--color-vert-energie)" : "var(--color-erreur)",
-            border: `1px solid ${allOk ? "rgba(0, 210, 106, 0.27)" : "rgba(255, 102, 102, 0.27)"}`,
+            border: `1px solid ${allOk ? "rgba(200, 75, 255, 0.27)" : "rgba(255, 102, 102, 0.27)"}`,
           }}
         >
           {allOk ? "TOUT OPÉRATIONNEL" : "DÉGRADÉ"}
@@ -92,7 +92,7 @@ export default async function AdminHealthPage() {
         className="rounded-2xl p-5"
         style={{
           backgroundColor: "var(--color-surface)",
-          border: `1px solid ${unreadAlerts.length > 0 ? "rgba(255, 194, 14, 0.27)" : "var(--color-elevated)"}`,
+          border: `1px solid ${unreadAlerts.length > 0 ? "rgba(69, 230, 255, 0.27)" : "var(--color-elevated)"}`,
         }}
       >
         <div className="flex items-center justify-between mb-4">
@@ -100,7 +100,7 @@ export default async function AdminHealthPage() {
           {unreadAlerts.length > 0 && (
             <span
               className="px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ backgroundColor: "rgba(255, 194, 14, 0.13)", color: "var(--color-or-solaire)" }}
+              style={{ backgroundColor: "rgba(69, 230, 255, 0.13)", color: "var(--color-or-solaire)" }}
             >
               {unreadAlerts.length} non lue{unreadAlerts.length > 1 ? "s" : ""}
             </span>
@@ -114,7 +114,7 @@ export default async function AdminHealthPage() {
               <div
                 key={alert.id}
                 className="rounded-lg px-3 py-2.5"
-                style={{ backgroundColor: "var(--color-elevated)", border: "1px solid rgba(255, 194, 14, 0.20)" }}
+                style={{ backgroundColor: "var(--color-elevated)", border: "1px solid rgba(69, 230, 255, 0.20)" }}
               >
                 <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--color-or-solaire)" }}>
                   ⚠️ {alert.type.replace(/_/g, " ")}

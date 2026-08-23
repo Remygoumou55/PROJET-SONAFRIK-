@@ -75,7 +75,7 @@
 .listen-track-card-play-overlay {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.4);
+  background: rgb(7 6 11 / 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -98,7 +98,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-noir-profond);
-  box-shadow: 0 4px 20px rgb(0 136 48 / 0.4);
+  box-shadow: 0 4px 20px rgb(200 75 255 / 0.4);
 }
 
 /* Homepage discovery row — tokens en CSS (évite mismatch hydration inline var()) */
@@ -161,7 +161,7 @@
 }
 
 .listen-track-row:hover {
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(247 243 255 / 0.04);
 }
 
 .listen-track-row-pos {
@@ -309,7 +309,7 @@
   background: rgb(13 13 13 / 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgb(255 255 255 / 0.05);
+  border-bottom: 1px solid rgb(247 243 255 / 0.05);
 }
 
 .header-logo-mobile {
@@ -352,8 +352,8 @@
 .header-filters {
   display: flex;
   gap: 4px;
-  background: rgb(255 255 255 / 0.04);
-  border: 1px solid rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.04);
+  border: 1px solid rgb(247 243 255 / 0.06);
   border-radius: 99px;
   padding: 4px;
   overflow-x: auto;
@@ -410,7 +410,7 @@
 
 .header-filter-btn:hover {
   color: var(--color-texte-principal);
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(247 243 255 / 0.05);
 }
 
 .header-filter-btn.active {
@@ -426,7 +426,7 @@
 .header-filters-skeleton {
   width: 280px;
   height: 40px;
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(247 243 255 / 0.04);
   border-radius: 99px;
   animation: listen-skeleton-pulse 1.5s ease-in-out infinite;
 }
@@ -486,7 +486,7 @@
   padding: 24px 0 20px;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgb(255 255 255 / 0.05);
+  border-bottom: 1px solid rgb(247 243 255 / 0.05);
 }
 
 .listen-hero-compact::before {
@@ -498,7 +498,7 @@
   height: 200px;
   background: radial-gradient(
     ellipse at 100% 0%,
-    rgb(0 136 48 / 0.08) 0%,
+    rgb(200 75 255 / 0.08) 0%,
     transparent 70%
   );
   pointer-events: none;
@@ -518,7 +518,7 @@
 
 .listen-hero-sub {
   font-size: 14px;
-  color: rgb(255 255 255 / 0.45);
+  color: rgb(247 243 255 / 0.45);
   margin-bottom: 12px;
 }
 
@@ -542,7 +542,7 @@
   background-image: url("/brand/listen-pattern-strip.svg");
   background-repeat: repeat-y;
   background-size: 28px 80px;
-  border-right: 1px solid rgb(246 192 9 / 0.08);
+  border-right: 1px solid rgb(200 75 255 / 0.08);
 }
 
 .listener-sidebar__body {
@@ -555,7 +555,7 @@
   overflow-y: auto;
   scrollbar-width: none;
   padding: 0 0 16px;
-  border-right: 1px solid rgb(255 255 255 / 0.05);
+  border-right: 1px solid rgb(247 243 255 / 0.05);
 }
 
 .listener-sidebar__body::-webkit-scrollbar {
@@ -567,7 +567,7 @@
 }
 
 .ls-skeleton {
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.06);
 }
 
 /* ===== LOGO ===== */
@@ -596,7 +596,7 @@
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgb(246 192 9 / 0.55);
+  color: rgb(200 75 255 / 0.55);
   margin-top: 6px;
 }
 
@@ -617,7 +617,7 @@
   border-left: 3px solid transparent;
   font-size: 14px;
   font-weight: 500;
-  color: rgb(255 255 255 / 0.45);
+  color: rgb(247 243 255 / 0.45);
   text-decoration: none;
   transition:
     background 0.15s ease,
@@ -627,13 +627,13 @@
 }
 
 .ls-nav-item:hover:not(.ls-nav-item--active) {
-  background: rgb(246 192 9 / 0.05);
-  color: rgb(255 255 255 / 0.85);
-  border-left-color: rgb(246 192 9 / 0.22);
+  background: rgb(200 75 255 / 0.05);
+  color: rgb(247 243 255 / 0.85);
+  border-left-color: rgb(200 75 255 / 0.22);
 }
 
 .ls-nav-item--active {
-  background: rgb(246 192 9 / 0.09);
+  background: rgb(200 75 255 / 0.09);
   color: var(--color-or-solaire);
   font-weight: 600;
   border-left-color: var(--color-or-solaire);
@@ -645,7 +645,7 @@
   justify-content: center;
   width: 22px;
   flex-shrink: 0;
-  color: rgb(246 192 9 / 0.5);
+  color: rgb(200 75 255 / 0.5);
   transition: color 0.15s ease;
 }
 
@@ -654,7 +654,7 @@
 }
 
 .ls-nav-item:hover:not(.ls-nav-item--active) .ls-nav-icon {
-  color: rgb(246 192 9 / 0.88);
+  color: rgb(200 75 255 / 0.88);
 }
 
 .ls-nav-label {
@@ -673,7 +673,7 @@
 /* ===== SÉPARATEUR ===== */
 .ls-divider {
   height: 1px;
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(247 243 255 / 0.05);
   margin: 12px 20px;
   flex-shrink: 0;
 }
@@ -689,7 +689,7 @@
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgb(246 192 9 / 0.65);
+  color: rgb(200 75 255 / 0.65);
   padding: 12px 20px 8px;
   display: block;
   flex-shrink: 0;
@@ -717,7 +717,7 @@
 }
 
 .ls-recently-item:hover {
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(247 243 255 / 0.04);
 }
 
 .ls-recently-cover {
@@ -726,7 +726,7 @@
   border-radius: 7px;
   overflow: hidden;
   flex-shrink: 0;
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(247 243 255 / 0.06);
 }
 
 .ls-recently-info {
@@ -737,7 +737,7 @@
 .ls-recently-title {
   font-size: 12px;
   font-weight: 500;
-  color: rgb(255 255 255 / 0.75);
+  color: rgb(247 243 255 / 0.75);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -745,7 +745,7 @@
 
 .ls-recently-artist {
   font-size: 11px;
-  color: rgb(255 255 255 / 0.3);
+  color: rgb(247 243 255 / 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -772,7 +772,7 @@
 }
 
 .ls-playlist-item:hover {
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(247 243 255 / 0.04);
 }
 
 .ls-playlist-icon {
@@ -783,12 +783,12 @@
 .ls-playlist-label {
   font-size: 13px;
   font-weight: 500;
-  color: rgb(255 255 255 / 0.5);
+  color: rgb(247 243 255 / 0.5);
   flex: 1;
 }
 
 .ls-playlist-count {
   font-size: 11px;
-  color: rgb(255 255 255 / 0.2);
+  color: rgb(247 243 255 / 0.2);
   font-variant-numeric: tabular-nums;
 }

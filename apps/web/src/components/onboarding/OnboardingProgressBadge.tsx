@@ -26,7 +26,7 @@ export function OnboardingProgressBadge({ currentStep, totalSteps = 5 }: Props) 
             width: '48px',
             height: '48px',
             borderRadius: '50%',
-            background: 'rgba(0,210,106,0.1)',
+            background: 'rgba(200, 75, 255,0.1)',
             border: '2px solid var(--color-vert-energie)',
             display: 'flex',
             alignItems: 'center',
@@ -52,7 +52,7 @@ export function OnboardingProgressBadge({ currentStep, totalSteps = 5 }: Props) 
       <div
         style={{
           height: '4px',
-          background: 'rgba(255,255,255,0.08)',
+          background: 'rgba(247, 243, 255,0.08)',
           borderRadius: '2px',
           position: 'relative',
           marginBottom: '10px',
@@ -81,7 +81,7 @@ export function OnboardingProgressBadge({ currentStep, totalSteps = 5 }: Props) 
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              background: i + 1 <= currentStep ? 'var(--color-vert-energie)' : 'rgba(255,255,255,0.15)',
+              background: i + 1 <= currentStep ? 'var(--color-vert-energie)' : 'rgba(247, 243, 255,0.15)',
               transition: 'background 0.3s',
             }}
           />
