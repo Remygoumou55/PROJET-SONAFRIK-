@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
 import type { DiscoveryArtist, DiscoveryTrack, TrackWithMeta } from "@sonafrik/types";
+import { CoverImage } from "../../features/shared/components/CoverImage";
+import { ScreenHeader } from "../../features/shared/components/ScreenHeader";
+import { SectionHeader } from "../../features/shared/components/SectionHeader";
 import { useDiscovery } from "../../features/streaming/useDiscovery";
 import { usePlayerContext } from "../../features/streaming/PlayerContext";
 
-// Convertit DiscoveryTrack → TrackWithMeta pour usePlayer
 function toTrackWithMeta(dt: DiscoveryTrack): TrackWithMeta {
-  const now = new Date().toISOString();
   return {
     id: dt.track_id,
     creator_id: dt.creator_id,
@@ -33,12 +34,12 @@ function toTrackWithMeta(dt: DiscoveryTrack): TrackWithMeta {
     submitted_at: null,
     published_at: dt.published_at,
     metadata: {},
-    created_at: dt.published_at ?? now,
-    updated_at: dt.published_at ?? now,
+    created_at: dt.published_at ?? new Date().toISOString(),
+    updated_at: dt.published_at ?? new Date().toISOString(),
     deleted_at: null,
     artist_name: dt.artist_name ?? undefined,
     album_title: dt.album_title ?? undefined,
-    cover_url: null,
+    cover_url: dt.cover_path,
   };
 }
 
@@ -63,7 +64,6 @@ function greeting(): string {
   return "Bonsoir";
 }
 
-// ─── Track card (horizontal scroll) ────────────────────────────────────────
 function TrackCard({ track, onPress, isPlaying }: {
   track: DiscoveryTrack;
   onPress: () => void;
@@ -71,46 +71,26 @@ function TrackCard({ track, onPress, isPlaying }: {
 }) {
   return (
     <Pressable onPress={onPress} style={styles.trackCard}>
-      <View style={[styles.trackCover, isPlaying && styles.trackCoverActive]}>
-        {isPlaying ? (
-          <Text style={styles.trackCoverIcon}>▶</Text>
-        ) : (
-          <Text style={styles.trackCoverIcon}>♪</Text>
-        )}
+      <View style={[styles.coverWrap, isPlaying && styles.coverWrapActive]}>
+        <CoverImage coverPath={track.cover_path} label={track.artist_name ?? track.title} size={140} borderRadius={10} />
       </View>
-      <Text style={styles.trackCardTitle} numberOfLines={2}>
-        {track.title}
-      </Text>
-      <Text style={styles.trackCardMeta} numberOfLines={1}>
-        {track.artist_name ?? "Artiste"}
-      </Text>
-      <Text style={styles.trackCardStats}>
-        {formatCount(track.stream_count)} écoutes
-      </Text>
+      <Text style={styles.trackCardTitle} numberOfLines={2}>{track.title}</Text>
+      <Text style={styles.trackCardMeta} numberOfLines={1}>{track.artist_name ?? "Artiste"}</Text>
+      <Text style={styles.trackCardStats}>{formatCount(track.stream_count)} écoutes</Text>
     </Pressable>
   );
 }
 
-// ─── Artist chip (horizontal scroll) ────────────────────────────────────────
 function ArtistChip({ artist }: { artist: DiscoveryArtist }) {
   return (
     <View style={styles.artistChip}>
-      <View style={styles.artistAvatar}>
-        <Text style={styles.artistAvatarText}>
-          {artist.stage_name.charAt(0).toUpperCase()}
-        </Text>
-      </View>
-      <Text style={styles.artistName} numberOfLines={1}>
-        {artist.stage_name}
-      </Text>
-      {artist.verified ? (
-        <Text style={styles.artistVerified}>✓</Text>
-      ) : null}
+      <CoverImage coverPath={artist.cover_path} label={artist.stage_name} size={64} round />
+      <Text style={styles.artistName} numberOfLines={1}>{artist.stage_name}</Text>
+      {artist.verified ? <Text style={styles.artistVerified}>✓</Text> : null}
     </View>
   );
 }
 
-// ─── New release row (vertical list) ────────────────────────────────────────
 function NewTrackRow({ track, onPress, isPlaying }: {
   track: DiscoveryTrack;
   onPress: () => void;
@@ -119,12 +99,10 @@ function NewTrackRow({ track, onPress, isPlaying }: {
   return (
     <Pressable onPress={onPress} style={styles.newRow}>
       <View style={[styles.newCover, isPlaying && styles.newCoverActive]}>
-        <Text style={styles.newCoverIcon}>{isPlaying ? "▶" : "♪"}</Text>
+        <CoverImage coverPath={track.cover_path} label={track.artist_name ?? track.title} size={46} borderRadius={10} />
       </View>
       <View style={styles.newInfo}>
-        <Text style={styles.newTitle} numberOfLines={1}>
-          {track.title}
-        </Text>
+        <Text style={styles.newTitle} numberOfLines={1}>{track.title}</Text>
         <Text style={styles.newMeta} numberOfLines={1}>
           {track.artist_name ?? "Artiste"}
           {track.duration_seconds ? `  ·  ${formatDuration(track.duration_seconds)}` : ""}
@@ -135,7 +113,6 @@ function NewTrackRow({ track, onPress, isPlaying }: {
   );
 }
 
-// ─── Main screen ─────────────────────────────────────────────────────────────
 export default function AccueilTab() {
   const { feed, artists, newReleases, isLoading, error } = useDiscovery();
   const { currentTrack, isPlaying, loadAndPlay, pause, resume } = usePlayerContext();
@@ -160,46 +137,16 @@ export default function AccueilTab() {
   const heroTrack = feed[0];
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header ───────────────────────────────────────── */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>{greeting()}</Text>
-          <Text style={styles.brand}>
-            <Text style={styles.brandWhite}>SONA</Text>
-            <Text style={styles.brandGreen}>FRIK</Text>
-          </Text>
-        </View>
-        <View style={styles.tagRow}>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>NOTRE BIEN COMMUN</Text>
-          </View>
-        </View>
-      </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScreenHeader title="SONAFRIK" subtitle={greeting()} rightIcon="⚙" onRightPress={() => {}} />
 
-      {/* Hero track ────────────────────────────────────── */}
       {heroTrack ? (
-        <Pressable
-          style={styles.hero}
-          onPress={() => handlePlay(heroTrack)}
-        >
-          <View style={styles.heroVisual}>
-            <Text style={styles.heroIcon}>
-              {currentTrack?.id === heroTrack.track_id && isPlaying ? "⏸" : "▶"}
-            </Text>
-          </View>
+        <Pressable style={styles.hero} onPress={() => handlePlay(heroTrack)}>
+          <CoverImage coverPath={heroTrack.cover_path} label={heroTrack.artist_name ?? heroTrack.title} size={80} borderRadius={16} />
           <View style={styles.heroInfo}>
             <Text style={styles.heroLabel}>À la une</Text>
-            <Text style={styles.heroTitle} numberOfLines={2}>
-              {heroTrack.title}
-            </Text>
-            <Text style={styles.heroArtist} numberOfLines={1}>
-              {heroTrack.artist_name ?? "Artiste"}
-            </Text>
+            <Text style={styles.heroTitle} numberOfLines={2}>{heroTrack.title}</Text>
+            <Text style={styles.heroArtist} numberOfLines={1}>{heroTrack.artist_name ?? "Artiste"}</Text>
             <Text style={styles.heroStats}>
               {formatCount(heroTrack.stream_count)} écoutes · {formatCount(heroTrack.like_count)} ♥
             </Text>
@@ -207,10 +154,9 @@ export default function AccueilTab() {
         </Pressable>
       ) : null}
 
-      {/* Pour vous ─────────────────────────────────────── */}
       {feed.length > 1 ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pour vous</Text>
+          <SectionHeader title="Pour vous" />
           <FlatList
             data={feed.slice(1)}
             horizontal
@@ -230,10 +176,9 @@ export default function AccueilTab() {
         </View>
       ) : null}
 
-      {/* Top artistes ────────────────────────────────── */}
       {artists.length > 0 ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Top artistes</Text>
+          <SectionHeader title="Top artistes" />
           <FlatList
             data={artists}
             horizontal
@@ -247,10 +192,9 @@ export default function AccueilTab() {
         </View>
       ) : null}
 
-      {/* Nouveautés ─────────────────────────────────── */}
       {newReleases && newReleases.tracks.length > 0 ? (
         <View style={[styles.section, styles.sectionLast]}>
-          <Text style={styles.sectionTitle}>Nouveautés</Text>
+          <SectionHeader title="Nouveautés" />
           {newReleases.tracks.map((track) => (
             <NewTrackRow
               key={track.track_id}
@@ -262,9 +206,7 @@ export default function AccueilTab() {
         </View>
       ) : null}
 
-      {error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </ScrollView>
   );
 }
@@ -274,31 +216,6 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 120 },
   center: { flex: 1, backgroundColor: colors.noirProfond, alignItems: "center", justifyContent: "center" },
 
-  // Header
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 56,
-    paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  greeting: { color: colors.texteSecondaire, fontSize: 13, marginBottom: 2 },
-  brand: { fontSize: 28, fontWeight: "800" },
-  brandWhite: { color: colors.textePrincipal },
-  brandGreen: { color: colors.vertEnergie },
-  tagRow: { paddingTop: 8 },
-  tag: {
-    backgroundColor: colors.orSolaire13,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: colors.orSolaire27,
-  },
-  tagText: { color: colors.orSolaire, fontSize: 10, fontWeight: "700", letterSpacing: 0.5 },
-
-  // Hero
   hero: {
     marginHorizontal: 16,
     marginBottom: 8,
@@ -311,101 +228,34 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.vertEnergie20,
   },
-  heroVisual: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.noir20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-  },
-  heroIcon: { fontSize: 24, color: colors.textePrincipal },
-  heroInfo: { flex: 1 },
+  heroInfo: { flex: 1, marginLeft: 14 },
   heroLabel: { color: colors.blanc60, fontSize: 11, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 },
   heroTitle: { color: colors.textePrincipal, fontSize: 17, fontWeight: "700", marginBottom: 3 },
   heroArtist: { color: colors.blanc80, fontSize: 13, marginBottom: 4 },
   heroStats: { color: colors.blanc53, fontSize: 12 },
 
-  // Sections
   section: { paddingHorizontal: 16, marginTop: 24 },
   sectionLast: { marginBottom: 8 },
-  sectionTitle: {
-    color: colors.textePrincipal,
-    fontSize: 17,
-    fontWeight: "700",
-    marginBottom: 14,
-  },
   hScroll: { gap: 12, paddingRight: 16 },
 
-  // Track card
-  trackCard: {
-    width: 140,
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: colors.bordure,
-  },
-  trackCover: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 10,
-    backgroundColor: colors.elevated,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  trackCoverActive: { backgroundColor: "colors.vertEnergie13", borderColor: colors.vertEnergie, borderWidth: 1.5 },
-  trackCoverIcon: { fontSize: 28, color: colors.texteSecondaire },
+  trackCard: { width: 140 },
+  coverWrap: { borderRadius: 10, marginBottom: 10 },
+  coverWrapActive: { borderWidth: 1.5, borderColor: colors.vertEnergie, borderRadius: 11, padding: 1 },
   trackCardTitle: { color: colors.textePrincipal, fontSize: 13, fontWeight: "600", marginBottom: 3 },
   trackCardMeta: { color: colors.texteSecondaire, fontSize: 12, marginBottom: 4 },
   trackCardStats: { color: colors.texteDesactive, fontSize: 11 },
 
-  // Artist chip
-  artistChip: {
-    width: 84,
-    alignItems: "center",
-    gap: 6,
-  },
-  artistAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.elevated,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: colors.bordure,
-  },
-  artistAvatarText: { color: colors.vertEnergie, fontSize: 22, fontWeight: "800" },
+  artistChip: { width: 84, alignItems: "center", gap: 6 },
   artistName: { color: colors.textePrincipal, fontSize: 12, fontWeight: "500", textAlign: "center" },
   artistVerified: { color: colors.vertEnergie, fontSize: 10 },
 
-  // New release row
-  newRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.bordure,
-    gap: 12,
-  },
-  newCover: {
-    width: 46,
-    height: 46,
-    borderRadius: 10,
-    backgroundColor: colors.elevated,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  newCoverActive: { backgroundColor: "colors.vertEnergie13", borderColor: colors.vertEnergie, borderWidth: 1.5 },
-  newCoverIcon: { fontSize: 18, color: colors.texteSecondaire },
+  newRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.bordure, gap: 12 },
+  newCover: { borderRadius: 10 },
+  newCoverActive: { borderWidth: 1.5, borderColor: colors.vertEnergie, borderRadius: 11, padding: 1 },
   newInfo: { flex: 1 },
   newTitle: { color: colors.textePrincipal, fontSize: 14, fontWeight: "600" },
   newMeta: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
   newLikes: { color: colors.texteDesactive, fontSize: 12 },
 
-  // Error
   errorText: { color: colors.texteSecondaire, textAlign: "center", marginTop: 20 },
 });

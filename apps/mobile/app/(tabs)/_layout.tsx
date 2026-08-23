@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Tabs, Redirect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@sonafrik/ui/tokens";
+import { CoverImage } from "../../features/shared/components/CoverImage";
 import { PlayerProvider, usePlayerContext } from "../../features/streaming/PlayerContext";
 import { getSupabaseMobileClient } from "../../lib/supabase";
 
@@ -14,6 +15,7 @@ function MiniPlayerBar({ bottomOffset }: { bottomOffset: number }) {
 
   return (
     <View style={[styles.miniPlayer, { bottom: bottomOffset }]}>
+      <CoverImage coverPath={currentTrack.cover_url ?? null} label={currentTrack.artist_name ?? currentTrack.title} size={44} borderRadius={8} />
       <View style={styles.miniInfo}>
         <Text style={styles.miniTitle} numberOfLines={1}>
           {currentTrack.title}

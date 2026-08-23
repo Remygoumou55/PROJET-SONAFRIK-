@@ -1,7 +1,8 @@
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
-import { SUBSCRIPTION_PLANS, REVENUE_POOL_PERCENT, TRANSACTION_TYPE_LABELS } from "@sonafrik/types";
+import { SUBSCRIPTION_PLANS, TRANSACTION_TYPE_LABELS } from "@sonafrik/types";
 import { formatGnf } from "@sonafrik/shared";
+import { ScreenHeader } from "../../features/shared/components/ScreenHeader";
 import { useWallet } from "../../features/wallet/useWallet";
 
 export default function WalletTab() {
@@ -27,68 +28,51 @@ export default function WalletTab() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Mon Wallet</Text>
+      <ScreenHeader title="Mon Wallet" subtitle={formatGnf(wallet.balance_gnf)} />
 
-      {/* Carte solde */}
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>Solde disponible</Text>
-        <Text style={styles.balanceAmount}>{formatGnf(wallet.balance_gnf)}</Text>
+        <Text style={styles.balanceAmount} numberOfLines={1}>{formatGnf(wallet.balance_gnf)}</Text>
         <View style={styles.balanceActions}>
           <TouchableOpacity
             style={styles.actionBtn}
-            onPress={() => Alert.alert(
-              "Recharger",
-              "La recharge de wallet est disponible sur l'application web SONAFRIK.",
-              [{ text: "OK" }],
-            )}
+            onPress={() => Alert.alert("Recharger", "Disponible sur l'application web SONAFRIK.", [{ text: "OK" }])}
           >
             <Text style={styles.actionBtnText}>Recharger</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionBtn}
-            onPress={() => Alert.alert(
-              "Retirer",
-              "Les retraits sont disponibles sur l'application web SONAFRIK.",
-              [{ text: "OK" }],
-            )}
+            onPress={() => Alert.alert("Retirer", "Disponible sur l'application web SONAFRIK.", [{ text: "OK" }])}
           >
             <Text style={styles.actionBtnText}>Retirer</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Statut premium */}
       <View style={styles.premiumCard}>
-        <View style={styles.premiumRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.premiumTitle}>
-              {isPremium ? "Premium actif" : isInGracePeriod ? "Essai gratuit" : "Abonnement expiré"}
-            </Text>
-            <Text style={styles.premiumSub}>
-              {isPremium && premiumExpiresAt
-                ? `Expire le ${new Date(premiumExpiresAt).toLocaleDateString("fr-FR")}`
-                : isInGracePeriod
-                ? "7 jours d'essai · Abonnez-vous"
-                : "Abonnez-vous pour écouter"}
-            </Text>
-          </View>
-          {!isPremium && (
-            <TouchableOpacity
-              style={styles.subscribeBtn}
-              onPress={() => subscribePremium("monthly")}
-            >
-              <Text style={styles.subscribeBtnText}>S'abonner</Text>
-            </TouchableOpacity>
-          )}
-          {isPremium && (
-            <View style={styles.premiumBadge}>
-              <Text style={styles.premiumBadgeText}>PREMIUM</Text>
-            </View>
-          )}
+        <View style={{ flex: 1 }}>
+          <Text style={styles.premiumTitle}>
+            {isPremium ? "Premium actif" : isInGracePeriod ? "Essai gratuit" : "Accès expiré"}
+          </Text>
+          <Text style={styles.premiumSub} numberOfLines={2}>
+            {isPremium && premiumExpiresAt
+              ? `Expire le ${new Date(premiumExpiresAt).toLocaleDateString("fr-FR")}`
+              : isInGracePeriod
+              ? "7 jours d'essai · Abonnez-vous"
+              : "Abonnez-vous pour écouter sans limite"}
+          </Text>
         </View>
+        {!isPremium ? (
+          <TouchableOpacity style={styles.subscribeBtn} onPress={() => subscribePremium("monthly")}>
+            <Text style={styles.subscribeBtnText}>S'abonner</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.premiumBadge}>
+            <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+          </View>
+        )}
       </View>
 
-      {/* Plans */}
       {!isPremium && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Abonnements</Text>
@@ -108,15 +92,6 @@ export default function WalletTab() {
         </View>
       )}
 
-      {/* Revenue Pool info */}
-      <View style={styles.poolCard}>
-        <Text style={styles.poolTitle}>Revenue Pool · {REVENUE_POOL_PERCENT}%</Text>
-        <Text style={styles.poolSub}>
-          {REVENUE_POOL_PERCENT}% des revenus sont redistribués aux artistes selon leurs écoutes valides.
-        </Text>
-      </View>
-
-      {/* Transactions récentes */}
       {recentTransactions.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Dernières opérations</Text>
@@ -149,8 +124,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.noirProfond },
   content: { padding: 16, paddingBottom: 32 },
   center: { alignItems: "center", justifyContent: "center" },
-  title: { color: colors.textePrincipal, fontSize: 22, fontWeight: "700", marginBottom: 16 },
   errorText: { color: colors.texteSecondaire },
+
   balanceCard: {
     borderRadius: 20,
     padding: 20,
@@ -168,7 +143,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   actionBtnText: { color: colors.textePrincipal, fontWeight: "600", fontSize: 14 },
+
   premiumCard: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.card,
     borderRadius: 14,
     padding: 16,
@@ -176,7 +154,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.bordure,
   },
-  premiumRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   premiumTitle: { color: colors.textePrincipal, fontSize: 14, fontWeight: "600" },
   premiumSub: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
   subscribeBtn: {
@@ -193,6 +170,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   premiumBadgeText: { color: colors.vertEnergie, fontSize: 11, fontWeight: "700" },
+
   section: { marginTop: 12 },
   sectionTitle: {
     color: colors.texteSecondaire,
@@ -214,17 +192,7 @@ const styles = StyleSheet.create({
   planLabel: { color: colors.textePrincipal, fontWeight: "600", fontSize: 14 },
   planPrice: { color: colors.orSolaire, fontWeight: "700", fontSize: 16, marginTop: 4 },
   planMeta: { color: colors.texteSecondaire, fontSize: 12, marginTop: 2 },
-  poolCard: {
-    backgroundColor: colors.orNoir,
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: colors.orSolaire20,
-    marginTop: 12,
-    marginBottom: 4,
-  },
-  poolTitle: { color: colors.orSolaire, fontWeight: "600", fontSize: 14 },
-  poolSub: { color: colors.texteSecondaire, fontSize: 12, marginTop: 4, lineHeight: 18 },
+
   txRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
   txIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
   txLabel: { color: colors.textePrincipal, fontSize: 14, fontWeight: "500" },

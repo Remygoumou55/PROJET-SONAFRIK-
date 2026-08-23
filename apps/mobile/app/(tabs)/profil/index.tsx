@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +12,8 @@ import { IdentityError } from "@sonafrik/api/identity";
 import type { IdentityContext } from "@sonafrik/types";
 import { ACCOUNT_TYPE_OPTIONS } from "@sonafrik/types";
 import { colors } from "@sonafrik/ui/tokens";
+import { CoverImage } from "../../../features/shared/components/CoverImage";
+import { ScreenHeader } from "../../../features/shared/components/ScreenHeader";
 import { useIdentityService } from "../../../features/identity/useIdentity";
 
 export default function ProfilScreen() {
@@ -75,14 +76,10 @@ export default function ProfilScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <ScreenHeader title="Mon profil" />
+
       <View style={styles.header}>
-        {avatarUrl ? (
-          <Image source={{ uri: avatarUrl }} style={styles.avatar} />
-        ) : (
-          <View style={styles.avatarFallback}>
-            <Text style={styles.avatarInitial}>{displayName.charAt(0).toUpperCase()}</Text>
-          </View>
-        )}
+        <CoverImage coverPath={avatarUrl ?? null} label={displayName} size={96} round />
         <Text style={styles.name} numberOfLines={1}>{displayName}</Text>
         <Text style={styles.meta} numberOfLines={1}>
           {profile.city ?? "Conakry"} · {profile.country_code ?? "GN"}
@@ -91,16 +88,10 @@ export default function ProfilScreen() {
         <Text style={styles.bio} numberOfLines={3}>{profile.bio ?? "Aucune bio pour le moment."}</Text>
       </View>
 
-      <View style={styles.stats}>
-        <Stat label="Non lues" value={String(context.unreadNotifications)} />
-        <Stat label="Sessions" value={String(context.activeSessions)} />
-        <Stat label="Langue" value={context.preferences.language} />
-      </View>
-
       <MenuItem label="Modifier le profil" onPress={() => router.push("/(tabs)/profil/edit")} />
       {profile.account_type === "artiste" || profile.account_type === "auditeur_artiste" ? (
         <MenuItem
-          label="Espace créateur (Creator OS)"
+          label="Espace créateur"
           onPress={() => router.push("/(tabs)/profil/creator")}
         />
       ) : null}
@@ -112,15 +103,6 @@ export default function ProfilScreen() {
       <MenuItem label="Sessions actives" onPress={() => router.push("/(tabs)/profil/sessions")} />
       <MenuItem label="Compte & suppression" onPress={() => router.push("/(tabs)/profil/account")} />
     </ScrollView>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
-    </View>
   );
 }
 
@@ -142,19 +124,6 @@ const styles = StyleSheet.create({
   },
   container: { padding: 16, paddingBottom: 32 },
   header: { alignItems: "center", marginBottom: 20 },
-  avatar: { width: 96, height: 96, borderRadius: 48, marginBottom: 12 },
-  avatarFallback: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.bordure,
-  },
-  avatarInitial: { color: colors.textePrincipal, fontSize: 32, fontWeight: "700" },
   name: { color: colors.textePrincipal, fontSize: 22, fontWeight: "700" },
   meta: { color: colors.texteSecondaire, marginTop: 4 },
   badge: {
@@ -169,10 +138,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   bio: { color: colors.texteSecondaire, textAlign: "center", marginTop: 12, lineHeight: 20 },
-  stats: { flexDirection: "row", justifyContent: "space-around", marginBottom: 16 },
-  stat: { alignItems: "center" },
-  statLabel: { color: colors.texteDesactive, fontSize: 11, textTransform: "uppercase" },
-  statValue: { color: colors.textePrincipal, fontWeight: "600", marginTop: 4 },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
