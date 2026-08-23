@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface HeroSlide {
@@ -50,8 +51,7 @@ export function AdminHeroSlidesClient() {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   // hero_slides not yet in generated DB types — cast after migration
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = getSupabaseBrowserClient() as any;
+  const supabase = getSupabaseBrowserClient() as unknown as SupabaseClient;
 
   const load = useCallback(async () => {
     setLoading(true);

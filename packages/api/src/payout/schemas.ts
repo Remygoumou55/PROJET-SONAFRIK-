@@ -40,6 +40,10 @@ export const createBatchSchema = z.object({
   notes: z.string().max(500).optional(),
 });
 
+export const recentPayoutsSchema = z.object({
+  days: z.coerce.number().min(1).max(50).default(30),
+});
+
 export type WithdrawalIdInput    = z.infer<typeof withdrawalIdSchema>;
 export type ApprovePayoutInput   = z.infer<typeof approvePayoutSchema>;
 export type RejectPayoutInput    = z.infer<typeof rejectPayoutSchema>;
