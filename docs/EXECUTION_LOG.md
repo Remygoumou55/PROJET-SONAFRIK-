@@ -11,6 +11,57 @@
 
 ---
 
+## 2026-08-23 — Territory 8 : migration Card + Input
+
+### Fichiers touchés
+- `packages/ui/src/components/Card.tsx` — migration des surfaces, bordures et états focus/hover/premium vers T8
+- `packages/ui/src/components/Input.tsx` — migration fond, bordures, placeholder, états error/success et typographie vers T8
+
+### Code avant (extrait clé)
+```before
+// Card.tsx
+"rounded-xl border border-bordure bg-card text-texte-principal"
+"hover:border-vert-energie/50"
+"border-or-solaire/30 shadow-[0_0_20px_rgba(255,194,14,0.15)]"
+```
+
+```before
+// Input.tsx
+"w-full rounded-lg border bg-surface text-texte-principal placeholder:text-texte-desactive"
+"border-bordure focus:border-vert-energie"
+"text-red-500"
+```
+
+### Code après (extrait clé)
+```after
+// Card.tsx
+"rounded-xl border border-[var(--t8-border-default)] bg-[var(--t8-surface-02)] text-[var(--t8-pearl)]"
+"hover:border-[var(--t8-border-hover)]"
+"border-[var(--t8-border-premium)] shadow-[0_0_20px_var(--t8-glow-lavender)]"
+```
+
+```after
+// Input.tsx
+"w-full rounded-lg border bg-[var(--t8-surface-01)] text-[var(--t8-pearl)] placeholder:text-[var(--t8-silver-deep)]"
+"border-[var(--t8-border-default)] focus:border-[var(--t8-primary-lavender)]"
+"text-[var(--t8-error)]"
+```
+
+### Validation
+- `pnpm --filter @sonafrik/ui typecheck` : ✅
+- `pnpm --filter @sonafrik/ui lint` : ✅
+- `pnpm --filter @sonafrik/web build` : ✅
+
+### Décision
+- Card et Input deviennent les premiers composants T8 cohérents avec la palette lavender/cyan/pearl.
+- Les anciennes classes V5.0 (`bg-card`, `border-bordure`, `text-texte-principal`, etc.) restent utilisées par les autres composants ; migration progressive.
+
+### Tests à faire
+- [ ] Afficher un Card avec variant `interactive` et vérifier le hover lavender.
+- [ ] Afficher un Input en `default`, `error`, `success` et vérifier les bordures T8.
+
+---
+
 ## 2026-08-23 — auth/connexion: suppression de l'appel serveur RPC et timeout client
 
 ### Fichiers touchés

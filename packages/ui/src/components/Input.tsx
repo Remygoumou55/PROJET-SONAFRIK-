@@ -4,19 +4,19 @@ import { cn } from "../lib/cn";
 
 const inputVariants = cva(
   [
-    "w-full rounded-lg border bg-surface text-texte-principal",
-    "placeholder:text-texte-desactive",
+    "w-full rounded-lg border bg-[var(--t8-surface-01)] text-[var(--t8-pearl)]",
+    "placeholder:text-[var(--t8-silver-deep)]",
     "transition-all duration-300 ease-in-out",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vert-energie",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t8-primary-lavender)]",
     "disabled:cursor-not-allowed disabled:opacity-50",
     "min-h-[44px] px-4 py-2 text-base",
   ],
   {
     variants: {
       variant: {
-        default: "border-bordure focus:border-vert-energie",
-        error: "border-red-500 focus:border-red-500 focus-visible:outline-red-500",
-        success: "border-vert-energie focus:border-vert-energie",
+        default: "border-[var(--t8-border-default)] focus:border-[var(--t8-primary-lavender)]",
+        error: "border-[var(--t8-error)] focus:border-[var(--t8-error)] focus-visible:outline-[var(--t8-error)]",
+        success: "border-[var(--t8-success)] focus:border-[var(--t8-success)]",
       },
       inputSize: {
         sm: "min-h-[36px] px-3 py-1.5 text-sm",
@@ -59,9 +59,9 @@ export function Input({
   return (
     <div className="flex w-full flex-col gap-1.5">
       {label ? (
-        <label htmlFor={inputId} className="text-sm font-medium text-texte-principal">
+        <label htmlFor={inputId} className="text-sm font-medium text-[var(--t8-pearl)]">
           {label}
-          {required ? <span className="text-vert-energie ml-0.5">*</span> : null}
+          {required ? <span className="text-[var(--t8-soft-rose)] ml-0.5">*</span> : null}
         </label>
       ) : null}
       <div className="relative">
@@ -85,12 +85,12 @@ export function Input({
         ) : null}
       </div>
       {error ? (
-        <p id={errorId} className="text-sm text-red-500" role="alert">
+        <p id={errorId} className="text-sm text-[var(--t8-error)]" role="alert">
           {error}
         </p>
       ) : null}
       {hint && !error ? (
-        <p id={hintId} className="text-sm text-texte-secondaire">
+        <p id={hintId} className="text-sm text-[var(--t8-silver)]">
           {hint}
         </p>
       ) : null}
