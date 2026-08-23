@@ -11,6 +11,45 @@
 
 ---
 
+## 2026-08-23 — vague-e(mobile): interruption audio, animations 300ms, validation globale
+
+### Fichiers touchés
+- `apps/mobile/features/streaming/usePlayer.ts` — `InterruptionModeIOS/Android.DoNotMix`, `playThroughEarpieceAndroid: false`.
+- `apps/mobile/features/shared/components/FullPlayer.tsx` — animation slide 300ms avec `Animated` + `Modal`, backdrop `colors.noirProfond` interpollé en opacité 0→70%.
+
+### Code avant (extrait)
+```before
+// FullPlayer.tsx — Modal sans animation personnalisée
+<Modal visible={visible} animationType="slide" transparent={false} ...>
+```
+
+### Code après (extrait)
+```after
+// FullPlayer.tsx — Animated slide 300ms
+const animatedValue = useRef(new Animated.Value(visible ? 1 : 0)).current;
+<Modal visible={isVisible} transparent animationType="none" ...>
+  <Animated.View style={{ opacity: animatedValue.interpolate(...) }} />
+  <Animated.View style={{ transform: [{ translateY }] }}>...</Animated.View>
+</Modal>
+```
+
+### Validation
+- `pnpm build` : ✅
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `663b601` poussé sur `main`.
+
+### Dette technique
+- Animation gérée en pure React Native `Animated` ; pas de librairie externe.
+- `DoNotMix` stoppe la lecture d'autres apps ; test à confirmer sur iOS/Android physique.
+
+### Tests à faire
+- [ ] Couper un autre son (musique, appel) → le player doit respecter l'interruption.
+- [ ] Ouvrir / fermer le FullPlayer → slide fluide en 300ms.
+- [ ] Tap sur le fond noir → fermeture animée.
+
+---
+
 ## 2026-08-23 — vague-e: re-audit payments et correction tests
 
 ### Fichiers touchés
