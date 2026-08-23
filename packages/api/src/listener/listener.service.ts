@@ -1,6 +1,6 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { HeroItem, ListenMusicCategory } from "@sonafrik/types";
-import { AdminConfigRepository } from "../admin/admin.config.repository";
+import { AdminConfigRepository } from "../shared/admin-config.repository";
 import { ListenerRepository } from "./listener.repository";
 import type {
   ListenerAlbumDetail,

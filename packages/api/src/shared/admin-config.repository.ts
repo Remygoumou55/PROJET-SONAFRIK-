@@ -1,11 +1,11 @@
+import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { Json } from "@sonafrik/database/types";
 import type { FeatureFlag, SystemSetting, SystemSettingAuditEntry } from "@sonafrik/types";
-import type { AdminRepoClient } from "./admin.shared";
 
 export type { SystemSettingAuditEntry };
 
 export class AdminConfigRepository {
-  constructor(private readonly client: AdminRepoClient) {}
+  constructor(private readonly client: SonafrikSupabaseClient) {}
 
   async listFeatureFlags(): Promise<FeatureFlag[]> {
     const { data, error } = await this.client

@@ -1,4 +1,4 @@
-import { AdminConfigRepository } from "../../admin/admin.config.repository";
+import { AdminConfigRepository } from "../../shared/admin-config.repository";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 
 /** Sprint 2.1 — Streaming Runtime Foundation feature flags */

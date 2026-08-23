@@ -1,6 +1,6 @@
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import type { FeatureFlag, SystemSetting } from "@sonafrik/types";
-import { AdminConfigRepository } from "./admin.config.repository";
+import { AdminConfigRepository } from "../shared/admin-config.repository";
 import { AdminDashboardRepository } from "./admin.dashboard.repository";
 import { AdminFinancialRepository } from "./admin.financial.repository";
 import { AdminFraudRepository } from "./admin.fraud.repository";

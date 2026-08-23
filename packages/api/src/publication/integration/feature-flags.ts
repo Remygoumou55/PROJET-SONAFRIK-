@@ -1,4 +1,4 @@
-import { AdminConfigRepository } from "../../admin/admin.config.repository";
+import { AdminConfigRepository } from "../../shared/admin-config.repository";
 import type { SonafrikSupabaseClient } from "@sonafrik/database";
 
 /** Internal publication feature flags — progressive rollout Phase 5 */

@@ -18,7 +18,6 @@ export function ProfileSignOutButton() {
       const auth = createAuthService(getSupabaseBrowserClient());
       await auth.signOut();
       router.push("/auth/connexion");
-      router.refresh();
     } catch {
       setError("Impossible de se déconnecter. Réessayez.");
     } finally {
