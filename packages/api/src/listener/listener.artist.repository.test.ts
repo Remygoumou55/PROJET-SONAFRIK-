@@ -3,14 +3,17 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import { ListenerArtistRepository } from "./listener.artist.repository";
 
 function mockChain(result: { data: unknown; error: unknown; count?: number }) {
-  const chain: any = {};
+  const chain: Record<string, (...args: unknown[]) => unknown> = {};
   for (const m of ["select", "eq", "is", "order", "in", "gte"]) {
-    chain[m] = vi.fn(() => chain);
+    chain[m] = () => chain as unknown;
   }
-  chain.limit = vi.fn(() => chain);
-  chain.maybeSingle = vi.fn(() => chain);
-  chain.then = (resolve: (v: any) => void) => resolve(result);
-  return chain;
+  chain.limit = () => chain as unknown;
+  chain.maybeSingle = () => chain as unknown;
+  chain.then = (resolve: unknown) => {
+    (resolve as (value: unknown) => void)(result);
+    return undefined as unknown;
+  };
+  return chain as unknown;
 }
 
 function createMockClient(overrides: Partial<SonafrikSupabaseClient> = {}): SonafrikSupabaseClient {
@@ -74,9 +77,11 @@ describe("ListenerArtistRepository", () => {
       ],
       error: null,
     });
-    const client = createMockClient({ from: vi.fn().mockImplementation((table: string) =>
-      table === "albums" ? chain : mockChain({ data: [], error: null }),
-    ) });
+    const client = createMockClient({
+      from: vi.fn().mockImplementation((table: string) =>
+        table === "albums" ? chain : mockChain({ data: [], error: null }),
+      ),
+    });
     const repo = new ListenerArtistRepository(client);
     const result = await repo.getPublishedAlbumsForArtist("c1");
     expect(result).toHaveLength(1);
@@ -90,9 +95,11 @@ describe("ListenerArtistRepository", () => {
       ],
       error: null,
     });
-    const client = createMockClient({ from: vi.fn().mockImplementation((table: string) =>
-      table === "tracks" ? chain : mockChain({ data: [], error: null }),
-    ) });
+    const client = createMockClient({
+      from: vi.fn().mockImplementation((table: string) =>
+        table === "tracks" ? chain : mockChain({ data: [], error: null }),
+      ),
+    });
     const repo = new ListenerArtistRepository(client);
     const result = await repo.getPublishedTracksForArtist("c1", "Artist", new Map([["a1", "cover.jpg"]]));
     expect(result).toHaveLength(1);
@@ -155,7 +162,7 @@ describe("ListenerArtistRepository", () => {
     const tracks = [
       { creator_id: "c1", track_id: "t1", title: "Track", is_from_guinea: false },
     ] as unknown as Parameters<ListenerArtistRepository["filterDiscoveryByCategory"]>[0];
-    const result = await repo.filterDiscoveryByCategory(tracks, "guinea");
+    const result = await repo.filterDiscoveryByCategory(tracks, "guinee");
     expect(result).toHaveLength(1);
   });
 });

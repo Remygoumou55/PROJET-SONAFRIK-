@@ -3,14 +3,17 @@ import type { SonafrikSupabaseClient } from "@sonafrik/database";
 import { ListenerTrackRepository } from "./listener.track.repository";
 
 function mockChain(result: { data: unknown; error: unknown; count?: number }) {
-  const chain: any = {};
+  const chain: Record<string, (...args: unknown[]) => unknown> = {};
   for (const m of ["select", "eq", "is", "order", "in", "gte"]) {
-    chain[m] = vi.fn(() => chain);
+    chain[m] = () => chain as unknown;
   }
-  chain.limit = vi.fn(() => chain);
-  chain.maybeSingle = vi.fn(() => chain);
-  chain.then = (resolve: (v: any) => void) => resolve(result);
-  return chain;
+  chain.limit = () => chain as unknown;
+  chain.maybeSingle = () => chain as unknown;
+  chain.then = (resolve: unknown) => {
+    (resolve as (value: unknown) => void)(result);
+    return undefined as unknown;
+  };
+  return chain as unknown;
 }
 
 function createMockClient(overrides: Partial<SonafrikSupabaseClient> = {}): SonafrikSupabaseClient {
@@ -50,7 +53,7 @@ describe("ListenerTrackRepository", () => {
   });
 
   it("getPublishedAlbumDetail mappe les champs", async () => {
-    const albumChain = mockChain({
+    const chain = mockChain({
       data: {
         id: "a1",
         title: "Album",
@@ -63,7 +66,9 @@ describe("ListenerTrackRepository", () => {
       error: null,
     });
     const artistChain = mockChain({ data: [], error: null });
-    const from = vi.fn().mockReturnValueOnce(albumChain).mockReturnValueOnce(artistChain);
+    const from = vi.fn().mockImplementation((table: string) =>
+      table === "albums" ? chain : artistChain,
+    );
     const client = createMockClient({ from });
     const repo = new ListenerTrackRepository(client);
     const result = await repo.getPublishedAlbumDetail("a1");
