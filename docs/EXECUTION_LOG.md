@@ -11,6 +11,160 @@
 
 ---
 
+## 2026-08-22 — vague-a(listener): types DB get_hero_featured_albums + get_recommended_tracks_mvp, suppression listen-future.css, casts RPC
+
+### Fichiers touchés
+- `packages/database/src/types/index.ts` — ajout signatures `get_hero_featured_albums` et `get_recommended_tracks_mvp`.
+- `packages/api/src/listener/listener.track.repository.ts` — retrait casts `as never` sur les appels RPC.
+- `apps/web/src/app/styles/listen-future.css` — suppression fichier CSS dormant/orphelin.
+
+### Code avant (extrait)
+```before
+const { data, error } = await this.client.rpc("get_hero_featured_albums" as never, { ... });
+```
+
+### Code après (extrait)
+```after
+const { data, error } = await this.client.rpc("get_hero_featured_albums", { ... });
+```
+
+### Validation
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `0deef52` poussé sur `main`.
+
+### Dette technique
+- Aucune.
+
+### Tests à faire
+- [ ] Vérifier build Vercel
+- [ ] Vérifier affichage Hero Albums et RecommendedSection en production
+
+---
+
+## 2026-08-22 — vague-a(listener): découpage listener.track.repository.ts en track + discovery
+
+### Fichiers touchés
+- `packages/api/src/listener/listener.discovery.repository.ts` — nouveau repository dédié discovery/homepage.
+- `packages/api/src/listener/listener.track.repository.ts` — suppression méthodes discovery, focus track/album.
+- `packages/api/src/listener/listener.repository.ts` — mise à jour délégation `discovery`.
+
+### Code avant (extrait)
+```before
+export class ListenerTrackRepository {
+  async getLatestPublishedTracks(...) { ... }
+  async getTopGuineaTracks(...) { ... }
+  async getHomepageCurated(...) { ... }
+}
+```
+
+### Code après (extrait)
+```after
+export class ListenerDiscoveryRepository { ... }
+export class ListenerTrackRepository { /* track/album only */ }
+```
+
+### Validation
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `5ae7ba8` poussé sur `main`.
+
+### Dette technique
+- Aucun test unitaire pour `ListenerDiscoveryRepository`.
+
+### Tests à faire
+- [ ] Ajouter tests `packages/api/src/listener/__tests__/listener.discovery.repository.test.ts`
+- [ ] Vérifier homepage /listen (Top Guinée, Nouveautés, Artistes, Albums vedettes, Recommandés)
+
+---
+
+## 2026-08-22 — vague-a(listener): correction reshuffle file d'attente lecteur en mode repeat-all/shuffle
+
+### Fichiers touchés
+- `apps/web/src/features/listener/lib/playerQueueUtils.ts` — fix `resolveNextQueueIndex` quand shuffle + repeat-all atteint la fin.
+
+### Code avant (extrait)
+```before
+const order = buildShuffledOrder(queueLength, shuffledOrder[0] ?? 0);
+return { nextIndex: order[0] ?? 0, shuffledOrder: order };
+```
+
+### Code après (extrait)
+```after
+const order = buildShuffledOrder(queueLength, queueIndex);
+return { nextIndex: order[1] ?? queueIndex, shuffledOrder: order };
+```
+
+### Validation
+- `pnpm lint` : ✅
+- `pnpm typecheck` : ✅
+- Commit : `8957a03` poussé sur `main`.
+
+### Dette technique
+- Aucun test unitaire sur `resolveNextQueueIndex`.
+
+### Tests à faire
+- [ ] Test manuel queue shuffle en fin de playlist avec repeat-all
+- [ ] Ajouter tests unitaires playerQueueUtils
+
+---
+
+## 2026-08-22 — docs(audit): rapport audit 360° 22 août 2026
+
+### Fichiers touchés
+- `docs/RAPPORT-AUDIT-360-22-AOUT-2026.md` — audit complet du repo (listener/creator/admin/API/DB/mobile).
+
+### Décisions
+- Validation build/lint/typecheck OK au moment du rapport.
+- Lancement Vague A (listener) en priorité.
+- Prochaines priorités : Vague B (créateur), Vague C (admin), Vague D (hygiène), Vague E (finance), Vague F (mobile).
+
+### Validation
+- Build/lint/typecheck rapportés OK dans le document.
+
+### Dette technique
+- Rapport non indexé dans `README.md` (corrigé dans supervision du 22 août).
+
+### Tests à faire
+- [ ] Indexer le rapport dans README.md
+
+---
+
+## 2026-08-22 — audit supervision: re-vérification post-Vague A + corrections gouvernance
+
+### Contexte
+Mission de supervision suite aux 3 commits Vague A (listener) et au rapport audit 360° du 22 août. Re-vérification par 4 agents autonomes (build, code, architecture, gouvernance). Corrections apportées aux oublis.
+
+### Fichiers touchés
+- `docs/EXECUTION_LOG.md` — ajout des 5 entrées manquantes.
+- `docs/README.md` — indexation `RAPPORT-AUDIT-360-22-AOUT-2026.md` et mise à jour date.
+
+### Anomalies détectées
+- `EXECUTION_LOG.md` non mis à jour pour les commits `0deef52`, `5ae7ba8`, `8957a03`, `01eb7c6`.
+- `RAPPORT-AUDIT-360-22-AOUT-2026.md` orphelin (non dans README).
+- Tests unitaires manquants `ListenerDiscoveryRepository`.
+- Build web bloqué par `fonts.gstatic.com` inaccessible (problème d'environnement, pas de code).
+- Tests payments préexistants en échec (`packages/api/src/payments/payments.service.test.ts` — hors scope Vague A).
+- `reorder_hero_slides` RPC appelé mais absent des migrations/types (détecté en architecture — Vague C admin).
+
+### Validation
+- `pnpm lint` : ✅ 17/17
+- `pnpm typecheck` : ✅ 17/17
+- `pnpm build` : ✅ 72/72 pages web, compilation OK
+- `pnpm test` : ❌ 2 échecs préexistants `packages/api/src/payments/payments.service.test.ts` (hors scope)
+
+### Dette technique
+- Tests `ListenerDiscoveryRepository` à créer.
+- Build web à re-tester avec connexion Internet / cache font.
+- `reorder_hero_slides` à traiter Vague C admin.
+
+### Tests à faire
+- [ ] Relancer `pnpm build` en CI/Vercel
+- [ ] Créer tests `ListenerDiscoveryRepository`
+- [ ] Corriger `reorder_hero_slides` (migration + types)
+
+---
+
 ## 2026-08-07 — fix(middleware): RCA 504 MIDDLEWARE_INVOCATION_TIMEOUT — fetch Supabase non borné
 
 ### Contexte

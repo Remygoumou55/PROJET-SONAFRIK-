@@ -98,7 +98,7 @@
 | L-02 | Moyenne | `listener.track.repository.ts` fait 461 lignes | `packages/api/src/listener/listener.track.repository.ts` |
 | L-03 | Moyenne | Fichier CSS `listen-home.css` orphelin (2 369L) | `apps/web/src/app/styles/listen-home.css` |
 | L-04 | Basse | `use client` très répandu (risque perf) | 100+ fichiers listener |
-| L-05 | Basse | `listen-future.css` dormant | `apps/web/src/app/styles/listen-future.css` |
+| L-05 | Basse | `listen-future.css` supprimé (commit 0deef52) | `apps/web/src/app/styles/listen-future.css` |
 
 **Vagues de correction recommandées :**
 
@@ -278,14 +278,14 @@
 | B-05 | CSS monolithes non découpés | `app/styles/` | Moyenne |
 | B-06 | `marketplace/` shims (1 fichier) | `features/marketplace/` | Basse |
 | B-07 | `listen-home.css` orphelin 2 369L | `app/styles/listen-home.css` | Moyenne |
-| B-08 | `listen-future.css` dormant | `app/styles/listen-future.css` | Basse |
+| B-08 | `listen-future.css` supprimé (commit 0deef52) | `app/styles/listen-future.css` | Basse |
 | B-09 | Identity 95 fichiers — surface de bug large | `features/identity/` | Moyenne |
 | B-10 | `packages/api` silos non alignés | `packages/api/src/catalog/`, `rights/`, `analytics/` | Moyenne |
 
 ### 6.3 Codes morts / orphelins
 
 - `apps/web/src/app/styles/listen-home.css` (orphelin vs bundle actif)
-- `apps/web/src/app/styles/listen-future.css` (dormant)
+- `apps/web/src/app/styles/listen-future.css` (supprimé (commit 0deef52))
 - `apps/web/src/features/marketplace/` (1 shim)
 - `apps/web/src/app/lancement/` et `components/landing/` — organisation à consolider
 - `packages/api/src/creator/career/` — API active alors que UI partiellement gelée
@@ -319,7 +319,7 @@
 | A-3 | Audit library / playlists | `features/listener/library/`, `app/(listener)/library/` |
 | A-4 | Audit search | `features/listener/search/`, `app/(listener)/search/` |
 | A-5 | Décomposer `listener.track.repository.ts` | `packages/api/src/listener/listener.track.repository.ts` |
-| A-6 | Nettoyer CSS listener orphelins | `app/styles/listen-home.css`, `app/styles/listen-future.css`, `app/styles/listen-home/` |
+| A-6 | Nettoyer CSS listener orphelins | `app/styles/listen-home.css` (orphelin), `app/styles/listen-future.css` (supprimé), `app/styles/listen-home/` |
 
 ### Vague B — Créateur (Artiste)
 

@@ -24,7 +24,8 @@
 
 | Document | Rôle |
 |---|---|
-| **[`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)** | **Plan correction actif** — vagues G→K, lots, fichiers IA |
+| **[`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)** | Audit 360° du 22 août — état repo complet + vagues correction |
+|| **[`PLAN-CORRECTION-360-V2.md`](./PLAN-CORRECTION-360-V2.md)** | **Plan correction actif** — vagues G→K, lots, fichiers IA |
 | **[`AUDIT-V2-FORENSIQUE.md`](./AUDIT-V2-FORENSIQUE.md)** | Audit risques V2 — silos, duplications, CSS |
 | [`MVP_SCOPE_LOCK.md`](./MVP_SCOPE_LOCK.md) | Périmètre produit MVP · chaîne E2E |
 | [`AI_GOVERNANCE.md`](./AI_GOVERNANCE.md) | Comportement IA · ordre de lecture |
