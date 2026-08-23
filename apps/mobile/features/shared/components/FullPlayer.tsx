@@ -1,3 +1,5 @@
+import { useState } from "react";
+import type { GestureResponderEvent } from "react-native";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@sonafrik/ui/tokens";
 import { CoverImage } from "./CoverImage";
@@ -15,7 +17,7 @@ type FullPlayerProps = {
 };
 
 export function FullPlayer({ visible, onClose }: FullPlayerProps) {
-  const { currentTrack, isPlaying, currentPosition, duration, pause, resume } = usePlayerContext();
+  const { currentTrack, isPlaying, currentPosition, duration, pause, resume, seek } = usePlayerContext();
   const progress = duration > 0 ? currentPosition / duration : 0;
 
   if (!currentTrack) return null;
@@ -46,15 +48,7 @@ export function FullPlayer({ visible, onClose }: FullPlayerProps) {
             <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist_name}</Text>
           )}
 
-          <View style={styles.progress}>
-            <View style={styles.barBackground}>
-              <View style={[styles.barFill, { width: `${progress * 100}%` }]} />
-            </View>
-            <View style={styles.times}>
-              <Text style={styles.time}>{formatTime(currentPosition)}</Text>
-              <Text style={styles.time}>{formatTime(duration)}</Text>
-            </View>
-          </View>
+          <ProgressBar duration={duration} position={currentPosition} progress={progress} onSeek={seek} />
 
           <View style={styles.controls}>
             <Pressable style={styles.controlBtn} onPress={isPlaying ? pause : resume}>
@@ -64,6 +58,39 @@ export function FullPlayer({ visible, onClose }: FullPlayerProps) {
         </View>
       </View>
     </Modal>
+  );
+}
+
+function ProgressBar({
+  duration,
+  position,
+  progress,
+  onSeek,
+}: {
+  duration: number;
+  position: number;
+  progress: number;
+  onSeek: (seconds: number) => void;
+}) {
+  const [barWidth, setBarWidth] = useState(0);
+
+  function handlePress(e: GestureResponderEvent) {
+    if (duration <= 0 || barWidth <= 0) return;
+    const x = e.nativeEvent.locationX;
+    const ratio = Math.max(0, Math.min(1, x / barWidth));
+    onSeek(Math.floor(ratio * duration));
+  }
+
+  return (
+    <View style={styles.progress} onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}>
+      <Pressable onPressIn={handlePress} style={styles.barBackground}>
+        <View style={[styles.barFill, { width: `${progress * 100}%` }]} />
+      </Pressable>
+      <View style={styles.times}>
+        <Text style={styles.time}>{formatTime(position)}</Text>
+        <Text style={styles.time}>{formatTime(duration)}</Text>
+      </View>
+    </View>
   );
 }
 
@@ -108,13 +135,14 @@ const styles = StyleSheet.create({
   progress: { width: "100%", marginBottom: 32 },
   barBackground: {
     width: "100%",
-    height: 4,
+    height: 8,
     backgroundColor: colors.surface,
-    borderRadius: 2,
+    borderRadius: 4,
     overflow: "hidden",
     marginBottom: 8,
+    justifyContent: "center",
   },
-  barFill: { height: "100%", backgroundColor: colors.vertEnergie, borderRadius: 2 },
+  barFill: { height: "100%", backgroundColor: colors.vertEnergie, borderRadius: 4 },
   times: { flexDirection: "row", justifyContent: "space-between" },
   time: { color: colors.texteSecondaire, fontSize: 12 },
   controls: { flexDirection: "row", alignItems: "center", gap: 32 },
