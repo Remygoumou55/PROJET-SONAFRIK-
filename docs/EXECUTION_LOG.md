@@ -65,6 +65,57 @@ return (
 
 ---
 
+## 2026-08-23 — Territory 8 : audit + fondation design tokens
+
+### Fichiers touchés
+- `packages/ui/src/tokens/territory8.ts` — création du fichier source de vérité Territory 8 (couleurs, surfaces, bordures, glows, gradients)
+- `packages/ui/src/tokens/index.ts` — export du module Territory 8
+- `apps/web/src/app/globals.css` — intégration des variables CSS `--t8-*` dans le bloc `@theme` officiel
+
+### Code avant (extrait clé)
+Aucun token Territory 8 dans le codebase. La charte en vigueur est la V5.0 verte/or (`globals.css`, `packages/ui/src/tokens/colors.ts`).
+
+### Code après (extrait clé)
+```ts
+// packages/ui/src/tokens/territory8.ts
+export const territory8Colors = {
+  primaryLavender: "#C84BFF",
+  audioCyan: "#45E6FF",
+  softRose: "#FF5CCF",
+  pearl: "#F7F3FF",
+  // ... 40+ tokens
+} as const;
+```
+
+```css
+/* apps/web/src/app/globals.css — @theme */
+--t8-primary-lavender: #C84BFF;
+--t8-audio-cyan: #45E6FF;
+--t8-soft-rose: #FF5CCF;
+--t8-glow-lavender: rgba(200, 75, 255, 0.18);
+--t8-gradient-primary-light: linear-gradient(135deg, #C84BFF, #8B2BCB);
+```
+
+### Validation
+- `pnpm probe:hex-colors` : ✅ 4/4 (0 hardcodé, 0 violation)
+- `pnpm --filter @sonafrik/ui typecheck` : ✅
+- `pnpm --filter @sonafrik/web typecheck` : ✅
+- `pnpm --filter @sonafrik/web build` : ⚠️ compiled OK, mais échec final `ENOENT pages-manifest.json` — problème Next.js indépendant des tokens T8 (avertissements d'imports pré-existants)
+
+### Décision
+Fondation tokens créée en coexistence avec la charte V5.0 (préfixe `--t8-*` côté web, `territory8*` côté packages/ui) pour ne pas casser l'UI existante. La migration des composants devra se faire page par page / composant par composant.
+
+### Dette technique créée
+- Charte V5.0 verte/or encore en place et référencée par les composants existants.
+- Tokens T8 non encore consommés par les composants web/mobile.
+
+### Tests à faire
+- [ ] Vérifier `import { territory8Colors } from "@sonafrik/ui/tokens"`.
+- [ ] Migrer un premier composant (ex. `Button`) vers `territory8Colors` / `var(--t8-primary-lavender)`.
+- [ ] Résoudre l'erreur Next.js `pages-manifest.json` avant commit/push.
+
+---
+
 ## 2026-08-23 — vague-g(web): audit Lighthouse /listen et /lancement
 
 ### Fichiers concernés

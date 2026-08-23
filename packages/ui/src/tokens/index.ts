@@ -1,4 +1,5 @@
 export * from "./colors";
+export * from "./territory8";
 export * from "./typography";
 export * from "./spacing";
 export * from "./borderRadius";

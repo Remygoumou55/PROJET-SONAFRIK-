@@ -467,6 +467,65 @@
   --shadow-md: 0 4px 12px 0 rgb(0 0 0 / 0.45);
   --shadow-lg: 0 8px 24px 0 rgb(0 0 0 / 0.5);
   --shadow-xl: 0 16px 48px 0 rgb(0 0 0 / 0.55);
+
+  --t8-pearl-black: #07060B;
+  --t8-deep-black: #040309;
+  --t8-midnight: #0B0912;
+  --t8-deep-surface: #0F0C18;
+  --t8-elevated-surface: #14101F;
+  --t8-soft-surface: #191422;
+
+  --t8-primary-lavender: #C84BFF;
+  --t8-primary-lavender-bright: #D96BFF;
+  --t8-primary-lavender-deep: #8B2BCB;
+  --t8-primary-lavender-soft: #E7A8FF;
+  --t8-primary-lavender-muted: #9C68B5;
+
+  --t8-audio-cyan: #45E6FF;
+  --t8-audio-cyan-bright: #73EEFF;
+  --t8-audio-cyan-deep: #159DB8;
+  --t8-audio-cyan-soft: #A8F7FF;
+
+  --t8-soft-rose: #FF5CCF;
+  --t8-rose-bright: #FF79DA;
+  --t8-rose-deep: #C7359F;
+  --t8-rose-soft: #FFB3E8;
+
+  --t8-pearl: #F7F3FF;
+  --t8-pearl-soft: #E8E1EF;
+  --t8-pearl-muted: #C9C0D0;
+  --t8-silver: #B8B2C2;
+  --t8-silver-deep: #817A89;
+
+  --t8-success: #55D98B;
+  --t8-success-deep: #248A52;
+  --t8-warning: #F4B95E;
+  --t8-warning-deep: #A96C16;
+  --t8-error: #FF5C78;
+  --t8-error-deep: #A92843;
+  --t8-info: #6EA8FF;
+
+  --t8-surface-01: #0B0912;
+  --t8-surface-02: #0F0C18;
+  --t8-surface-03: #14101F;
+  --t8-surface-04: #191422;
+  --t8-surface-elevated: #21192C;
+
+  --t8-border-default: rgba(255, 255, 255, 0.07);
+  --t8-border-hover: rgba(200, 75, 255, 0.30);
+  --t8-border-active: rgba(200, 75, 255, 0.55);
+  --t8-border-audio: rgba(69, 230, 255, 0.45);
+  --t8-border-premium: rgba(247, 243, 255, 0.20);
+
+  --t8-glow-lavender: rgba(200, 75, 255, 0.18);
+  --t8-glow-cyan: rgba(69, 230, 255, 0.16);
+  --t8-glow-rose: rgba(255, 92, 207, 0.14);
+
+  --t8-gradient-primary-light: linear-gradient(135deg, #C84BFF, #8B2BCB);
+  --t8-gradient-audio-light: linear-gradient(135deg, #45E6FF, #C84BFF);
+  --t8-gradient-emotional-light: linear-gradient(135deg, #FF5CCF, #C84BFF);
+  --t8-gradient-luminous-system: linear-gradient(135deg, #45E6FF, #C84BFF, #FF5CCF);
+  --t8-gradient-deep-system: linear-gradient(135deg, #191422, #07060B);
 }
 
 @layer base {
